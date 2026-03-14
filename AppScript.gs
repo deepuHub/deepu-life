@@ -92,8 +92,30 @@ function setupSheets() {
   ui.alert('✅ Done!\n\nTabs Runs, Books, and Plants are ready with your data.\nNow deploy as a Web App (Deploy → New deployment).');
 }
 
+
+// ─── FORCE SEED: wipes data rows and refills — run this if sheet is empty ────
+// Select forceSeed in the dropdown → click ▶ Run
+function forceSeed() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  function clearAndFill(sheetName, numCols, fillFn) {
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) { Logger.log('Sheet not found: ' + sheetName); return; }
+    // Clear everything below row 1 (keep headers)
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) sheet.getRange(2, 1, lastRow - 1, numCols).clearContent();
+    fillFn(sheet);
+    Logger.log(sheetName + ' filled.');
+  }
+
+  clearAndFill('Runs',   5, _seedRuns);
+  clearAndFill('Books',  7, _seedBooks);
+  clearAndFill('Plants', 6, _seedPlants);
+
+  SpreadsheetApp.getUi().alert('✅ All data loaded!\n\nRuns: 4 rows\nBooks: 26 rows\nPlants: 5 rows\n\nReload your site to see it.');
+}
+
 function _seedRuns(sheet) {
-  if (sheet.getLastRow() > 1) return;
   sheet.getRange(2,1,4,5).setValues([
     ['1','2015-12-01','3.1', '', '5K race 🏅 First ever race!'],
     ['2','2018-12-01','6.2', '', '10K race 🏅 Chased it down with a 4-week plan'],
@@ -103,7 +125,6 @@ function _seedRuns(sheet) {
 }
 
 function _seedBooks(sheet) {
-  if (sheet.getLastRow() > 1) return;
   sheet.getRange(2,1,26,7).setValues([
     ['1', 'Learning How to Learn',                     'Dr. Barbara Oakley & Dr. Terrence Sejnowski','Learning',   'done',    '2016-05-21',''],
     ['2', 'Calculus One',                              'Jim Fowler @ Coursera',                       'Math',       'done',    '2016-09-26',''],
@@ -135,7 +156,6 @@ function _seedBooks(sheet) {
 }
 
 function _seedPlants(sheet) {
-  if (sheet.getLastRow() > 1) return;
   sheet.getRange(2,1,5,6).setValues([
     ['1','Basil',    '2025-02-10','Kratky','growing',   'Week 4, smells amazing'],
     ['2','Spinach',  '2025-02-20','DWC',   'growing',   'Day 18, dense leaves'],
