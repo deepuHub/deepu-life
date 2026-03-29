@@ -390,7 +390,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
 .sheets-btn-read{border-color:var(--read-dim);background:var(--read-dim);color:var(--read)}
 .sheets-btn-read:hover{background:var(--read);color:#0a0f0d}
 .sheets-btn-grow{border-color:var(--grow-dim);background:var(--grow-dim);color:var(--grow)}
-.sheets-btn-grow:hover{background:var(--grow);color:#0a0f0d}
+.sheets-btn-grow:hover{background:var(--grow);color:#0a0f0d}.sheets-btn-cycle{border-color:var(--cycle-dim);background:var(--cycle-dim);color:var(--cycle)}.sheets-btn-cycle:hover{background:var(--cycle);color:#0a0f0d}
 
 /* ═══ LAST SYNCED BADGE ═══════════════════════════════════ */
 .sync-badge{
@@ -532,7 +532,7 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
   </div>
 </section>
 
-<footer>
+<!-- ══ 🚴 CYCLE ══════════════════════════════════════════════ --><section class="tab-section" id="tab-cycle"> <div class="sec-head"> <div><p class="sec-eyebrow cycle-c">04 — Cycling</p><h2 class="sec-title">Ride log.</h2></div> <a id="sheets-link-cycle" href="#" target="_blank" class="sheets-btn sheets-btn-cycle"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg> Add in Sheets</a> </div> <div class="summary-strip" id="cycle-sum"></div> <div id="cycle-tv"></div> <div id="cycle-lv" class="list-wrap"> <div class="list-section-label">All Rides</div> <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Type</th><th class="ht">Zone</th><th class="ht">Notes</th></tr></thead><tbody id="cycle-tbody"></tbody></table></div> <div class="card-list" id="cycle-cards"></div> <div class="empty-st" id="cycle-empty"><span class="emo">🚴</span>No rides yet — add one in Google Sheets!</div> </div></section><footer>
   <div class="flogo">deepu<span>-life</span></div>
   <div class="fright">Standalone tracker · Deepu's personal hub
     <div class="flinks">
