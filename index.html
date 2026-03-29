@@ -1007,6 +1007,12 @@ function updateHero() {
   const harvested = plants.filter(p=>p.status==='harvested').length;
   document.getElementById('h-plants').textContent   = growing;
   document.getElementById('h-harvests').textContent = `${harvested} harvest${harvested!==1?'s':''}`;
+    const rides = DB.cycling || [];
+  const km = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);
+  const hkm = document.getElementById('h-km');
+  if (hkm) hkm.innerHTML = `${km.toFixed(0)} <small>km</small>`;
+  const hrides = document.getElementById('h-rides');
+  if (hrides) hrides.textContent = `${rides.length} ride${rides.length!==1?'s':''} logged`;
 }
 
 /* ══════════════════════════════════════════════════════════
