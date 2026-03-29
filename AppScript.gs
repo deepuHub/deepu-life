@@ -8,6 +8,7 @@
  *   Runs   → id | date | dist | time | note
  *   Books  → id | title | author | cat | status | added | quotes
  *   Plants → id | name | date | system | status | note
+ *  Rides  → id | date | dist | duration | type | zone | note
  *
  * Books > Quotes column: pipe-separated strings
  *   e.g.  "First insight.|Second great line.|Third quote."
@@ -30,6 +31,7 @@ function doGet(e) {
       runs:   sheetToObjects(ss.getSheetByName('Runs')),
       books:  sheetToObjects(ss.getSheetByName('Books')),
       plants: sheetToObjects(ss.getSheetByName('Plants')),
+      cycling: sheetToObjects(ss.getSheetByName('Rides')),
     });
   } catch (err) {
     return respond({ error: err.message });
@@ -68,6 +70,7 @@ function setupSheets() {
     'Runs':   ['id','date','dist','time','note'],
     'Books':  ['id','title','author','cat','status','added','quotes'],
     'Plants': ['id','name','date','system','status','note'],
+    'Rides':  ['id','date','dist','duration','type','zone','note'],
   };
 
   // Create or verify each tab
@@ -88,8 +91,9 @@ function setupSheets() {
   _seedRuns(ss.getSheetByName('Runs'));
   _seedBooks(ss.getSheetByName('Books'));
   _seedPlants(ss.getSheetByName('Plants'));
+  _seedRides(ss.getSheetByName('Rides'));
 
-  ui.alert('✅ Done!\n\nTabs Runs, Books, and Plants are ready with your data.\nNow deploy as a Web App (Deploy → New deployment).');
+  ui.alert('✅ Done!\n\nTabs Runs, Books, Plants, and Rides are ready with your data.\nNow deploy as a Web App (Deploy → New deployment).');
 }
 
 
@@ -110,9 +114,10 @@ function forceSeed() {
 
   clearAndFill('Runs',   5, _seedRuns);
   clearAndFill('Books',  7, _seedBooks);
-  clearAndFill('Plants', 6, _seedPlants);
+  clearAndFill('Plants', 6, _seedPlants);   clearAndFill('Rides', 7, _seedRides);
 
-  SpreadsheetApp.getUi().alert('✅ All data loaded!\n\nRuns: 4 rows\nBooks: 26 rows\nPlants: 5 rows\n\nReload your site to see it.');
+  SpreadsheetApp.getUi().alert('✅ All data loaded!\n\nRuns: 4 rows\nBooks: 26 rows\nPlants: 5 rows
+Rides: 3 rows\n\nReload your site to see it.');
 }
 
 function _seedRuns(sheet) {
@@ -162,5 +167,12 @@ function _seedPlants(sheet) {
     ['3','Lettuce',  '2025-01-20','NFT',   'harvested', 'Great yield — 2 heads'],
     ['4','Mint',     '2024-11-10','Kratky','harvested', 'Harvested 3 times!'],
     ['5','Cilantro', '2024-10-01','DWC',   'failed',    'Bolted too fast'],
+  ]);
+}
+function _seedRides(sheet) {
+  sheet.getRange(2,1,3,7).setValues([
+    ['1','2024-01-15','25','1:10:00','outdoor','zone2','First 25km ride!'],
+    ['2','2024-03-20','40','1:45:00','outdoor','zone3','Morning endurance ride'],
+    ['3','2024-06-01','50','2:05:00','outdoor','zone3','50km milestone ride! 🚴'],
   ]);
 }
