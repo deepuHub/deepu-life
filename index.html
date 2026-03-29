@@ -447,6 +447,7 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
     <button class="nav-pill active" data-tab="run"  onclick="showTab('run')">🏃 Run</button>
     <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
     <button class="nav-pill"        data-tab="grow" onclick="showTab('grow')">🌱 Grow</button>
+          <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
   </div>
 </nav>
 
@@ -465,6 +466,10 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
       <span class="hero-cell-label">Plants growing</span>
       <div class="hero-cell-stat grow-c" id="h-plants">0</div>
       <span class="hero-cell-sub" id="h-harvests">0 harvests</span></div></div>
+          <div class="hero-cell"><span class="hero-cell-icon">🚴</span><div>
+          <span class="hero-cell-label">Total distance</span>
+          <div class="hero-cell-stat cycle-c" id="h-km">0 <small>km</small></div>
+          <span class="hero-cell-sub" id="h-rides">0 rides logged</span></div></div>
   </div>
   <h1 class="hero-title">Run.<br><em>Read.</em><br>Grow.</h1>
   <p class="hero-sub">A personal life tracker for Deepu — logging every mile, every page, every harvest.</p>
