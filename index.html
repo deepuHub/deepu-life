@@ -554,7 +554,7 @@ const GS_SHEET_ID = '1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE';   // Google 
 /* ══════════════════════════════════════════════════════════
    IN-MEMORY DATA
 ══════════════════════════════════════════════════════════ */
-const DB = { runs:[], books:[], plants:[] };
+const DB = { runs:[], books:[], plants:[], cycling:[] };
 
 /* ══════════════════════════════════════════════════════════
    UI HELPERS — loader, banner, sync badge
@@ -609,7 +609,7 @@ function setSheetLinks() {
   // (Apps Script seeds them in order: Runs=first, Books=second, Plants=third)
   document.getElementById('sheets-link')?.setAttribute('href', base + '0');
   document.getElementById('sheets-link-read')?.setAttribute('href', base + '1');
-  document.getElementById('sheets-link-grow')?.setAttribute('href', base + '2');
+  document.getElementById('sheets-link-grow')?.setAttribute('href', base + '2');   document.getElementById('sheets-link-cycle')?.setAttribute('href', base + '3');
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -630,7 +630,7 @@ async function gsGet() {
     if (data.error) throw new Error(data.error);
     DB.runs   = data.runs   || [];
     DB.books  = data.books  || [];
-    DB.plants = data.plants || [];
+    DB.plants = data.plants || [];     DB.cycling = data.cycling || [];
     hideLoader();
     const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
     setSyncBadge('ok', `at ${now}`);
@@ -990,7 +990,7 @@ function renderPlants() {
   updateHero();
 }
 
-function renderAll() { renderRuns(); renderBooks(); renderPlants(); }
+/* ══════════════════════════════════════════════════════════    🚴 CYCLE RENDERER ══════════════════════════════════════════════════════════ */ const cycleCfg = {   color:'#a78bfa', icon:'🚴',   getDate: r => r.date,   getBarH: r => parseFloat(r.dist) || 1,   makeMarkerVal: r => `${r.dist}km`,   getTeaserTitle: r => `${r.dist} km`,   makeSlide: r => {     return `<div class="tl-slide-inner">       <div class="tl-date">${fmtF(r.date)}</div>       <div class="tl-stat cycle-c">${r.dist}<small> km</small></div>       <div class="tl-meta">         ${r.duration ? `<span class="badge b-neu">${r.duration}</span>` : ''}         ${r.type ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.type}</span>` : ''}         ${r.zone ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.zone}</span>` : ''}       </div>       ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}     </div>`;   } }; function renderRides() {   const rides = [...(DB.cycling||[])].sort((a,b) => String(a.date)<String(b.date)?-1:1);   const tbody = document.getElementById('cycle-tbody');   const cards = document.getElementById('cycle-cards');   const empty = document.getElementById('cycle-empty');   if (!tbody) return;   tbody.innerHTML = ''; cards.innerHTML = '';   empty.style.display = rides.length ? 'none' : 'block';   rides.forEach(r => {     const tr = document.createElement('tr');     tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="cycle-c">${r.dist} km</strong></td><td>${r.duration||'—'}</td><td class="ht">${r.type||'—'}</td><td class="ht">${r.zone||'—'}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;     tbody.appendChild(tr);     const c = document.createElement('div'); c.className='ecard';     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title cycle-c">${r.dist} km</span></div><div class="ecard-meta"><span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${fmtS(r.date)}</span>${r.duration?`<span class="badge b-neu">${r.duration}</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}` ;     cards.appendChild(c);   });   tlBuild('cycle', rides, cycleCfg);   const total = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);   const longest = rides.length ? Math.max(...rides.map(r=>parseFloat(r.dist||0))) : 0;   document.getElementById('cycle-sum').innerHTML = chips([     {l:'Total km', v:total.toFixed(0)+' km', cls:'cycle-c'},     {l:'Rides', v:rides.length},     {l:'Longest', v:rides.length ? longest+' km' : '—', cls:'cycle-c'},     {l:'Avg', v:rides.length ? (total/rides.length).toFixed(0)+' km' : '—'},   ]);   updateHero(); } function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); }
 
 /* ══════════════════════════════════════════════════════════
    HERO
