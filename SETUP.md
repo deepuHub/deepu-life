@@ -56,9 +56,9 @@ A new tab opens with the script editor. You should see a mostly empty file.
    - Choose your Google account
    - Click **Allow**
 4. Click **▶ Run** again
-5. A popup appears: *"✅ Done! Tabs Runs, Books, and Plants are ready…"*
+5. A popup appears: *"✅ Done! Tabs Runs, Books, Plants, and Rides are ready…"*
 
-Go back to your Sheet — you'll see three new tabs: **Runs · Books · Plants**  
+Go back to your Sheet — you'll see four new tabs: **Runs · Books · Plants · Rides**  
 All your real data is already in there.
 
 ---
@@ -146,7 +146,7 @@ System 1 is fast, automatic, and emotional.|System 2 is slow, deliberate, and lo
 Change `planned` → `reading` → `done` directly in the cell.  
 Reload the site → badge updates instantly.
 
-### Adding a plant
+### Adding a ride  **Rides tab** → new row:  | id | date | dist | duration | type | zone | note | |---|---|---|---|---|---|---| | 4 | 2025-08-15 | 30 | 1:15:00 | outdoor | zone2 | Morning ride |  Type options: `outdoor` · `indoor`   Zone options: `zone1` · `zone2` · `zone3` · `zone4` · `zone5`  ---  ### Adding a plant
 **Plants tab** → new row:
 
 | id | name | date | system | status | note |
@@ -176,7 +176,7 @@ Status options: `growing` · `harvested` · `failed`
 
 **Books** — `id` · `title` · `author` · `cat` · `status` (done/reading/planned) · `added` (YYYY-MM-DD) · `quotes` (pipe-separated, optional)
 
-**Plants** — `id` · `name` · `date` (YYYY-MM-DD) · `system` (NFT/DWC/Kratky/etc) · `status` (growing/harvested/failed) · `note`
+**Plants** — `id` · `name` · `date` (YYYY-MM-DD) · `system` (NFT/DWC/Kratky/etc) · `status` (growing/harvested/failed) · `note`  **Rides** — `id` · `date` (YYYY-MM-DD) · `dist` (km) · `duration` (HH:MM:SS) · `type` (outdoor/indoor) · `zone` (zone1-zone5) · `note`
 
 ---
 
