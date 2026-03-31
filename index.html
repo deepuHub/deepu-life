@@ -1,4 +1,401 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+ <meta name="theme-color" content="#0a0f0d"/>
+ <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"/>
+ <title>deepu-life — Running · Reading · Growing · Cycling</title>
+ <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139981219-1"></script>
+ <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-139981219-1');</script>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=Epilogue:wght@300;500;700&display=swap" rel="stylesheet">
+ <style>
+  /* ═══════════════════════ TOKENS ═══════════════════════════ */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+   --bg:#0a0f0d;--surface:#111a15;--surface2:#162019;
+   --border:#243020;--text:#e8ede9;--muted:#6b7d6e;
+   --run:#c8f04a;--read:#f0a83c;--grow:#4acfa8;
+   --run-dim:#2a3a0e;--read-dim:#3a2808;--grow-dim:#0a2e26;
+   --cycle:#a78bfa;--cycle-dim:#1e1535;
+   --pad:clamp(1rem,5vw,4rem);--nav-h:60px;
+  }
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--text);font-family:'Epilogue',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:0.04}
+  
+  /* ═══════════════════════ NAV ══════════════════════════════ */
+  nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);display:flex;justify-content:space-between;align-items:center;padding:0 var(--pad);background:rgba(10,15,13,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+  .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(0.9rem,3vw,1.15rem);color:var(--text);text-decoration:none;flex-shrink:0}
+  .nav-logo span{color:var(--run)}
+  .nav-pills{display:flex;gap:0.3rem;overflow-x:auto;scrollbar-width:none;padding:0.2rem 0 0.2rem 0.5rem}
+  .nav-pills::-webkit-scrollbar{display:none}
+  .nav-pill{padding:0.38rem 0.85rem;border-radius:999px;font-size:clamp(0.68rem,2vw,0.78rem);font-weight:500;letter-spacing:0.03em;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:pointer;white-space:nowrap;min-height:36px;display:flex;align-items:center;font-family:'Epilogue',sans-serif;transition:all 0.2s}
+  .nav-pill[data-tab="run"].active{background:var(--run-dim);border-color:var(--run);color:var(--run)}
+  .nav-pill[data-tab="read"].active{background:var(--read-dim);border-color:var(--read);color:var(--read)}
+  .nav-pill[data-tab="grow"].active{background:var(--grow-dim);border-color:var(--grow);color:var(--grow)}
+  .nav-pill[data-tab="cycle"].active{background:var(--cycle-dim);border-color:var(--cycle);color:var(--cycle)}
+
+  /* ═══════════════════════ HERO ═════════════════════════════ */
+  .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h) + 3rem) var(--pad) 3rem;border-bottom:1px solid var(--border)}
+  .hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
+  .hero-cell{background:var(--surface);padding:clamp(0.9rem,2.5vw,2rem);display:flex;flex-direction:column;gap:0.35rem;opacity:0;animation:fadeUp 0.7s forwards}
+  .hero-cell:nth-child(1){animation-delay:.1s}.hero-cell:nth-child(2){animation-delay:.25s}.hero-cell:nth-child(3){animation-delay:.4s}.hero-cell:nth-child(4){animation-delay:.55s}
+  .hero-cell-icon{font-size:clamp(1.2rem,3vw,1.8rem)}
+  .hero-cell-label{font-size:clamp(0.58rem,1.3vw,0.7rem);letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
+  .hero-cell-stat{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.5rem,4vw,3rem);line-height:1;letter-spacing:-0.03em}
+  .hero-cell-stat small{font-size:0.4em;letter-spacing:0;color:var(--muted)}
+  .hero-cell-sub{font-size:clamp(0.65rem,1.3vw,0.82rem);color:var(--muted)}
+  .run-c{color:var(--run)}.read-c{color:var(--read)}.grow-c{color:var(--grow)}.cycle-c{color:var(--cycle)}
+  .hero-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.8rem,10vw,8rem);line-height:0.92;letter-spacing:-0.04em;opacity:0;animation:fadeUp 0.8s 0.5s forwards}
+  .hero-title em{font-style:italic;font-weight:300;color:var(--muted)}
+  .hero-sub{margin-top:1.2rem;font-size:clamp(0.85rem,2vw,1rem);color:var(--muted);max-width:440px;line-height:1.6;opacity:0;animation:fadeUp 0.8s 0.7s forwards}
+
+  /* ═══════════════════════ TABS ═════════════════════════════ */
+  .tab-section{display:none;animation:fadeIn 0.3s ease}
+  .tab-section.active{display:block}
+
+  /* ═══════════════════════ SECTION HEADER ══════════════════ */
+  .sec-head{padding:clamp(1.5rem,4vw,3rem) var(--pad) 0.5rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+  .sec-eyebrow{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.4rem;color:var(--muted)}
+  .sec-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,4.5rem);letter-spacing:-0.03em;line-height:1}
+  .sheets-btn{font-size:0.75rem;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:all 0.2s}
+  .sheets-btn:hover{color:var(--text);border-color:var(--text)}
+
+  /* ═══════════════════════ SUMMARY ══════════════════════════ */
+  .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.5rem;padding:1.25rem var(--pad)}
+  .summary-chip{background:var(--surface);border:1px solid var(--border);padding:1.2rem 1.5rem;border-radius:4px;display:flex;flex-direction:column;gap:0.2rem}
+  .chip-lbl{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  .chip-val{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.5rem,3vw,2.2rem);line-height:1}
+
+  /* ═══════════════════════ TIMERS ════════════════════════════ */
+  .timers-wrap{padding:0 var(--pad);margin:1.5rem 0 2rem;display:flex;flex-direction:column;gap:1rem}
+  .timer-hero{background:linear-gradient(135deg, var(--surface2) 0%, var(--bg) 100%);border:1px solid var(--border);padding:clamp(2rem,5vw,4rem) var(--pad);border-radius:24px;position:relative;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.5);text-align:center}
+  .timer-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right, var(--run) 0%, transparent 60%);opacity:0.08}
+  .timer-hero .timer-label{font-size:clamp(0.7rem,1.5vw,0.9rem);color:var(--run);letter-spacing:0.5em;font-weight:900;margin-bottom:2rem;display:block;text-transform:uppercase}
+  .timer-hero .timer-val{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.5rem,10vw,7rem);line-height:0.9;color:var(--text);letter-spacing:-0.03em;display:flex;justify-content:center;gap:clamp(0.5rem,3vw,2rem);flex-wrap:wrap}
+  .timer-unit{display:flex;flex-direction:column;align-items:center;min-width:1ch}
+  .timer-num{display:block;filter:drop-shadow(0 0 30px rgba(200,240,74,0.2))}
+  .timer-txt{font-size:clamp(0.6rem,1.5vw,0.8rem);text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-top:1rem;font-weight:700}
+
+  /* ═══════════════════════ WORKOUT HERO ═════════════════════ */
+  .workout-hero{margin:1rem var(--pad) 4rem;position:relative}
+  .wh-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem}
+  .wh-date{font-size:0.75rem;letter-spacing:0.2em;color:var(--muted);display:flex;align-items:center;gap:1rem}
+  .wh-date::before{content:'';width:30px;height:1px;background:var(--muted)}
+  .wh-count{font-family:'Fraunces',serif;font-size:0.9rem;color:var(--muted);font-weight:700}
+  .wh-title-wrap{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem}
+  .wh-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.5rem,7vw,5rem);line-height:0.95;letter-spacing:-0.03em;color:var(--cycle)}
+  .wh-week{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--muted);font-weight:300}
+  .wh-badges{display:flex;gap:0.5rem;margin-bottom:2rem}
+  .wh-note{background:rgba(16,26,21,0.5);border-left:4px solid var(--cycle);padding:2.5rem;font-size:clamp(1.1rem,2.8vw,1.6rem);line-height:1.6;color:var(--text);border-radius:0 4px 4px 0;box-shadow:inset 0 0 40px rgba(0,0,0,0.2)}
+
+  /* ═══════════════════════ LIST VIEW ════════════════════════ */
+  .list-wrap{padding:1.5rem var(--pad) 4rem}
+  .list-section-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:1rem}
+  .twrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:4px}
+  .etable{width:100%;border-collapse:collapse;min-width:500px}
+  .etable th{text-align:left;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:0.85rem 1.25rem;border-bottom:1px solid var(--border);background:var(--surface)}
+  .etable td{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.88rem}
+  .etable tr:hover td{background:var(--surface2)}
+  
+  /* ═══════════════════════ BADGES ═══════════════════════════ */
+  .badge{display:inline-block;padding:0.25rem 0.7rem;border-radius:999px;font-size:0.68rem;font-weight:600;letter-spacing:0.04em}
+  .b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}.b-cycle{background:var(--cycle-dim);color:var(--cycle)}
+  .b-done{background:#1a2a1a;color:#4acfa8}.b-prog{background:#2a2005;color:#f0a83c}.b-plan{background:#1a1a2a;color:#8888ff}.b-fail{background:#2a0a0a;color:#ff8080}
+  .b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+
+  footer{padding:4rem var(--pad);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2rem;border-top:1px solid var(--border)}
+  .flogo{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem}.flogo span{color:var(--run)}
+  .fright{font-size:0.85rem;color:var(--muted)}
+  .flinks{display:flex;gap:1.5rem;margin-top:0.7rem}.flinks a{color:var(--muted);text-decoration:none;transition:color 0.2s}.flinks a:hover{color:var(--text)}
+  
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @media(max-width:768px){.ht{display:none!important}}
+ </style>
+</head>
+<body>
+ <nav>
+  <a href="#" class="nav-logo">deepu<span>-life</span></a>
+  <div class="nav-pills">
+   <button class="nav-pill active" data-tab="run" onclick="showTab('run')">🏃 Run</button>
+   <button class="nav-pill" data-tab="read" onclick="showTab('read')">📚 Read</button>
+   <button class="nav-pill" data-tab="grow" onclick="showTab('grow')">🌱 Grow</button>
+   <button class="nav-pill" data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
+  </div>
+ </nav>
+ <main>
+  <section class="hero">
+   <div class="hero-grid">
+    <div class="hero-cell">
+     <span class="hero-cell-icon">🏃</span>
+     <span class="hero-cell-label">Total distance</span>
+     <span class="hero-cell-stat run-c" id="h-miles">0 <small>mi</small></span>
+     <span class="hero-cell-sub" id="h-runs">0 races logged</span>
+    </div>
+    <div class="hero-cell">
+     <span class="hero-cell-icon">📚</span>
+     <span class="hero-cell-label">Books finished</span>
+     <span class="hero-cell-stat read-c" id="h-books">0</span>
+     <span class="hero-cell-sub" id="h-reading">0 total in list</span>
+    </div>
+    <div class="hero-cell">
+     <span class="hero-cell-icon">🌱</span>
+     <span class="hero-cell-label">Plants growing</span>
+     <span class="hero-cell-stat grow-c" id="h-plants">0</span>
+     <span class="hero-cell-sub" id="h-harvests">0 harvests</span>
+    </div>
+    <div class="hero-cell">
+     <span class="hero-cell-icon">🚴</span>
+     <span class="hero-cell-label">Total distance</span>
+     <span class="hero-cell-stat cycle-c" id="h-km">0 <small>km</small></span>
+     <span class="hero-cell-sub" id="h-rides">0 rides logged</span>
+    </div>
+   </div>
+   <h1 class="hero-title">Run. <em>Read.</em><br>Grow. Cycle.</h1>
+   <p class="hero-sub">A personal life tracker for Deepu — logging every mile, every page, every harvest, every km.</p>
+  </section>
+
+  <!-- 🏃 RUNNING -->
+  <section id="tab-run" class="tab-section active">
+   <div class="sec-head">
+    <div>
+     <div class="sec-eyebrow">01 — Running</div>
+     <h2 class="sec-title">Run log.</h2>
+    </div>
+    <a href="https://docs.google.com/spreadsheets/d/1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE/edit#gid=0" target="_blank" class="sheets-btn">Add in Sheets</a>
+   </div>
+   <div class="summary-strip" id="run-sum"></div>
+   <div class="list-wrap">
+    <div class="list-section-label">Full History</div>
+    <div class="twrap">
+     <table class="etable">
+      <thead><tr><th>Date</th><th>Dist</th><th>Time</th><th class="ht">Pace</th><th class="ht">Notes</th></tr></thead>
+      <tbody id="run-tbody"></tbody>
+     </table>
+    </div>
+   </div>
+  </section>
+
+  <!-- 📚 READING -->
+  <section id="tab-read" class="tab-section">
+   <div class="sec-head">
+    <div>
+     <div class="sec-eyebrow">02 — Reading</div>
+     <h2 class="sec-title">Book list.</h2>
+    </div>
+    <a href="https://docs.google.com/spreadsheets/d/1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE/edit#gid=1978255931" target="_blank" class="sheets-btn">Add in Sheets</a>
+   </div>
+   <div class="summary-strip" id="read-sum"></div>
+   <div class="list-wrap">
+    <div class="list-section-label">Library</div>
+    <div class="twrap">
+     <table class="etable">
+      <thead><tr><th>Title</th><th class="ht">Author</th><th class="ht">Category</th><th>Status</th><th class="ht">Added</th></tr></thead>
+      <tbody id="read-tbody"></tbody>
+     </table>
+    </div>
+   </div>
+  </section>
+
+  <!-- 🌱 HYDROPONICS -->
+  <section id="tab-grow" class="tab-section">
+   <div class="sec-head">
+    <div>
+     <div class="sec-eyebrow">03 — Hydroponics</div>
+     <h2 class="sec-title">Grow log.</h2>
+    </div>
+    <a href="https://docs.google.com/spreadsheets/d/1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE/edit#gid=44622119" target="_blank" class="sheets-btn">Add in Sheets</a>
+   </div>
+   <div class="summary-strip" id="grow-sum"></div>
+   <div class="list-wrap">
+    <div class="list-section-label">Active & Past Grows</div>
+    <div class="twrap">
+     <table class="etable">
+      <thead><tr><th>Plant</th><th class="ht">Started</th><th class="ht">System</th><th>Days</th><th>Status</th></tr></thead>
+      <tbody id="grow-tbody"></tbody>
+     </table>
+    </div>
+   </div>
+  </section>
+
+  <!-- 🚴 CYCLING -->
+  <section id="tab-cycle" class="tab-section">
+   <div class="sec-head">
+    <div>
+     <div class="sec-eyebrow">04 — Cycling</div>
+     <h2 class="sec-title">Training plan.</h2>
+    </div>
+    <a href="https://docs.google.com/spreadsheets/d/1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE/edit#gid=416756462" target="_blank" class="sheets-btn">Add in Sheets</a>
+   </div>
+   <div class="timers-wrap" id="cycle-timers"></div>
+   <div class="summary-strip" id="cycle-sum"></div>
+   <div id="cycle-hero-workout"></div>
+   <div class="list-wrap">
+    <div class="list-section-label">Full Schedule</div>
+    <div class="twrap">
+     <table class="etable">
+      <thead><tr><th>Date</th><th>Workout</th><th>Duration</th><th class="ht">Zone</th><th class="ht">Dist</th><th>Status</th></tr></thead>
+      <tbody id="cycle-tbody"></tbody>
+     </table>
+    </div>
+   </div>
+  </section>
+ </main>
+ <footer>
+  <div class="flogo">deepu<span>-life</span></div>
+  <div class="fright">
+   <div>Standalone tracker · Deepu's personal hub</div>
+   <div class="flinks">
+    <a href="https://deepuhub.github.io">DeepuHub →</a>
+    <a href="https://github.com/deepuHub">GitHub →</a>
+   </div>
+  </div>
+ </footer>
+
+ <script>
+  const GS_URL = 'https://script.google.com/macros/s/AKfycbyJyCwv2hh4m5RHbVgaTOiInv8kgoyIppYlFlrqoYgOzF8hGBNEH6gyqtK7CI1ngm4eVQ/exec';
+  const DB = { runs:[], books:[], plants:[], cycling:[] };
+  window.timers = [];
+
+  const parseD = s => {
+   if(!s) return new Date();
+   const p = s.split('/');
+   if(p.length < 3) return new Date(s);
+   return new Date(p[2], p[1]-1, p[0]);
+  };
+
+  class CountdownTimer {
+   constructor(targetDate, elementId, label, isHero = false) {
+    this.targetDate = targetDate;
+    this.el = document.getElementById(elementId);
+    this.label = label;
+    this.isHero = isHero;
+    this.interval = null;
+    if (this.el) this.start();
+   }
+   start() { this.tick(); this.interval = setInterval(() => this.tick(), 1000); }
+   stop() { if (this.interval) clearInterval(this.interval); }
+   tick() {
+    const diff = this.targetDate - new Date();
+    if (diff <= 0) { this.render(0,0,0,0); this.stop(); return; }
+    const d = Math.floor(diff / 864e5), h = Math.floor((diff % 864e5) / 36e5), m = Math.floor((diff % 36e5) / 6e4), s = Math.floor((diff % 6e4) / 1e3);
+    this.render(d, h, m, s);
+   }
+   render(d, h, m, s) {
+    const pad = n => String(n).padStart(2, '0');
+    if (this.isHero) {
+     this.el.innerHTML = `
+      <div class="timer-hero">
+       <span class="timer-label">${this.label}</span>
+       <div class="timer-val">
+        <div class="timer-unit"><span class="timer-num">${d}</span><span class="timer-txt">Days</span></div>
+        <div class="timer-unit"><span class="timer-num">${pad(h)}</span><span class="timer-txt">Hours</span></div>
+        <div class="timer-unit"><span class="timer-num">${pad(m)}</span><span class="timer-txt">Min</span></div>
+        <div class="timer-unit"><span class="timer-num">${pad(s)}</span><span class="timer-txt">Sec</span></div>
+       </div>
+      </div>
+     `;
+    } else {
+     this.el.innerHTML = `<div class="timer-card"><span class="timer-label">${this.label}</span><span class="timer-val">${d}d ${pad(h)}h ${pad(m)}m ${pad(s)}s</span></div>`;
+    }
+   }
+  }
+
+  async function gsGet() {
+   try {
+    const res = await fetch(GS_URL + '?v=' + Date.now());
+    const data = await res.json();
+    DB.runs = data.runs || []; DB.books = data.books || []; DB.plants = data.plants || []; DB.cycling = data.cycling || [];
+    renderAll();
+   } catch(e) { console.error(e); renderAll(); }
+  }
+
+  const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmtS = d => { if(!d) return '—'; const dt = parseD(d); return `${MO[dt.getMonth()]} ${dt.getDate()}`; };
+  const fmtF = d => { if(!d) return '—'; const dt = parseD(d); return `${MO[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`; };
+  const daysFrom = d => Math.floor((Date.now()-parseD(d).getTime())/86400000);
+  const chips = arr => arr.map(c => `<div class="summary-chip"><span class="chip-lbl">${c.l}</span><span class="chip-val ${c.cls||''}">${c.v}</span></div>`).join('');
+
+  function showTab(tab) {
+   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+   document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+   document.getElementById('tab-'+tab).classList.add('active');
+   document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+   window.scrollTo({ top: document.querySelector('.hero').offsetHeight, behavior:'smooth' });
+  }
+
+  function renderRuns() {
+   const items = [...DB.runs].sort((a,b) => parseD(b.date) - parseD(a.date));
+   const tbody = document.getElementById('run-tbody'); tbody.innerHTML = '';
+   items.forEach(r => tbody.innerHTML += `<tr><td>${fmtS(r.date)}</td><td><strong>${r.dist} mi</strong></td><td>${r.time||'—'}</td><td class="ht">${(r.time/r.dist||0).toFixed(1)}</td><td class="ht">${r.note||''}</td></tr>`);
+   document.getElementById('run-sum').innerHTML = chips([{l:'Total',v:items.reduce((s,r)=>s+parseFloat(r.dist||0),0).toFixed(1)+' mi',cls:'run-c'},{l:'Runs',v:items.length}]);
+  }
+
+  function renderBooks() {
+   const items = [...DB.books].sort((a,b) => parseD(b.added) - parseD(a.added));
+   const tbody = document.getElementById('read-tbody'); tbody.innerHTML = '';
+   items.forEach(b => tbody.innerHTML += `<tr><td><strong>${b.title}</strong></td><td class="ht">${b.author}</td><td class="ht"><span class="badge b-read">${b.cat}</span></td><td><span class="badge ${b.status==='done'?'b-done':'b-prog'}">${b.status}</span></td><td class="ht">${fmtS(b.added)}</td></tr>`);
+   document.getElementById('read-sum').innerHTML = chips([{l:'Total',v:items.length},{l:'Finished',v:items.filter(b=>b.status==='done').length,cls:'read-c'}]);
+  }
+
+  function renderPlants() {
+   const items = [...DB.plants].sort((a,b) => parseD(b.date) - parseD(a.date));
+   const tbody = document.getElementById('grow-tbody'); tbody.innerHTML = '';
+   items.forEach(p => tbody.innerHTML += `<tr><td><strong>${p.name}</strong></td><td class="ht">${fmtS(p.date)}</td><td class="ht">${p.system}</td><td class="grow-c">${daysFrom(p.date)}d</td><td><span class="badge b-grow">${p.status}</span></td></tr>`);
+   document.getElementById('grow-sum').innerHTML = chips([{l:'Growing',v:items.filter(p=>p.status==='growing').length,cls:'grow-c'},{l:'Harvests',v:items.filter(p=>p.status==='harvested').length}]);
+  }
+
+  function renderRides() {
+   if (window.timers) window.timers.forEach(t => t.stop()); window.timers = [];
+   const items = [...DB.cycling].sort((a,b) => parseD(a.date) - parseD(b.date));
+   const tbody = document.getElementById('cycle-tbody'); tbody.innerHTML = '';
+   items.forEach(r => tbody.innerHTML += `<tr><td>${fmtS(r.date)}</td><td><strong>${r.type}</strong></td><td>${r.duration}</td><td class="ht">${r.zone}</td><td class="ht">${r.dist} km</td><td><span class="badge ${r.status==='Completed'?'b-done':(r.status==='Skipped'?'b-fail':'b-neu')}">${r.status||'Upcoming'}</span></td></tr>`);
+   
+   const done = items.filter(r=>r.status==='Completed').length;
+   document.getElementById('cycle-sum').innerHTML = chips([{l:'Done',v:done+' / '+items.length,cls:'cycle-c'},{l:'Goal',v:'25 km'}]);
+   
+   document.getElementById('cycle-timers').innerHTML = '<div id="timer-race"></div>';
+   window.timers.push(new CountdownTimer(parseD('25/04/2026'), 'timer-race', 'Race Day Countdown', true));
+
+   const active = items.find(r => !r.status || r.status==='Upcoming') || items[items.length-1];
+   if (active) {
+    document.getElementById('cycle-hero-workout').innerHTML = `
+     <div class="workout-hero">
+      <div class="wh-header">
+       <div class="wh-date">${fmtF(active.date)}</div>
+       <div class="wh-count">${active.id} / ${items.length}</div>
+      </div>
+      <div class="wh-title-wrap">
+       <div class="wh-title">${active.type}</div>
+       <div class="wh-week">Week ${active.week}</div>
+      </div>
+      <div class="wh-badges">
+       <span class="badge b-neu">${active.duration} min</span>
+       <span class="badge b-cycle">${active.zone}</span>
+      </div>
+      <div class="wh-note">${active.note}</div>
+     </div>
+    `;
+   }
+  }
+
+  function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); updateHero(); }
+  function updateHero() {
+   const mi = DB.runs.reduce((s,r)=>s+parseFloat(r.dist||0), 0); document.getElementById('h-miles').innerHTML = mi.toFixed(1)+' <small>mi</small>';
+   const km = DB.cycling.filter(r=>r.status==='Completed').reduce((s,r)=>s+parseFloat(r.dist||0),0); document.getElementById('h-km').innerHTML = km.toFixed(0)+' <small>km</small>';
+   document.getElementById('h-books').textContent = DB.books.filter(b=>b.status==='done').length;
+   document.getElementById('h-plants').textContent = DB.plants.filter(p=>p.status==='growing').length;
+  }
+
+  gsGet();
+ </script>
+</body>
+</html>
+
 <html lang="en">
 <head>
  <meta charset="UTF-8"/>
