@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="theme-color" content="#0a0f0d"/>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox=%220%200%2032%2032%22%3E%3Crect%20width=%2232%22%20height=%2232%22%20rx=%226%22%20fill=%22%230a0f0d%22%2F%3E%3Ctext%20x=%2216%22%20y=%2223%22%20font-family=%22Georgia%2Cserif%22%20font-weight=%22900%22%20font-size=%2222%22%20text-anchor=%22middle%22%20fill=%22%23c8f04a%22%3Ed%3C%2Ftext%3E%3Ccircle%20cx=%2226%22%20cy=%2226%22%20r=%223%22%20fill=%22%23c8f04a%22%2F%3E%3C%2Fsvg%3E"/>
-  <title>deepu-life — Running · Reading · Growing · Cycling</title>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139981219-1"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-139981219-1');</script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+    <meta name="theme-color" content="#0a0f0d"/>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"/>
+    <title>deepu-life — Running · Reading · Growing · Cycling</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139981219-1"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-139981219-1');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=Epilogue:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
 /* ═══════════════════════ TOKENS ═══════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -26,7 +27,6 @@ body{background:var(--bg);color:var(--text);font-family:'Epilogue',sans-serif;fo
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   opacity:0.04}
-
 /* ═══════════════════════ NAV ══════════════════════════════ */
 nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
   display:flex;justify-content:space-between;align-items:center;padding:0 var(--pad);
@@ -41,9 +41,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
 .nav-pill[data-tab="read"].active{background:var(--read-dim);border-color:var(--read);color:var(--read)}
 .nav-pill[data-tab="grow"].active{background:var(--grow-dim);border-color:var(--grow);color:var(--grow)}
 .nav-pill[data-tab="cycle"].active{background:var(--cycle-dim);border-color:var(--cycle);color:var(--cycle)}
-
 /* ═══════════════════════ HERO ═════════════════════════════ */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h)+3rem) var(--pad) 3rem;border-bottom:1px solid var(--border)}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h) + 3rem) var(--pad) 3rem;border-bottom:1px solid var(--border)}
 .hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
 .hero-cell{background:var(--surface);padding:clamp(0.9rem,2.5vw,2rem);display:flex;flex-direction:column;gap:0.35rem;opacity:0;animation:fadeUp 0.7s forwards}
 .hero-cell:nth-child(1){animation-delay:.1s}.hero-cell:nth-child(2){animation-delay:.25s}.hero-cell:nth-child(3){animation-delay:.4s}.hero-cell:nth-child(4){animation-delay:.55s}
@@ -55,40 +54,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
 .hero-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.8rem,10vw,8rem);line-height:0.92;letter-spacing:-0.04em;opacity:0;animation:fadeUp 0.8s 0.5s forwards}
 .hero-title em{font-style:italic;font-weight:300;color:var(--muted)}
 .hero-sub{margin-top:1.2rem;font-size:clamp(0.85rem,2vw,1rem);color:var(--muted);max-width:440px;line-height:1.6;opacity:0;animation:fadeUp 0.8s 0.7s forwards}
-
 /* ═══════════════════════ TABS ═════════════════════════════ */
 .tab-section{display:none;animation:fadeIn 0.3s ease}
 .tab-section.active{display:block}
-
 /* ═══════════════════════ SECTION HEADER ══════════════════ */
 .sec-head{padding:clamp(1.5rem,4vw,3rem) var(--pad) 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
 .sec-eyebrow{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.4rem}
 .sec-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,4.5rem);letter-spacing:-0.03em;line-height:1}
-
-/* view toggle */
-
-
-
-
-
-
 /* ═══════════════════════ SUMMARY ══════════════════════════ */
 .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.5rem;padding:1.25rem var(--pad)}
 .summary-chip{background:var(--surface);border:1px solid var(--border);padding:0.85rem 1rem;border-radius:3px;display:flex;flex-direction:column;gap:0.15rem}
 .chip-lbl{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
 .chip-val{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.1rem,3vw,1.5rem);line-height:1.1}
-
-/* ═══════════════════════ ADD FORM ═════════════════════════ */
-
-
-
-
-
-.finp:focus{border-color:var(--muted)}
-
-
-
-
 /* ═══════════════════════ LIST VIEW ════════════════════════ */
 .list-wrap{padding:1.5rem var(--pad) 3rem}
 .twrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:3px}
@@ -103,578 +80,275 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
 .ecard-title{font-weight:500;font-size:0.95rem}
 .ecard-meta{display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center}
 .ecard-note{font-size:0.78rem;color:var(--muted);line-height:1.4}
-
 /* ═══════════════════════ BADGES ═══════════════════════════ */
 .badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:999px;font-size:0.67rem;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
 .b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}
 .b-done{background:#1a2a1a;color:#4acfa8}.b-prog{background:#2a2005;color:#f0a83c}.b-plan{background:#1a1a2a;color:#8888ff}
 .b-fail{background:#2a0a0a;color:#ff8080}.b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-
-.empty-st{text-align:center;padding:4rem 2rem;color:var(--muted)}
-.empty-st .emo{font-size:2.5rem;display:block;margin-bottom:1rem}
-
-/* ═══════════════════════════════════════════════════════════
-   ★ CINEMATIC TIMELINE — Knight Lab–style ★
-═══════════════════════════════════════════════════════════ */
-
-/* Outer shell, full viewport height */
-.tl-shell{
-  position:relative;width:100%;
-  height:calc(85svh - var(--nav-h));min-height:500px;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  background:var(--bg);
-  user-select:none;-webkit-user-select:none;
-}
-
-/* ── AMBIENT GLOW LAYER ──────────────────────────────── */
-.tl-glow{
-  position:absolute;inset:0;z-index:0;pointer-events:none;
-  transition:background 0.9s cubic-bezier(0.4,0,0.2,1);
-  background:radial-gradient(ellipse 55% 45% at 50% 55%, var(--ac) 0%, transparent 70%);
-  opacity:0.10;
-}
-
-/* ── STAGE: big slide display area ─────────────────── */
-.tl-stage{
-  flex:1;position:relative;overflow:hidden;z-index:1;
-  display:flex;align-items:center;justify-content:center;
-}
-
-/* Slides */
-.tl-slide{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  padding:2rem var(--pad);
-  pointer-events:none;
-  will-change:opacity,transform;
-}
+/* ═══════════════════════════════════════════════════════════ TIMELINE ENGINE ═══════════════════════════════════════════════════════════ */
+.tl-shell{ position:relative;width:100%; height:calc(85svh - var(--nav-h));min-height:500px; overflow:hidden; display:flex;flex-direction:column; background:var(--bg); user-select:none; }
+.tl-glow{ position:absolute;inset:0;z-index:0;pointer-events:none; transition:background 0.9s cubic-bezier(0.4,0,0.2,1); background:radial-gradient(ellipse 55% 45% at 50% 55%, var(--ac) 0%, transparent 70%); opacity:0.10; }
+.tl-stage{ flex:1;position:relative;overflow:hidden;z-index:1; display:flex;align-items:center;justify-content:center; }
+.tl-slide{ position:absolute;inset:0; display:flex;align-items:center;justify-content:center; padding:2rem var(--pad); pointer-events:none; will-change:opacity,transform; }
 .tl-slide.active{pointer-events:all}
-
-.tl-slide-inner{
-  max-width:680px;width:100%;
-  display:flex;flex-direction:column;gap:1.2rem;
-}
-
-/* Date eyebrow */
-.tl-date{
-  font-size:0.7rem;letter-spacing:0.28em;text-transform:uppercase;
-  color:var(--ac,var(--muted));
-  display:flex;align-items:center;gap:0.75rem;
-}
+.tl-slide-inner{ max-width:680px;width:100%; display:flex;flex-direction:column;gap:1.2rem; }
+.tl-date{ font-size:0.7rem;letter-spacing:0.28em;text-transform:uppercase; color:var(--ac,var(--muted)); display:flex;align-items:center;gap:0.75rem; }
 .tl-date::before{content:'';width:36px;height:1px;background:var(--ac,var(--muted));flex-shrink:0}
-
-/* Big stat / title */
-.tl-stat{
-  font-family:'Fraunces',serif;font-weight:900;
-  font-size:clamp(4.5rem,14vw,10rem);
-  line-height:0.85;letter-spacing:-0.05em;
-  color:var(--ac,var(--text));
-  filter:drop-shadow(0 0 60px var(--ac,transparent));
-}
-.tl-stat small{
-  font-size:0.22em;font-family:'Epilogue',sans-serif;
-  font-weight:300;color:var(--muted);letter-spacing:0.05em;
-  vertical-align:middle;
-}
-.tl-headline{
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:clamp(1.8rem,5vw,3.8rem);
-  line-height:1.05;letter-spacing:-0.03em;
-  color:var(--ac,var(--text));
-}
-.tl-meta{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center}
-.tl-note{
-  font-size:clamp(0.9rem,2vw,1.1rem);color:var(--muted);
-  line-height:1.65;max-width:520px;font-style:italic;
-  border-left:2px solid var(--ac,var(--border));padding-left:1rem;
-}
-
-/* Prev/Next title teasers (like Knight Lab) */
-.tl-prev-teaser,.tl-next-teaser{
-  position:absolute;bottom:50%;transform:translateY(50%);
-  z-index:5;display:flex;flex-direction:column;gap:0.2rem;
-  cursor:pointer;padding:1rem 0.5rem;transition:opacity 0.2s;
-}
-.tl-prev-teaser{left:0;align-items:flex-start}
-.tl-next-teaser{right:0;align-items:flex-end}
-.tl-prev-teaser:hover,.tl-next-teaser:hover{opacity:1!important}
-.teaser-arrow{font-size:1.4rem;color:var(--ac,var(--muted));line-height:1}
-.teaser-date{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
-.teaser-title{font-family:'Fraunces',serif;font-weight:700;font-size:0.85rem;color:var(--text);max-width:120px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* Slide counter */
-.tl-counter{
-  position:absolute;top:1.5rem;right:var(--pad);
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;z-index:5;
-}
-
-/* ── NAV BAR ──────────────────────────────────────── */
-.tl-nav{
-  flex-shrink:0;height:160px;
-  background:rgba(10,15,13,0.97);
-  border-top:1px solid var(--border);
-  position:relative;overflow:hidden;z-index:10;
-}
-
-/* Thin progress line at very top of nav */
-.tl-progress{
-  position:absolute;top:0;left:0;height:2px;
-  background:var(--ac,var(--muted));
-  box-shadow:0 0 10px var(--ac,transparent);
-  transition:width 0.45s cubic-bezier(0.4,0,0.2,1);
-  z-index:2;pointer-events:none;
-}
-
-/* Drag track container */
-.tl-track-outer{
-  position:absolute;inset:0;overflow:hidden;cursor:grab;
-}
-.tl-track-outer.dragging{cursor:grabbing}
-.tl-track-outer::before,.tl-track-outer::after{
-  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:3;pointer-events:none;
-}
-.tl-track-outer::before{left:0;background:linear-gradient(to right,var(--bg) 0%,transparent 100%)}
-.tl-track-outer::after{right:0;background:linear-gradient(to left,var(--bg) 0%,transparent 100%)}
-
-/* The actual scrolling track */
-.tl-track{
-  position:absolute;top:0;bottom:0;
-  display:flex;align-items:flex-end;
-  padding:0 50%;          /* centering trick: active marker always centered */
-  transition:left 0.55s cubic-bezier(0.4,0,0.2,1);
-  gap:0;
-}
-.tl-track.no-transition{transition:none}
-
-/* Horizontal axis line */
-.tl-axis{
-  position:absolute;bottom:52px;left:0;right:0;height:1px;background:var(--border);z-index:0;pointer-events:none;
-}
-
-/* Each marker */
-.tl-marker{
-  width:100px;flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  padding-bottom:8px;cursor:pointer;position:relative;
-  transition:opacity 0.25s;
-}
-.tl-marker:hover .tl-dot{transform:scale(1.5)}
-.tl-marker:hover .tl-mlabel{color:var(--text)}
-
-/* Bar that grows from axis to indicate magnitude (for runs: height = distance) */
-.tl-bar{
-  width:3px;border-radius:2px 2px 0 0;
-  background:var(--border);
-  transition:height 0.4s cubic-bezier(0.4,0,0.2,1),background 0.3s;
-  min-height:4px;
-  margin-bottom:0;
-}
+.tl-stat{ font-family:'Fraunces',serif;font-weight:900; font-size:clamp(4.5rem,14vw,10rem); line-height:0.85;letter-spacing:-0.05em; color:var(--ac,var(--text)); filter:drop-shadow(0 0 60px var(--ac,transparent)); }
+.tl-stat small{ font-size:0.22em;font-family:'Epilogue',sans-serif; font-weight:300;color:var(--muted);letter-spacing:0.05em; vertical-align:middle; }
+.tl-headline{ font-family:'Fraunces',serif;font-weight:700; font-size:clamp(1.8rem,5vw,3.8rem); line-height:1.05;letter-spacing:-0.03em; color:var(--ac,var(--text)); }
+.tl-note{ font-size:clamp(0.9rem,2vw,1.1rem);color:var(--muted); line-height:1.65;max-width:520px;font-style:italic; border-left:2px solid var(--ac,var(--border));padding-left:1rem; }
+.tl-prev-teaser,.tl-next-teaser{ position:absolute;bottom:50%;transform:translateY(50%); z-index:5;display:flex;flex-direction:column;gap:0.2rem; cursor:pointer;padding:1rem 0.5rem;transition:opacity 0.2s; }
+.tl-prev-teaser{left:0;align-items:flex-start}.tl-next-teaser{right:0;align-items:flex-end}
+.tl-counter{ position:absolute;top:1.5rem;right:var(--pad); font-family:'Fraunces',serif;font-weight:700; font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;z-index:5; }
+.tl-nav{ flex-shrink:0;height:160px; background:rgba(10,15,13,0.97); border-top:1px solid var(--border); position:relative;overflow:hidden;z-index:10; }
+.tl-progress{ position:absolute;top:0;left:0;height:2px; background:var(--ac,var(--muted)); box-shadow:0 0 10px var(--ac,transparent); transition:width 0.45s cubic-bezier(0.4,0,0.2,1); z-index:2; }
+.tl-track-outer{ position:absolute;inset:0;overflow:hidden;cursor:grab; }
+.tl-track{ position:absolute;top:0;bottom:0; display:flex;align-items:flex-end; padding:0 50%; transition:left 0.55s cubic-bezier(0.4,0,0.2,1); gap:0; }
+.tl-axis{ position:absolute;bottom:52px;left:0;right:0;height:1px;background:var(--border);z-index:0; }
+.tl-marker{ width:100px;flex-shrink:0; display:flex;flex-direction:column;align-items:center;justify-content:flex-end; padding-bottom:8px;cursor:pointer;position:relative; transition:opacity 0.25s; }
+.tl-bar{ width:3px;border-radius:2px 2px 0 0; background:var(--border); transition:height 0.4s cubic-bezier(0.4,0,0.2,1),background 0.3s; min-height:4px; }
 .tl-marker.active .tl-bar{background:var(--ac,var(--muted))}
-
-.tl-dot{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--border);border:2px solid var(--border);
-  transition:transform 0.25s,background 0.2s,box-shadow 0.2s;
-  flex-shrink:0;
-}
-.tl-marker.active .tl-dot{
-  background:var(--ac,var(--text));border-color:var(--ac,var(--text));
-  box-shadow:0 0 14px var(--ac,transparent),0 0 40px color-mix(in srgb,var(--ac,transparent) 30%,transparent);
-}
-
-.tl-mlabel{
-  font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--muted);margin-top:6px;text-align:center;
-  max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  transition:color 0.2s;
-}
-.tl-marker.active .tl-mlabel{color:var(--ac,var(--text));font-weight:600}
-
-.tl-mval{
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:0.7rem;color:var(--muted);margin-top:2px;
-  transition:color 0.2s;
-}
-.tl-marker.active .tl-mval{color:var(--ac,var(--text))}
-
-/* Prev / Next arrow buttons */
-.tl-btn-prev,.tl-btn-next{
-  position:absolute;bottom:12px;z-index:20;
-  width:36px;height:36px;border-radius:50%;
-  background:var(--surface);border:1px solid var(--border);
-  color:var(--muted);font-size:1rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.2s;font-family:'Epilogue',sans-serif;
-}
+.tl-dot{ width:10px;height:10px;border-radius:50%; background:var(--border);border:2px solid var(--border); transition:transform 0.25s,background 0.2s; }
+.tl-marker.active .tl-dot{ background:var(--ac,var(--text));border-color:var(--ac,var(--text)); box-shadow:0 0 14px var(--ac,transparent); }
+.tl-mlabel{ font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase; color:var(--muted);margin-top:6px;text-align:center; max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.tl-btn-prev,.tl-btn-next{ position:absolute;bottom:12px;z-index:20; width:36px;height:36px;border-radius:50%; background:var(--surface);border:1px solid var(--border); color:var(--muted);cursor:pointer; display:flex;align-items:center;justify-content:center; transition:all 0.2s; }
 .tl-btn-prev{left:var(--pad)}.tl-btn-next{left:calc(var(--pad) + 44px)}
-.tl-btn-prev:hover,.tl-btn-next:hover{background:var(--border);color:var(--text)}
-.tl-btn-prev:disabled,.tl-btn-next:disabled{opacity:0.2;cursor:default}
-
-/* Keyboard hint */
 .tl-keyhint{position:absolute;bottom:18px;right:var(--pad);font-size:0.6rem;color:var(--muted);display:flex;gap:0.4rem;align-items:center;z-index:20}
 .key{display:inline-block;padding:0.08rem 0.32rem;border:1px solid var(--border);border-radius:3px;font-size:0.58rem}
-
-/* Empty state */
-.tl-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;color:var(--muted);font-size:0.9rem;z-index:5}
-.tl-empty-ico{font-size:3rem}
-
 /* ═══════════════════════ QUOTES MODAL ═════════════════════ */
 .qmodal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.2s ease}
 .qmodal{background:var(--surface);border:1px solid var(--border);border-radius:6px;max-width:640px;width:100%;max-height:85svh;display:flex;flex-direction:column;overflow:hidden}
-.qmodal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-shrink:0}
+.qmodal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
 .qmodal-title{font-family:'Fraunces',serif;font-weight:700;font-size:1.1rem;line-height:1.3;color:var(--read)}
-.qmodal-author{font-size:0.78rem;color:var(--muted);margin-top:0.2rem}
-.qmodal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.4rem;line-height:1;padding:0.1rem 0.3rem;border-radius:3px;flex-shrink:0;transition:color 0.2s}
-.qmodal-close:hover{color:var(--text)}
 .qmodal-body{overflow-y:auto;padding:1rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1rem}
-.qmodal-body::-webkit-scrollbar{width:4px}
-.qmodal-body::-webkit-scrollbar-track{background:transparent}
-.qmodal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.q-item{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--read);border-radius:3px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.4rem}
+.q-item{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--read);border-radius:3px;padding:0.9rem 1rem}
 .q-text{font-size:0.88rem;line-height:1.65;color:var(--text)}
-.q-page{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
-.q-count{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:0 1.5rem 0.5rem}
-/* Quotes button on slide */
-.quotes-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:1px solid var(--read-dim);border-radius:999px;background:var(--read-dim);color:var(--read);font-size:0.75rem;font-weight:500;font-family:'Epilogue',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.03em}
-.quotes-btn:hover{background:var(--read);color:#0a0f0d}
-
-
-
-
-/* ── Year separator on timeline track ── */
-.tl-year-marker{
-  flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:flex-end;padding-bottom:8px;
-  pointer-events:none;
-  /* Slightly wider so the label has room */
-  width:52px;
-}
-.tl-year-stem{
-  width:1px;height:40px;
-  background:var(--border);
-  margin-bottom:2px;
-}
-.tl-year-label{
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:0.68rem;color:var(--ac,var(--muted));
-  letter-spacing:0.04em;white-space:nowrap;
-  /* pill background so it pops against markers */
-  background:var(--bg);
-  padding:0.1rem 0.3rem;
-  border:1px solid var(--border);
-  border-radius:3px;
-  margin-top:4px;
-}
-
-/* ═══ LIST SECTION LABEL ════════════════════════════════ */
-.list-section-label{
-  font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;
-  color:var(--muted);padding:1.5rem var(--pad) 0.75rem;
-  display:flex;align-items:center;gap:0.75rem;
-}
-.list-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ═══ SHEETS BUTTON ═════════════════════════════════════ */
-.sheets-btn{
-  display:inline-flex;align-items:center;gap:0.45rem;
-  padding:0.42rem 1rem;border-radius:999px;
-  font-size:0.75rem;font-weight:500;letter-spacing:0.03em;
-  border:1px solid var(--run-dim);background:var(--run-dim);color:var(--run);
-  text-decoration:none;font-family:'Epilogue',sans-serif;
-  transition:all 0.2s;white-space:nowrap;
-}
-.sheets-btn:hover{background:var(--run);color:#0a0f0d}
-.sheets-btn-read{border-color:var(--read-dim);background:var(--read-dim);color:var(--read)}
-.sheets-btn-read:hover{background:var(--read);color:#0a0f0d}
-.sheets-btn-grow{border-color:var(--grow-dim);background:var(--grow-dim);color:var(--grow)}
-.sheets-btn-grow:hover{background:var(--grow);color:#0a0f0d}.sheets-btn-cycle{border-color:var(--cycle-dim);background:var(--cycle-dim);color:var(--cycle)}.sheets-btn-cycle:hover{background:var(--cycle);color:#0a0f0d}
-
-/* ═══ LAST SYNCED BADGE ═══════════════════════════════════ */
-.sync-badge{
-  font-size:0.63rem;color:var(--muted);letter-spacing:0.06em;
-  display:flex;align-items:center;gap:0.35rem;
-}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-.sync-dot.ok{background:#4acfa8;box-shadow:0 0 6px #4acfa8}
-.sync-dot.err{background:#ff8080}
-
 /* ═══════════════════════ FOOTER ═══════════════════════════ */
-footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--border)}
-.flogo{font-family:'Fraunces',serif;font-weight:900;font-size:1.25rem}
-.flogo span{color:var(--run)}
+footer{padding:2.5rem var(--pad);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--border)}
+.flogo{font-family:'Fraunces',serif;font-weight:900;font-size:1.25rem}.flogo span{color:var(--run)}
 .fright{font-size:0.76rem;color:var(--muted)}
-.flinks{display:flex;gap:1rem;margin-top:0.3rem;flex-wrap:wrap}
-.flinks a{color:var(--muted);text-decoration:none;font-size:0.76rem}
-.flinks a:hover{color:var(--text)}
-
-/* ═══════════════════════ ANIMATIONS ═══════════════════════ */
+.flinks{display:flex;gap:1rem;margin-top:0.3rem}.flinks a{color:var(--muted);text-decoration:none;font-size:0.76rem}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* ═══════════════════════ RESPONSIVE ═══════════════════════ */
 @media(max-width:768px){.ht{display:none!important}}
 @media(max-width:480px){
-  :root{--nav-h:56px}
   .hero-grid{grid-template-columns:1fr}
-  .hero-cell{flex-direction:row;align-items:center;gap:1rem}
-  .hero-cell>div{display:flex;flex-direction:column;gap:0.2rem}
-  .hero-cell-icon{font-size:1.5rem;flex-shrink:0}
-  .hero-cell-stat{font-size:1.8rem}
-  .summary-strip{grid-template-columns:repeat(2,1fr)}
-  
-  .twrap{display:none!important}.card-list{display:flex}
-  footer{flex-direction:column;align-items:flex-start}
-  .tl-nav{height:130px}
-  .tl-marker{width:72px}
-  .tl-keyhint{display:none}
-  .tl-prev-teaser,.tl-next-teaser{display:none}
+  .card-list{display:flex}.twrap{display:none!important}
+  .tl-nav{height:130px}.tl-marker{width:72px}
 }
-
-  .fg-read{grid-template-columns:2fr 1.5fr 120px 130px 120px}
-  .fg-grow{grid-template-columns:1.2fr 130px 130px 120px 1.5fr 130px}.fg-cycle{grid-template-columns:120px 100px 100px 100px 100px 1fr}
-}
-  </style>
+    </style>
 </head>
 <body>
+    <nav>
+        <a href="#" class="nav-logo">deepu<span>-life</span></a>
+        <div class="nav-pills">
+            <button class="nav-pill active" data-tab="run" onclick="showTab('run')">🏃 Run</button>
+            <button class="nav-pill" data-tab="read" onclick="showTab('read')">📚 Read</button>
+            <button class="nav-pill" data-tab="grow" onclick="showTab('grow')">🌱 Grow</button>
+            <button class="nav-pill" data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
+        </div>
+    </nav>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">deepu<span>-life</span></a>
-  <div class="nav-pills">
-    <button class="nav-pill active" data-tab="run"  onclick="showTab('run')">🏃 Run</button>
-    <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
-    <button class="nav-pill"        data-tab="grow" onclick="showTab('grow')">🌱 Grow</button>
-          <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
-  </div>
-</nav>
+    <main>
+        <section class="hero">
+            <div class="hero-grid">
+                <div class="hero-cell">
+                    <div class="hero-cell-icon">🏃</div>
+                    <div>
+                        <div class="hero-cell-label">Total distance</div>
+                        <div class="hero-cell-stat run-c" id="h-miles">0 <small>mi</small></div>
+                        <div class="hero-cell-sub" id="h-runs">0 races logged</div>
+                    </div>
+                </div>
+                <div class="hero-cell">
+                    <div class="hero-cell-icon">📚</div>
+                    <div>
+                        <div class="hero-cell-label">Books finished</div>
+                        <div class="hero-cell-stat read-c" id="h-books">0</div>
+                        <div class="hero-cell-sub" id="h-reading">0 total in list</div>
+                    </div>
+                </div>
+                <div class="hero-cell">
+                    <div class="hero-cell-icon">🌱</div>
+                    <div>
+                        <div class="hero-cell-label">Plants growing</div>
+                        <div class="hero-cell-stat grow-c" id="h-plants">0</div>
+                        <div class="hero-cell-sub" id="h-harvests">0 harvests</div>
+                    </div>
+                </div>
+                <div class="hero-cell">
+                    <div class="hero-cell-icon">🚴</div>
+                    <div>
+                        <div class="hero-cell-label">Total distance</div>
+                        <div class="hero-cell-stat cycle-c" id="h-km">0 <small>km</small></div>
+                        <div class="hero-cell-sub" id="h-rides">0 rides logged</div>
+                    </div>
+                </div>
+            </div>
+            <h1 class="hero-title">Run. <em>Read.</em><br>Grow. Cycle.</h1>
+            <p class="hero-sub">A personal life tracker for Deepu — logging every mile, every page, every harvest, every km.</p>
+        </section>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-grid">
-    <div class="hero-cell"><span class="hero-cell-icon">🏃</span><div>
-      <span class="hero-cell-label">Total distance</span>
-      <div class="hero-cell-stat run-c" id="h-miles">0 <small style="font-size:.4em">mi</small></div>
-      <span class="hero-cell-sub" id="h-runs">0 runs logged</span></div></div>
-    <div class="hero-cell"><span class="hero-cell-icon">📚</span><div>
-      <span class="hero-cell-label">Books finished</span>
-      <div class="hero-cell-stat read-c" id="h-books">0</div>
-      <span class="hero-cell-sub" id="h-reading">0 total in list</span></div></div>
-    <div class="hero-cell"><span class="hero-cell-icon">🌱</span><div>
-      <span class="hero-cell-label">Plants growing</span>
-      <div class="hero-cell-stat grow-c" id="h-plants">0</div>
-      <span class="hero-cell-sub" id="h-harvests">0 harvests</span></div></div>
-          <div class="hero-cell"><span class="hero-cell-icon">🚴</span><div>
-          <span class="hero-cell-label">Total distance</span>
-          <div class="hero-cell-stat cycle-c" id="h-km">0 <small>km</small></div>
-          <span class="hero-cell-sub" id="h-rides">0 rides logged</span></div></div>
-  </div>
-  <h1 class="hero-title">Run.<br><em>Read.</em><br>Grow.<br>Cycle.</h1>
-  <p class="hero-sub">A personal life tracker for Deepu — logging every mile, every page, every harvest, every km.</p>
-</section>
+        <!-- 🏃 RUNNING -->
+        <section id="tab-run" class="tab-section active">
+            <div class="sec-head">
+                <div>
+                    <div class="sec-eyebrow">01 — Running</div>
+                    <h2 class="sec-title">Run log.</h2>
+                </div>
+                <div style="display:flex;gap:0.8rem;align-items:center">
+                    <div class="sync-badge" id="sync-badge-run"><div class="sync-dot"></div><span class="sync-label">Checking Sheets…</span></div>
+                    <a href="#" target="_blank" class="sheets-btn" id="sheets-link">Add in Sheets</a>
+                </div>
+            </div>
+            <div class="summary-strip" id="run-sum"></div>
+            <div id="run-tv"></div>
+            <div class="list-wrap">
+                <div class="list-section-label">All Runs</div>
+                <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Pace</th><th class="ht">Notes</th></tr></thead><tbody id="run-tbody"></tbody></table></div>
+                <div class="card-list" id="run-cards"></div>
+                <div id="run-empty" class="empty-st"><span class="emo">🏃</span>No runs yet — add one in Google Sheets!</div>
+            </div>
+        </section>
 
-<!-- ══ 🏃 RUN ══════════════════════════════════════════════ -->
-<section class="tab-section active" id="tab-run">
-  <div class="sec-head">
-    <div><p class="sec-eyebrow run-c">01 — Running</p><h2 class="sec-title">Run log.</h2></div>
-    <a id="sheets-link" href="#" target="_blank" class="sheets-btn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      Add in Sheets
-    </a>
-  </div>
-  <div class="summary-strip" id="run-sum"></div>
-  <div id="run-tv"></div>
-  <div id="run-lv" class="list-wrap">
-    <div class="list-section-label">All Runs</div>
-    <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Pace</th><th class="ht">Notes</th></tr></thead><tbody id="run-tbody"></tbody></table></div>
-    <div class="card-list" id="run-cards"></div>
-    <div class="empty-st" id="run-empty"><span class="emo">🏃</span>No runs yet — add one in Google Sheets!</div>
-  </div>
-</section>
+        <!-- 📚 READING -->
+        <section id="tab-read" class="tab-section">
+            <div class="sec-head">
+                <div>
+                    <div class="sec-eyebrow">02 — Reading</div>
+                    <h2 class="sec-title">Book list.</h2>
+                </div>
+                <a href="#" target="_blank" class="sheets-btn sheets-btn-read" id="sheets-link-read">Add in Sheets</a>
+            </div>
+            <div class="summary-strip" id="read-sum"></div>
+            <div id="read-tv"></div>
+            <div class="list-wrap">
+                <div class="list-section-label">All Books</div>
+                <div class="twrap"><table class="etable"><thead><tr><th>Title</th><th class="ht">Author</th><th class="ht">Category</th><th>Status</th><th class="ht">Quotes</th><th class="ht">Added</th></tr></thead><tbody id="read-tbody"></tbody></table></div>
+                <div class="card-list" id="read-cards"></div>
+                <div id="read-empty" class="empty-st"><span class="emo">📚</span>No books yet — add one in Google Sheets!</div>
+            </div>
+        </section>
 
-<!-- ══ 📚 READ ═════════════════════════════════════════════ -->
-<section class="tab-section" id="tab-read">
-  <div class="sec-head">
-    <div><p class="sec-eyebrow read-c">02 — Reading</p><h2 class="sec-title">Book list.</h2></div>
-    <a id="sheets-link-read" href="#" target="_blank" class="sheets-btn sheets-btn-read">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      Add in Sheets
-    </a>
-  </div>
-  <div class="summary-strip" id="read-sum"></div>
-  <div id="read-tv"></div>
-  <div id="read-lv" class="list-wrap">
-    <div class="list-section-label">All Books</div>
-    <div class="twrap"><table class="etable"><thead><tr><th>Title</th><th class="ht">Author</th><th class="ht">Category</th><th>Status</th><th class="ht">Quotes</th><th class="ht">Added</th></tr></thead><tbody id="read-tbody"></tbody></table></div>
-    <div class="card-list" id="read-cards"></div>
-    <div class="empty-st" id="read-empty"><span class="emo">📚</span>No books yet — add one in Google Sheets!</div>
-  </div>
-</section>
+        <!-- 🌱 HYDROPONICS -->
+        <section id="tab-grow" class="tab-section">
+            <div class="sec-head">
+                <div>
+                    <div class="sec-eyebrow">03 — Hydroponics</div>
+                    <h2 class="sec-title">Grow log.</h2>
+                </div>
+                <a href="#" target="_blank" class="sheets-btn sheets-btn-grow" id="sheets-link-grow">Add in Sheets</a>
+            </div>
+            <div class="summary-strip" id="grow-sum"></div>
+            <div id="grow-tv"></div>
+            <div class="list-wrap">
+                <div class="list-section-label">All Plants</div>
+                <div class="twrap"><table class="etable"><thead><tr><th>Plant</th><th class="ht">Started</th><th class="ht">System</th><th>Days</th><th>Status</th><th class="ht">Notes</th></tr></thead><tbody id="grow-tbody"></tbody></table></div>
+                <div class="card-list" id="grow-cards"></div>
+                <div id="grow-empty" class="empty-st"><span class="emo">🌱</span>No plants yet — add one in Google Sheets!</div>
+            </div>
+        </section>
 
-<!-- ══ 🌱 GROW ═════════════════════════════════════════════ -->
-<section class="tab-section" id="tab-grow">
-  <div class="sec-head">
-    <div><p class="sec-eyebrow grow-c">03 — Hydroponics</p><h2 class="sec-title">Grow log.</h2></div>
-    <a id="sheets-link-grow" href="#" target="_blank" class="sheets-btn sheets-btn-grow">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      Add in Sheets
-    </a>
-  </div>
-  <div class="summary-strip" id="grow-sum"></div>
-  <div id="grow-tv"></div>
-  <div id="grow-lv" class="list-wrap">
-    <div class="list-section-label">All Plants</div>
-    <div class="twrap"><table class="etable"><thead><tr><th>Plant</th><th class="ht">Started</th><th class="ht">System</th><th>Days</th><th>Status</th><th class="ht">Notes</th></tr></thead><tbody id="grow-tbody"></tbody></table></div>
-    <div class="card-list" id="grow-cards"></div>
-    <div class="empty-st" id="grow-empty"><span class="emo">🌱</span>No plants yet — add one in Google Sheets!</div>
-  </div>
-</section>
+        <!-- 🚴 CYCLING -->
+        <section id="tab-cycle" class="tab-section">
+            <div class="sec-head">
+                <div>
+                    <div class="sec-eyebrow">04 — Cycling</div>
+                    <h2 class="sec-title">Training plan.</h2>
+                </div>
+                <a href="#" target="_blank" class="sheets-btn sheets-btn-cycle" id="sheets-link-cycle">Add in Sheets</a>
+            </div>
+            <div class="summary-strip" id="cycle-sum"></div>
+            <div id="cycle-tv"></div>
+            <div class="list-wrap">
+                <div class="list-section-label">Full Schedule</div>
+                <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Workout</th><th>Duration</th><th class="ht">Target</th><th class="ht">Dist</th><th>Status</th></tr></thead><tbody id="cycle-tbody"></tbody></table></div>
+                <div class="card-list" id="cycle-cards"></div>
+                <div id="cycle-empty" class="empty-st"><span class="emo">🚴</span>No rides yet — add one in Google Sheets!</div>
+            </div>
+        </section>
+    </main>
 
-<!-- ══ 🚴 CYCLE ══════════════════════════════════════════════ --><section class="tab-section" id="tab-cycle"> <div class="sec-head"> <div><p class="sec-eyebrow cycle-c">04 — Cycling</p><h2 class="sec-title">Ride log.</h2></div> <a id="sheets-link-cycle" href="#" target="_blank" class="sheets-btn sheets-btn-cycle"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg> Add in Sheets</a> </div> <div class="summary-strip" id="cycle-sum"></div> <div id="cycle-tv"></div> <div id="cycle-lv" class="list-wrap"> <div class="list-section-label">All Rides</div> <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Type</th><th class="ht">Zone</th><th class="ht">Notes</th></tr></thead><tbody id="cycle-tbody"></tbody></table></div> <div class="card-list" id="cycle-cards"></div> <div class="empty-st" id="cycle-empty"><span class="emo">🚴</span>No rides yet — add one in Google Sheets!</div> </div></section><footer>
-  <div class="flogo">deepu<span>-life</span></div>
-  <div class="fright">Standalone tracker · Deepu's personal hub
-    <div class="flinks">
-      <a href="https://deepuhub.github.io" target="_blank">DeepuHub →</a>
-      <a href="https://deepuhub.github.io/reading-list/" target="_blank">Reading List →</a>
-      <a href="https://github.com/deepuHub" target="_blank">GitHub →</a>
-    </div>
-  </div>
-</footer>
+    <footer>
+        <div class="flogo">deepu<span>-life</span></div>
+        <div class="fright">
+            <div>Standalone tracker · Deepu's personal hub</div>
+            <div class="flinks">
+                <a href="https://deepuhub.github.io">DeepuHub →</a>
+                <a href="https://deepuhub.github.io/reading-list/">Reading List →</a>
+                <a href="https://github.com/deepuHub">GitHub →</a>
+            </div>
+        </div>
+    </footer>
 
-<script>
-/* ══════════════════════════════════════════════════════════
-   CONFIG
-   After completing SETUP.md, paste your two values here:
-══════════════════════════════════════════════════════════ */
-const GS_URL      = 'https://script.google.com/macros/s/AKfycbyJyCwv2hh4m5RHbVgaTOiInv8kgoyIppYlFlrqoYgOzF8hGBNEH6gyqtK7CI1ngm4eVQ/exec';   // Apps Script Web App URL
-const GS_SHEET_ID = '1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE';   // Google Sheet ID (from the URL: /d/THIS_PART/edit)
+    <script>
+/* ══════════════════════════════════════════════════════════ CONFIG ══════════════════════════════════════════════════════════ */
+const GS_URL = 'https://script.google.com/macros/s/AKfycbyJyCwv2hh4m5RHbVgaTOiInv8kgoyIppYlFlrqoYgOzF8hGBNEH6gyqtK7CI1ngm4eVQ/exec';
+const GS_SHEET_ID = '1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE';
 
-/* ══════════════════════════════════════════════════════════
-   IN-MEMORY DATA
-══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════ IN-MEMORY DATA ══════════════════════════════════════════════════════════ */
 const DB = { runs:[], books:[], plants:[], cycling:[] };
 
-/* ══════════════════════════════════════════════════════════
-   UI HELPERS — loader, banner, sync badge
-══════════════════════════════════════════════════════════ */
-function showLoader(msg='Loading from Google Sheets…') {
+/* ══════════════════════════════════════════════════════════ UI HELPERS ══════════════════════════════════════════════════════════ */
+function showLoader(msg='Loading data…') {
   let el = document.getElementById('gs-loader');
   if (!el) {
-    el = document.createElement('div');
-    el.id = 'gs-loader';
-    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,15,13,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;font-family:Epilogue,sans-serif;color:#6b7d6e;font-size:0.88rem;letter-spacing:0.06em;backdrop-filter:blur(8px)';
-    el.innerHTML = `
-      <div style="width:38px;height:38px;border:2px solid #243020;border-top-color:#c8f04a;border-radius:50%;animation:gs-spin 0.7s linear infinite"></div>
-      <div id="gs-loader-msg">${msg}</div>`;
-    const s = document.createElement('style');
-    s.textContent = '@keyframes gs-spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
+    el = document.createElement('div'); el.id = 'gs-loader';
+    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,15,13,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;backdrop-filter:blur(8px)';
+    el.innerHTML = '<div style="width:38px;height:38px;border:2px solid #243020;border-top-color:#c8f04a;border-radius:50%;animation:gs-spin 0.7s linear infinite"></div><div id="gs-loader-msg" style="color:#6b7d6e;font-size:0.88rem;letter-spacing:0.06em">'+msg+'</div>';
+    const s = document.createElement('style'); s.textContent = '@keyframes gs-spin{to{transform:rotate(360deg)}}'; document.head.appendChild(s);
     document.body.appendChild(el);
-  } else {
-    document.getElementById('gs-loader-msg').textContent = msg;
-  }
+  } else document.getElementById('gs-loader-msg').textContent = msg;
 }
 function hideLoader() { document.getElementById('gs-loader')?.remove(); }
 
 function showBanner(msg, type='error') {
   document.getElementById('gs-banner')?.remove();
-  const el = document.createElement('div');
-  el.id = 'gs-banner';
-  const colors = { error:'#ff8080', success:'#c8f04a', info:'#4acfa8', warn:'#f0a83c' };
-  const bgs    = { error:'#2e0a0a',  success:'#1a2e10', info:'#0a2e26', warn:'#2e1a00' };
-  const c = colors[type]||colors.info;
-  el.style.cssText = `position:fixed;top:var(--nav-h,60px);left:0;right:0;z-index:400;padding:0.7rem 1.5rem;font-size:0.82rem;font-family:Epilogue,sans-serif;display:flex;justify-content:space-between;align-items:center;gap:1rem;background:${bgs[type]||bgs.info};color:${c};border-bottom:1px solid ${c}33`;
-  el.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:${c};font-size:1.1rem;line-height:1">×</button>`;
+  const el = document.createElement('div'); el.id = 'gs-banner';
+  const c = type==='error'?'#ff8080':'#c8f04a'; const bg = type==='error'?'#2e0a0a':'#1a2e10';
+  el.style.cssText = `position:fixed;top:var(--nav-h);left:0;right:0;z-index:400;padding:0.7rem 1.5rem;font-size:0.82rem;background:${bg};color:${c};border-bottom:1px solid ${c}33;display:flex;justify-content:space-between;align-items:center`;
+  el.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:${c};font-size:1.1rem">×</button>`;
   document.body.appendChild(el);
   if (type !== 'error') setTimeout(() => el.remove(), 4000);
 }
 
 function setSyncBadge(state, timeStr) {
-  const badge = document.getElementById('sync-badge');
-  if (!badge) return;
-  const dot   = badge.querySelector('.sync-dot');
-  const label = badge.querySelector('.sync-label');
-  if (state === 'ok')  { dot.className='sync-dot ok';  label.textContent = `Synced ${timeStr}`; }
-  if (state === 'err') { dot.className='sync-dot err'; label.textContent = 'Sync failed'; }
-  if (state === 'loading') { dot.className='sync-dot'; label.textContent = 'Loading…'; }
+  document.querySelectorAll('.sync-badge').forEach(badge => {
+    const dot = badge.querySelector('.sync-dot'); const label = badge.querySelector('.sync-label');
+    if (state === 'ok') { dot.className='sync-dot ok'; label.textContent = `Synced ${timeStr}`; }
+    else if (state === 'err') { dot.className='sync-dot err'; label.textContent = 'Sync failed'; }
+    else { dot.className='sync-dot'; label.textContent = 'Loading…'; }
+  });
 }
-
-/* Wire "Add in Sheets" buttons to the actual Sheet URL */
 function setSheetLinks() {
   if (!GS_SHEET_ID) return;
   const base = `https://docs.google.com/spreadsheets/d/${GS_SHEET_ID}/edit#gid=`;
-  // gid values are set in setupSheets() — use 0, 1, 2 as defaults
-  // (Apps Script seeds them in order: Runs=first, Books=second, Plants=third)
   document.getElementById('sheets-link')?.setAttribute('href', base + '0');
   document.getElementById('sheets-link-read')?.setAttribute('href', base + '1');
-  document.getElementById('sheets-link-grow')?.setAttribute('href', base + '2');   document.getElementById('sheets-link-cycle')?.setAttribute('href', base + '3');
+  document.getElementById('sheets-link-grow')?.setAttribute('href', base + '2');
+  document.getElementById('sheets-link-cycle')?.setAttribute('href', base + '3');
 }
 
-/* ══════════════════════════════════════════════════════════
-   GOOGLE SHEETS — fetch data
-══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════ FETCH DATA ══════════════════════════════════════════════════════════ */
 async function gsGet() {
-  if (!GS_URL) {
-    showBanner('⚠ Not connected yet — showing demo data. Follow SETUP.md to connect Google Sheets.', 'warn');
-    loadDemoData();
-    return;
-  }
-  setSyncBadge('loading');
-  showLoader();
+  setSyncBadge('loading'); showLoader();
   try {
-    const res  = await fetch(GS_URL + '?action=getAll', { cache: 'no-store' });
+    const res = await fetch(GS_URL + '?v=' + Date.now());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-    DB.runs   = data.runs   || [];
-    DB.books  = data.books  || [];
-    DB.plants = data.plants || [];     DB.cycling = data.cycling || [];
-    hideLoader();
-    const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-    setSyncBadge('ok', `at ${now}`);
-    renderAll();
+    DB.runs = data.runs || []; DB.books = data.books || []; DB.plants = data.plants || []; DB.cycling = data.cycling || [];
+    hideLoader(); const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    setSyncBadge('ok', `at ${now}`); renderAll();
   } catch(e) {
-    hideLoader();
-    setSyncBadge('err');
-    showBanner(`❌ Could not load from Google Sheets: ${e.message}`, 'error');
-    loadDemoData();
+    hideLoader(); setSyncBadge('err');
+    showBanner(`❌ Sheets connection failed: ${e.message}. Showing local cache.`, 'error');
+    renderAll();
   }
 }
 
-function loadDemoData() {
-  DB.runs = [
-    {id:'1',date:'2015-12-01',dist:'3.1', time:'',  note:'5K race 🏅 First ever race!'},
-    {id:'2',date:'2018-12-01',dist:'6.2', time:'',  note:'10K race 🏅 Chased it down with a 4-week plan'},
-    {id:'3',date:'2020-01-25',dist:'6.2', time:'',  note:'10K race 🏅 Jan 2020 — beat the previous time!'},
-    {id:'4',date:'2024-12-01',dist:'13.1',time:'',  note:'Half Marathon 🏅🥇 Finally did it!'},
-  ];
-  DB.books = [
-    {id:'1',title:'Learning How to Learn',   author:'Dr. Barbara Oakley',  cat:'Learning', status:'done',    added:'2016-05-21',quotes:''},
-    {id:'2',title:'Playing It My Way',        author:'Sachin Tendulkar',    cat:'Biography',status:'done',    added:'2016-05-25',quotes:''},
-    {id:'3',title:'Machine Learning is Fun!', author:'Adam Geitgey',        cat:'AI/ML',    status:'done',    added:'2017-11-18',quotes:"Face embeddings embed a face into 128 numbers — once trained, works on any new face.|Sequence-to-sequence learning rewrote machine translation overnight."},
-    {id:'4',title:'The DevOps Handbook',      author:'Gene Kim et al.',     cat:'Tech',     status:'done',    added:'2019-07-31',quotes:"Stop starting. Start finishing.|Don't fight stupid, make more awesome."},
-    {id:'5',title:'Factfulness',              author:'Hans Rosling',        cat:'Non-Fiction',status:'done',  added:'2019-08-17',quotes:"The world cannot be understood without numbers — and not with numbers alone.|The blame instinct stops us finding the real cause."},
-    {id:'6',title:'The Almanack of Naval Ravikant',author:'Eric Jorgenson', cat:'Self',     status:'done',    added:'2025-02-13',quotes:'Specific knowledge cannot be trained. It can only be discovered.|Value your time at an hourly rate and ruthlessly spend to save it.'},
-    {id:'7',title:'Zero to One',              author:'Peter Thiel',         cat:'Business', status:'done',    added:'2025-06-11',quotes:''},
-    {id:'8',title:'The Art of Doing Twice the Work',author:'Jeff Sutherland',cat:'Productivity',status:'reading',added:'2025-07-01',quotes:''},
-    {id:'9',title:'Educated',                 author:'Tara Westover',       cat:'Biography',status:'planned', added:'2025-07-01',quotes:''},
-    {id:'10',title:'Army of None',            author:'Paul Scharre',        cat:'AI/ML',    status:'planned', added:'2025-07-01',quotes:''},
-  ];
-  DB.plants = [
-    {id:'1',name:'Basil',   date:'2025-02-10',system:'Kratky',status:'growing',   note:'Week 4, smells amazing'},
-    {id:'2',name:'Spinach', date:'2025-02-20',system:'DWC',   status:'growing',   note:'Day 18, dense leaves'},
-    {id:'3',name:'Lettuce', date:'2025-01-20',system:'NFT',   status:'harvested', note:'Great yield — 2 heads'},
-    {id:'4',name:'Mint',    date:'2024-11-10',system:'Kratky',status:'harvested', note:'Harvested 3 times!'},
-    {id:'5',name:'Cilantro',date:'2024-10-01',system:'DWC',   status:'failed',    note:'Bolted too fast'},
-  ];
-  DB.cycling = [ {id:'1',date:'2024-01-15',dist:'25',duration:'1:10:00',type:'outdoor',zone:'zone2',note:'First 25km ride! 🚴'}, {id:'2',date:'2024-03-20',dist:'40',duration:'1:45:00',type:'outdoor',zone:'zone3',note:'Morning endurance ride'}, {id:'3',date:'2024-06-01',dist:'50',duration:'2:05:00',type:'outdoor',zone:'zone3',note:'50km milestone ride! 🚴‍♂️'}, ]; renderAll();
-}
-
-/* ══════════════════════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════ HELPERS ══════════════════════════════════════════════════════════ */
 const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fmtS = d => { if(!d) return '—'; const p=String(d).split('-'); return `${MO[+p[1]-1]} ${+p[2]}`; };
 const fmtF = d => { if(!d) return '—'; const p=String(d).split('-'); return `${MO[+p[1]-1]} ${+p[2]}, ${p[0]}`; };
@@ -682,9 +356,7 @@ const daysFrom = d => Math.floor((Date.now()-new Date(String(d)+'T00:00:00').get
 const chips = arr => arr.map(c => `<div class="summary-chip"><span class="chip-lbl">${c.l}</span><span class="chip-val ${c.cls||''}">${c.v}</span></div>`).join('');
 const parseQuotes = q => !q||typeof q!=='string' ? [] : q.split('|').map(s=>s.trim()).filter(Boolean).map(s=>({content:s}));
 
-/* ══════════════════════════════════════════════════════════
-   TAB / VIEW STATE
-══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════ TAB STATE ══════════════════════════════════════════════════════════ */
 let activeTab = 'run';
 function showTab(tab) {
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
@@ -695,362 +367,153 @@ function showTab(tab) {
   window.scrollTo({ top: document.querySelector('.hero').offsetHeight, behavior:'smooth' });
 }
 
-
-/* ══════════════════════════════════════════════════════════
-   CINEMATIC TIMELINE ENGINE
-══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════ TIMELINE ENGINE ══════════════════════════════════════════════════════════ */
 const TL = {};
-
 function tlBuild(tab, items, cfg) {
-  const container = document.getElementById(`${tab}-tv`);
-  container.innerHTML = '';
+  const container = document.getElementById(`${tab}-tv`); container.innerHTML = '';
   const state = TL[tab] = { idx:0, items, cfg, dragging:false };
   if (!items.length) {
-    container.innerHTML = `<div class="tl-shell" style="--ac:${cfg.color}"><div class="tl-empty"><div class="tl-empty-ico">${cfg.icon}</div><div>Nothing here yet — add a row in Google Sheets!</div></div></div>`;
+    container.innerHTML = `<div class="tl-shell" style="--ac:${cfg.color}"><div class="tl-empty" style="text-align:center;padding:4rem;color:var(--muted)">Nothing here yet!</div></div>`;
     return;
   }
   container.innerHTML = `
-  <div class="tl-shell" id="${tab}-shell" style="--ac:${cfg.color}">
-    <div class="tl-glow" style="--ac:${cfg.color}"></div>
-    <div class="tl-stage" id="${tab}-stage">
-      <div class="tl-counter" id="${tab}-counter"></div>
-      <div class="tl-prev-teaser" id="${tab}-prev-t" onclick="tlPrev('${tab}')">
-        <div class="teaser-arrow">←</div>
-        <div class="teaser-date" id="${tab}-prev-date"></div>
-        <div class="teaser-title" id="${tab}-prev-title"></div>
+    <div class="tl-shell" id="${tab}-shell" style="--ac:${cfg.color}">
+      <div class="tl-glow" style="--ac:${cfg.color}"></div>
+      <div class="tl-stage" id="${tab}-stage"><div class="tl-counter" id="${tab}-counter"></div></div>
+      <div class="tl-nav" id="${tab}-nav">
+        <div class="tl-progress" id="${tab}-prog"></div><div class="tl-axis"></div>
+        <div class="tl-track-outer" id="${tab}-to"><div class="tl-track" id="${tab}-track"></div></div>
+        <button class="tl-btn-prev" id="${tab}-prev" onclick="tlPrev('${tab}')">←</button>
+        <button class="tl-btn-next" id="${tab}-next" onclick="tlNext('${tab}')">→</button>
       </div>
-      <div class="tl-next-teaser" id="${tab}-next-t" onclick="tlNext('${tab}')">
-        <div class="teaser-arrow" style="text-align:right">→</div>
-        <div class="teaser-date" id="${tab}-next-date"></div>
-        <div class="teaser-title" id="${tab}-next-title"></div>
-      </div>
-    </div>
-    <div class="tl-nav" id="${tab}-nav">
-      <div class="tl-progress" id="${tab}-prog"></div>
-      <div class="tl-axis"></div>
-      <div class="tl-track-outer" id="${tab}-to"><div class="tl-track" id="${tab}-track"></div></div>
-      <button class="tl-btn-prev" id="${tab}-prev" onclick="tlPrev('${tab}')">←</button>
-      <button class="tl-btn-next" id="${tab}-next" onclick="tlNext('${tab}')">→</button>
-      <div class="tl-keyhint"><span class="key">←</span><span class="key">→</span> navigate · drag track</div>
-    </div>
-  </div>`;
-
-  const stage   = document.getElementById(`${tab}-stage`);
-  const maxVal  = Math.max(...items.map(cfg.getBarH), 1);
-
+    </div>`;
+  const stage = document.getElementById(`${tab}-stage`);
+  const maxVal = Math.max(...items.map(cfg.getBarH), 1);
   items.forEach((item, i) => {
-    const slide = document.createElement('div');
-    slide.className = 'tl-slide'; slide.id = `${tab}-slide-${i}`;
-    slide.style.cssText = `opacity:0;transform:translateX(${i===0?'0':'60px'});transition:opacity 0.55s cubic-bezier(0.4,0,0.2,1),transform 0.55s cubic-bezier(0.4,0,0.2,1)`;
-    slide.innerHTML = cfg.makeSlide(item);
-    stage.insertBefore(slide, document.getElementById(`${tab}-prev-t`));
+    const slide = document.createElement('div'); slide.className = 'tl-slide'; slide.id = `${tab}-slide-${i}`;
+    slide.style.cssText = `opacity:0;transform:translateX(60px);transition:all 0.5s`;
+    slide.innerHTML = cfg.makeSlide(item); stage.appendChild(slide);
   });
-
-  const track  = document.getElementById(`${tab}-track`);
-  const NAV_H  = parseInt(getComputedStyle(document.getElementById(`${tab}-nav`)).height) || 160;
-  const BAR_MAX = NAV_H - 80;
-  let lastYear = null;
+  const track = document.getElementById(`${tab}-track`);
   items.forEach((item, i) => {
-    // ── Year separator marker ───────────────────────────────
-    const itemYear = String(cfg.getDate(item)).split('-')[0];
-    if (itemYear && itemYear !== lastYear) {
-      const ym = document.createElement('div');
-      ym.className = 'tl-year-marker';
-      ym.innerHTML = `<div class="tl-year-stem"></div><div class="tl-year-label">${itemYear}</div>`;
-      track.appendChild(ym);
-      lastYear = itemYear;
-    }
-    // ── Item marker ─────────────────────────────────────────
-    const marker = document.createElement('div');
-    marker.className = 'tl-marker'; marker.dataset.idx = i; marker.onclick = () => tlGoTo(tab, i);
-    const barH = Math.max(4, Math.round((cfg.getBarH(item)/maxVal)*BAR_MAX));
-    marker.innerHTML = `<div class="tl-bar" style="height:${barH}px"></div><div class="tl-dot"></div><div class="tl-mlabel">${fmtS(cfg.getDate(item))}</div><div class="tl-mval">${cfg.makeMarkerVal(item)}</div>`;
+    const marker = document.createElement('div'); marker.className = 'tl-marker'; marker.dataset.idx = i;
+    marker.onclick = () => tlGoTo(tab, i);
+    const barH = Math.max(4, Math.round((cfg.getBarH(item)/maxVal)*80));
+    const ac = cfg.getMarkerColor ? cfg.getMarkerColor(item) : cfg.color;
+    marker.innerHTML = `<div class="tl-bar" style="height:${barH}px;background:${ac}"></div><div class="tl-dot" style="border-color:${ac}"></div><div class="tl-mlabel">${fmtS(cfg.getDate(item))}</div>`;
     track.appendChild(marker);
   });
-
-  tlInitDrag(tab); tlInitSwipe(tab);
-  requestAnimationFrame(() => tlGoTo(tab, 0, true));
+  tlGoTo(tab, 0, true);
 }
-
-function tlGoTo(tab, newIdx, initial=false) {
-  const state = TL[tab]; if (!state || newIdx<0 || newIdx>=state.items.length) return;
-  state.idx = newIdx;
-  const items = state.items; const n = items.length;
-  items.forEach((_, i) => {
-    const el = document.getElementById(`${tab}-slide-${i}`); if (!el) return;
-    if (i===newIdx) { el.style.transition=initial?'opacity 0.7s':'opacity 0.55s cubic-bezier(0.4,0,0.2,1),transform 0.55s cubic-bezier(0.4,0,0.2,1)'; el.style.opacity='1'; el.style.transform='translateX(0)'; el.style.zIndex='2'; el.classList.add('active'); }
-    else { const off=i<newIdx?-60:60; el.style.transition=initial?'none':'opacity 0.4s,transform 0.4s'; el.style.opacity='0'; el.style.transform=`translateX(${off}px)`; el.style.zIndex='1'; el.classList.remove('active'); }
-  });
+function tlGoTo(tab, newIdx, init=false) {
+  const s = TL[tab]; if (!s || newIdx<0 || newIdx>=s.items.length) return;
+  s.idx = newIdx;
   document.querySelectorAll(`#${tab}-track .tl-marker`).forEach((m,i) => m.classList.toggle('active', i===newIdx));
-  const pct = n>1 ? ((newIdx/(n-1))*100) : 100;
-  document.getElementById(`${tab}-prog`).style.width = pct + '%';
-  document.getElementById(`${tab}-counter`).textContent = `${String(newIdx+1).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
-  document.getElementById(`${tab}-prev`).disabled = newIdx===0;
-  document.getElementById(`${tab}-next`).disabled = newIdx===n-1;
-  const pt = document.getElementById(`${tab}-prev-t`);
-  const nt = document.getElementById(`${tab}-next-t`);
-  if (newIdx>0) { pt.style.opacity='0.6'; document.getElementById(`${tab}-prev-date`).textContent=fmtS(state.cfg.getDate(items[newIdx-1])); document.getElementById(`${tab}-prev-title`).textContent=state.cfg.getTeaserTitle(items[newIdx-1]); }
-  else pt.style.opacity='0';
-  if (newIdx<n-1) { nt.style.opacity='0.6'; document.getElementById(`${tab}-next-date`).textContent=fmtS(state.cfg.getDate(items[newIdx+1])); document.getElementById(`${tab}-next-title`).textContent=state.cfg.getTeaserTitle(items[newIdx+1]); }
-  else nt.style.opacity='0';
-  tlScrollToActive(tab);
-}
-function tlScrollToActive(tab) {
-  const state = TL[tab]; if (!state) return;
-  const track = document.getElementById(`${tab}-track`); if (!track) return;
-  const outer = document.getElementById(`${tab}-to`);
-  const markers = [...track.querySelectorAll('.tl-marker')];
-  const active = markers[state.idx]; if (!active) return;
-  const outerW = outer.offsetWidth;
-  const markerMid = active.offsetLeft + active.offsetWidth/2;
-  const clampedLeft = Math.min(0, Math.max(-(track.scrollWidth-outerW), outerW/2-markerMid));
-  if (!state.dragging) { track.classList.remove('no-transition'); track.style.left = clampedLeft + 'px'; }
-}
-function tlPrev(tab) { const s=TL[tab]; if(s) tlGoTo(tab,s.idx-1); }
-function tlNext(tab) { const s=TL[tab]; if(s) tlGoTo(tab,s.idx+1); }
-
-function tlInitDrag(tab) {
-  const outer = document.getElementById(`${tab}-to`);
-  const track = document.getElementById(`${tab}-track`);
-  const state = TL[tab]; let startX=0, startLeft=0;
-  const getLeft = () => parseInt(track.style.left||'0');
-  const onDown = e => { state.dragging=true; outer.classList.add('dragging'); track.classList.add('no-transition'); startX=(e.touches?e.touches[0]:e).clientX; startLeft=getLeft(); e.preventDefault(); };
-  const onMove = e => { if(!state.dragging) return; const x=(e.touches?e.touches[0]:e).clientX; const dx=x-startX; const outerW=outer.offsetWidth; const maxRight=-(track.scrollWidth-outerW); track.style.left=Math.min(0,Math.max(maxRight,startLeft+dx))+'px'; };
-  const onUp = () => { if(!state.dragging) return; state.dragging=false; outer.classList.remove('dragging'); track.classList.remove('no-transition'); const outerW=outer.offsetWidth; const currentLeft=parseInt(track.style.left||'0'); const markers=[...track.querySelectorAll('.tl-marker')]; let closest=0,minDist=Infinity; markers.forEach((m,i)=>{const c=m.offsetLeft+m.offsetWidth/2+currentLeft; const d=Math.abs(c-outerW/2); if(d<minDist){minDist=d;closest=i;}}); tlGoTo(tab,closest); };
-  outer.addEventListener('mousedown',onDown); outer.addEventListener('mousemove',onMove); outer.addEventListener('mouseup',onUp); outer.addEventListener('mouseleave',onUp);
-  outer.addEventListener('touchstart',onDown,{passive:false}); outer.addEventListener('touchmove',onMove,{passive:true}); outer.addEventListener('touchend',onUp);
-}
-function tlInitSwipe(tab) {
-  const stage = document.getElementById(`${tab}-stage`); let sx=0, sy=0;
-  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-  stage.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;const dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>44){dx<0?tlNext(tab):tlPrev(tab);}});
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowLeft')  tlPrev(activeTab);
-  if (e.key === 'ArrowRight') tlNext(activeTab);
-});
-
-/* ══════════════════════════════════════════════════════════
-   🏃 RUN RENDERER
-══════════════════════════════════════════════════════════ */
-const runCfg = {
-  color:'#c8f04a', icon:'🏃',
-  getDate: r => r.date,
-  getBarH: r => parseFloat(r.dist) || 1,
-  makeMarkerVal: r => `${r.dist}mi`,
-  getTeaserTitle: r => `${r.dist} mi`,
-  makeSlide: r => {
-    const pace = r.time && r.dist ? (parseFloat(r.time)/parseFloat(r.dist)).toFixed(1)+' min/mi' : null;
-    return `<div class="tl-slide-inner">
-      <div class="tl-date">${fmtF(r.date)}</div>
-      <div class="tl-stat run-c">${r.dist}<small> mi</small></div>
-      <div class="tl-meta">
-        ${r.time ? `<span class="badge b-neu">${r.time} min</span>` : ''}
-        ${pace   ? `<span class="badge b-run">⚡ ${pace}</span>` : ''}
-      </div>
-      ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}
-    </div>`;
-  }
-};
-
-function renderRuns() {
-  const runs = [...DB.runs].sort((a,b) => String(a.date) < String(b.date) ? -1 : 1);
-  const tbody = document.getElementById('run-tbody');
-  const cards = document.getElementById('run-cards');
-  const empty = document.getElementById('run-empty');
-  tbody.innerHTML = ''; cards.innerHTML = '';
-  empty.style.display = runs.length ? 'none' : 'block';
-  runs.forEach(r => {
-    const pace = r.time && r.dist ? (parseFloat(r.time)/parseFloat(r.dist)).toFixed(1)+' min/mi' : '—';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="run-c">${r.dist} mi</strong></td><td>${r.time?r.time+' min':'—'}</td><td class="ht" style="color:var(--muted)">${pace}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;
-    tbody.appendChild(tr);
-    const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title run-c">${r.dist} mi</span></div><div class="ecard-meta"><span class="badge b-run">${fmtS(r.date)}</span>${r.time?`<span class="badge b-neu">${r.time} min</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}`;
-    cards.appendChild(c);
+  s.items.forEach((_, i) => {
+    const el = document.getElementById(`${tab}-slide-${i}`); if(!el) return;
+    el.style.opacity = i===newIdx?'1':'0'; el.style.transform = i===newIdx?'none':(i<newIdx? 'translateX(-60px)':'translateX(60px)'); el.classList.toggle('active', i===newIdx);
   });
-  tlBuild('run', runs, runCfg);
-  const total = runs.reduce((s,r) => s+parseFloat(r.dist||0), 0);
-  document.getElementById('run-sum').innerHTML = chips([
-    {l:'Total',    v:total.toFixed(1)+' mi', cls:'run-c'},
-    {l:'Races',    v:runs.length},
-    {l:'Longest',  v:runs.length ? Math.max(...runs.map(r=>parseFloat(r.dist||0)))+' mi' : '—', cls:'run-c'},
-    {l:'Avg',      v:runs.length ? (total/runs.length).toFixed(1)+' mi' : '—'},
-  ]);
+  document.getElementById(`${tab}-prog`).style.width = ((newIdx/(s.items.length-1||1))*100)+'%';
+  document.getElementById(`${tab}-counter`).textContent = `${newIdx+1} / ${s.items.length}`;
+  const track = document.getElementById(`${tab}-track`); const outer = document.getElementById(`${tab}-to`);
+  const active = track.children[newIdx]; if(active) track.style.left = (outer.offsetWidth/2 - active.offsetLeft - active.offsetWidth/2) + 'px';
+}
+function tlPrev(t){ tlGoTo(t, TL[t].idx-1); }
+function tlNext(t){ tlGoTo(t, TL[t].idx+1); }
+
+/* ══════════════════════════════════════════════════════════ RENDERERS ══════════════════════════════════════════════════════════ */
+function renderRuns() {
+  const items = [...DB.runs].sort((a,b) => a.date<b.date?-1:1);
+  const tbody = document.getElementById('run-tbody'); tbody.innerHTML = '';
+  items.forEach(r => {
+    tbody.innerHTML += `<tr><td>${fmtS(r.date)}</td><td><strong class="run-c">${r.dist} mi</strong></td><td>${r.time||'—'}</td><td class="ht">${(r.time/r.dist||0).toFixed(1)}</td><td class="ht">${r.note||''}</td></tr>`;
+  });
+  tlBuild('run', items, {
+    color:'#c8f04a', icon:'🏃', getDate:r=>r.date, getBarH:r=>parseFloat(r.dist)||1,
+    makeSlide: r => `<div class="tl-slide-inner"><div class="tl-date">${fmtF(r.date)}</div><div class="tl-stat run-c">${r.dist}<small> mi</small></div><div class="tl-note">${r.note||'A solid run logged.'}</div></div>`
+  });
+  const total = items.reduce((s,r)=>s+parseFloat(r.dist||0), 0);
+  document.getElementById('run-sum').innerHTML = chips([{l:'Total',v:total.toFixed(1)+' mi',cls:'run-c'},{l:'Runs',v:items.length}]);
   updateHero();
 }
-
-/* ══════════════════════════════════════════════════════════
-   📚 READ RENDERER
-══════════════════════════════════════════════════════════ */
-const readCfg = {
-  color:'#f0a83c', icon:'📚',
-  getDate: b => b.added,
-  getBarH: _ => 1,
-  makeMarkerVal: b => b.status==='done' ? '✓' : b.status==='reading' ? '…' : '○',
-  getTeaserTitle: b => b.title,
-  makeSlide: b => {
-    const badge = b.status==='done' ? `<span class="badge b-done">Done ✓</span>` : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>` : `<span class="badge b-plan">Planned</span>`;
-    const qs    = parseQuotes(b.quotes);
-    const qBtn  = qs.length ? `<button class="quotes-btn" onclick="openQuotes('${b.id}')">📖 ${qs.length} Quote${qs.length!==1?'s':''}</button>` : '';
-    return `<div class="tl-slide-inner">
-      <div class="tl-date">Added ${fmtF(b.added)}</div>
-      <div class="tl-headline" style="color:var(--read)">${b.title}</div>
-      <div class="tl-meta">
-        ${badge}
-        ${b.cat    ? `<span class="badge b-read">${b.cat}</span>` : ''}
-        ${b.author ? `<span style="font-size:.9rem;color:var(--muted)">by ${b.author}</span>` : ''}
-      </div>
-      ${qBtn ? `<div style="margin-top:0.75rem">${qBtn}</div>` : ''}
-    </div>`;
-  }
-};
 
 function renderBooks() {
-  const books = [...DB.books].sort((a,b) => String(a.added) < String(b.added) ? -1 : 1);
-  const tbody = document.getElementById('read-tbody');
-  const cards = document.getElementById('read-cards');
-  const empty = document.getElementById('read-empty');
-  tbody.innerHTML = ''; cards.innerHTML = '';
-  empty.style.display = books.length ? 'none' : 'block';
-  books.forEach(b => {
-    const badge = b.status==='done' ? `<span class="badge b-done">Done ✓</span>` : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>` : `<span class="badge b-plan">Planned</span>`;
-    const qs   = parseQuotes(b.quotes);
-    const qbtn = qs.length ? `<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0;white-space:nowrap">📖 ${qs.length}q</button>` : '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><strong>${b.title}</strong></td><td class="ht" style="color:var(--muted)">${b.author||'—'}</td><td class="ht"><span class="badge b-read">${b.cat||'—'}</span></td><td>${badge}</td><td class="ht">${qbtn}</td><td class="ht" style="color:var(--muted);font-size:.82rem">${fmtS(b.added)}</td>`;
-    tbody.appendChild(tr);
-    const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${b.title}</span></div><div class="ecard-meta">${badge}${b.cat?`<span class="badge b-read">${b.cat}</span>`:''}${b.author?`<span style="font-size:.78rem;color:var(--muted)">${b.author}</span>`:''}${qs.length?`<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0">📖 ${qs.length}q</button>`:''}</div>`;
-    cards.appendChild(c);
+  const items = [...DB.books].sort((a,b) => a.added<b.added?-1:1);
+  const tbody = document.getElementById('read-tbody'); tbody.innerHTML = '';
+  items.forEach(b => {
+    const badge = b.status==='done'?'<span class="badge b-done">Done ✓</span>':(b.status==='reading'?'<span class="badge b-prog">Reading…</span>':'<span class="badge b-plan">Planned</span>');
+    tbody.innerHTML += `<tr><td><strong>${b.title}</strong></td><td class="ht">${b.author}</td><td class="ht"><span class="badge b-read">${b.cat}</span></td><td>${badge}</td><td class="ht">${parseQuotes(b.quotes).length}q</td><td class="ht">${fmtS(b.added)}</td></tr>`;
   });
-  tlBuild('read', books, readCfg);
-  const done    = books.filter(b=>b.status==='done').length;
-  const reading = books.filter(b=>b.status==='reading').length;
-  document.getElementById('read-sum').innerHTML = chips([
-    {l:'Total',   v:books.length},
-    {l:'Finished',v:done,    cls:'read-c'},
-    {l:'Reading', v:reading},
-    {l:'Planned', v:books.length-done-reading},
-  ]);
+  tlBuild('read', items, {
+    color:'#f0a83c', icon:'📚', getDate:b=>b.added, getBarH:b=>1,
+    makeSlide: b => `<div class="tl-slide-inner"><div class="tl-date">${fmtF(b.added)}</div><div class="tl-headline" style="color:var(--read)">${b.title}</div><div class="tl-meta"><span class="badge b-read">${b.cat}</span> by ${b.author}</div></div>`
+  });
+  document.getElementById('read-sum').innerHTML = chips([{l:'Total',v:items.length},{l:'Finished',v:items.filter(b=>b.status==='done').length,cls:'read-c'}]);
   updateHero();
 }
-
-/* ══════════════════════════════════════════════════════════
-   🌱 GROW RENDERER
-══════════════════════════════════════════════════════════ */
-const growCfg = {
-  color:'#4acfa8', icon:'🌱',
-  getDate: p => p.date,
-  getBarH: p => Math.max(1, daysFrom(p.date)),
-  makeMarkerVal: p => p.status==='growing' ? '🌿' : p.status==='harvested' ? '✓' : '✗',
-  getTeaserTitle: p => p.name,
-  makeSlide: p => {
-    const days  = daysFrom(p.date);
-    const badge = p.status==='growing' ? `<span class="badge b-grow">Growing 🌿</span>` : p.status==='harvested' ? `<span class="badge b-done">Harvested ✓</span>` : `<span class="badge b-fail">Failed ✗</span>`;
-    return `<div class="tl-slide-inner">
-      <div class="tl-date">Started ${fmtF(p.date)}</div>
-      <div class="tl-stat grow-c">${days}<small> days</small></div>
-      <div class="tl-headline" style="font-size:clamp(1.5rem,4vw,2.8rem);color:var(--grow)">${p.name}</div>
-      <div class="tl-meta">
-        ${badge}
-        ${p.system ? `<span class="badge" style="background:var(--grow-dim);color:var(--grow)">${p.system}</span>` : ''}
-      </div>
-      ${p.note ? `<div class="tl-note">${p.note}</div>` : ''}
-    </div>`;
-  }
-};
 
 function renderPlants() {
-  const plants = [...DB.plants].sort((a,b) => String(a.date) < String(b.date) ? -1 : 1);
-  const tbody  = document.getElementById('grow-tbody');
-  const cards  = document.getElementById('grow-cards');
-  const empty  = document.getElementById('grow-empty');
-  tbody.innerHTML = ''; cards.innerHTML = '';
-  empty.style.display = plants.length ? 'none' : 'block';
-  plants.forEach(p => {
-    const days  = daysFrom(p.date);
-    const badge = p.status==='growing' ? `<span class="badge b-grow">Growing 🌿</span>` : p.status==='harvested' ? `<span class="badge b-done">Harvested ✓</span>` : `<span class="badge b-fail">Failed ✗</span>`;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><strong>${p.name}</strong></td><td class="ht" style="color:var(--muted)">${fmtS(p.date)}</td><td class="ht"><span class="badge" style="background:var(--grow-dim);color:var(--grow)">${p.system||'—'}</span></td><td class="grow-c">${days}d</td><td>${badge}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.note||'—'}</td>`;
-    tbody.appendChild(tr);
-    const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${p.name}</span></div><div class="ecard-meta">${badge}<span class="badge b-grow">${days}d</span>${p.system?`<span class="badge b-neu">${p.system}</span>`:''}</div>${p.note?`<div class="ecard-note">${p.note}</div>`:''}`;
-    cards.appendChild(c);
+  const items = [...DB.plants].sort((a,b) => a.date<b.date?-1:1);
+  const tbody = document.getElementById('grow-tbody'); tbody.innerHTML = '';
+  items.forEach(p => {
+    const d = daysFrom(p.date); const badge = p.status==='growing'?'<span class="badge b-grow">Growing</span>':(p.status==='harvested'?'<span class="badge b-done">Harvested</span>':'<span class="badge b-fail">Failed</span>');
+    tbody.innerHTML += `<tr><td><strong>${p.name}</strong></td><td class="ht">${fmtS(p.date)}</td><td class="ht">${p.system}</td><td class="grow-c">${d}d</td><td>${badge}</td><td class="ht">${p.note}</td></tr>`;
   });
-  tlBuild('grow', plants, growCfg);
-  const growing   = plants.filter(p=>p.status==='growing').length;
-  const harvested = plants.filter(p=>p.status==='harvested').length;
-  document.getElementById('grow-sum').innerHTML = chips([
-    {l:'Total',     v:plants.length},
-    {l:'Growing',   v:growing,   cls:'grow-c'},
-    {l:'Harvested', v:harvested, cls:'grow-c'},
-    {l:'Failed',    v:plants.length-growing-harvested},
+  tlBuild('grow', items, {
+    color:'#4acfa8', icon:'🌱', getDate:p=>p.date, getBarH:p=>daysFrom(p.date),
+    makeSlide: p => `<div class="tl-slide-inner"><div class="tl-date">${fmtF(p.date)}</div><div class="tl-stat grow-c">${daysFrom(p.date)}<small> days</small></div><div class="tl-headline">${p.name}</div><div class="tl-note">${p.note}</div></div>`
+  });
+  document.getElementById('grow-sum').innerHTML = chips([{l:'Growing',v:items.filter(p=>p.status==='growing').length,cls:'grow-c'},{l:'Harvests',v:items.filter(p=>p.status==='harvested').length}]);
+  updateHero();
+}
+
+function renderRides() {
+  const items = [...DB.cycling].sort((a,b) => a.date<b.date?-1:1);
+  const tbody = document.getElementById('cycle-tbody'); tbody.innerHTML = '';
+  items.forEach(r => {
+    const b = r.status==='Completed'?'b-done':(r.status==='Skipped'?'b-fail':'b-neu');
+    tbody.innerHTML += `<tr><td>${fmtS(r.date)}</td><td><strong>${r.type}</strong></td><td>${r.duration}</td><td class="ht">${r.zone}</td><td class="ht">${r.dist} km</td><td><span class="badge ${b}">${r.status||'Upcoming'}</span></td></tr>`;
+  });
+  tlBuild('cycle', items, {
+    color:'#a78bfa', icon:'🚴', getDate:r=>r.date, getBarH:r=>parseFloat(r.dist)||20,
+    getMarkerColor: r => r.status==='Completed'?'#4acfa8':(r.status==='Skipped'?'#ff8080':'#a78bfa'),
+    makeSlide: r => `
+      <div class="tl-slide-inner">
+        <div class="tl-date">${fmtF(r.date)}</div>
+        <div class="tl-headline cycle-c">${r.type} <span style="font-size:0.5em;color:var(--muted)">Week ${r.week||'—'}</span></div>
+        <div class="tl-meta">
+          <span class="badge b-neu">${r.duration}</span>
+          <span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.zone}</span>
+Transform Cycle tab into Training Plan UI: status coloring, countdown chips, and coaching instruction slides        </div>
+        <div class="tl-note" style="border-left-color:var(--cycle);background:var(--surface);padding:1.5rem;font-style:normal;color:var(--text)">${r.note}</div>
+      </div>`
+  });
+  const done = items.filter(r=>r.status==='Completed').length;
+  const raceDate = new Date('2026-04-25'); const daysLeft = Math.ceil((raceDate-Date.now())/86400000);
+  document.getElementById('cycle-sum').innerHTML = chips([
+    {l:'Sessions Done', v:done+' / '+items.length, cls:'cycle-c'},
+    {l:'Race Countdown', v:daysLeft+' days', cls:'read-c'},
+    {l:'Race Goal', v:'25 km'}
   ]);
   updateHero();
 }
 
-/* ══════════════════════════════════════════════════════════    🚴 CYCLE RENDERER ══════════════════════════════════════════════════════════ */ const cycleCfg = {   color:'#a78bfa', icon:'🚴',   getDate: r => r.date,   getBarH: r => parseFloat(r.dist) || 1,   makeMarkerVal: r => `${r.dist}km`,   getTeaserTitle: r => `${r.dist} km`,   makeSlide: r => {     return `<div class="tl-slide-inner">       <div class="tl-date">${fmtF(r.date)}</div>       <div class="tl-stat cycle-c">${r.dist}<small> km</small></div>       <div class="tl-meta">         ${r.duration ? `<span class="badge b-neu">${r.duration}</span>` : ''}         ${r.type ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.type}</span>` : ''}         ${r.zone ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.zone}</span>` : ''}       </div>       ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}     </div>`;   } }; function renderRides() {   const rides = [...(DB.cycling||[])].sort((a,b) => String(a.date)<String(b.date)?-1:1);   const tbody = document.getElementById('cycle-tbody');   const cards = document.getElementById('cycle-cards');   const empty = document.getElementById('cycle-empty');   if (!tbody) return;   tbody.innerHTML = ''; cards.innerHTML = '';   empty.style.display = rides.length ? 'none' : 'block';   rides.forEach(r => {     const tr = document.createElement('tr');     tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="cycle-c">${r.dist} km</strong></td><td>${r.duration||'—'}</td><td class="ht">${r.type||'—'}</td><td class="ht">${r.zone||'—'}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;     tbody.appendChild(tr);     const c = document.createElement('div'); c.className='ecard';     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title cycle-c">${r.dist} km</span></div><div class="ecard-meta"><span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${fmtS(r.date)}</span>${r.duration?`<span class="badge b-neu">${r.duration}</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}` ;     cards.appendChild(c);   });   tlBuild('cycle', rides, cycleCfg);   const total = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);   const longest = rides.length ? Math.max(...rides.map(r=>parseFloat(r.dist||0))) : 0;   document.getElementById('cycle-sum').innerHTML = chips([     {l:'Total km', v:total.toFixed(0)+' km', cls:'cycle-c'},     {l:'Rides', v:rides.length},     {l:'Longest', v:rides.length ? longest+' km' : '—', cls:'cycle-c'},     {l:'Avg', v:rides.length ? (total/rides.length).toFixed(0)+' km' : '—'},   ]);   updateHero(); } function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); }
+function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); }
 
-/* ══════════════════════════════════════════════════════════
-   HERO
-══════════════════════════════════════════════════════════ */
 function updateHero() {
-  const { runs, books, plants } = DB;
-  const mi = runs.reduce((s,r) => s+parseFloat(r.dist||0), 0);
-  document.getElementById('h-miles').innerHTML = `${mi.toFixed(1)} <small style="font-size:.4em">mi</small>`;
-  document.getElementById('h-runs').textContent = `${runs.length} race${runs.length!==1?'s':''} logged`;
-  const done = books.filter(b=>b.status==='done').length;
-  document.getElementById('h-books').textContent  = done;
-  document.getElementById('h-reading').textContent = `${books.length} total in list`;
-  const growing   = plants.filter(p=>p.status==='growing').length;
-  const harvested = plants.filter(p=>p.status==='harvested').length;
-  document.getElementById('h-plants').textContent   = growing;
-  document.getElementById('h-harvests').textContent = `${harvested} harvest${harvested!==1?'s':''}`;
-    const rides = DB.cycling || [];
-  const km = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);
-  const hkm = document.getElementById('h-km');
-  if (hkm) hkm.innerHTML = `${km.toFixed(0)} <small>km</small>`;
-  const hrides = document.getElementById('h-rides');
-  if (hrides) hrides.textContent = `${rides.length} ride${rides.length!==1?'s':''} logged`;
+  const mi = DB.runs.reduce((s,r)=>s+parseFloat(r.dist||0), 0);
+  document.getElementById('h-miles').innerHTML = mi.toFixed(1)+' <small>mi</small>';
+  document.getElementById('h-runs').textContent = DB.runs.length + ' race' + (DB.runs.length!==1?'s':'') + ' logged';
+  document.getElementById('h-books').textContent = DB.books.filter(b=>b.status==='done').length;
+  document.getElementById('h-reading').textContent = DB.books.length + ' total in list';
+  document.getElementById('h-plants').textContent = DB.plants.filter(p=>p.status==='growing').length;
+  document.getElementById('h-harvests').textContent = DB.plants.filter(p=>p.status==='harvested').length + ' harvests';
+  const km = DB.cycling.filter(r=>r.status==='Completed').reduce((s,r)=>s+parseFloat(r.dist||0),0);
+  document.getElementById('h-km').innerHTML = km.toFixed(0)+' <small>km</small>';
+  document.getElementById('h-rides').textContent = DB.cycling.filter(r=>r.status==='Completed').length + ' rides completed';
 }
 
-/* ══════════════════════════════════════════════════════════
-   QUOTES MODAL
-══════════════════════════════════════════════════════════ */
-function openQuotes(bookId) {
-  const b = DB.books.find(b => String(b.id) === String(bookId));
-  if (!b) return;
-  const qs = parseQuotes(b.quotes);
-  if (!qs.length) { showBanner('No quotes for this book yet — add them in Sheets under the Quotes column, separated by |', 'info'); return; }
-  document.getElementById('qmodal')?.remove();
-  const modal = document.createElement('div');
-  modal.className = 'qmodal-overlay'; modal.id = 'qmodal';
-  modal.innerHTML = `
-    <div class="qmodal" role="dialog" aria-modal="true">
-      <div class="qmodal-head">
-        <div>
-          <div class="qmodal-title">${escHtml(b.title)}</div>
-          <div class="qmodal-author">by ${escHtml(b.author||'')}</div>
-        </div>
-        <button class="qmodal-close" onclick="closeQuotes()">×</button>
-      </div>
-      <div class="q-count">${qs.length} quote${qs.length!==1?'s':''}</div>
-      <div class="qmodal-body">${qs.map(q=>`<div class="q-item"><div class="q-text">${escHtml(q.content)}</div></div>`).join('')}</div>
-    </div>`;
-  document.body.appendChild(modal);
-  modal.addEventListener('click', e => { if (e.target===modal) closeQuotes(); });
-  document.addEventListener('keydown', onModalKey);
-}
-function closeQuotes() { document.getElementById('qmodal')?.remove(); document.removeEventListener('keydown', onModalKey); }
-function onModalKey(e) { if (e.key==='Escape') closeQuotes(); }
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* ══════════════════════════════════════════════════════════
-   INIT
-══════════════════════════════════════════════════════════ */
-setSheetLinks();
-gsGet();
-</script>
+setSheetLinks(); gsGet();
+    </script>
 </body>
 </html>
