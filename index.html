@@ -769,7 +769,7 @@ function tlBuild(tab, items, cfg) {
   });
 
   tlInitDrag(tab); tlInitSwipe(tab);
-  const startIdx = tab === 'run' ? items.length - 1 : 0;
+  const startIdx = (tab === 'run' || tab === 'read') ? items.length - 1 : 0;
   requestAnimationFrame(() => tlGoTo(tab, startIdx, true));
 }
 
@@ -919,7 +919,7 @@ function renderBooks() {
     const qs   = parseQuotes(b.quotes);
     const qbtn = qs.length ? `<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0;white-space:nowrap">📖 ${qs.length}q</button>` : '';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td><strong>${b.title}</strong></td><td class="ht" style="color:var(--muted)">${b.author||'—'}</td><td class="ht"><span class="badge b-read">${b.cat||'—'}</span></td><td>${badge}</td><td class="ht">${qbtn}</td><td class="ht" style="color:var(--muted);font-size:.82rem">${fmtS(b.added)}</td>`;
+    tr.innerHTML = `<td><strong>${b.title}</strong></td><td class="ht" style="color:var(--muted)">${b.author||'—'}</td><td class="ht"><span class="badge b-read">${b.cat||'—'}</span></td><td>${badge}</td><td class="ht">${qbtn}</td><td class="ht" style="color:var(--muted);font-size:.82rem">${fmtF(b.added)}</td>`;
     tbody.appendChild(tr);
     const c = document.createElement('div'); c.className = 'ecard';
     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${b.title}</span></div><div class="ecard-meta">${badge}${b.cat?`<span class="badge b-read">${b.cat}</span>`:''}${b.author?`<span style="font-size:.78rem;color:var(--muted)">${b.author}</span>`:''}${qs.length?`<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0">📖 ${qs.length}q</button>`:''}</div>`;
