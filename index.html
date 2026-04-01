@@ -361,7 +361,7 @@
    document.getElementById('cycle-timers').innerHTML = '<div id="timer-race"></div>';
    window.timers.push(new CountdownTimer(parseD('25/04/2026'), 'timer-race', 'Race Day Countdown', true));
 
-   const active = items.find(r => !r.status || r.status==='Upcoming') || items[items.length-1];
+   const today = new Date(); today.setHours(0,0,0,0); const active = items.find(r => { const d = parseD(r.date); d.setHours(0,0,0,0); return d >= today; }) || items[items.length-1];
    if (active) {
     document.getElementById('cycle-hero-workout').innerHTML = `
      <div class="workout-hero">
@@ -815,6 +815,8 @@
    const km = DB.cycling.filter(r=>r.status==='Completed').reduce((s,r)=>s+parseFloat(r.dist||0),0); document.getElementById('h-km').innerHTML = km.toFixed(0)+' <small>km</small>';
    document.getElementById('h-books').textContent = DB.books.filter(b=>b.status==='done').length;
    document.getElementById('h-plants').textContent = DB.plants.filter(p=>p.status==='growing').length;
+   document.getElementById('h-runs').textContent = DB.runs.length + ' race' + (DB.runs.length!==1?'s':'') + ' logged';
+   document.getElementById('h-rides').textContent = DB.cycling.filter(r=>r.status==='Completed').length + ' rides logged';
   }
 
   gsGet();
