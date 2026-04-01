@@ -769,7 +769,8 @@ function tlBuild(tab, items, cfg) {
   });
 
   tlInitDrag(tab); tlInitSwipe(tab);
-  requestAnimationFrame(() => tlGoTo(tab, 0, true));
+  const startIdx = tab === 'run' ? items.length - 1 : 0;
+  requestAnimationFrame(() => tlGoTo(tab, startIdx, true));
 }
 
 function tlGoTo(tab, newIdx, initial=false) {
@@ -863,7 +864,7 @@ function renderRuns() {
   runs.forEach(r => {
     const pace = r.time && r.dist ? (parseFloat(r.time)/parseFloat(r.dist)).toFixed(1)+' min/mi' : '—';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="run-c">${r.dist} mi</strong></td><td>${r.time?r.time+' min':'—'}</td><td class="ht" style="color:var(--muted)">${pace}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;
+    tr.innerHTML = `<td>${fmtF(r.date)}</td><td><strong class="run-c">${r.dist} mi</strong></td><td>${r.time?r.time+' min':'—'}</td><td class="ht" style="color:var(--muted)">${pace}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;
     tbody.appendChild(tr);
     const c = document.createElement('div'); c.className = 'ecard';
     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title run-c">${r.dist} mi</span></div><div class="ecard-meta"><span class="badge b-run">${fmtS(r.date)}</span>${r.time?`<span class="badge b-neu">${r.time} min</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}`;
