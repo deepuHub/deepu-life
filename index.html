@@ -504,7 +504,8 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
     </a>
   </div>
   <div class="summary-strip" id="read-sum"></div>
-  <div id="read-tv"></div>
+  <div id="read-now-row" class="read-now-row"></div>
+    <div id="read-tv"></div>
   <div id="read-lv" class="list-wrap">
     <div class="list-section-label">All Books</div>
     <div class="twrap"><table class="etable"><thead><tr><th>Title</th><th class="ht">Author</th><th class="ht">Category</th><th>Status</th><th class="ht">Quotes</th><th class="ht">Added</th></tr></thead><tbody id="read-tbody"></tbody></table></div>
@@ -532,7 +533,7 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
   </div>
 </section>
 
-<!-- ══ 🚴 CYCLE ══════════════════════════════════════════════ --><section class="tab-section" id="tab-cycle"> <div class="sec-head"> <div><p class="sec-eyebrow cycle-c">04 — Cycling</p><h2 class="sec-title">Ride log.</h2></div> <a id="sheets-link-cycle" href="#" target="_blank" class="sheets-btn sheets-btn-cycle"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg> Add in Sheets</a> </div> <div class="summary-strip" id="cycle-sum"></div> <div id="cycle-tv"></div> <div id="cycle-lv" class="list-wrap"> <div class="list-section-label">All Rides</div> <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Type</th><th class="ht">Zone</th><th class="ht">Notes</th></tr></thead><tbody id="cycle-tbody"></tbody></table></div> <div class="card-list" id="cycle-cards"></div> <div class="empty-st" id="cycle-empty"><span class="emo">🚴</span>No rides yet — add one in Google Sheets!</div> </div></section><footer>
+<!-- ══ 🚴 CYCLE ══════════════════════════════════════════════ --><section class="tab-section" id="tab-cycle"> <div class="sec-head"> <div><p class="sec-eyebrow cycle-c">04 — Cycling</p><h2 class="sec-title">Ride log.</h2></div> <a id="sheets-link-cycle" href="#" target="_blank" class="sheets-btn sheets-btn-cycle"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg> Add in Sheets</a> </div> <div class="summary-strip" id="cycle-sum"></div> <div id="cycle-tv"></div> <div id="cycle-lv" class="list-wrap"> <div class="list-section-label">All Rides</div> <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Type</th><th class="ht">Zone</th><th>Status</th><th class="ht">Notes</th></tr></thead><tbody id="cycle-tbody"></tbody></table></div> <div class="card-list" id="cycle-cards"></div> <div class="empty-st" id="cycle-empty"><span class="emo">🚴</span>No rides yet — add one in Google Sheets!</div> </div></section><footer>
   <div class="flogo">deepu<span>-life</span></div>
   <div class="fright">Standalone tracker · Deepu's personal hub
     <div class="flinks">
@@ -769,7 +770,7 @@ function tlBuild(tab, items, cfg) {
   });
 
   tlInitDrag(tab); tlInitSwipe(tab);
-  const startIdx = (tab === 'run' || tab === 'read') ? items.length - 1 : 0;
+  const startIdx = tab === 'run' ? items.length - 1 : 0;
   requestAnimationFrame(() => tlGoTo(tab, startIdx, true));
 }
 
@@ -926,6 +927,22 @@ function renderBooks() {
     cards.appendChild(c);
   });
   tlBuild('read', books, readCfg);
+    // ── Reading-now chips + smart default ───────────────
+    const readingNow = books.filter(b => b.status === 'reading')
+      .sort((a,b) => String(b.added) > String(a.added) ? 1 : -1);
+    const rnRow = document.getElementById('read-now-row');
+    if (rnRow) {
+      if (readingNow.length) {
+        rnRow.innerHTML = readingNow.map(b =>
+          `<button class="read-now-chip" onclick="tlGoTo('read',${books.indexOf(b)})">${escHtml(b.title)}</button>`
+        ).join('');
+        rnRow.style.display = 'flex';
+        tlGoTo('read', books.indexOf(readingNow[0]));
+      } else {
+        rnRow.style.display = 'none';
+        tlGoTo('read', books.length - 1);
+      }
+    }
   const done    = books.filter(b=>b.status==='done').length;
   const reading = books.filter(b=>b.status==='reading').length;
   document.getElementById('read-sum').innerHTML = chips([
@@ -991,7 +1008,7 @@ function renderPlants() {
   updateHero();
 }
 
-/* ══════════════════════════════════════════════════════════    🚴 CYCLE RENDERER ══════════════════════════════════════════════════════════ */ const cycleCfg = {   color:'#a78bfa', icon:'🚴',   getDate: r => r.date,   getBarH: r => parseFloat(r.dist) || 1,   makeMarkerVal: r => `${r.dist}km`,   getTeaserTitle: r => `${r.dist} km`,   makeSlide: r => {     return `<div class="tl-slide-inner">       <div class="tl-date">${fmtF(r.date)}</div>       <div class="tl-stat cycle-c">${r.dist}<small> km</small></div>       <div class="tl-meta">         ${r.duration ? `<span class="badge b-neu">${r.duration}</span>` : ''}         ${r.type ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.type}</span>` : ''}         ${r.zone ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.zone}</span>` : ''}       </div>       ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}     </div>`;   } }; function renderRides() {   const rides = [...(DB.cycling||[])].sort((a,b) => String(a.date)<String(b.date)?-1:1);   const tbody = document.getElementById('cycle-tbody');   const cards = document.getElementById('cycle-cards');   const empty = document.getElementById('cycle-empty');   if (!tbody) return;   tbody.innerHTML = ''; cards.innerHTML = '';   empty.style.display = rides.length ? 'none' : 'block';   rides.forEach(r => {     const tr = document.createElement('tr');     tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="cycle-c">${r.dist} km</strong></td><td>${r.duration||'—'}</td><td class="ht">${r.type||'—'}</td><td class="ht">${r.zone||'—'}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;     tbody.appendChild(tr);     const c = document.createElement('div'); c.className='ecard';     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title cycle-c">${r.dist} km</span></div><div class="ecard-meta"><span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${fmtS(r.date)}</span>${r.duration?`<span class="badge b-neu">${r.duration}</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}` ;     cards.appendChild(c);   });   tlBuild('cycle', rides, cycleCfg);   const total = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);   const longest = rides.length ? Math.max(...rides.map(r=>parseFloat(r.dist||0))) : 0;   document.getElementById('cycle-sum').innerHTML = chips([     {l:'Total km', v:total.toFixed(0)+' km', cls:'cycle-c'},     {l:'Rides', v:rides.length},     {l:'Longest', v:rides.length ? longest+' km' : '—', cls:'cycle-c'},     {l:'Avg', v:rides.length ? (total/rides.length).toFixed(0)+' km' : '—'},   ]);   updateHero(); } function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); }
+/* ══════════════════════════════════════════════════════════    🚴 CYCLE RENDERER ══════════════════════════════════════════════════════════ */ const cycleCfg = {   color:'#a78bfa', icon:'🚴',   getDate: r => r.date,   getBarH: r => parseFloat(r.dist) || 1,   makeMarkerVal: r => `${r.dist}km`,   getTeaserTitle: r => `${r.dist} km`,   makeSlide: r => {     return `<div class="tl-slide-inner">       <div class="tl-date">${fmtF(r.date)}</div>       <div class="tl-stat cycle-c">${r.dist}<small> km</small></div>       <div class="tl-meta">         ${r.duration ? `<span class="badge b-neu">${r.duration}</span>` : ''}         ${r.type ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.type}</span>` : ''}         ${r.zone ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.zone}</span>${r.status?`<span class="badge ${r.status.toLowerCase()==='skipped'?'b-fail':r.status.toLowerCase()==='done'?'b-done':'b-neu'}">${r.status}</span>`:''}` : ''}       </div>       ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}     </div>`;   } }; function renderRides() {   const rides = [...(DB.cycling||[])].sort((a,b) => String(a.date)<String(b.date)?-1:1);   const tbody = document.getElementById('cycle-tbody');   const cards = document.getElementById('cycle-cards');   const empty = document.getElementById('cycle-empty');   if (!tbody) return;   tbody.innerHTML = ''; cards.innerHTML = '';   empty.style.display = rides.length ? 'none' : 'block';   rides.forEach(r => {     const tr = document.createElement('tr');     tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="cycle-c">${r.dist} km</strong></td><td>${r.duration||'—'}</td><td class="ht">${r.type||'—'}</td><td class="ht">${r.zone||'—'}</td><td>${r.status?`<span class="badge ${r.status.toLowerCase()==='skipped'?'b-fail':r.status.toLowerCase()==='done'?'b-done':'b-neu'}">${r.status}</span>`:'—'}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;     tbody.appendChild(tr);     const c = document.createElement('div'); c.className='ecard';     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title cycle-c">${r.dist} km</span></div><div class="ecard-meta"><span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${fmtS(r.date)}</span>${r.duration?`<span class="badge b-neu">${r.duration}</span>`:''} ${r.status?`<span class="badge ${r.status.toLowerCase()==='skipped'?'b-fail':r.status.toLowerCase()==='done'?'b-done':'b-neu'}">${r.status}</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}` ;     cards.appendChild(c);   });   tlBuild('cycle', rides, cycleCfg);   const total = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);   const longest = rides.length ? Math.max(...rides.map(r=>parseFloat(r.dist||0))) : 0;   document.getElementById('cycle-sum').innerHTML = chips([     {l:'Total km', v:total.toFixed(0)+' km', cls:'cycle-c'},     {l:'Rides', v:rides.length},     {l:'Longest', v:rides.length ? longest+' km' : '—', cls:'cycle-c'},     {l:'Avg', v:rides.length ? (total/rides.length).toFixed(0)+' km' : '—'},   ]);   updateHero(); } function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); }
 
 /* ══════════════════════════════════════════════════════════
    HERO
