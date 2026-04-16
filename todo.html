@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Local To-Do Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="description" content="Local To-Do Manager - an offline, localStorage-based multi-checklist to-do app." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- Optional favicon/icons; you can replace these with your own assets -->
+  <link rel="icon" href="icons/icon-192.png" />
+  <style>
+    :root {
+      --bg-body: #e5e7eb;
+      --bg-sidebar: #111827;
+      --bg-main: #f9fafb;
+      --accent: #4f46e5;
+      --accent-light: #6366f1;
+      --accent-soft: #e0e7ff;
+      --border-subtle: #d1d5db;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --danger: #ef4444;
+      --danger-soft: #fee2e2;
+      --warning: #facc15;
+      --warning-soft: #fef9c3;
+      --success: #22c55e;
+      --success-soft: #dcfce7;
+      --radius: 0.5rem;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #eef2ff, #e5e7eb);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: radial-gradient(circle at top left, #1f2937, #020617);
+      color: #f9fafb;
+      padding: 1rem 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      box-shadow: 3px 0 15px rgba(15, 23, 42, 0.3);
+    }
+
+    .sidebar-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .app-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .app-subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .sidebar-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 8px 16px rgba(79, 70, 229, 0.4);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.55);
+      background: linear-gradient(135deg, var(--accent-light), #818cf8);
+    }
+
+    button.secondary {
+      background: rgba(31, 41, 55, 0.8);
+      color: #e5e7eb;
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    }
+
+    button.secondary:hover {
+      background: rgba(55, 65, 81, 1);
+      border-color: rgba(75, 85, 99, 1);
+      transform: translateY(-1px);
+    }
+
+    .checklist-section-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .checklist-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      padding: 0.45rem 0.6rem;
+      border-radius: 0.45rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: linear-gradient(to right, rgba(31, 41, 55, 0.9), rgba(17, 24, 39, 0.9));
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+      font-size: 0.8rem;
+      color: #e5e7eb;
+    }
+
+    .checklist-item:hover {
+      background: linear-gradient(to right, rgba(55, 65, 81, 0.95), rgba(17, 24, 39, 0.95));
+      transform: translateY(-1px);
+    }
+
+    .checklist-item.active {
+      border-color: rgba(129, 140, 248, 0.9);
+      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.75);
+      background: radial-gradient(circle at left, rgba(129, 140, 248, 0.3), rgba(17, 24, 39, 0.95));
+    }
+
+    .checklist-item-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .checklist-item-count {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    .sidebar-footer {
+      font-size: 0.7rem;
+      color: #6b7280;
+      border-top: 1px solid rgba(55, 65, 81, 0.8);
+      padding-top: 0.5rem;
+      margin-top: 0.3rem;
+    }
+
+    /* Main panel */
+    .main {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .main-card {
+      background: rgba(249, 250, 251, 0.95);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(209, 213, 219, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .main-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .main-header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .main-header-title h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .main-header-title small {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 0.1rem 0.5rem;
+      font-size: 0.7rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(129, 140, 248, 0.8);
+    }
+
+    .main-header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .button-ghost {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: white;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .button-ghost:hover {
+      background: #f3f4f6;
+      color: var(--text-main);
+      border-color: #9ca3af;
+    }
+
+    .button-danger {
+      border-radius: 999px;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      background: rgba(248, 250, 252, 0.9);
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      color: var(--danger);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .button-danger:hover {
+      background: var(--danger-soft);
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    /* Filters and search */
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filters-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .filters-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .filters-group select,
+    .filters-group input[type="search"] {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      background: white;
+      color: var(--text-main);
+      min-width: 110px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .filters-group input[type="search"] {
+      min-width: 160px;
+    }
+
+    .filters-group select:focus,
+    .filters-group input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
+    }
+
+    .filters-spacer {
+      flex: 1;
+    }
+
+    /* Task list */
+    .tasks-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .tasks-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .tasks-header-count strong {
+      color: var(--text-main);
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+
+    .task-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid var(--border-subtle);
+      background: white;
+      transition: box-shadow 0.12s ease, transform 0.08s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .task-item:hover {
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+      border-color: rgba(129, 140, 248, 0.6);
+    }
+
+    .task-checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-checkbox input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+    }
+
+    .task-main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+
+    .task-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .task-title.completed {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .task-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .task-priority-pill {
+      padding: 0.05rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+
+    .priority-high {
+      border-left: 4px solid var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .priority-high .task-priority-pill {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .priority-medium {
+      border-left: 4px solid var(--warning);
+      background: var(--warning-soft);
+    }
+
+    .priority-medium .task-priority-pill {
+      background: rgba(250, 204, 21, 0.1);
+      color: #92400e;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .priority-low {
+      border-left: 4px solid var(--success);
+      background: var(--success-soft);
+    }
+
+    .priority-low .task-priority-pill {
+      background: rgba(34, 197, 94, 0.1);
+      color: #166534;
+      border-color: rgba(34, 197, 94, 0.4);
+    }
+
+    .priority-none {
+      border-left: 4px solid #9ca3af;
+      background: #f3f4f6;
+    }
+
+    .priority-none .task-priority-pill {
+      background: rgba(156, 163, 175, 0.1);
+      color: #4b5563;
+      border-color: rgba(156, 163, 175, 0.4);
+    }
+
+    .task-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .task-actions button {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #f9fafb;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+    }
+
+    .task-actions button:hover {
+      background: #e5e7eb;
+      color: var(--text-main);
+      border-color: #9ca3af;
+      transform: translateY(-0.5px);
+    }
+
+    .task-actions button.delete {
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(254, 242, 242, 0.8);
+    }
+
+    .task-actions button.delete:hover {
+      background: var(--danger-soft);
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    .no-tasks {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 0.75rem;
+      border-radius: 0.6rem;
+      background: #f3f4f6;
+      border: 1px dashed var(--border-subtle);
+    }
+
+    /* Task form */
+    .task-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, #f9fafb, #e0f2fe);
+      border: 1px solid #d1d5db;
+    }
+
+    .task-form input[type="text"],
+    .task-form input[type="date"],
+    .task-form select {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      background: white;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .task-form input[type="text"] {
+      flex: 1 1 160px;
+      min-width: 140px;
+    }
+
+    .task-form input[type="date"] {
+      flex: 0 0 auto;
+    }
+
+    .task-form select {
+      flex: 0 0 auto;
+    }
+
+    .task-form input:focus,
+    .task-form select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
+    }
+
+    .task-form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .task-form .primary {
+      padding-inline: 1rem;
+      font-size: 0.82rem;
+    }
+
+    .task-form small {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Stats / charts */
+    .stats-card {
+      background: rgba(249, 250, 251, 0.95);
+      border-radius: 1rem;
+      padding: 1rem 1.25rem 1.25rem;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(209, 213, 219, 0.7);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .stat-block h3 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .stat-block small {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .stat-chart {
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-subtle);
+      background: #f9fafb;
+      padding: 0.25rem;
+    }
+
+    canvas {
+      width: 100%;
+      height: 140px;
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .stats-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: column;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.4);
+      }
+      .main {
+        padding: 1rem;
+      }
+      .main-card {
+        padding: 1rem 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar: checklists -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="app-title">Local To-Do Manager</div>
+        <div class="app-subtitle">Offline, multi-checklist, localStorage-based to-do app.</div>
+        <div class="sidebar-actions">
+          <button id="new-checklist-btn" class="primary">
+            <span>＋</span>
+            <span>New Checklist</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="checklist-section-title">Checklists</div>
+        <ul id="checklist-list" class="checklist-list"></ul>
+      </div>
+
+      <div class="sidebar-footer">
+        Data is stored in your browser’s local storage and never leaves this device.
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <section class="main-card">
+        <header class="main-header">
+          <div class="main-header-title">
+            <h1>
+              <span id="checklist-title">Checklist</span>
+              <span class="badge" id="checklist-task-count-badge">0 tasks</span>
+            </h1>
+            <small id="checklist-subtitle">Create or select a checklist from the sidebar.</small>
+          </div>
+          <div class="main-header-actions">
+            <button id="rename-checklist-btn" class="button-ghost">
+              ✎ <span>Rename</span>
+            </button>
+            <button id="delete-checklist-btn" class="button-danger">
+              🗑 <span>Delete Checklist</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Filters and search -->
+        <div class="filters-row">
+          <div class="filters-group">
+            <label for="filter-status">Status</label>
+            <select id="filter-status">
+              <option value="all">All</option>
+              <option value="completed">Completed</option>
+              <option value="incomplete">Incomplete</option>
+            </select>
+          </div>
+          <div class="filters-group">
+            <label for="filter-priority">Priority</label>
+            <select id="filter-priority">
+              <option value="all">All</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div class="filters-spacer"></div>
+          <div class="filters-group">
+            <label for="task-search">Search</label>
+            <input id="task-search" type="search" placeholder="Search tasks…" />
+          </div>
+        </div>
+
+        <!-- Tasks -->
+        <section class="tasks-section">
+          <div class="tasks-header">
+            <div class="tasks-header-count">
+              <span><strong id="tasks-visible-count">0</strong> shown</span>
+              <span>•</span>
+              <span><span id="tasks-total-count">0</span> total</span>
+            </div>
+          </div>
+          <ul id="task-list" class="task-list"></ul>
+          <div id="no-tasks-message" class="no-tasks" style="display:none;">
+            No tasks match the current filters. Try changing the filters or adding a new task.
+          </div>
+        </section>
+
+        <!-- Task form -->
+        <form id="task-form" class="task-form">
+          <input id="task-title" type="text" placeholder="Task title…" required />
+          <input id="task-due-date" type="date" />
+          <select id="task-priority">
+            <option value="none">No priority</option>
+            <option value="high">High priority</option>
+            <option value="medium">Medium priority</option>
+            <option value="low">Low priority</option>
+          </select>
+          <div class="task-form-actions">
+            <button id="task-submit-btn" type="submit" class="primary">
+              ＋ Add Task
+            </button>
+            <button id="task-cancel-edit-btn" type="button" class="button-ghost" style="display:none;">
+              ✕ Cancel
+            </button>
+            <small id="task-form-hint">Enter a title, optional due date and priority.</small>
+          </div>
+        </form>
+      </section>
+
+      <!-- Graphs and stats -->
+      <section class="stats-card">
+        <div class="stat-block">
+          <h3>Completed over time</h3>
+          <small>Total completed tasks per day (all checklists).</small>
+          <div class="stat-chart">
+            <canvas id="chart-completed-over-time"></canvas>
+          </div>
+        </div>
+        <div class="stat-block">
+          <h3>Completion rate per checklist</h3>
+          <small>Completed vs total tasks by checklist.</small>
+          <div class="stat-chart">
+            <canvas id="chart-completion-rate"></canvas>
+          </div>
+        </div>
+        <div class="stat-block">
+          <h3>Priority distribution</h3>
+          <small>High/medium/low/none priorities in the current checklist.</small>
+          <div class="stat-chart">
+            <canvas id="chart-priority-distribution"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "localTodoManagerState_v1";
+
+      let state = {
+        checklists: [],
+        selectedChecklistId: null,
+        filters: {
+          status: "all",
+          priority: "all",
+          search: ""
+        }
+      };
+
+      let editingTaskId = null;
+
+      // Cached DOM elements
+      let checklistListEl,
+          newChecklistBtn,
+          checklistTitleEl,
+          checklistSubtitleEl,
+          checklistTaskCountBadge,
+          renameChecklistBtn,
+          deleteChecklistBtn,
+          filterStatusEl,
+          filterPriorityEl,
+          taskSearchEl,
+          taskListEl,
+          noTasksMessageEl,
+          tasksVisibleCountEl,
+          tasksTotalCountEl,
+          taskFormEl,
+          taskTitleEl,
+          taskDueDateEl,
+          taskPriorityEl,
+          taskSubmitBtn,
+          taskCancelEditBtn,
+          taskFormHintEl,
+          chartCompletedOverTimeEl,
+          chartCompletionRateEl,
+          chartPriorityDistributionEl;
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          console.error("Failed to save state to localStorage", e);
+        }
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") return;
+          if (!Array.isArray(parsed.checklists)) return;
+          state = Object.assign(
+            {
+              checklists: [],
+              selectedChecklistId: null,
+              filters: { status: "all", priority: "all", search: "" }
+            },
+            parsed
+          );
+        } catch (e) {
+          console.warn("Failed to parse state from localStorage, using defaults", e);
+        }
+      }
+
+      function createChecklist(name) {
+        return {
+          id: "cl_" + Date.now() + "_" + Math.random().toString(36).slice(2),
+          name: name || "New Checklist",
+          createdAt: new Date().toISOString(),
+          tasks: []
+        };
+      }
+
+      function createTask(title, dueDate, priority) {
+        return {
+          id: "ts_" + Date.now() + "_" + Math.random().toString(36).slice(2),
+          title: title.trim(),
+          dueDate: dueDate || null,
+          priority: priority || "none",
+          completed: false,
+          createdAt: new Date().toISOString(),
+          completedAt: null
+        };
+      }
+
+      function getSelectedChecklist() {
+        return state.checklists.find(c => c.id === state.selectedChecklistId) || null;
+      }
+
+      function ensureInitialChecklist() {
+        if (state.checklists.length === 0) {
+          const initial = createChecklist("My First Checklist");
+          initial.tasks.push(createTask("Welcome to Local To-Do Manager", null, "medium"));
+          initial.tasks.push(createTask("Try adding your own tasks", null, "low"));
+          state.checklists.push(initial);
+          state.selectedChecklistId = initial.id;
+        } else if (!state.selectedChecklistId && state.checklists[0]) {
+          state.selectedChecklistId = state.checklists[0].id;
+        }
+      }
+
+      function setEditingTask(taskId) {
+        editingTaskId = taskId;
+        const checklist = getSelectedChecklist();
+        const task = checklist ? checklist.tasks.find(t => t.id === taskId) : null;
+        if (!task) {
+          clearTaskForm();
+          return;
+        }
+        taskTitleEl.value = task.title;
+        taskDueDateEl.value = task.dueDate || "";
+        taskPriorityEl.value = task.priority || "none";
+        taskSubmitBtn.textContent = "Save Changes";
+        taskFormHintEl.textContent = "Editing existing task. Save or cancel to finish.";
+        taskCancelEditBtn.style.display = "inline-flex";
+      }
+
+      function clearTaskForm() {
+        editingTaskId = null;
+        taskFormEl.reset();
+        taskPriorityEl.value = "none";
+        taskSubmitBtn.textContent = "＋ Add Task";
+        taskFormHintEl.textContent = "Enter a title, optional due date and priority.";
+        taskCancelEditBtn.style.display = "none";
+      }
+
+      function applyFilters(tasks) {
+        const { status, priority, search } = state.filters;
+        const q = (search || "").toLowerCase().trim();
+        return tasks.filter(task => {
+          if (status === "completed" && !task.completed) return false;
+          if (status === "incomplete" && task.completed) return false;
+          if (priority !== "all" && task.priority !== priority) return false;
+          if (q && !task.title.toLowerCase().includes(q)) return false;
+          return true;
+        });
+      }
+
+      function updateChecklistHeader() {
+        const checklist = getSelectedChecklist();
+        if (!checklist) {
+          checklistTitleEl.textContent = "No checklist selected";
+          checklistSubtitleEl.textContent = "Create a checklist from the sidebar to get started.";
+          checklistTaskCountBadge.textContent = "0 tasks";
+          return;
+        }
+        const total = checklist.tasks.length;
+        const completed = checklist.tasks.filter(t => t.completed).length;
+        checklistTitleEl.textContent = checklist.name || "Untitled checklist";
+        checklistSubtitleEl.textContent = `${completed} of ${total} tasks completed`;
+        checklistTaskCountBadge.textContent = `${total} task${total === 1 ? "" : "s"}`;
+      }
+
+      function renderSidebar() {
+        checklistListEl.innerHTML = "";
+        if (state.checklists.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "No checklists yet.";
+          li.style.fontSize = "0.85rem";
+          li.style.color = "#9ca3af";
+          checklistListEl.appendChild(li);
+          return;
+        }
+        state.checklists.forEach(checklist => {
+          const li = document.createElement("li");
+          li.className = "checklist-item" + (checklist.id === state.selectedChecklistId ? " active" : "");
+          li.dataset.id = checklist.id;
+
+          const nameSpan = document.createElement("span");
+          nameSpan.className = "checklist-item-name";
+          nameSpan.textContent = checklist.name || "Untitled checklist";
+
+          const countSpan = document.createElement("span");
+          countSpan.className = "checklist-item-count";
+          const total = checklist.tasks.length;
+          const completed = checklist.tasks.filter(t => t.completed).length;
+          countSpan.textContent = `${completed}/${total}`;
+
+          li.appendChild(nameSpan);
+          li.appendChild(countSpan);
+
+          li.addEventListener("click", () => {
+            state.selectedChecklistId = checklist.id;
+            clearTaskForm();
+            saveState();
+            renderAll();
+          });
+
+          checklistListEl.appendChild(li);
+        });
+      }
+
+      function renderTasks() {
+        const checklist = getSelectedChecklist();
+        taskListEl.innerHTML = "";
+        if (!checklist) {
+          noTasksMessageEl.style.display = "block";
+          tasksVisibleCountEl.textContent = "0";
+          tasksTotalCountEl.textContent = "0";
+          return;
+        }
+        const tasks = checklist.tasks;
+        const filtered = applyFilters(tasks);
+
+        tasksTotalCountEl.textContent = String(tasks.length);
+        tasksVisibleCountEl.textContent = String(filtered.length);
+        noTasksMessageEl.style.display = filtered.length === 0 ? "block" : "none";
+
+        filtered.forEach(task => {
+          const li = document.createElement("li");
+          const priorityClass =
+            task.priority === "high"
+              ? "priority-high"
+              : task.priority === "medium"
+              ? "priority-medium"
+              : task.priority === "low"
+              ? "priority-low"
+              : "priority-none";
+          li.className = "task-item " + priorityClass;
+          li.dataset.id = task.id;
+
+          const checkboxDiv = document.createElement("div");
+          checkboxDiv.className = "task-checkbox";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = !!task.completed;
+          checkbox.addEventListener("change", () => {
+            task.completed = checkbox.checked;
+            task.completedAt = task.completed ? new Date().toISOString() : null;
+            saveState();
+            renderAll();
+          });
+          checkboxDiv.appendChild(checkbox);
+
+          const mainDiv = document.createElement("div");
+          mainDiv.className = "task-main";
+
+          const titleSpan = document.createElement("span");
+          titleSpan.className = "task-title" + (task.completed ? " completed" : "");
+          titleSpan.textContent = task.title;
+          mainDiv.appendChild(titleSpan);
+
+          const metaDiv = document.createElement("div");
+          metaDiv.className = "task-meta";
+
+          if (task.dueDate) {
+            const dueSpan = document.createElement("span");
+            dueSpan.textContent = "Due: " + task.dueDate;
+            metaDiv.appendChild(dueSpan);
+          }
+
+          const prioritySpan = document.createElement("span");
+          const priorityPill = document.createElement("span");
+          priorityPill.className = "task-priority-pill";
+          let label = "No priority";
+          if (task.priority === "high") label = "High";
+          else if (task.priority === "medium") label = "Medium";
+          else if (task.priority === "low") label = "Low";
+          priorityPill.textContent = label;
+          prioritySpan.appendChild(priorityPill);
+          metaDiv.appendChild(prioritySpan);
+
+          mainDiv.appendChild(metaDiv);
+
+          const actionsDiv = document.createElement("div");
+          actionsDiv.className = "task-actions";
+
+          const editBtn = document.createElement("button");
+          editBtn.type = "button";
+          editBtn.textContent = "✎ Edit";
+          editBtn.addEventListener("click", () => {
+            setEditingTask(task.id);
+          });
+
+          const upBtn = document.createElement("button");
+          upBtn.type = "button";
+          upBtn.textContent = "↑ Move up";
+          upBtn.addEventListener("click", () => {
+            moveTask(task.id, -1);
+          });
+
+          const downBtn = document.createElement("button");
+          downBtn.type = "button";
+          downBtn.textContent = "↓ Move down";
+          downBtn.addEventListener("click", () => {
+            moveTask(task.id, 1);
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.type = "button";
+          deleteBtn.textContent = "🗑 Delete";
+          deleteBtn.classList.add("delete");
+          deleteBtn.addEventListener("click", () => {
+            if (!confirm("Delete this task?")) return;
+            const idx = checklist.tasks.findIndex(t => t.id === task.id);
+            if (idx !== -1) {
+              checklist.tasks.splice(idx, 1);
+              if (editingTaskId === task.id) {
+                clearTaskForm();
+              }
+              saveState();
+              renderAll();
+            }
+          });
+
+          actionsDiv.appendChild(editBtn);
+          actionsDiv.appendChild(upBtn);
+          actionsDiv.appendChild(downBtn);
+          actionsDiv.appendChild(deleteBtn);
+
+          li.appendChild(checkboxDiv);
+          li.appendChild(mainDiv);
+          li.appendChild(actionsDiv);
+
+          taskListEl.appendChild(li);
+        });
+      }
+
+      function moveTask(taskId, direction) {
+        const checklist = getSelectedChecklist();
+        if (!checklist) return;
+        const tasks = checklist.tasks;
+        const idx = tasks.findIndex(t => t.id === taskId);
+        if (idx === -1) return;
+        const newIndex = idx + direction;
+        if (newIndex < 0 || newIndex >= tasks.length) return;
+        const [task] = tasks.splice(idx, 1);
+        tasks.splice(newIndex, 0, task);
+        saveState();
+        renderTasks();
+        renderStats();
+      }
+
+      function getAllTasksWithChecklist() {
+        const results = [];
+        state.checklists.forEach(cl => {
+          cl.tasks.forEach(task => {
+            results.push({
+              checklistId: cl.id,
+              checklistName: cl.name || "Untitled",
+              task
+            });
+          });
+        });
+        return results;
+      }
+
+      function renderChartsCompletedOverTime(ctx, width, height) {
+        const allTasks = getAllTasksWithChecklist()
+          .map(entry => entry.task)
+          .filter(task => task.completed && task.completedAt);
+
+        const countsByDate = {};
+        allTasks.forEach(task => {
+          const d = task.completedAt.slice(0, 10);
+          countsByDate[d] = (countsByDate[d] || 0) + 1;
+        });
+
+        const dates = Object.keys(countsByDate).sort();
+        ctx.clearRect(0, 0, width, height);
+
+        if (dates.length === 0) {
+          ctx.fillStyle = "#9ca3af";
+          ctx.font = "12px system-ui";
+          ctx.textAlign = "center";
+          ctx.fillText("Complete tasks to see activity over time.", width / 2, height / 2);
+          return;
+        }
+
+        const maxCount = Math.max(...dates.map(d => countsByDate[d]));
+        const padding = 24;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+        const barWidth = Math.max(8, chartWidth / (dates.length * 1.6));
+
+        ctx.strokeStyle = "#e5e7eb";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, height - padding);
+        ctx.lineTo(width - padding, height - padding);
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.stroke();
+
+        dates.forEach((date, index) => {
+          const count = countsByDate[date];
+          const x =
+            padding +
+            (chartWidth / dates.length) * index +
+            (chartWidth / dates.length - barWidth) / 2;
+          const barHeight = (count / maxCount) * chartHeight;
+          const y = height - padding - barHeight;
+
+          const gradient = ctx.createLinearGradient(x, y, x, height - padding);
+          gradient.addColorStop(0, "#4f46e5");
+          gradient.addColorStop(1, "#a5b4fc");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, barWidth, barHeight);
+
+          ctx.fillStyle = "#6b7280";
+          ctx.font = "10px system-ui";
+          ctx.save();
+          ctx.translate(x + barWidth / 2, height - padding + 10);
+          ctx.rotate(-Math.PI / 4);
+          ctx.textAlign = "right";
+          ctx.fillText(date.slice(5), 0, 0);
+          ctx.restore();
+        });
+      }
+
+      function renderChartsCompletionRate(ctx, width, height) {
+        const entries = state.checklists
+          .map(cl => {
+            const total = cl.tasks.length;
+            const completed = cl.tasks.filter(t => t.completed).length;
+            const rate = total > 0 ? completed / total : 0;
+            return { name: cl.name || "Untitled", total, completed, rate };
+          })
+          .filter(e => e.total > 0);
+
+        ctx.clearRect(0, 0, width, height);
+
+        if (entries.length === 0) {
+          ctx.fillStyle = "#9ca3af";
+          ctx.font = "12px system-ui";
+          ctx.textAlign = "center";
+          ctx.fillText("Add tasks to your checklists to see completion rates.", width / 2, height / 2);
+          return;
+        }
+
+        const padding = 24;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+        const barWidth = Math.max(10, chartWidth / (entries.length * 1.6));
+
+        ctx.strokeStyle = "#e5e7eb";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, height - padding);
+        ctx.lineTo(width - padding, height - padding);
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.stroke();
+
+        entries.forEach((entry, index) => {
+          const x =
+            padding +
+            (chartWidth / entries.length) * index +
+            (chartWidth / entries.length - barWidth) / 2;
+          const barHeight = entry.rate * chartHeight;
+          const y = height - padding - barHeight;
+
+          const gradient = ctx.createLinearGradient(x, y, x, height - padding);
+          gradient.addColorStop(0, "#10b981");
+          gradient.addColorStop(1, "#bbf7d0");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, barWidth, barHeight);
+
+          ctx.fillStyle = "#6b7280";
+          ctx.font = "10px system-ui";
+          ctx.textAlign = "center";
+          const nameLabel =
+            entry.name.length > 8 ? entry.name.slice(0, 7) + "…" : entry.name;
+          ctx.fillText(nameLabel, x + barWidth / 2, height - padding + 12);
+
+          ctx.fillStyle = "#4b5563";
+          ctx.font = "10px system-ui";
+          const pct = Math.round(entry.rate * 100);
+          ctx.fillText(pct + "%", x + barWidth / 2, y - 3);
+        });
+      }
+
+      function renderChartsPriorityDistribution(ctx, width, height) {
+        const checklist = getSelectedChecklist();
+        ctx.clearRect(0, 0, width, height);
+
+        if (!checklist || checklist.tasks.length === 0) {
+          ctx.fillStyle = "#9ca3af";
+          ctx.font = "12px system-ui";
+          ctx.textAlign = "center";
+          ctx.fillText("Add tasks to this checklist to see priority distribution.", width / 2, height / 2);
+          return;
+        }
+
+        const counts = { high: 0, medium: 0, low: 0, none: 0 };
+        checklist.tasks.forEach(task => {
+          const p = task.priority || "none";
+          if (p === "high" || p === "medium" || p === "low") {
+            counts[p]++;
+          } else {
+            counts.none++;
+          }
+        });
+
+        const categories = ["high", "medium", "low", "none"];
+        const colors = {
+          high: "#ef4444",
+          medium: "#facc15",
+          low: "#22c55e",
+          none: "#9ca3af"
+        };
+
+        const maxCount = Math.max(...categories.map(c => counts[c] || 0), 1);
+        const padding = 24;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+        const barWidth = Math.max(10, chartWidth / (categories.length * 1.6));
+
+        ctx.strokeStyle = "#e5e7eb";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, height - padding);
+        ctx.lineTo(width - padding, height - padding);
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.stroke();
+
+        categories.forEach((cat, index) => {
+          const count = counts[cat];
+          const x =
+            padding +
+            (chartWidth / categories.length) * index +
+            (chartWidth / categories.length - barWidth) / 2;
+          const barHeight = (count / maxCount) * chartHeight;
+          const y = height - padding - barHeight;
+
+          const gradient = ctx.createLinearGradient(x, y, x, height - padding);
+          gradient.addColorStop(0, colors[cat]);
+          gradient.addColorStop(1, "#ffffff");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, barWidth, barHeight);
+
+          ctx.fillStyle = "#4b5563";
+          ctx.font = "10px system-ui";
+          ctx.textAlign = "center";
+          ctx.fillText(count, x + barWidth / 2, y - 3);
+
+          ctx.fillStyle = "#6b7280";
+          const label =
+            cat === "high"
+              ? "High"
+              : cat === "medium"
+              ? "Med"
+              : cat === "low"
+              ? "Low"
+              : "None";
+          ctx.fillText(label, x + barWidth / 2, height - padding + 12);
+        });
+      }
+
+      function renderStats() {
+        const dpr = window.devicePixelRatio || 1;
+
+        function prepareCanvas(canvas) {
+          const rect = canvas.getBoundingClientRect();
+          canvas.width = rect.width * dpr;
+          canvas.height = rect.height * dpr;
+          const ctx = canvas.getContext("2d");
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          return { ctx, width: rect.width, height: rect.height };
+        }
+
+        if (chartCompletedOverTimeEl) {
+          const { ctx, width, height } = prepareCanvas(chartCompletedOverTimeEl);
+          renderChartsCompletedOverTime(ctx, width, height);
+        }
+        if (chartCompletionRateEl) {
+          const { ctx, width, height } = prepareCanvas(chartCompletionRateEl);
+          renderChartsCompletionRate(ctx, width, height);
+        }
+        if (chartPriorityDistributionEl) {
+          const { ctx, width, height } = prepareCanvas(chartPriorityDistributionEl);
+          renderChartsPriorityDistribution(ctx, width, height);
+        }
+      }
+
+      function renderAll() {
+        updateChecklistHeader();
+        renderSidebar();
+        renderTasks();
+        renderStats();
+      }
+
+      function registerEventListeners() {
+        newChecklistBtn.addEventListener("click", () => {
+          const name = prompt("Name for the new checklist:", "New checklist");
+          if (!name) return;
+          const checklist = createChecklist(name);
+          state.checklists.push(checklist);
+          state.selectedChecklistId = checklist.id;
+          saveState();
+          clearTaskForm();
+          renderAll();
+        });
+
+        renameChecklistBtn.addEventListener("click", () => {
+          const checklist = getSelectedChecklist();
+          if (!checklist) return;
+          const name = prompt("Rename checklist:", checklist.name || "");
+          if (!name) return;
+          checklist.name = name.trim() || "Untitled checklist";
+          saveState();
+          renderAll();
+        });
+
+        deleteChecklistBtn.addEventListener("click", () => {
+          const checklist = getSelectedChecklist();
+          if (!checklist) return;
+          if (!confirm(`Delete checklist "${checklist.name}" and all its tasks?`)) return;
+          const idx = state.checklists.findIndex(c => c.id === checklist.id);
+          if (idx !== -1) {
+            state.checklists.splice(idx, 1);
+            if (state.checklists[0]) {
+              state.selectedChecklistId = state.checklists[0].id;
+            } else {
+              state.selectedChecklistId = null;
+            }
+            clearTaskForm();
+            saveState();
+            renderAll();
+          }
+        });
+
+        filterStatusEl.addEventListener("change", () => {
+          state.filters.status = filterStatusEl.value;
+          saveState();
+          renderTasks();
+          renderStats();
+        });
+
+        filterPriorityEl.addEventListener("change", () => {
+          state.filters.priority = filterPriorityEl.value;
+          saveState();
+          renderTasks();
+          renderStats();
+        });
+
+        taskSearchEl.addEventListener("input", () => {
+          state.filters.search = taskSearchEl.value;
+          saveState();
+          renderTasks();
+          renderStats();
+        });
+
+        taskFormEl.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const checklist = getSelectedChecklist();
+          if (!checklist) {
+            alert("Please create a checklist first.");
+            return;
+          }
+          const title = taskTitleEl.value.trim();
+          if (!title) {
+            taskTitleEl.focus();
+            return;
+          }
+          const dueDate = taskDueDateEl.value || null;
+          const priority = taskPriorityEl.value || "none";
+
+          if (editingTaskId) {
+            const task = checklist.tasks.find(t => t.id === editingTaskId);
+            if (task) {
+              task.title = title;
+              task.dueDate = dueDate;
+              task.priority = priority;
+            }
+          } else {
+            const newTask = createTask(title, dueDate, priority);
+            checklist.tasks.push(newTask);
+          }
+          saveState();
+          clearTaskForm();
+          renderAll();
+        });
+
+        taskCancelEditBtn.addEventListener("click", () => {
+          clearTaskForm();
+        });
+      }
+
+      function registerServiceWorker() {
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", () => {
+            navigator.serviceWorker
+              .register("sw.js")
+              .catch(err => console.error("Service worker registration failed", err));
+          });
+        }
+      }
+
+      function init() {
+        // Cache DOM references
+        checklistListEl = document.getElementById("checklist-list");
+        newChecklistBtn = document.getElementById("new-checklist-btn");
+        checklistTitleEl = document.getElementById("checklist-title");
+        checklistSubtitleEl = document.getElementById("checklist-subtitle");
+        checklistTaskCountBadge = document.getElementById("checklist-task-count-badge");
+        renameChecklistBtn = document.getElementById("rename-checklist-btn");
+        deleteChecklistBtn = document.getElementById("delete-checklist-btn");
+        filterStatusEl = document.getElementById("filter-status");
+        filterPriorityEl = document.getElementById("filter-priority");
+        taskSearchEl = document.getElementById("task-search");
+        taskListEl = document.getElementById("task-list");
+        noTasksMessageEl = document.getElementById("no-tasks-message");
+        tasksVisibleCountEl = document.getElementById("tasks-visible-count");
+        tasksTotalCountEl = document.getElementById("tasks-total-count");
+        taskFormEl = document.getElementById("task-form");
+        taskTitleEl = document.getElementById("task-title");
+        taskDueDateEl = document.getElementById("task-due-date");
+        taskPriorityEl = document.getElementById("task-priority");
+        taskSubmitBtn = document.getElementById("task-submit-btn");
+        taskCancelEditBtn = document.getElementById("task-cancel-edit-btn");
+        taskFormHintEl = document.getElementById("task-form-hint");
+        chartCompletedOverTimeEl = document.getElementById("chart-completed-over-time");
+        chartCompletionRateEl = document.getElementById("chart-completion-rate");
+        chartPriorityDistributionEl = document.getElementById("chart-priority-distribution");
+
+        loadState();
+        ensureInitialChecklist();
+
+        // Initialize filter UI from state
+        filterStatusEl.value = state.filters.status || "all";
+        filterPriorityEl.value = state.filters.priority || "all";
+        taskSearchEl.value = state.filters.search || "";
+
+        registerEventListeners();
+        renderAll();
+        registerServiceWorker();
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    })();
+  </script>
+</body>
+</html>
