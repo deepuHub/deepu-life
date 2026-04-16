@@ -185,6 +185,21 @@
       color: #9ca3af;
     }
 
+    /* NEW: data actions area in sidebar */
+    .sidebar-data-actions {
+      margin-top: 0.75rem;
+      border-top: 1px solid rgba(55, 65, 81, 0.8);
+      padding-top: 0.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .sidebar-data-actions button {
+      flex: 1 1 48%;
+      justify-content: center;
+    }
+
     .sidebar-footer {
       font-size: 0.7rem;
       color: #6b7280;
@@ -686,6 +701,17 @@
         <ul id="checklist-list" class="checklist-list"></ul>
       </div>
 
+      <!-- NEW: Export / Import controls -->
+      <div class="sidebar-data-actions">
+        <button id="export-data-btn" class="secondary">
+          ⇩ Export Data
+        </button>
+        <button id="import-data-btn" class="secondary">
+          ⇧ Import Data
+        </button>
+        <input id="import-file-input" type="file" accept="application/json" style="display:none" />
+      </div>
+
       <div class="sidebar-footer">
         Data is stored in your browser’s local storage and never leaves this device.
       </div>
@@ -842,7 +868,10 @@
           taskFormHintEl,
           chartCompletedOverTimeEl,
           chartCompletionRateEl,
-          chartPriorityDistributionEl;
+          chartPriorityDistributionEl,
+          exportDataBtn,
+          importDataBtn,
+          importFileInput;
 
       function saveState() {
         try {
@@ -1384,6 +1413,94 @@
         }
       }
 
+      /* ---------- Export / Import helpers ---------- */
+
+      function triggerDownloadJson(data, filename) {
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: "application/json" }); // Blob + JSON for download[web:40][web:34]
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename || "local-todo-data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function isValidExportShape(parsed) {
+        if (!parsed || typeof parsed !== "object") return false;
+        if (!Array.isArray(parsed.checklists)) return false;
+
+        if (!parsed.filters || typeof parsed.filters !== "object") return false;
+        if (typeof parsed.filters.status !== "string") return false;
+        if (typeof parsed.filters.priority !== "string") return false;
+        if (typeof parsed.filters.search !== "string") return false;
+
+        for (const cl of parsed.checklists) {
+          if (!cl || typeof cl !== "object") return false;
+          if (typeof cl.id !== "string") return false;
+          if (typeof cl.name !== "string") return false;
+          if (!Array.isArray(cl.tasks)) return false;
+          for (const t of cl.tasks) {
+            if (!t || typeof t !== "object") return false;
+            if (typeof t.id !== "string") return false;
+            if (typeof t.title !== "string") return false;
+            if (!["high", "medium", "low", "none"].includes(t.priority)) return false;
+            if (typeof t.completed !== "boolean") return false;
+          }
+        }
+        return true;
+      }
+
+      function handleExportData() {
+        const snapshot = JSON.parse(JSON.stringify(state)); // deep clone for safety
+        triggerDownloadJson(snapshot, "local-todo-data.json");
+      }
+
+      function handleImportFile(file) {
+        const reader = new FileReader(); // FileReader for client-side JSON load[web:37]
+        reader.onload = (e) => {
+          try {
+            const text = e.target.result;
+            const parsed = JSON.parse(text);
+
+            if (!isValidExportShape(parsed)) {
+              throw new Error("Invalid schema");
+            }
+
+            // If schema is valid, fully replace state
+            const nextState = {
+              checklists: parsed.checklists || [],
+              selectedChecklistId: parsed.selectedChecklistId || null,
+              filters: {
+                status: parsed.filters.status || "all",
+                priority: parsed.filters.priority || "all",
+                search: parsed.filters.search || ""
+              }
+            };
+
+            state = nextState;
+            ensureInitialChecklist();
+            saveState();
+            clearTaskForm();
+            renderAll();
+            alert("Data imported successfully.");
+          } catch (err) {
+            console.error("Failed to import data", err);
+            alert("Invalid file format. Please upload a valid Local To-Do Manager export file.");
+          } finally {
+            importFileInput.value = "";
+          }
+        };
+        reader.onerror = () => {
+          console.error("FileReader error");
+          alert("Could not read the selected file.");
+          importFileInput.value = "";
+        };
+        reader.readAsText(file, "utf-8");
+      }
+
       function renderAll() {
         updateChecklistHeader();
         renderSidebar();
@@ -1486,6 +1603,21 @@
         taskCancelEditBtn.addEventListener("click", () => {
           clearTaskForm();
         });
+
+        // NEW: export/import listeners
+        exportDataBtn.addEventListener("click", () => {
+          handleExportData();
+        });
+
+        importDataBtn.addEventListener("click", () => {
+          importFileInput.click();
+        });
+
+        importFileInput.addEventListener("change", () => {
+          const file = importFileInput.files && importFileInput.files[0];
+          if (!file) return;
+          handleImportFile(file);
+        });
       }
 
       function registerServiceWorker() {
@@ -1524,6 +1656,9 @@
         chartCompletedOverTimeEl = document.getElementById("chart-completed-over-time");
         chartCompletionRateEl = document.getElementById("chart-completion-rate");
         chartPriorityDistributionEl = document.getElementById("chart-priority-distribution");
+        exportDataBtn = document.getElementById("export-data-btn");
+        importDataBtn = document.getElementById("import-data-btn");
+        importFileInput = document.getElementById("import-file-input");
 
         loadState();
         ensureInitialChecklist();
