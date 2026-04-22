@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Udhbhav's School Day</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --sky-dawn:   #fdf4e7;
+      --sky-mid:    #fce8c3;
+      --sky-noon:   #f9dba0;
+      --accent:     #e07b2a;
+      --accent2:    #c0392b;
+      --green:      #2ecc71;
+      --teal:       #16a085;
+      --blue:       #2980b9;
+      --purple:     #8e44ad;
+      --pink:       #e91e8c;
+      --orange:     #e67e22;
+      --red:        #c0392b;
+      --brown:      #795548;
+      --indigo:     #3f51b5;
+      --cyan:       #00bcd4;
+      --lime:       #8bc34a;
+      --text:       #2c1a0e;
+      --muted:      #8b6f5c;
+      --line:       #e8c99a;
+      --card-bg:    rgba(255,255,255,0.88);
+      --radius:     16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(175deg, var(--sky-dawn) 0%, var(--sky-mid) 40%, var(--sky-noon) 100%);
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 28px 20px 16px;
+      text-align: center;
+      position: relative;
+    }
+    .header-sun {
+      font-size: 2.4rem;
+      display: block;
+      animation: spin 18s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-top: 6px;
+    }
+    .header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* ── DAY SELECTOR ── */
+    .day-selector {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 20px 4px;
+      scrollbar-width: none;
+    }
+    .day-selector::-webkit-scrollbar { display: none; }
+
+    .day-btn {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--card-bg);
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 14px 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 58px;
+    }
+    .day-btn .d-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .day-btn .d-num {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      margin: 2px 0;
+    }
+    .day-btn .d-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    .day-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .day-btn.active .d-name,
+    .day-btn.active .d-num { color: #fff; }
+    .day-btn.active .d-dot { background: rgba(255,255,255,0.7); }
+    .day-btn.today-btn { border-color: var(--accent); }
+    .day-btn.today-btn .d-dot { background: var(--accent); }
+
+    .week-label {
+      padding: 6px 20px 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── WEEK TABS ── */
+    .week-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 20px 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .week-tabs::-webkit-scrollbar { display: none; }
+    .week-tab {
+      flex: 0 0 auto;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1.5px solid var(--line);
+      background: var(--card-bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .week-tab.active {
+      background: var(--text);
+      border-color: var(--text);
+      color: #fff;
+    }
+
+    /* ── TIMELINE WRAPPER ── */
+    .timeline-wrap {
+      padding: 16px 16px 40px;
+    }
+
+    /* each day panel */
+    .day-panel { display: none; }
+    .day-panel.active { display: block; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+      padding-left: 62px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 34px;
+      top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--accent), var(--sky-noon));
+      border-radius: 2px;
+    }
+
+    /* time marker */
+    .t-time {
+      position: absolute;
+      left: 0;
+      width: 58px;
+      text-align: right;
+      padding-right: 14px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1;
+      top: 14px;
+    }
+
+    /* timeline node dot */
+    .t-dot {
+      position: absolute;
+      left: 28px;
+      top: 12px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px var(--accent);
+      background: var(--accent);
+      z-index: 1;
+    }
+
+    /* timeline item */
+    .t-item {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    /* period card */
+    .period-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 11px 14px;
+      border-left: 4px solid var(--accent);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .period-icon { font-size: 1.3rem; flex: 0 0 auto; }
+    .period-info { flex: 1; min-width: 0; }
+    .period-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .period-time {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .period-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex: 0 0 auto;
+    }
+
+    /* break card */
+    .break-card {
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .break-card.short-break {
+      background: linear-gradient(135deg, #fff8f0, #fff3e0);
+      border: 1.5px dashed #f5c07a;
+    }
+    .break-card.long-break {
+      background: linear-gradient(135deg, #f0fff4, #e8f5e9);
+      border: 1.5px dashed #81c784;
+    }
+    .break-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .short-break .break-title { color: #e07b2a; }
+    .long-break .break-title { color: #2e7d32; }
+
+    /* food items inside break */
+    .food-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .food-chip {
+      background: #fff;
+      border-radius: 10px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .food-chip .fc-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 1px;
+    }
+    .food-chip-inner { display: flex; flex-direction: column; }
+
+    /* jain toggle */
+    .jain-toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 0 0 12px;
+    }
+    .jain-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #ccc;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle input:checked + .toggle-slider { background: #4caf50; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* end of day */
+    .day-end {
+      text-align: center;
+      padding: 18px 0 4px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+    }
+
+    /* holiday */
+    .holiday-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 40px 20px;
+      text-align: center;
+      border: 2px dashed var(--line);
+      margin-top: 10px;
+    }
+    .holiday-card .h-emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
+    .holiday-card h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    .holiday-card p { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
+
+    /* yummy badge */
+    .yummy-strip {
+      background: linear-gradient(135deg, #fff3cd, #ffe8a1);
+      border: 1.5px solid #f5c842;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8a6200;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* evening snack */
+    .snack-strip {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      border: 1.5px solid #f48fb1;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin-top: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #880e4f;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* footer */
+    .footer {
+      text-align: center;
+      padding: 0 16px 32px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    /* subject colors */
+    .c-science    { border-color: #16a085; } .c-science    .t-dot, .c-science    .period-badge { background: #16a085; } .c-science .t-dot { box-shadow: 0 0 0 2px #16a085; }
+    .c-math       { border-color: #2980b9; } .c-math       .t-dot, .c-math       .period-badge { background: #2980b9; } .c-math .t-dot { box-shadow: 0 0 0 2px #2980b9; }
+    .c-english    { border-color: #8e44ad; } .c-english    .t-dot, .c-english    .period-badge { background: #8e44ad; } .c-english .t-dot { box-shadow: 0 0 0 2px #8e44ad; }
+    .c-hindi      { border-color: #e91e8c; } .c-hindi      .t-dot, .c-hindi      .period-badge { background: #e91e8c; } .c-hindi .t-dot { box-shadow: 0 0 0 2px #e91e8c; }
+    .c-steam      { border-color: #00bcd4; } .c-steam      .t-dot, .c-steam      .period-badge { background: #00bcd4; } .c-steam .t-dot { box-shadow: 0 0 0 2px #00bcd4; }
+    .c-dlc        { border-color: #3f51b5; } .c-dlc        .t-dot, .c-dlc        .period-badge { background: #3f51b5; } .c-dlc .t-dot { box-shadow: 0 0 0 2px #3f51b5; }
+    .c-music      { border-color: #e67e22; } .c-music      .t-dot, .c-music      .period-badge { background: #e67e22; } .c-music .t-dot { box-shadow: 0 0 0 2px #e67e22; }
+    .c-global     { border-color: #27ae60; } .c-global     .t-dot, .c-global     .period-badge { background: #27ae60; } .c-global .t-dot { box-shadow: 0 0 0 2px #27ae60; }
+    .c-social     { border-color: #795548; } .c-social     .t-dot, .c-social     .period-badge { background: #795548; } .c-social .t-dot { box-shadow: 0 0 0 2px #795548; }
+    .c-pe         { border-color: #c0392b; } .c-pe         .t-dot, .c-pe         .period-badge { background: #c0392b; } .c-pe .t-dot { box-shadow: 0 0 0 2px #c0392b; }
+    .c-art        { border-color: #e84393; } .c-art        .t-dot, .c-art        .period-badge { background: #e84393; } .c-art .t-dot { box-shadow: 0 0 0 2px #e84393; }
+    .c-marathi    { border-color: #ff7043; } .c-marathi    .t-dot, .c-marathi    .period-badge { background: #ff7043; } .c-marathi .t-dot { box-shadow: 0 0 0 2px #ff7043; }
+    .c-assembly   { border-color: #f39c12; } .c-assembly   .t-dot, .c-assembly   .period-badge { background: #f39c12; } .c-assembly .t-dot { box-shadow: 0 0 0 2px #f39c12; }
+    .c-library    { border-color: #6d4c41; } .c-library    .t-dot, .c-library    .period-badge { background: #6d4c41; } .c-library .t-dot { box-shadow: 0 0 0 2px #6d4c41; }
+    .c-drama      { border-color: #ad1457; } .c-drama      .t-dot, .c-drama      .period-badge { background: #ad1457; } .c-drama .t-dot { box-shadow: 0 0 0 2px #ad1457; }
+    .c-games      { border-color: #558b2f; } .c-games      .t-dot, .c-games      .period-badge { background: #558b2f; } .c-games .t-dot { box-shadow: 0 0 0 2px #558b2f; }
+    .c-dance      { border-color: #d81b60; } .c-dance      .t-dot, .c-dance      .period-badge { background: #d81b60; } .c-dance .t-dot { box-shadow: 0 0 0 2px #d81b60; }
+    .c-vocals     { border-color: #6a1b9a; } .c-vocals     .t-dot, .c-vocals     .period-badge { background: #6a1b9a; } .c-vocals .t-dot { box-shadow: 0 0 0 2px #6a1b9a; }
+    .c-circle     { border-color: #f57c00; } .c-circle     .t-dot, .c-circle     .period-badge { background: #f57c00; } .c-circle .t-dot { box-shadow: 0 0 0 2px #f57c00; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-sun">☀️</span>
+  <h1>CNS Cafeteria Menu</h1>
+  <p>April 2026 • Regular + Jain meals • Primary &amp; Secondary</p>
+</div>
+
+<!-- Jain toggle -->
+<div style="padding: 0 20px;">
+  <div class="jain-toggle-wrap">
+    <span class="jain-label">🌿 Jain Menu</span>
+    <label class="toggle">
+      <input type="checkbox" id="jainToggle" onchange="toggleJain()"/>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+</div>
+
+<!-- Week selector tabs -->
+<div class="week-tabs">
+  <button class="week-tab active" onclick="showWeek(0,this)">Week 1 · Apr 1–2</button>
+  <button class="week-tab" onclick="showWeek(1,this)">Week 2 · Apr 6–10</button>
+  <button class="week-tab" onclick="showWeek(2,this)">Week 3 · Apr 13–17</button>
+  <button class="week-tab" onclick="showWeek(3,this)">Week 4 · Apr 20–24</button>
+  <button class="week-tab" onclick="showWeek(4,this)">Week 5 · Apr 27–30</button>
+</div>
+
+<!-- Day selector -->
+<div class="day-selector" id="daySelector"></div>
+<div class="week-label" id="weekLabel"></div>
+
+<!-- Timeline panels -->
+<div class="timeline-wrap" id="timelineWrap"></div>
+
+<div class="footer">Made with ❤️ for kids and parents — by Udhbhav's father</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const SUBJECT_META = {
+  'Circle Time':        { icon: '🔵', cat: 'c-circle',   badge: 'Morning' },
+  'Science':            { icon: '🔬', cat: 'c-science',  badge: 'Core' },
+  'Mathematics':        { icon: '📐', cat: 'c-math',     badge: 'Core' },
+  'English':            { icon: '📖', cat: 'c-english',  badge: 'Core' },
+  'Hindi':              { icon: '🇮🇳', cat: 'c-hindi',    badge: 'Lang' },
+  'STEAM':              { icon: '⚗️',  cat: 'c-steam',   badge: 'STEAM' },
+  'DL&C':               { icon: '💻', cat: 'c-dlc',      badge: 'Tech' },
+  'Music':              { icon: '🎵', cat: 'c-music',    badge: 'Arts' },
+  'Global Perspective': { icon: '🌍', cat: 'c-global',   badge: 'GP' },
+  'Social Studies':     { icon: '🏛️', cat: 'c-social',   badge: 'Social' },
+  'Physical Education': { icon: '🏃', cat: 'c-pe',       badge: 'PE' },
+  'Art & Design':       { icon: '🎨', cat: 'c-art',      badge: 'Arts' },
+  'Marathi':            { icon: '📜', cat: 'c-marathi',  badge: 'Lang' },
+  'Assembly':           { icon: '🎤', cat: 'c-assembly', badge: 'School' },
+  'Library':            { icon: '📚', cat: 'c-library',  badge: 'Lib' },
+  'Drama':              { icon: '🎭', cat: 'c-drama',    badge: 'Arts' },
+  'Games':              { icon: '⚽', cat: 'c-games',    badge: 'Sport' },
+  'Dance':              { icon: '💃', cat: 'c-dance',    badge: 'Arts' },
+  'Vocals':             { icon: '🎤', cat: 'c-vocals',   badge: 'Arts' },
+};
+
+// Timetable: array of periods per day
+// format: [time_start, time_end, subject]
+const TIMETABLE = {
+  mon: [
+    ['8:30','9:00','Circle Time'],
+    ['9:00','9:45','Science'],
+    ['9:45','10:15','SHORT_BREAK'],
+    ['10:15','11:00','Mathematics'],
+    ['11:00','11:45','English'],
+    ['11:45','12:30','STEAM'],
+    ['12:30','1:15','LONG_BREAK'],
+    ['1:15','2:00','DL&C'],
+    ['2:00','2:45','Music'],
+    ['2:45','3:30','Global Perspective'],
+  ],
+  tue: [
+    ['8:30','9:00','Circle Time'],
+    ['9:00','9:45','Hindi'],
+    ['9:45','10:15','SHORT_BREAK'],
+    ['10:15','11:00','Science'],
+    ['11:00','11:45','Global Perspective'],
+    ['11:45','12:30','Mathematics'],
+    ['12:30','1:15','LONG_BREAK'],
+    ['1:15','2:00','English'],
+    ['2:00','2:45','Social Studies'],
+    ['2:45','3:30','DL&C'],
+  ],
+  wed: [
+    ['8:30','9:00','Circle Time'],
+    ['9:00','9:45','Music'],
+    ['9:45','10:15','SHORT_BREAK'],
+    ['10:15','11:00','Hindi'],
+    ['11:00','11:45','Mathematics'],
+    ['11:45','12:30','English'],
+    ['12:30','1:15','LONG_BREAK'],
+    ['1:15','2:00','Vocals'],
+    ['2:00','2:45','Games'],
+    ['2:45','3:30','Science'],
+  ],
+  thu: [
+    ['8:30','9:00','Circle Time'],
+    ['9:00','9:45','Physical Education'],
+    ['9:45','10:15','SHORT_BREAK'],
+    ['10:15','11:00','Science'],
+    ['11:00','11:45','Mathematics'],
+    ['11:45','12:30','English'],
+    ['12:30','1:15','LONG_BREAK'],
+    ['1:15','2:00','Art & Design'],
+    ['2:00','2:45','Marathi'],
+    ['2:45','3:30','Assembly'],
+  ],
+  fri: [
+    ['8:30','9:00','Science'],
+    ['9:00','9:45','Library'],
+    ['9:45','10:15','SHORT_BREAK'],
+    ['10:15','11:00','Drama'],
+    ['11:00','11:45','Mathematics'],
+    ['11:45','12:30','Games'],
+    ['12:30','1:15','LONG_BREAK'],
+    ['1:15','2:00','English'],
+    ['2:00','2:45','Art & Design'],
+    ['2:45','3:30','Dance'],
+  ],
+};
+
+// Menu data keyed by date string YYYY-MM-DD
+const MENU = {
+  '2026-04-01': {
+    breakfast: {
+      regular: { opt1:'Sponge Dosa, Coconut Chutney', opt2:'Bread Patice, Sweet Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Sponge Dosa, Coconut Chutney', opt2:'Bread Patice, Sweet Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Toss Salad', raita:'Black Chana Raita', dessert:'Rice Kheer', main:'Veg Makhanwala', dal:'Dal Makhani', rice:'Jeera Rice', bread:'Ajwaini Roti', yummy:'Dahi Wada', snack:'Fruit Yogurt' },
+      jain:    { salad:'Toss Salad', raita:'Black Chana Raita', dessert:'Rice Kheer', main:'Veg Makhanwala', dal:'Dal Makhani', rice:'Jeera Rice', bread:'Dahi Wada', yummy:'Dahi Wada', snack:'Fruit Yogurt' },
+    },
+  },
+  '2026-04-02': {
+    breakfast: {
+      regular: { opt1:'Mix Veg Roll, Sweet Chutney', opt2:'Batata Poha, Sev', fruit:'Mix Fruit' },
+      jain:    { opt1:'Mix Veg Roll, Sweet Chutney', opt2:'Green Peas Poha, Sev', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Green Salad', raita:'Mix Veg Raita', main:'Turai Masala', dal:'Dal Fry', rice:'Tadka Rice', bread:'Chapati', yummy:'Potato & Onion Pakoda', snack:'Pancake' },
+      jain:    { salad:'Green Salad', raita:'Mix Veg Raita', main:'Turai Masala', dal:'Dal Fry', rice:'Tadka Rice', bread:'Chapatti', yummy:'Potato & Onion Pakoda', snack:'Pancake' },
+    },
+  },
+  '2026-04-03': { holiday: true },
+  '2026-04-06': {
+    breakfast: {
+      regular: { opt1:'Medu Wada, Sambar', opt2:'Veg Upma, Coconut Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Medu Wada, Sambar', opt2:'Veg Upma, Coconut Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Green Salad', raita:'Mix Veg Raita', dessert:'Seviyan Kheer', main:'Paneer Mutter', dal:'Dal Tadka', rice:'Jeera Rice', bread:'Dhaniya Roti', yummy:'Kacchi Dabeli', snack:'Bhel' },
+      jain:    { salad:'Green Salad', raita:'Mix Veg Raita', dessert:'Seviyan Kheer', main:'Paneer Mutter', dal:'Dal Tadka', rice:'Jeera Rice', bread:'Dhaniya Roti', yummy:'Kacchi Dabeli', snack:'Bhel' },
+    },
+  },
+  '2026-04-07': {
+    breakfast: {
+      regular: { opt1:'Tadka Dhokla, Sweet Chutney', opt2:'Corn Spinach Sandwich', fruit:'Mix Fruit' },
+      jain:    { opt1:'Tadka Dhokla, Sweet Chutney', opt2:'Corn Spinach Sandwich, Sweet Chutney', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Kachumber Salad', raita:'Masala Chaas', main:'Chole Masala', dal:'Dal Fry', rice:'Tawa Pulao', bread:'Chapati', yummy:'Arrabiata Pasta', snack:'Paneer Pakoda' },
+      jain:    { salad:'Kachumber Salad', raita:'Masala Chaas', main:'Chole Masala', dal:'Dal Fry', rice:'Tawa Pulao', bread:'Chapati', yummy:'Arrabiata Pasta', snack:'Paneer Pakoda' },
+    },
+  },
+  '2026-04-08': {
+    breakfast: {
+      regular: { opt1:'Mix Veg Paratha, Curd', opt2:'Oats Kheer, Coconut Chutney', fruit:'Papaya' },
+      jain:    { opt1:'Mix Veg Paratha, Curd', opt2:'Oats Kheer, Coconut Chutney', fruit:'Papaya' },
+    },
+    lunch: {
+      regular: { salad:'Black Chana Salad', raita:'Burhani Raita', dessert:'Sweet Boondi', main:'Bhindi Masala', dal:'Raw Mango Dal', rice:'Steam Rice', bread:'Palak Roti', yummy:'KhowSouy / Gobhi Paratha', snack:'Potato & Onion Pakoda' },
+      jain:    { salad:'Black Chana Salad', raita:'Burhani Raita', dessert:'Sweet Boondi', main:'Bhindi Masala', dal:'Raw Mango Dal', rice:'Steam Rice', bread:'Palak Roti', yummy:'KhowSouy / Gobhi Paratha', snack:'Gobhi Paratha' },
+    },
+  },
+  '2026-04-09': {
+    breakfast: {
+      regular: { opt1:'Oats Chocolate Pancake, Maple Syrup', opt2:'Veg Cutlet, Ketchup', fruit:'Watermelon' },
+      jain:    { opt1:'Oats Chocolate Pancake, Maple Syrup', opt2:'Veg Cutlet, Ketchup', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Corn Salad', raita:'Butter Milk', main:'Aloo Gobhi Matar', dal:'Saboot Masoor Tadka', rice:'Peas Pulao', bread:'Chapati', yummy:'Schezwan Noodles', snack:'Potato & Onion Pakoda' },
+      jain:    { salad:'Corn Salad', raita:'Butter Milk', main:'Aaloo Gobhi Mater', dal:'Saboot Masoor Tadka', rice:'Peas Pulao', bread:'Chapati', yummy:'Schezwan Noodles', snack:'Potato & Onion Pakoda' },
+    },
+  },
+  '2026-04-10': {
+    breakfast: {
+      regular: { opt1:'Onion Utthapm, Sambar', opt2:'Kanda Poha, Sweet Chutney', fruit:'Mix Fruit' },
+      jain:    { opt1:'Onion Utthapm, Sambar', opt2:'Kanda Poha, Sweet Chutney', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Green Salad', raita:'Mint Cooler', dessert:'Balushahi', main:'Veg Maratha', dal:'Chana Dal Amti', rice:'Masala Bhat', bread:'Puri', yummy:'Vada Pav', snack:'Puran Poli' },
+      jain:    { salad:'Green Salad', raita:'Mint Cooler', dessert:'Balushahi', main:'Veg Maratha', dal:'Chana Dal Amti', rice:'Masala Bhat', bread:'Puri', yummy:'Vada Pav', snack:'Puran Poli' },
+    },
+  },
+  '2026-04-13': {
+    breakfast: {
+      regular: { opt1:'Cheese Chutney Sandwich, Sweet Chutney', opt2:'Veg Cutlet, Sweet Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Cheese Chutney Sandwich, Sweet Chutney', opt2:'Veg Cutlet, Sweet Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Black Chana Salad', raita:'Veg Raita', dessert:'Fruit Custard', main:'Paneer Butter Masala', dal:'Masoor Dal Tadka', rice:'Jeera Rice', bread:'Chapati', yummy:'Veg Manchurian', snack:'Cheese Sandwich' },
+      jain:    { salad:'Black Chana Salad', raita:'Veg Raita', dessert:'Fruit Custard', main:'Paneer Butter Masala', dal:'Masoor Dal Tadka', rice:'Jeera Rice', bread:'Chapati', yummy:'Veg Manchurian', snack:'Cheese Sandwich' },
+    },
+  },
+  '2026-04-15': {
+    breakfast: {
+      regular: { opt1:'Idli, Sambar', opt2:'Thepla, Curd', fruit:'Mix Fruit' },
+      jain:    { opt1:'Idli, Sambar', opt2:'Thepla, Curd', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Green Moong Salad', raita:'Butter Milk', dessert:'Lapse', main:'Kofta Curry', dal:'Dal Palak', rice:'Corn Pulao', bread:'Ajwaini Roti', yummy:'Pasta Alfredo', snack:'Veg Wrap' },
+      jain:    { salad:'Green Moong Salad', raita:'Butter Milk', dessert:'Lapse', main:'Kofta Curry', dal:'Dal Palak', rice:'Corn Pulao', bread:'Ajwaini Roti', yummy:'Pasta Alfredo', snack:'Veg Wrap' },
+    },
+  },
+  '2026-04-16': {
+    breakfast: {
+      regular: { opt1:'Misal, Pav', opt2:'Dhokla, Sweet Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Misal, Pav', opt2:'Dhokla, Sweet Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Green Salad', raita:'Lemonade', main:'Navaratna Korma', dal:'Dal Fry', rice:'Tadka Rice', bread:'Chapatti', yummy:'Sev Puri', snack:'Paneer Paratha' },
+      jain:    { salad:'Green Salad', raita:'Lemonade', main:'Navratna Korma', dal:'Dal Fry', rice:'Tadka Rice', bread:'Chapatti', yummy:'Sev Puri', snack:'Paneer Paratha' },
+    },
+  },
+  '2026-04-17': {
+    breakfast: {
+      regular: { opt1:'Poori, Bhaji', opt2:'Vermicelli Upma, Coconut Chutney', fruit:'Mix Fruit' },
+      jain:    { opt1:'Poori, Bhaji', opt2:'Vermicelli Upma, Coconut Chutney', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Khimchi Salad', raita:'Veg Manchaw Soup', dessert:'Dry Fruit Cake', main:'Stir Fried Veg', dal:'Veg Brunt Garlic Noodles', rice:'Veg Fried Rice', bread:'Veg Manchurian', yummy:'Chinese Bhel', snack:'Dahi Puri' },
+      jain:    { salad:'Khimchi Salad', raita:'Veg Manchaw Soup', dessert:'Dry Fruit Cake', main:'Stir Fried Veg', dal:'Veg Hakka Noodles', rice:'Veg Fried Rice', bread:'Veg Manchurian', yummy:'Chinese Bhel', snack:'Dahi Puri' },
+    },
+  },
+  '2026-04-20': {
+    breakfast: {
+      regular: { opt1:'Veg Puff, Sweet Chutney', opt2:'Khaman Dhokla, Sweet Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Veg Puff, Sweet Chutney', opt2:'Khaman Dhokla, Sweet Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Carrot Salad', raita:'Cucumber Raita', dessert:'Sheera', main:'Kadhai Paneer', dal:'Dal Palak', rice:'Steam Rice', bread:'Missi Roti', yummy:'Veg Hakka Noodles', snack:'Mix Fruit' },
+      jain:    { salad:'Cucumber', raita:'Cucumber Raita', dessert:'Sheera', main:'Kadhai Paneer', dal:'Dal Palak', rice:'Steam Rice', bread:'Missi Roti', yummy:'Veg Hakka Noodles', snack:'Mix Fruit' },
+    },
+  },
+  '2026-04-21': {
+    breakfast: {
+      regular: { opt1:'Adai Dosa, Coconut Chutney', opt2:'Mix Veg Upma, Coconut Chutney', fruit:'Papaya' },
+      jain:    { opt1:'Adai dosa, Coconut Chutney', opt2:'Mix Veg Upma, Coconut Chutney', fruit:'Papaya' },
+    },
+    lunch: {
+      regular: { salad:'Three Bean Salad', raita:'Sunrise Pineapple', main:'Annakoot', dal:'Moong Dal Tadka', rice:'Coriander Rice', bread:'Chapati', yummy:'Dahiwada', snack:'Veg Puff' },
+      jain:    { salad:'Three Been Salad', raita:'Sunrise Pineapple', main:'Annakoot', dal:'Moong Dal Tadka', rice:'Coriander Rice', bread:'Chapati', yummy:'Dahiwada', snack:'Veg Puff' },
+    },
+  },
+  '2026-04-22': {
+    breakfast: {
+      regular: { opt1:'Aloo Paratha, Curd', opt2:'Hara Bhara Kabab, Green Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Aloo Paratha, Curd', opt2:'Hara Bhara Kabab, Green Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Beetroot Salad', raita:'Bhurani Raita', main:'Mix Veg', dal:'Dal Tadka', rice:'Jeera Rice', bread:'Palak Roti', yummy:'Cheese Garlic Bread', snack:'Bhel' },
+      jain:    { salad:'Cucumber', raita:'Bhurani raita', main:'Mix Veg', dal:'Dal tadka', rice:'Jeera Rice', bread:'Palak Roti', yummy:'Cheese Garlic Bread', snack:'Bhel' },
+    },
+  },
+  '2026-04-23': {
+    breakfast: {
+      regular: { opt1:'Moong Dal Chilla, Coconut Chutney', opt2:'Hakka Noodle', fruit:'Mix Fruit' },
+      jain:    { opt1:'Moong Dal Chilla, Coconut Chutney', opt2:'Hakka Noodle', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Mix Sprout Salad', raita:'Vegetable Raita', main:'Jeera Aloo', dal:'Dal Fry', rice:'Tawa Pulao', bread:'Chapati', yummy:'Ragada Pattice', snack:'Churma Ladu' },
+      jain:    { salad:'Mix Sprout Salad', raita:'Vegetable Raita', main:'Gobi Adraki', dal:'Dal Fry', rice:'Tawa Pulao', bread:'Chapati', yummy:'Ragada Pattice', snack:'Churma Ladu' },
+    },
+  },
+  '2026-04-24': {
+    breakfast: {
+      regular: { opt1:'Mix Veg Idli, Sambar', opt2:'Paneer Chilli Roll, Sweet Chutney', fruit:'Watermelon' },
+      jain:    { opt1:'Mix Veg Idli, Sambar', opt2:'Paneer Chilli Roll, Sweet Chutney', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Three Beans Salad', raita:'Palak Raita', dessert:'Fruit Custard', main:'Veg Biryani', dal:'Capsicum Salan', rice:'Singaporian Noodles', bread:'Chapati', yummy:'Singaporian Noodles', snack:'Pasta' },
+      jain:    { salad:'Three Beans Salad', raita:'Palak Raita', dessert:'Fruit Custard', main:'Veg Biryani', dal:'Capsicum Salan', rice:'Singaporian Noodles', bread:'Chapati', yummy:'Singaporian Noodles', snack:'Pasta' },
+    },
+  },
+  '2026-04-27': {
+    breakfast: {
+      regular: { opt1:'Veg Frankie, Sweet Chutney', opt2:'Batata Poha, Sev', fruit:'Papaya' },
+      jain:    { opt1:'Veg Puff, Sweet Chutney', opt2:'Tomato Poha, Sev', fruit:'Papaya' },
+    },
+    lunch: {
+      regular: { salad:'Rainbow Salad', raita:'Masala Chaas', dessert:'Sabudana Kheer', main:'Paneer Makhanwala', dal:'Vegetable Daal Tadka', rice:'Sweet Pulao', bread:'Paratha', yummy:'Batata Poha', snack:'Pizza' },
+      jain:    { salad:'Black Chana Salad', raita:'Masala Chaas', dessert:'Sabudana Kheer', main:'Paneer Makhanwala', dal:'Vegetable daal tadka', rice:'Sweet Pulao', bread:'Paratha', yummy:'Batata Poha', snack:'Pizza' },
+    },
+  },
+  '2026-04-28': {
+    breakfast: {
+      regular: { opt1:'Pav Bhaji', opt2:'Oats Kheer', fruit:'Mix Fruit' },
+      jain:    { opt1:'Pav Bhaji', opt2:'Oats Kheer', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Green Salad', raita:'Boondi Raita', main:'Soya Masala', dal:'Vegetable Khichdi', rice:'Khadi', bread:'Missi Roti', yummy:'Pakoda', snack:'Veg Frankie' },
+      jain:    { salad:'Green Salad', raita:'Boondi Raita', main:'Soya Masala', dal:'Vegetable Khichidi', rice:'Khadi', bread:'Missi Roti', yummy:'Pakoda', snack:'Veg Frankie' },
+    },
+  },
+  '2026-04-29': {
+    breakfast: {
+      regular: { opt1:'Ragi Pancake, Maple Syrup', opt2:'Veg Cutlet, Ketchup', fruit:'Watermelon' },
+      jain:    { opt1:'Ragi Pancake, Maple Syrup', opt2:'Veg Cutlet, Ketchup', fruit:'Watermelon' },
+    },
+    lunch: {
+      regular: { salad:'Boiled Veg', raita:'Curd', dessert:'Malpua', main:'Aloo Beans', dal:'Dal Palak', rice:'Tawa Pulao', bread:'Ajwain Chapai', yummy:'Kacchi Dabeli', snack:'Muffin' },
+      jain:    { salad:'Boiled Veg', raita:'Curd', dessert:'Malpua', main:'Aloo beans', dal:'Dal Palak', rice:'Tawa Pulao', bread:'Ajwain Chapai', yummy:'Kacchi Dabeli', snack:'Muffin' },
+    },
+  },
+  '2026-04-30': {
+    breakfast: {
+      regular: { opt1:'Tadka Idli, Coconut Chutney', opt2:'Mix Veg Paratha, Curd', fruit:'Mix Fruit' },
+      jain:    { opt1:'Tadka Idli, Coconut Chutney', opt2:'Mix Veg Paratha, Curd', fruit:'Mix Fruit' },
+    },
+    lunch: {
+      regular: { salad:'Corn Salad', raita:'Aam Panna', main:'Malai Kofta Curry', dal:'Dal Palak', rice:'Jeera Rice', bread:'Chapati', yummy:'Honey Chilli Potato', snack:'Noodles' },
+      jain:    { salad:'Corn Salad', raita:'Aam Panna', main:'Malai Kofta Curry', dal:'Dal Palak', rice:'Jeera Rice', bread:'Chapati', yummy:'Honey Chilli Potato', snack:'Noodles' },
+    },
+  },
+};
+
+// Weeks structure
+const WEEKS = [
+  { label: 'Week 1 · Apr 1–2',   days: ['2026-04-01','2026-04-02'] },
+  { label: 'Week 2 · Apr 6–10',  days: ['2026-04-06','2026-04-07','2026-04-08','2026-04-09','2026-04-10'] },
+  { label: 'Week 3 · Apr 13–17', days: ['2026-04-13','2026-04-15','2026-04-16','2026-04-17'] },  // 14 Apr holiday not in data
+  { label: 'Week 4 · Apr 20–24', days: ['2026-04-20','2026-04-21','2026-04-22','2026-04-23','2026-04-24'] },
+  { label: 'Week 5 · Apr 27–30', days: ['2026-04-27','2026-04-28','2026-04-29','2026-04-30'] },
+];
+
+const DAY_NAMES = { '01':'Wed','02':'Thu','03':'Fri','06':'Mon','07':'Tue','08':'Wed','09':'Thu','10':'Fri','13':'Mon','14':'Tue','15':'Wed','16':'Thu','17':'Fri','20':'Mon','21':'Tue','22':'Wed','23':'Thu','24':'Fri','27':'Mon','28':'Tue','29':'Wed','30':'Thu' };
+const TT_KEY = { 'Mon':'mon','Tue':'tue','Wed':'wed','Thu':'thu','Fri':'fri' };
+
+let currentWeek = 0;
+let currentDay = null;
+let jainMode = false;
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  // Auto-select today if in April 2026
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // Find week for today
+  let foundWeek = -1;
+  WEEKS.forEach((w,i) => { if (w.days.includes(todayStr)) foundWeek = i; });
+
+  if (foundWeek >= 0) {
+    currentWeek = foundWeek;
+    currentDay = todayStr;
+  } else {
+    currentWeek = 0;
+    currentDay = WEEKS[0].days[0];
+  }
+  renderWeekTabs();
+  renderDaySelector();
+  renderTimeline();
+}
+
+function renderWeekTabs() {
+  document.querySelectorAll('.week-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === currentWeek);
+  });
+}
+
+function showWeek(idx, el) {
+  currentWeek = idx;
+  currentDay = WEEKS[idx].days[0];
+  renderWeekTabs();
+  renderDaySelector();
+  renderTimeline();
+}
+
+function renderDaySelector() {
+  const sel = document.getElementById('daySelector');
+  const todayStr = getTodayStr();
+  const week = WEEKS[currentWeek];
+  sel.innerHTML = '';
+  week.days.forEach(dateStr => {
+    const dd = dateStr.slice(8);
+    const dayAbbr = DAY_NAMES[dd] || '';
+    const isToday = dateStr === todayStr;
+    const isActive = dateStr === currentDay;
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (isActive ? ' active' : '') + (isToday ? ' today-btn' : '');
+    btn.innerHTML = `<span class="d-name">${dayAbbr}</span><span class="d-num">${parseInt(dd)}</span><span class="d-dot"></span>`;
+    btn.onclick = () => { currentDay = dateStr; renderDaySelector(); renderTimeline(); };
+    sel.appendChild(btn);
+  });
+}
+
+function getTodayStr() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+
+function toggleJain() {
+  jainMode = document.getElementById('jainToggle').checked;
+  renderTimeline();
+}
+
+function renderTimeline() {
+  const wrap = document.getElementById('timelineWrap');
+  const menuData = MENU[currentDay];
+  const dd = currentDay.slice(8);
+  const dayAbbr = DAY_NAMES[dd];
+  const ttKey = TT_KEY[dayAbbr];
+  const timetable = TIMETABLE[ttKey] || [];
+  const mode = jainMode ? 'jain' : 'regular';
+
+  // Format date header
+  const dateObj = new Date(currentDay + 'T00:00:00');
+  const dateLabel = dateObj.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  let html = `<div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--accent);margin-bottom:14px;padding-left:2px;">${dateLabel}</div>`;
+
+  if (menuData && menuData.holiday) {
+    html += `<div class="holiday-card"><span class="h-emoji">🎉</span><h3>Holiday!</h3><p>No school today. Enjoy the day!</p></div>`;
+    wrap.innerHTML = html;
+    return;
+  }
+
+  if (!menuData) {
+    html += `<div class="holiday-card"><span class="h-emoji">📅</span><h3>No data</h3><p>Menu not available for this date.</p></div>`;
+    wrap.innerHTML = html;
+    return;
+  }
+
+  const bf = menuData.breakfast[mode];
+  const ln = menuData.lunch[mode];
+
+  html += `<div class="timeline">`;
+
+  timetable.forEach(([start, end, subject]) => {
+    if (subject === 'SHORT_BREAK') {
+      html += `
+        <div class="t-item" style="position:relative;">
+          <div class="t-time" style="top:16px;">${start}</div>
+          <div class="t-dot" style="background:#f39c12;box-shadow:0 0 0 2px #f39c12;"></div>
+          <div class="break-card short-break">
+            <div class="break-title">☕ Short Break <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">${start}–${end}</span></div>
+            <div class="food-row">
+              <div class="food-chip">🥞 <div class="food-chip-inner"><span class="fc-label">Option 1</span>${bf.opt1}</div></div>
+              <div class="food-chip">🥙 <div class="food-chip-inner"><span class="fc-label">Option 2</span>${bf.opt2}</div></div>
+              <div class="food-chip">🍉 <div class="food-chip-inner"><span class="fc-label">Fruit</span>${bf.fruit}</div></div>
+            </div>
+          </div>
+        </div>`;
+    } else if (subject === 'LONG_BREAK') {
+      let lunchItems = `
+        <div class="food-chip">🥗 <div class="food-chip-inner"><span class="fc-label">Salad</span>${ln.salad}</div></div>
+        <div class="food-chip">🥛 <div class="food-chip-inner"><span class="fc-label">Raita/Drink</span>${ln.raita}</div></div>
+        <div class="food-chip">🍛 <div class="food-chip-inner"><span class="fc-label">Main Veg</span>${ln.main}</div></div>
+        <div class="food-chip">🫘 <div class="food-chip-inner"><span class="fc-label">Dal</span>${ln.dal}</div></div>
+        <div class="food-chip">🍚 <div class="food-chip-inner"><span class="fc-label">Rice</span>${ln.rice}</div></div>
+        <div class="food-chip">🫓 <div class="food-chip-inner"><span class="fc-label">Bread</span>${ln.bread}</div></div>`;
+      if (ln.dessert) lunchItems += `<div class="food-chip">🍮 <div class="food-chip-inner"><span class="fc-label">Dessert</span>${ln.dessert}</div></div>`;
+      html += `
+        <div class="t-item" style="position:relative;">
+          <div class="t-time" style="top:16px;">${start}</div>
+          <div class="t-dot" style="background:#27ae60;box-shadow:0 0 0 2px #27ae60;"></div>
+          <div class="break-card long-break">
+            <div class="break-title">🍱 Lunch Break <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">${start}–${end}</span></div>
+            <div class="food-row">${lunchItems}</div>
+            <div class="yummy-strip">⭐ Yummy of the Day: ${ln.yummy}</div>
+            <div class="snack-strip">🌆 Evening Snack: ${ln.snack}</div>
+          </div>
+        </div>`;
+    } else {
+      const meta = SUBJECT_META[subject] || { icon:'📌', cat:'c-circle', badge:'Class' };
+      html += `
+        <div class="t-item ${meta.cat}" style="position:relative;">
+          <div class="t-time">${start}</div>
+          <div class="t-dot"></div>
+          <div class="period-card">
+            <span class="period-icon">${meta.icon}</span>
+            <div class="period-info">
+              <div class="period-name">${subject}</div>
+              <div class="period-time">${start} – ${end}</div>
+            </div>
+            <span class="period-badge">${meta.badge}</span>
+          </div>
+        </div>`;
+    }
+  });
+
+  // End of day marker
+  html += `
+    <div class="t-item" style="position:relative;">
+      <div class="t-time">3:30</div>
+      <div class="t-dot" style="background:var(--accent2);box-shadow:0 0 0 2px var(--accent2);width:18px;height:18px;left:26px;top:10px;"></div>
+      <div class="period-card" style="border-left-color:var(--accent2);background:linear-gradient(135deg,#fff5f5,#ffe8e8);">
+        <span class="period-icon">🏠</span>
+        <div class="period-info">
+          <div class="period-name">School Ends</div>
+          <div class="period-time">See you tomorrow!</div>
+        </div>
+      </div>
+    </div>`;
+
+  html += `</div>`; // close timeline
+  html += `<div class="day-end">— End of ${dayAbbr}'s schedule —</div>`;
+
+  wrap.innerHTML = html;
+}
+
+init();
+</script>
+</body>
+</html>
