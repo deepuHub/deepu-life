@@ -1058,7 +1058,11 @@
           else if (sub === 'LONG_BREAK') html += lItem(s, e, ln);
           else html += pItem(s, e, sub);
         });
-        html += eItem('3:30', 'School Ends', 'See you tomorrow!');
+        html += eItem(
+          '3:30',
+          'School Ends',
+          dayAbbr === 'Fri' ? 'See you on Monday.' : 'See you tomorrow!'
+        );
       }
 
       html += `</div><div class="day-end">— End of ${dayAbbr}'s schedule —</div>`;
