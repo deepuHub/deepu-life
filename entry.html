@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Life Story · Memory Capture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Dancing+Script:wght@600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0d0b08;
+  --s1: #161209;
+  --s2: #1f180e;
+  --s3: #2a2014;
+  --border: rgba(200,169,126,0.13);
+  --border2: rgba(200,169,126,0.26);
+  --cream: #faf6f0;
+  --parch: #f0e6d0;
+  --bl: #c8a97e;
+  --bm: #8a6a42;
+  --rose: #cc7a5e;
+  --rose2: #b86a50;
+  --gold: #c4973a;
+  --sage: #6a9470;
+  --text: #ddd0c0;
+  --text2: #8a7860;
+  --text3: #5a4a38;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh; overflow-x:hidden;
+}
+
+/* BACKGROUND GRAIN */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* AMBIENT GLOW */
+.glow {
+  position:fixed; pointer-events:none; z-index:0; border-radius:50%;
+  filter:blur(80px); opacity:.07;
+}
+.glow-1 { width:400px; height:400px; background:var(--rose); top:-100px; right:-100px; }
+.glow-2 { width:300px; height:300px; background:var(--gold); bottom:100px; left:-80px; }
+
+/* WRAPPER */
+#app { position:relative; z-index:1; max-width:430px; margin:0 auto; min-height:100vh; }
+
+/* ── SETUP SCREEN ── */
+#setupScreen {
+  min-height:100vh; display:flex; flex-direction:column;
+  justify-content:center; padding:32px 24px;
+}
+.setup-header { text-align:center; margin-bottom:40px; }
+.setup-script {
+  font-family:'Dancing Script',cursive; font-size:2.8rem;
+  color:var(--rose); line-height:1; margin-bottom:8px;
+}
+.setup-tagline {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:1rem; color:var(--bm);
+}
+.setup-card {
+  background:var(--s1); border:1px solid var(--border2);
+  border-radius:20px; padding:28px 24px; margin-bottom:16px;
+}
+.setup-step {
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:20px;
+}
+.step-num {
+  width:26px; height:26px; border-radius:50%;
+  background:var(--rose); color:white; font-size:.72rem;
+  font-weight:500; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.step-text { font-size:.82rem; color:var(--text2); line-height:1.5; }
+.step-text strong { color:var(--bl); }
+.setup-label {
+  font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--bm); margin-bottom:7px; display:block;
+}
+.setup-input {
+  width:100%; background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:13px 15px; font-family:'DM Sans',sans-serif;
+  font-size:.9rem; color:var(--text); outline:none; margin-bottom:14px;
+  transition:border-color .3s;
+}
+.setup-input:focus { border-color:var(--rose); }
+.setup-input::placeholder { color:var(--text3); }
+.btn-setup {
+  width:100%; padding:16px; border-radius:14px; border:none;
+  background:linear-gradient(135deg,var(--rose),var(--rose2));
+  color:white; font-family:'DM Sans',sans-serif; font-size:.95rem;
+  font-weight:500; cursor:pointer; transition:all .3s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-setup:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(204,122,94,.3); }
+.setup-note {
+  text-align:center; font-size:.72rem; color:var(--text3);
+  font-style:italic; margin-top:12px; line-height:1.6;
+}
+.setup-err { color:#e07070; font-size:.78rem; text-align:center; margin-top:8px; min-height:16px; }
+
+/* ── MAIN SCREEN ── */
+#mainScreen { display:none; }
+
+/* HEADER */
+.header {
+  position:sticky; top:0; z-index:50;
+  padding:15px 20px 12px;
+  background:rgba(13,11,8,.92); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.header-left {}
+.logo-script {
+  font-family:'Dancing Script',cursive; font-size:1.4rem;
+  color:var(--rose); line-height:1;
+}
+.logo-sub {
+  font-size:.58rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--bm); margin-top:1px;
+}
+.header-right { display:flex; align-items:center; gap:12px; }
+.header-date { font-size:.7rem; color:var(--text3); }
+.btn-settings {
+  width:34px; height:34px; border-radius:50%;
+  background:var(--s2); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .3s; font-size:.9rem;
+}
+.btn-settings:hover { border-color:var(--bl); background:var(--s3); }
+
+/* MAIN CONTENT */
+.main { padding:18px 16px 90px; }
+
+/* NOTE CARD */
+.note-card {
+  background:var(--s1); border:1px solid var(--border2);
+  border-radius:16px; padding:16px; margin-bottom:12px;
+  transition:border-color .3s;
+}
+.note-card:focus-within { border-color:rgba(204,122,94,.5); }
+.field-label {
+  font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--bm); margin-bottom:9px;
+  display:flex; align-items:center; gap:6px;
+}
+.label-dot {
+  width:4px; height:4px; border-radius:50%;
+  background:var(--rose); display:inline-block;
+}
+.note-textarea {
+  width:100%; background:none; border:none; outline:none;
+  font-family:'DM Sans',sans-serif; font-size:1rem;
+  color:var(--text); resize:none; line-height:1.7; min-height:88px;
+}
+.note-textarea::placeholder { color:var(--text3); }
+
+/* FIELDS GRID */
+.fields-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.field-card {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:12px; padding:12px 14px; transition:border-color .3s;
+}
+.field-card:focus-within { border-color:rgba(200,169,126,.35); }
+.field-card.full { grid-column:1/-1; }
+.field-input {
+  width:100%; background:none; border:none; outline:none;
+  font-family:'DM Sans',sans-serif; font-size:.88rem;
+  color:var(--text); padding-top:2px;
+}
+.field-input::placeholder { color:var(--text3); }
+input[type=date].field-input { color-scheme:dark; }
+
+/* GENERATE BTN */
+.btn-generate {
+  width:100%; padding:17px; border-radius:15px; border:none;
+  background:linear-gradient(135deg,var(--rose) 0%,var(--rose2) 100%);
+  color:white; font-family:'DM Sans',sans-serif;
+  font-size:.95rem; font-weight:500; cursor:pointer;
+  transition:all .3s; display:flex; align-items:center;
+  justify-content:center; gap:9px; margin-bottom:14px;
+  box-shadow:0 4px 20px rgba(204,122,94,.2);
+}
+.btn-generate:hover:not(:disabled) {
+  transform:translateY(-2px);
+  box-shadow:0 8px 28px rgba(204,122,94,.35);
+}
+.btn-generate:active:not(:disabled) { transform:translateY(0); }
+.btn-generate:disabled { opacity:.5; cursor:not-allowed; }
+
+/* PROGRESS BAR */
+.progress-wrap {
+  height:2px; background:var(--s2); border-radius:1px;
+  margin-bottom:14px; overflow:hidden; display:none;
+}
+.progress-wrap.show { display:block; }
+.progress-bar {
+  height:100%; border-radius:1px; width:0%;
+  background:linear-gradient(90deg,var(--rose),var(--gold));
+  transition:width .5s ease;
+}
+
+/* PREVIEW CARD */
+.preview-card {
+  background:var(--s1); border:1px solid var(--border2);
+  border-radius:16px; overflow:hidden; margin-bottom:14px;
+  opacity:0; transform:translateY(14px);
+  transition:opacity .5s, transform .5s cubic-bezier(.34,1.56,.64,1);
+  display:none;
+}
+.preview-card.show { opacity:1; transform:translateY(0); display:block; }
+
+.preview-top {
+  padding:13px 16px 11px;
+  border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.preview-badge {
+  font-size:.58rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--sage); display:flex; align-items:center; gap:5px;
+}
+.preview-badge::before { content:'✦'; font-size:.5rem; }
+.btn-edit-toggle {
+  background:none; border:none; font-family:'DM Sans',sans-serif;
+  font-size:.72rem; color:var(--bm); cursor:pointer;
+  text-decoration:underline; text-underline-offset:2px;
+}
+
+.preview-body { padding:16px; }
+.preview-title {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:1.12rem; color:var(--cream); line-height:1.35;
+  margin-bottom:10px;
+}
+.preview-desc {
+  font-size:.87rem; line-height:1.8; color:var(--text2);
+  font-style:italic; margin-bottom:14px;
+}
+.pills-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.pill {
+  padding:3px 11px; border-radius:20px;
+  font-size:.68rem; letter-spacing:.04em;
+}
+.pill-cat  { background:rgba(196,151,58,.14); color:var(--gold); }
+.pill-mood { background:rgba(106,148,112,.14); color:var(--sage); }
+.pill-tag  { background:rgba(200,169,126,.1);  color:var(--bl); }
+.pill-person { background:rgba(204,122,94,.12); color:var(--rose); border:1px solid rgba(204,122,94,.2); }
+
+.meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.meta-cell {
+  background:var(--s2); border-radius:9px; padding:9px 12px;
+}
+.meta-label {
+  font-size:.58rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--bm); margin-bottom:3px;
+}
+.meta-val { font-size:.82rem; color:var(--text); }
+
+/* EDIT MODE */
+.edit-wrap { padding:16px; display:flex; flex-direction:column; gap:10px; }
+.edit-label {
+  font-size:.58rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--bm); margin-bottom:4px; display:block;
+}
+.edit-input, .edit-textarea {
+  width:100%; background:var(--s2); border:1px solid var(--border);
+  border-radius:9px; padding:10px 12px; font-family:'DM Sans',sans-serif;
+  font-size:.87rem; color:var(--text); outline:none; resize:none;
+  transition:border-color .3s;
+}
+.edit-input:focus, .edit-textarea:focus { border-color:var(--rose); }
+.edit-textarea { line-height:1.65; }
+.btn-save-edit {
+  padding:11px; background:var(--s3); border:1px solid var(--border2);
+  border-radius:9px; color:var(--bl); font-family:'DM Sans',sans-serif;
+  font-size:.82rem; cursor:pointer; transition:all .3s;
+}
+.btn-save-edit:hover { border-color:var(--bl); }
+
+/* ACTION BUTTONS */
+.action-row { display:flex; gap:10px; padding:0 16px 16px; }
+.btn-regen {
+  flex:1; padding:13px; background:transparent;
+  border:1px solid var(--border2); border-radius:11px;
+  color:var(--text2); font-family:'DM Sans',sans-serif;
+  font-size:.85rem; cursor:pointer; transition:all .3s;
+}
+.btn-regen:hover { background:var(--s2); border-color:var(--bl); }
+.btn-save {
+  flex:2; padding:13px; background:linear-gradient(135deg,#3a2810,#6a4a28);
+  border:none; border-radius:11px; color:var(--parch);
+  font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:500;
+  cursor:pointer; transition:all .3s;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+}
+.btn-save:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 20px rgba(58,40,16,.5); }
+.btn-save:disabled { opacity:.45; cursor:not-allowed; }
+
+/* SUCCESS */
+.success-card {
+  background:linear-gradient(135deg,rgba(106,148,112,.12),rgba(106,148,112,.06));
+  border:1px solid rgba(106,148,112,.28); border-radius:16px;
+  padding:24px; text-align:center; margin-bottom:14px; display:none;
+}
+.success-card.show { display:block; animation:fadeUp .5s ease; }
+.success-icon { font-size:2.2rem; margin-bottom:8px; }
+.success-title {
+  font-family:'Dancing Script',cursive; font-size:1.5rem;
+  color:var(--sage); margin-bottom:5px;
+}
+.success-sub { font-size:.82rem; color:var(--text3); font-style:italic; margin-bottom:16px; }
+.btn-another {
+  width:100%; padding:13px; background:transparent;
+  border:1px solid var(--border2); border-radius:11px;
+  color:var(--text); font-family:'DM Sans',sans-serif;
+  font-size:.88rem; cursor:pointer; transition:all .3s;
+}
+.btn-another:hover { background:var(--s2); }
+
+/* RECENT */
+.recent-section { margin-top:28px; }
+.recent-heading {
+  font-size:.6rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--bm); margin-bottom:12px;
+  display:flex; align-items:center; gap:10px;
+}
+.recent-heading::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+.recent-empty {
+  font-size:.8rem; color:var(--text3); font-style:italic;
+  text-align:center; padding:16px 0;
+}
+.recent-item {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:11px; padding:12px 14px; margin-bottom:8px;
+  display:flex; align-items:flex-start; gap:10px;
+}
+.recent-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--rose); margin-top:5px; flex-shrink:0;
+}
+.recent-title { font-size:.87rem; color:var(--text); font-style:italic; margin-bottom:2px; }
+.recent-meta { font-size:.7rem; color:var(--text3); }
+
+/* SETTINGS MODAL */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.75);
+  backdrop-filter:blur(8px); z-index:200;
+  display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.settings-panel {
+  background:var(--s1); border:1px solid var(--border2);
+  border-radius:22px 22px 0 0; padding:28px 24px 40px;
+  width:100%; max-width:430px;
+  transform:translateY(100%); transition:transform .4s cubic-bezier(.34,1.2,.64,1);
+}
+.modal-overlay.open .settings-panel { transform:translateY(0); }
+.settings-handle {
+  width:36px; height:4px; border-radius:2px;
+  background:var(--s3); margin:0 auto 20px;
+}
+.settings-title {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:1.15rem; color:var(--cream); margin-bottom:4px;
+}
+.settings-sub { font-size:.78rem; color:var(--text3); margin-bottom:22px; font-style:italic; }
+.settings-label {
+  font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--bm); margin-bottom:7px; display:block;
+}
+.settings-input {
+  width:100%; background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px; font-family:'DM Sans',sans-serif;
+  font-size:.88rem; color:var(--text); outline:none; margin-bottom:14px;
+  transition:border-color .3s;
+}
+.settings-input:focus { border-color:var(--rose); }
+.settings-input::placeholder { color:var(--text3); }
+.settings-actions { display:flex; gap:10px; margin-top:4px; }
+.btn-settings-save {
+  flex:2; padding:14px; border-radius:12px; border:none;
+  background:linear-gradient(135deg,var(--rose),var(--rose2));
+  color:white; font-family:'DM Sans',sans-serif;
+  font-size:.88rem; font-weight:500; cursor:pointer; transition:all .3s;
+}
+.btn-settings-save:hover { transform:translateY(-1px); }
+.btn-settings-cancel {
+  flex:1; padding:14px; border-radius:12px;
+  background:transparent; border:1px solid var(--border2);
+  color:var(--text2); font-family:'DM Sans',sans-serif;
+  font-size:.88rem; cursor:pointer; transition:all .3s;
+}
+.btn-settings-cancel:hover { background:var(--s2); }
+.settings-status {
+  font-size:.72rem; text-align:center; margin-top:10px; min-height:16px;
+}
+.status-ok { color:var(--sage); }
+.status-err { color:#e07070; }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:var(--s2); border:1px solid var(--border2);
+  padding:11px 20px; border-radius:24px; font-size:.82rem;
+  color:var(--text); z-index:300; white-space:nowrap;
+  max-width:88vw; text-align:center;
+  opacity:0; transition:all .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+/* SPINNER */
+@keyframes spin { to { transform:rotate(360deg); } }
+.spin { animation:spin .7s linear infinite; display:inline-block; }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div id="app">
+
+  <!-- ══════════ SETUP SCREEN ══════════ -->
+  <div id="setupScreen">
+    <div class="setup-header">
+      <div class="setup-script">Life Story</div>
+      <div class="setup-tagline">Life Story · Memory Capture</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Go to <strong>notion.so/my-integrations</strong> → New integration → copy the <strong>secret_...</strong> token</div>
+      </div>
+      <div class="setup-step" style="margin-bottom:0">
+        <div class="step-num">2</div>
+        <div class="step-text">Your Memories database ID from the Notion URL (the part before ?v=)</div>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <label class="setup-label">Notion Integration Token</label>
+      <input class="setup-input" id="setupToken" type="password" placeholder="secret_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+
+      <label class="setup-label">Memories Database ID</label>
+      <input class="setup-input" id="setupDb" placeholder="Your database ID from Notion URL" autocomplete="off"/>
+
+      <button class="btn-setup" onclick="saveSetup()">
+        <span>Connect & Open Journal</span> <span>🌿</span>
+      </button>
+      <div class="setup-err" id="setupErr"></div>
+    </div>
+
+    <div class="setup-note">
+      Your credentials are saved only in this browser.<br/>
+      They never leave your device.
+    </div>
+  </div>
+
+  <!-- ══════════ MAIN SCREEN ══════════ -->
+  <div id="mainScreen">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-script">Life Story</div>
+        <div class="logo-sub">Life Story · Memory Capture</div>
+      </div>
+      <div class="header-right">
+        <div class="header-date" id="headerDate"></div>
+        <div class="btn-settings" onclick="openSettings()" title="Settings">⚙</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- SUCCESS -->
+      <div class="success-card" id="successCard">
+        <div class="success-icon">🌿</div>
+        <div class="success-title">Memory Saved</div>
+        <div class="success-sub" id="successSub">Memory saved to journal</div>
+        <button class="btn-another" onclick="resetForm()">+ Capture another memory</button>
+      </div>
+
+      <!-- NOTE -->
+      <div class="note-card" id="noteCard">
+        <div class="field-label"><span class="label-dot"></span>What happened?</div>
+        <textarea class="note-textarea" id="noteInput"
+          placeholder="e.g. His teachers surprised him with holiday wishes on the last day of Grade 1…"></textarea>
+      </div>
+
+      <!-- FIELDS -->
+      <div class="fields-grid">
+        <div class="field-card">
+          <div class="field-label">Date</div>
+          <input class="field-input" type="date" id="dateInput"/>
+        </div>
+        <div class="field-card">
+          <div class="field-label">Location</div>
+          <input class="field-input" type="text" id="locationInput" placeholder="e.g. School, Pune"/>
+        </div>
+        <div class="field-card full">
+          <div class="field-label">People (hint)</div>
+          <input class="field-input" type="text" id="peopleInput" placeholder="e.g. Son, Nanna, School Friends"/>
+        </div>
+      </div>
+
+      <!-- GENERATE -->
+      <button class="btn-generate" id="generateBtn" onclick="generate()">
+        <span>✦</span><span id="generateLabel">Generate Memory Entry</span>
+      </button>
+
+      <!-- PROGRESS -->
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-card" id="previewCard">
+        <div class="preview-top">
+          <div class="preview-badge">Claude's draft</div>
+          <button class="btn-edit-toggle" id="editToggleBtn" onclick="toggleEdit()">Edit fields</button>
+        </div>
+        <!-- normal view -->
+        <div id="previewNormal">
+          <div class="preview-body">
+            <div class="preview-title" id="pvTitle"></div>
+            <div class="preview-desc" id="pvDesc"></div>
+            <div class="pills-row" id="pvPeople"></div>
+            <div class="pills-row" id="pvTags"></div>
+            <div class="meta-grid">
+              <div class="meta-cell"><div class="meta-label">Date</div><div class="meta-val" id="pvDate"></div></div>
+              <div class="meta-cell"><div class="meta-label">Location</div><div class="meta-val" id="pvLoc"></div></div>
+            </div>
+          </div>
+          <div class="action-row">
+            <button class="btn-regen" onclick="generate()">↻ Redo</button>
+            <button class="btn-save" id="saveBtn" onclick="saveToNotion()">
+              Save to Notion 🌿
+            </button>
+          </div>
+        </div>
+        <!-- edit view -->
+        <div id="previewEdit" style="display:none">
+          <div class="edit-wrap">
+            <div>
+              <label class="edit-label">Memory Title</label>
+              <input class="edit-input" id="editTitle"/>
+            </div>
+            <div>
+              <label class="edit-label">Description</label>
+              <textarea class="edit-textarea" id="editDesc" rows="4"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div>
+                <label class="edit-label">Category</label>
+                <input class="edit-input" id="editCat"/>
+              </div>
+              <div>
+                <label class="edit-label">Mood</label>
+                <input class="edit-input" id="editMood"/>
+              </div>
+            </div>
+            <div>
+              <label class="edit-label">People (comma separated)</label>
+              <input class="edit-input" id="editPeople"/>
+            </div>
+            <div>
+              <label class="edit-label">Tags (comma separated)</label>
+              <input class="edit-input" id="editTags"/>
+            </div>
+            <div>
+              <label class="edit-label">Location</label>
+              <input class="edit-input" id="editLoc"/>
+            </div>
+            <button class="btn-save-edit" onclick="saveEdit()">✓ Done editing</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT -->
+      <div class="recent-section">
+        <div class="recent-heading">This session</div>
+        <div id="recentList">
+          <div class="recent-empty">Memories you capture will appear here</div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /mainScreen -->
+
+</div><!-- /app -->
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" onclick="overlayClick(event)">
+  <div class="settings-panel">
+    <div class="settings-handle"></div>
+    <div class="settings-title">Notion Settings</div>
+    <div class="settings-sub">Saved in your browser only. Never shared.</div>
+
+    <label class="settings-label">Integration Token</label>
+    <input class="settings-input" id="settingsToken" type="password" placeholder="secret_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+
+    <label class="settings-label">Database ID</label>
+    <input class="settings-input" id="settingsDb" placeholder="Your database ID"/>
+
+    <div class="settings-actions">
+      <button class="btn-settings-cancel" onclick="closeSettings()">Cancel</button>
+      <button class="btn-settings-save" onclick="updateSettings()">Save Changes</button>
+    </div>
+    <div class="settings-status" id="settingsStatus"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────── */
+var entry      = null;
+var isEditing  = false;
+var recentList = [];
+
+var VALID_CATS    = ['Trips','Outing','Firsts','Parks','School','Family Event','Milestone','Daily Life','Travel','Holiday','Achievement'];
+var VALID_MOODS   = ['Exciting','Happy','Nostalgic','Proud','Touching','Bittersweet','Funny'];
+var VALID_PEOPLE  = ['Son','Father','Mother','Grandfather','Grandmother','Uncle','Aunt','Brother','Sister','School Friends','School','Family'];
+var VALID_TAGS    = ['Arts & Crafts','Environment','Life skill','Travel Back','Holiday','Birthday','Wedding','Family Gathering','Sports','School','Vacation','Milestone'];
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+(function init(){
+  var d = new Date();
+  var iso = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  var el = document.getElementById('dateInput');
+  if(el) el.value = iso;
+
+  var hd = document.getElementById('headerDate');
+  if(hd) hd.textContent = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+
+  var token = ls('uc_token');
+  var db    = ls('uc_db');
+
+  if(token && db){
+    showMain();
+  } else {
+    showSetup();
+  }
+})();
+
+function pad(n){ return n<10?'0'+n:''+n; }
+function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+function showSetup(){
+  document.getElementById('setupScreen').style.display='flex';
+  document.getElementById('mainScreen').style.display='none';
+}
+function showMain(){
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('mainScreen').style.display='block';
+}
+
+/* ─────────────────────────────────────────────
+   SETUP
+───────────────────────────────────────────── */
+function saveSetup(){
+  var token = document.getElementById('setupToken').value.trim();
+  var db    = document.getElementById('setupDb').value.trim();
+  var err   = document.getElementById('setupErr');
+  if(!token){ err.textContent='Please enter your Notion token'; return; }
+  if(!db){ err.textContent='Please enter your database ID'; return; }
+  err.textContent='';
+  lsSet('uc_token', token);
+  lsSet('uc_db', db);
+  showMain();
+}
+
+document.getElementById('setupToken').addEventListener('keydown',function(e){
+  if(e.key==='Enter') saveSetup();
+});
+
+/* ─────────────────────────────────────────────
+   SETTINGS MODAL
+───────────────────────────────────────────── */
+function openSettings(){
+  document.getElementById('settingsToken').value = ls('uc_token')||'';
+  document.getElementById('settingsDb').value    = ls('uc_db')||'';
+  document.getElementById('settingsStatus').textContent='';
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('settingsModal').classList.remove('open');
+}
+function overlayClick(e){
+  if(e.target===document.getElementById('settingsModal')) closeSettings();
+}
+function updateSettings(){
+  var token = document.getElementById('settingsToken').value.trim();
+  var db    = document.getElementById('settingsDb').value.trim();
+  var st    = document.getElementById('settingsStatus');
+  if(!token||!db){ st.className='settings-status status-err'; st.textContent='Both fields required'; return; }
+  lsSet('uc_token',token); lsSet('uc_db',db);
+  st.className='settings-status status-ok'; st.textContent='✓ Saved';
+  setTimeout(closeSettings,900);
+}
+
+/* ─────────────────────────────────────────────
+   GENERATE
+───────────────────────────────────────────── */
+async function generate(){
+  var note     = document.getElementById('noteInput').value.trim();
+  var date     = document.getElementById('dateInput').value;
+  var location = document.getElementById('locationInput').value.trim();
+  var people   = document.getElementById('peopleInput').value.trim();
+
+  if(!note){ showToast('Write what happened first ✦'); return; }
+
+  setLoading(true);
+  hidePreview();
+  document.getElementById('successCard').style.display='none';
+
+  var prompt =
+    'You are helping a father document memories for his son\'s Life Story journal in Notion.\n\n'+
+    'Father\'s quick note: "'+note+'"\n'+
+    'Date: '+(date||'today')+'\n'+
+    'Location: '+(location||'not specified')+'\n'+
+    'People hint: '+(people||'not specified')+'\n\n'+
+    'Write the Description warmly and poetically — a heartfelt mix of personal letter and storytelling, '+
+    'addressed directly to him as "you". 2-4 sentences. Make it emotional and meaningful — '+
+    'something he will treasure reading at age 18.\n\n'+
+    'Valid Category (pick ONE): '+VALID_CATS.join(', ')+'\n'+
+    'Valid Mood (pick ONE): '+VALID_MOODS.join(', ')+'\n'+
+    'Valid People (pick from): '+VALID_PEOPLE.join(', ')+'\n'+
+    'Valid Tags (pick relevant): '+VALID_TAGS.join(', ')+'\n\n'+
+    'Respond ONLY with a valid JSON object, no markdown, no explanation:\n'+
+    '{\n'+
+    '  "Memory Title": "...",\n'+
+    '  "Description": "...",\n'+
+    '  "Category": "...",\n'+
+    '  "Mood": "...",\n'+
+    '  "People Involved": [...],\n'+
+    '  "Location": "...",\n'+
+    '  "Tags": [...],\n'+
+    '  "Date": "'+(date||new Date().toISOString().split('T')[0])+'"\n'+
+    '}';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:900,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    var data = await res.json();
+    if(data.error){ throw new Error(data.error.message); }
+    var raw = (data.content&&data.content[0]&&data.content[0].text||'')
+      .replace(/```json|```/g,'').trim();
+    entry = JSON.parse(raw);
+    renderPreview();
+  } catch(err){
+    showToast('Generation failed — check connection & try again');
+    console.error(err);
+  }
+  setLoading(false);
+}
+
+/* ─────────────────────────────────────────────
+   PREVIEW
+───────────────────────────────────────────── */
+function renderPreview(){
+  if(!entry) return;
+  document.getElementById('pvTitle').textContent = entry['Memory Title']||'';
+  document.getElementById('pvDesc').textContent  = entry['Description']||'';
+  document.getElementById('pvDate').textContent  = entry['Date']||'—';
+  document.getElementById('pvLoc').textContent   = entry['Location']||'—';
+
+  var pp = document.getElementById('pvPeople');
+  pp.innerHTML='';
+  (entry['People Involved']||[]).forEach(function(p){
+    var s=document.createElement('span');
+    s.className='pill pill-person'; s.textContent=p; pp.appendChild(s);
+  });
+
+  var pt = document.getElementById('pvTags');
+  pt.innerHTML='';
+  if(entry['Category']){
+    var s=document.createElement('span');
+    s.className='pill pill-cat'; s.textContent=entry['Category']; pt.appendChild(s);
+  }
+  if(entry['Mood']){
+    var s=document.createElement('span');
+    s.className='pill pill-mood'; s.textContent=entry['Mood']; pt.appendChild(s);
+  }
+  (entry['Tags']||[]).forEach(function(t){
+    var s=document.createElement('span');
+    s.className='pill pill-tag'; s.textContent=t; pt.appendChild(s);
+  });
+
+  showPreview();
+  document.getElementById('previewCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function showPreview(){
+  var c=document.getElementById('previewCard');
+  c.style.display='block';
+  requestAnimationFrame(function(){ c.classList.add('show'); });
+}
+function hidePreview(){
+  var c=document.getElementById('previewCard');
+  c.classList.remove('show');
+  setTimeout(function(){ c.style.display='none'; },400);
+}
+
+/* ─────────────────────────────────────────────
+   EDIT
+───────────────────────────────────────────── */
+function toggleEdit(){
+  isEditing=!isEditing;
+  if(isEditing){
+    document.getElementById('editTitle').value  = entry['Memory Title']||'';
+    document.getElementById('editDesc').value   = entry['Description']||'';
+    document.getElementById('editCat').value    = entry['Category']||'';
+    document.getElementById('editMood').value   = entry['Mood']||'';
+    document.getElementById('editPeople').value = (entry['People Involved']||[]).join(', ');
+    document.getElementById('editTags').value   = (entry['Tags']||[]).join(', ');
+    document.getElementById('editLoc').value    = entry['Location']||'';
+    document.getElementById('previewNormal').style.display='none';
+    document.getElementById('previewEdit').style.display='block';
+    document.getElementById('editToggleBtn').textContent='Cancel edit';
+  } else {
+    document.getElementById('previewNormal').style.display='block';
+    document.getElementById('previewEdit').style.display='none';
+    document.getElementById('editToggleBtn').textContent='Edit fields';
+  }
+}
+
+function saveEdit(){
+  entry['Memory Title']      = document.getElementById('editTitle').value.trim();
+  entry['Description']       = document.getElementById('editDesc').value.trim();
+  entry['Category']          = document.getElementById('editCat').value.trim();
+  entry['Mood']              = document.getElementById('editMood').value.trim();
+  entry['People Involved']   = document.getElementById('editPeople').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  entry['Tags']              = document.getElementById('editTags').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  entry['Location']          = document.getElementById('editLoc').value.trim();
+  isEditing=false;
+  document.getElementById('previewNormal').style.display='block';
+  document.getElementById('previewEdit').style.display='none';
+  document.getElementById('editToggleBtn').textContent='Edit fields';
+  renderPreview();
+}
+
+/* ─────────────────────────────────────────────
+   SAVE TO NOTION
+───────────────────────────────────────────── */
+async function saveToNotion(){
+  var token = ls('uc_token');
+  var db    = ls('uc_db');
+  if(!token||!db){ showToast('Set up Notion first — tap ⚙'); openSettings(); return; }
+  if(!entry){ showToast('Generate an entry first'); return; }
+
+  var btn=document.getElementById('saveBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin">⟳</span> Saving…';
+
+  var props={
+    'Memory Title':{ title:[{text:{content:entry['Memory Title']||''}}] },
+    'Description': { rich_text:[{text:{content:entry['Description']||''}}] },
+    'Location':    { rich_text:[{text:{content:entry['Location']||''}}] }
+  };
+  if(entry['Date']) props['Date']={date:{start:entry['Date']}};
+  if(entry['Category']&&VALID_CATS.indexOf(entry['Category'])!==-1)
+    props['Category']={select:{name:entry['Category']}};
+  if(entry['Mood']&&VALID_MOODS.indexOf(entry['Mood'])!==-1)
+    props['Mood']={select:{name:entry['Mood']}};
+  var vp=(entry['People Involved']||[]).filter(function(p){return VALID_PEOPLE.indexOf(p)!==-1;});
+  if(vp.length) props['People Involved']={multi_select:vp.map(function(n){return{name:n};})};
+  var vt=(entry['Tags']||[]).filter(function(t){return VALID_TAGS.indexOf(t)!==-1;});
+  if(vt.length) props['Tags']={multi_select:vt.map(function(n){return{name:n};})};
+
+  try {
+    var res=await fetch('https://api.notion.com/v1/pages',{
+      method:'POST',
+      headers:{
+        'Authorization':'Bearer '+token,
+        'Content-Type':'application/json',
+        'Notion-Version':'2022-06-28'
+      },
+      body:JSON.stringify({parent:{database_id:db.replace(/-/g,'')},properties:props})
+    });
+    var result=await res.json();
+    if(result.id){
+      recentList.unshift({title:entry['Memory Title'],date:entry['Date'],mood:entry['Mood']});
+      renderRecent();
+      hidePreview();
+      var sc=document.getElementById('successCard');
+      document.getElementById('successSub').textContent='"'+entry['Memory Title']+'" added to Life Story';
+      sc.style.display='block';
+      requestAnimationFrame(function(){sc.classList.add('show');});
+      sc.scrollIntoView({behavior:'smooth',block:'start'});
+    } else {
+      showToast('Notion error: '+(result.message||'Check token & DB ID'));
+      console.error(result);
+    }
+  } catch(err){
+    showToast('Could not reach Notion');
+    console.error(err);
+  }
+
+  btn.disabled=false;
+  btn.innerHTML='Save to Notion 🌿';
+}
+
+/* ─────────────────────────────────────────────
+   RECENT
+───────────────────────────────────────────── */
+function renderRecent(){
+  var el=document.getElementById('recentList');
+  if(!recentList.length){
+    el.innerHTML='<div class="recent-empty">Memories you capture will appear here</div>';
+    return;
+  }
+  el.innerHTML=recentList.map(function(m){
+    return '<div class="recent-item">'+
+      '<div class="recent-dot"></div>'+
+      '<div>'+
+        '<div class="recent-title">'+esc(m.title)+'</div>'+
+        '<div class="recent-meta">'+esc(m.date||'')+(m.mood?' · '+esc(m.mood):'')+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+function resetForm(){
+  document.getElementById('noteInput').value='';
+  document.getElementById('locationInput').value='';
+  document.getElementById('peopleInput').value='';
+  var d=new Date();
+  document.getElementById('dateInput').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  entry=null; isEditing=false;
+  var sc=document.getElementById('successCard');
+  sc.classList.remove('show');
+  setTimeout(function(){sc.style.display='none';},300);
+  hidePreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─────────────────────────────────────────────
+   LOADING
+───────────────────────────────────────────── */
+function setLoading(on){
+  var btn=document.getElementById('generateBtn');
+  var wrap=document.getElementById('progressWrap');
+  var bar=document.getElementById('progressBar');
+  var lbl=document.getElementById('generateLabel');
+  btn.disabled=on;
+  if(on){
+    lbl.textContent='Writing memory…';
+    wrap.classList.add('show');
+    bar.style.width='0%';
+    setTimeout(function(){bar.style.width='65%';},80);
+    setTimeout(function(){bar.style.width='88%';},1200);
+  } else {
+    lbl.textContent='Generate Memory Entry';
+    bar.style.width='100%';
+    setTimeout(function(){wrap.classList.remove('show');bar.style.width='0%';},500);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────── */
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3200);
+}
+
+/* ─────────────────────────────────────────────
+   ESCAPE
+───────────────────────────────────────────── */
+function esc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
