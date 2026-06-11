@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>deepu-life — Words</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0f0d;
+      --surface: #111a14;
+      --surface2: #172019;
+      --accent: #3d7a52;
+      --accent-bright: #5dab76;
+      --text: #e8ede9;
+      --text-muted: #7a9080;
+      --text-faint: #3d5244;
+      --line: #1e2e22;
+      --deepu: #a8d5b5;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(10,15,13,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1.5rem; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-brand { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
+    .nav-links a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+    /* HERO */
+    .hero { padding: 4rem 1.5rem 3rem; max-width: 760px; margin: 0 auto; border-bottom: 1px solid var(--line); }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-bright); margin-bottom: 1rem; }
+    .hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: var(--text); line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1rem; }
+    .hero h1 em { font-style: italic; font-weight: 300; color: var(--accent-bright); }
+    .hero-sub { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; max-width: 480px; }
+
+    /* LOADING */
+    .loading-state { max-width: 760px; margin: 3rem auto; padding: 0 1.5rem; display: flex; align-items: center; gap: 12px; color: var(--text-faint); font-size: 0.85rem; }
+    .spinner { width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--accent-bright); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state { max-width: 760px; margin: 3rem auto; padding: 1.5rem; background: var(--surface); border: 1px solid #3a1a1a; border-radius: 10px; color: #e07070; font-size: 0.85rem; line-height: 1.6; }
+    .error-state strong { display: block; margin-bottom: 6px; }
+
+    /* DAILY QUOTE */
+    .daily-section { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem; border-bottom: 1px solid var(--line); }
+    .section-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+    .daily-card { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent-bright); border-radius: 0 12px 12px 0; padding: 1.75rem 2rem; }
+    .daily-meta { font-size: 0.72rem; color: var(--text-faint); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .daily-meta .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-bright); animation: pulse 2.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .daily-quote { font-family: var(--font-display); font-size: clamp(1.05rem, 2.5vw, 1.3rem); line-height: 1.75; color: var(--text); font-style: italic; font-weight: 300; margin-bottom: 1.25rem; min-height: 2rem; }
+    #tw-text::after { content: '|'; animation: blink 0.9s step-end infinite; color: var(--accent-bright); margin-left: 1px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .daily-author { font-size: 0.82rem; color: var(--text-muted); }
+    .deepu-badge { display: inline-block; font-size: 0.68rem; font-weight: 500; background: rgba(93,171,118,0.12); color: var(--deepu); border: 1px solid rgba(93,171,118,0.25); padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+    .daily-actions { display: flex; gap: 8px; margin-top: 1.25rem; flex-wrap: wrap; }
+    .btn { font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; padding: 7px 16px; border-radius: 6px; cursor: pointer; border: 1px solid var(--line); background: var(--surface2); color: var(--text-muted); transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: var(--text-faint); color: var(--text); }
+    .btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* BROWSE */
+    .browse-section { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; align-items: center; }
+    .filter-label { font-size: 0.72rem; color: var(--text-faint); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; }
+    .chip { font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .chip:hover { border-color: var(--text-faint); color: var(--text); }
+    .chip.active { background: rgba(93,171,118,0.12); border-color: rgba(93,171,118,0.35); color: var(--deepu); }
+
+    /* STATS */
+    .stats-row { display: flex; gap: 12px; margin-bottom: 2rem; flex-wrap: wrap; }
+    .stat-pill { font-size: 0.75rem; color: var(--text-faint); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; display: flex; align-items: center; gap: 6px; }
+    .stat-pill strong { color: var(--text-muted); font-weight: 500; }
+
+    /* QUOTE CARDS */
+    .quotes-grid { display: flex; flex-direction: column; gap: 1px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .qcard { background: var(--surface); padding: 1.5rem 1.75rem; border-bottom: 1px solid var(--line); transition: background 0.15s; }
+    .qcard:last-child { border-bottom: none; }
+    .qcard:hover { background: var(--surface2); }
+    .qcard.is-deepu { border-left: 2px solid var(--accent); }
+    .qcard-text { font-family: var(--font-display); font-size: 1rem; line-height: 1.8; color: var(--text); font-style: italic; font-weight: 300; margin-bottom: 0.75rem; }
+    .qcard-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .qcard-author { font-size: 0.78rem; color: var(--text-muted); }
+    .qcard-tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .qtag { font-size: 0.65rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 8px; border-radius: 999px; }
+    .qtag-deepu { background: rgba(93,171,118,0.1); color: var(--deepu); border: 1px solid rgba(93,171,118,0.2); }
+
+    .empty { padding: 2.5rem; text-align: center; color: var(--text-faint); font-size: 0.9rem; }
+
+    footer { border-top: 1px solid var(--line); padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-faint); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 480px) {
+      .daily-card { padding: 1.25rem; }
+      .qcard { padding: 1.25rem; }
+      .nav-links { gap: 1rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand">deepu-life</a>
+  <ul class="nav-links">
+    <li><a href="index.html#running">🏃 Run</a></li>
+    <li><a href="index.html#reading">📚 Read</a></li>
+    <li><a href="index.html#grow">🌱 Grow</a></li>
+    <li><a href="index.html#cycling">🚴 Cycle</a></li>
+    <li><a href="todo.html">✅ To-Do</a></li>
+    <li><a href="quotes.html" class="active">💬 Words</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <p class="hero-eyebrow">05 — Words</p>
+  <h1>Quotes that <em>stuck.</em></h1>
+  <p class="hero-sub">A living collection pulled from Google Sheets — lines worth returning to, from writers, thinkers, and Deepu himself.</p>
+</section>
+
+<div class="loading-state" id="loading">
+  <div class="spinner"></div>
+  <span>Loading quotes from Google Sheets…</span>
+</div>
+
+<div class="error-state" id="error-msg" style="display:none;">
+  <strong>Could not load quotes.</strong>
+  Make sure the Google Sheet is published: File → Share → Publish to web → Quotes sheet → CSV.
+</div>
+
+<section class="daily-section" id="daily-section" style="display:none;">
+  <div class="section-label">Today's quote</div>
+  <div class="daily-card">
+    <div class="daily-meta">
+      <span class="dot"></span>
+      <span id="today-date"></span>
+    </div>
+    <p class="daily-quote"><span id="tw-text"></span></p>
+    <p class="daily-author" id="daily-author"></p>
+    <div class="daily-actions">
+      <button class="btn" id="copy-btn" onclick="copyDailyQuote()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy
+      </button>
+      <button class="btn" onclick="shareQuote()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+      <button class="btn" onclick="nextRandom()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+        Random
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="browse-section" id="browse-section" style="display:none;">
+  <div class="section-label">All quotes</div>
+  <div class="stats-row" id="stats-row"></div>
+  <div class="filter-row" id="filter-row">
+    <span class="filter-label">Filter</span>
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="__deepu">By Deepu</button>
+  </div>
+  <div class="quotes-grid" id="quotes-grid"></div>
+  <div class="empty" id="no-results" style="display:none;">No quotes match this filter.</div>
+</section>
+
+<footer>
+  deepu-life &nbsp;·&nbsp;
+  <a href="index.html">Home</a> &nbsp;·&nbsp;
+  <a href="https://deepuhub.github.io" target="_blank">DeepuHub</a> &nbsp;·&nbsp;
+  Made with ❤️ for kids and parents — by a kid's father
+</footer>
+
+<script>
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE/export?format=csv&gid=1315231731";
+
+let ALL_QUOTES = [];
+let activeFilter = 'all';
+let currentDailyQuote = null;
+let currentRandomIdx = null;
+
+// ── CSV PARSER (handles quoted fields with commas) ──────────────────────────
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        fields.push(cur.trim()); cur = '';
+      } else cur += ch;
+    }
+    fields.push(cur.trim());
+    rows.push(fields);
+  }
+  return rows;
+}
+
+// ── FETCH ──────────────────────────────────────────────────────────────────
+async function loadQuotes() {
+  try {
+    const res = await fetch(SHEET_CSV);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if (rows.length < 2) throw new Error('No data rows');
+
+    // Header row: SNO, Quote, Author, Category, Tags
+    const header = rows[0].map(h => h.toLowerCase().trim());
+    const idx = {
+      sno:      header.indexOf('sno'),
+      quote:    header.indexOf('quote'),
+      author:   header.indexOf('author'),
+      category: header.indexOf('category'),
+      tags:     header.indexOf('tags'),
+    };
+
+    ALL_QUOTES = rows.slice(1)
+      .filter(r => r[idx.quote] && r[idx.quote].trim())
+      .map(r => ({
+        sno:      r[idx.sno]      || '',
+        text:     r[idx.quote]    || '',
+        author:   r[idx.author]   || '',
+        category: r[idx.category] ? r[idx.category].trim() : '',
+        tags:     r[idx.tags]     ? r[idx.tags].split(/[,;|]/).map(t => t.trim().toLowerCase()).filter(Boolean) : [],
+        deepu:    (r[idx.author] || '').toLowerCase().trim() === 'deepu',
+      }));
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('daily-section').style.display = 'block';
+    document.getElementById('browse-section').style.display = 'block';
+
+    buildFilterChips();
+    initDaily();
+    renderStats();
+    renderCards('all');
+
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    const errEl = document.getElementById('error-msg');
+    errEl.style.display = 'block';
+    errEl.innerHTML = `<strong>Could not load quotes.</strong> ${e.message}<br><br>
+      Make sure the Google Sheet is published:<br>
+      File → Share → Publish to web → select "Quotes" sheet → CSV format → Publish.`;
+  }
+}
+
+// ── FILTER CHIPS (built from unique categories) ────────────────────────────
+function buildFilterChips() {
+  const categories = [...new Set(ALL_QUOTES.map(q => q.category).filter(Boolean))].sort();
+  const row = document.getElementById('filter-row');
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.dataset.filter = cat.toLowerCase();
+    btn.textContent = cat;
+    row.appendChild(btn);
+  });
+  row.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    renderCards(activeFilter);
+  });
+}
+
+// ── DAILY QUOTE ────────────────────────────────────────────────────────────
+function getDailyQuote() {
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return ALL_QUOTES[seed % ALL_QUOTES.length];
+}
+
+function initDaily() {
+  const q = getDailyQuote();
+  currentDailyQuote = q;
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  setDailyAuthor(q);
+  typewrite(q.text, document.getElementById('tw-text'), 22);
+}
+
+function setDailyAuthor(q) {
+  const badge = q.deepu ? '<span class="deepu-badge">by Deepu</span>' : '';
+  document.getElementById('daily-author').innerHTML = `— ${q.author}${badge}`;
+}
+
+let twTimer = null;
+function typewrite(text, el, speed) {
+  if (twTimer) clearTimeout(twTimer);
+  el.textContent = '';
+  let i = 0;
+  function tick() {
+    if (i < text.length) { el.textContent += text[i++]; twTimer = setTimeout(tick, speed); }
+  }
+  tick();
+}
+
+function copyDailyQuote() {
+  if (!currentDailyQuote) return;
+  const text = `"${currentDailyQuote.text}" — ${currentDailyQuote.author}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      const orig = btn.innerHTML;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.innerHTML = orig; }, 1800);
+    });
+  }
+}
+
+function shareQuote() {
+  if (!currentDailyQuote) return;
+  const text = `"${currentDailyQuote.text}" — ${currentDailyQuote.author}`;
+  if (navigator.share) {
+    navigator.share({ title: 'A quote from deepu-life', text });
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n\nhttps://deepuhub.github.io/deepu-life/quotes.html'), '_blank');
+  }
+}
+
+function nextRandom() {
+  if (ALL_QUOTES.length === 0) return;
+  let idx;
+  do { idx = Math.floor(Math.random() * ALL_QUOTES.length); } while (idx === currentRandomIdx && ALL_QUOTES.length > 1);
+  currentRandomIdx = idx;
+  const q = ALL_QUOTES[idx];
+  currentDailyQuote = q;
+  setDailyAuthor(q);
+  typewrite(q.text, document.getElementById('tw-text'), 18);
+}
+
+// ── STATS ──────────────────────────────────────────────────────────────────
+function renderStats() {
+  const byDeepu = ALL_QUOTES.filter(q => q.deepu).length;
+  const cats = [...new Set(ALL_QUOTES.map(q => q.category).filter(Boolean))].length;
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-pill"><strong>${ALL_QUOTES.length}</strong> quotes total</div>
+    <div class="stat-pill"><strong>${byDeepu}</strong> by Deepu</div>
+    <div class="stat-pill"><strong>${cats}</strong> categories</div>
+  `;
+}
+
+// ── TAG COLOR (auto-assign from a palette by hash) ─────────────────────────
+const TAG_PALETTE = [
+  'rgba(100,150,220,0.12)/rgba(100,150,220,0.22)/#7eaadd',
+  'rgba(200,140,80,0.12)/rgba(200,140,80,0.22)/#d4a06a',
+  'rgba(170,100,200,0.12)/rgba(170,100,200,0.22)/#c08ae0',
+  'rgba(80,180,140,0.12)/rgba(80,180,140,0.22)/#60c4a0',
+  'rgba(220,190,80,0.12)/rgba(220,190,80,0.22)/#d4bc5a',
+  'rgba(220,90,90,0.12)/rgba(220,90,90,0.22)/#e07070',
+];
+
+function tagStyle(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  const parts = TAG_PALETTE[h % TAG_PALETTE.length].split('/');
+  return `background:${parts[0]};border:1px solid ${parts[1]};color:${parts[2]};`;
+}
+
+// ── RENDER CARDS ───────────────────────────────────────────────────────────
+function renderCards(f) {
+  const grid = document.getElementById('quotes-grid');
+  const noRes = document.getElementById('no-results');
+
+  let list;
+  if (f === 'all') list = ALL_QUOTES;
+  else if (f === '__deepu') list = ALL_QUOTES.filter(q => q.deepu);
+  else list = ALL_QUOTES.filter(q => q.category.toLowerCase() === f || q.tags.includes(f));
+
+  if (list.length === 0) {
+    grid.style.display = 'none'; noRes.style.display = 'block'; return;
+  }
+  noRes.style.display = 'none'; grid.style.display = 'flex';
+
+  grid.innerHTML = list.map(q => {
+    const deepuBadge = q.deepu ? `<span class="qtag qtag-deepu">Deepu</span>` : '';
+    const catTag = q.category ? `<span class="qtag" style="${tagStyle(q.category)}">${q.category}</span>` : '';
+    const tagPills = q.tags.map(t => `<span class="qtag" style="${tagStyle(t)}">${t}</span>`).join('');
+    return `
+      <div class="qcard${q.deepu ? ' is-deepu' : ''}">
+        <p class="qcard-text">"${q.text}"</p>
+        <div class="qcard-footer">
+          <span class="qcard-author">— ${q.author}</span>
+          <div class="qcard-tags">${deepuBadge}${catTag}${tagPills}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+loadQuotes();
+</script>
+</body>
+</html>
