@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>School Day & Dining · July 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root, [data-theme="light"] {
+      /* CAPTAIN AMERICA — Light Mode: bold saturated red/white/blue, comic-flat */
+      --sky-dawn:   #ffffff;
+      --sky-mid:    #eef1ff;
+      --sky-noon:   #dfe6ff;
+      --accent:     #1b2a68;
+      --accent2:    #d0121b;
+      --text:       #0d1233;
+      --muted:      #43508a;
+      --line:       #1b2a68;
+      --line-soft:  rgba(27,42,104,0.35);
+      --card-bg:    rgba(255,255,255,0.96);
+      --card-solid: #ffffff;
+      --shadow:     rgba(13,18,51,0.18);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --radius:     16px;
+      --star:       #ffffff;
+      --stripe-red: #d0121b;
+      --stripe-blue:#1b2a68;
+      --stripe-white: #ffffff;
+      --break-short-bg1: #fff3e0;
+      --break-short-bg2: #ffe3cf;
+      --break-short-border: #d0121b;
+      --break-short-title: #b3121b;
+      --break-long-bg1: #e7ecff;
+      --break-long-bg2: #d6deff;
+      --break-long-border: #1b2a68;
+      --break-long-title: #1b2a68;
+    }
+
+    [data-theme="dark"] {
+      /* CAPTAIN AMERICA — Dark Mode: deep hero-night navy, glowing red/star accents */
+      --sky-dawn:   #060915;
+      --sky-mid:    #0b1130;
+      --sky-noon:   #121a4a;
+      --accent:     #4e63ff;
+      --accent2:    #ff2d3d;
+      --text:       #f4f6ff;
+      --muted:      #9aa6e8;
+      --line:       #2c3680;
+      --line-soft:  rgba(44,54,128,0.6);
+      --card-bg:    rgba(11,17,48,0.92);
+      --card-solid: #10163f;
+      --shadow:     rgba(0,0,0,0.55);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --radius:     16px;
+      --star:       #ffffff;
+      --stripe-red: #ff2d3d;
+      --stripe-blue:#4e63ff;
+      --stripe-white: #f4f6ff;
+      --break-short-bg1: #2a1420;
+      --break-short-bg2: #3a1626;
+      --break-short-border: #ff2d3d;
+      --break-short-title: #ff8c96;
+      --break-long-bg1: #141c46;
+      --break-long-bg2: #1c2660;
+      --break-long-border: #4e63ff;
+      --break-long-title: #9aa6ff;
+    }
+
+    /* ============ IRON MAN THEME (Tuesday) ============ */
+    [data-hero="ironman"][data-theme="light"] {
+      --sky-dawn:   #fff3e0;
+      --sky-mid:    #ffd9a8;
+      --sky-noon:   #ffb454;
+      --accent:     #a6151c;
+      --accent2:    #ffb700;
+      --text:       #2a0e05;
+      --muted:      #7a4a1a;
+      --line:       #a6151c;
+      --line-soft:  rgba(166,21,28,0.35);
+      --card-bg:    rgba(255,250,240,0.94);
+      --card-solid: #fffaf0;
+      --shadow:     rgba(120,40,0,0.20);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --star:       #26e0ff;
+      --stripe-red:   #a6151c;
+      --stripe-blue:  #ffb700;
+      --stripe-white: #fff4dd;
+      --break-short-bg1: #ffe7c2;
+      --break-short-bg2: #ffd08a;
+      --break-short-border: #a6151c;
+      --break-short-title: #8a1015;
+      --break-long-bg1: #fff0d6;
+      --break-long-bg2: #ffdca0;
+      --break-long-border: #ffb700;
+      --break-long-title: #9a6b00;
+      --reactor-glow: #26e0ff;
+    }
+
+    [data-hero="ironman"][data-theme="dark"] {
+      --sky-dawn:   #0a0a0d;
+      --sky-mid:    #14100c;
+      --sky-noon:   #1f1409;
+      --accent:     #ff3b3b;
+      --accent2:    #ffd042;
+      --text:       #fff3dc;
+      --muted:      #d9a86b;
+      --line:       #4a2a10;
+      --line-soft:  rgba(74,42,16,0.7);
+      --card-bg:    rgba(20,15,10,0.92);
+      --card-solid: #171210;
+      --shadow:     rgba(0,0,0,0.6);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --star:       #3ff0ff;
+      --stripe-red:   #ff3b3b;
+      --stripe-blue:  #ffd042;
+      --stripe-white: #2b2b2b;
+      --break-short-bg1: #2b1210;
+      --break-short-bg2: #3d1712;
+      --break-short-border: #ff3b3b;
+      --break-short-title: #ff9a8a;
+      --break-long-bg1: #2b2008;
+      --break-long-bg2: #3d2c0a;
+      --break-long-border: #ffd042;
+      --break-long-title: #ffe089;
+      --reactor-glow: #3ff0ff;
+    }
+
+    /* ============ HULK THEME (Wednesday) ============ */
+    [data-hero="hulk"][data-theme="light"] {
+      --sky-dawn:   #eaffe8;
+      --sky-mid:    #c7f4b8;
+      --sky-noon:   #8fdc6e;
+      --accent:     #2e7d32;
+      --accent2:    #4a148c;
+      --text:       #12240f;
+      --muted:      #3f6b3a;
+      --line:       #2e7d32;
+      --line-soft:  rgba(46,125,50,0.35);
+      --card-bg:    rgba(246,255,240,0.94);
+      --card-solid: #f6fff0;
+      --shadow:     rgba(18,40,10,0.20);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --star:       #d1ff5e;
+      --stripe-red:   #2e7d32;
+      --stripe-blue:  #4a148c;
+      --stripe-white: #e8ffdc;
+      --break-short-bg1: #e3ffd6;
+      --break-short-bg2: #c3f0a4;
+      --break-short-border: #2e7d32;
+      --break-short-title: #1b5e20;
+      --break-long-bg1: #f0e4ff;
+      --break-long-bg2: #dcc2f5;
+      --break-long-border: #4a148c;
+      --break-long-title: #4a148c;
+      --reactor-glow: #7cff3f;
+    }
+
+    [data-hero="hulk"][data-theme="dark"] {
+      --sky-dawn:   #060d05;
+      --sky-mid:    #0b1c09;
+      --sky-noon:   #10280d;
+      --accent:     #4ade52;
+      --accent2:    #b34dff;
+      --text:       #e9ffe3;
+      --muted:      #9fd18f;
+      --line:       #1c4a1a;
+      --line-soft:  rgba(28,74,26,0.7);
+      --card-bg:    rgba(10,20,9,0.92);
+      --card-solid: #0f1c0d;
+      --shadow:     rgba(0,0,0,0.6);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --star:       #c6ff5e;
+      --stripe-red:   #4ade52;
+      --stripe-blue:  #b34dff;
+      --stripe-white: #16330f;
+      --break-short-bg1: #12300f;
+      --break-short-bg2: #1a4016;
+      --break-short-border: #4ade52;
+      --break-short-title: #9dffa0;
+      --break-long-bg1: #250f38;
+      --break-long-bg2: #331550;
+      --break-long-border: #b34dff;
+      --break-long-title: #dcb3ff;
+      --reactor-glow: #8dff4d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-grad);
+      min-height: 100vh;
+      color: var(--text);
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before, body::after {
+      content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(70px); opacity: 0.5;
+    }
+    body::before { width: 360px; height: 360px; top: -100px; right: -100px; background: var(--accent2); }
+    body::after { width: 320px; height: 320px; bottom: -80px; left: -80px; background: var(--accent); }
+    [data-theme="dark"] body::before, [data-theme="dark"] body::after { opacity: 0.4; }
+    .header, .cap-stripe-banner, .month-tabs, .week-tabs, .day-selector, .timeline-wrap, .footer { position: relative; z-index: 1; }
+    div[style*="padding: 0 20px"] { position: relative; z-index: 1; }
+
+    /* HEADER */
+    .header { padding: 20px 20px 16px; text-align: center; position: relative; }
+    .header-actions { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+    .theme-toggle { width: 42px; height: 42px; border-radius: 999px; border: 2px solid var(--accent2); background: var(--card-bg); color: var(--text); display: inline-flex; align-items: center; justify-content: center; font-size: 1.05rem; box-shadow: 0 4px 14px var(--shadow); cursor: pointer; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+    .theme-toggle:hover { transform: translateY(-1px); }
+    .theme-toggle:active { transform: translateY(0); }
+    .cap-shield-wrap { position: relative; width: 88px; height: 88px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+    .cap-shield-wrap::before {
+      content: ''; position: absolute; inset: -10px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 70%);
+      opacity: 0.45; filter: blur(10px);
+      animation: emblem-glow-pulse 2.6s ease-in-out infinite;
+    }
+    .cap-shield {
+      position: relative; width: 78px; height: 78px; border-radius: 50%;
+      background: repeating-radial-gradient(
+        circle,
+        var(--stripe-red) 0 10px,
+        var(--stripe-white) 10px 20px,
+        var(--stripe-blue) 20px 30px,
+        var(--stripe-white) 30px 37px,
+        var(--stripe-red) 37px 39px
+      );
+      box-shadow: 0 6px 20px var(--shadow), inset 0 0 0 3px var(--stripe-white), 0 0 24px 2px var(--accent2);
+      display: flex; align-items: center; justify-content: center;
+      animation: shield-spin 16s linear infinite;
+    }
+    .cap-star { color: var(--stripe-white); font-size: 1.6rem; text-shadow: 0 0 6px rgba(0,0,0,0.4); }
+    @keyframes shield-spin { to { transform: rotate(360deg); } }
+    @keyframes emblem-glow-pulse {
+      0%, 100% { opacity: 0.35; transform: scale(0.96); }
+      50% { opacity: 0.6; transform: scale(1.08); }
+    }
+
+    /* Star-spangled stripe banner under the header */
+    .cap-stripe-banner {
+      height: 8px; width: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--stripe-red) 0 24px,
+        var(--stripe-white) 24px 48px,
+        var(--stripe-blue) 48px 72px
+      );
+    }
+
+    /* ============ IRON MAN ARC REACTOR EMBLEM (Tuesday) ============ */
+    [data-hero="ironman"] .cap-shield {
+      background: radial-gradient(circle, var(--reactor-glow) 0 14px, var(--stripe-blue) 14px 28px, var(--stripe-red) 28px 39px);
+      box-shadow: 0 0 24px 6px var(--reactor-glow), 0 6px 20px var(--shadow), inset 0 0 0 3px var(--stripe-white);
+      animation: reactor-pulse 2.2s ease-in-out infinite, shield-spin 26s linear infinite;
+    }
+    [data-hero="ironman"] .cap-star { color: var(--reactor-glow); text-shadow: 0 0 10px var(--reactor-glow); font-size: 1.3rem; }
+    [data-hero="ironman"] .cap-shield-wrap::before { background: radial-gradient(circle, var(--reactor-glow) 0%, transparent 70%); }
+    @keyframes reactor-pulse {
+      0%, 100% { box-shadow: 0 0 18px 4px var(--reactor-glow), 0 6px 20px var(--shadow), inset 0 0 0 3px var(--stripe-white); }
+      50% { box-shadow: 0 0 34px 10px var(--reactor-glow), 0 6px 20px var(--shadow), inset 0 0 0 3px var(--stripe-white); }
+    }
+    [data-hero="ironman"] .cap-stripe-banner {
+      background: repeating-linear-gradient(
+        90deg,
+        var(--stripe-red) 0 22px,
+        var(--stripe-blue) 22px 44px
+      );
+    }
+    [data-hero="ironman"] .header h1 {
+      text-shadow: 1px 1px 0 var(--stripe-blue), 0 0 10px var(--reactor-glow);
+    }
+
+    /* ============ HULK SMASH EMBLEM (Wednesday) ============ */
+    /* Comic halftone dot texture across the whole page */
+    [data-hero="hulk"] body::before, [data-hero="hulk"] body::after { display: none; }
+    [data-hero="hulk"] body {
+      background-image:
+        radial-gradient(circle, var(--line-soft) 1.6px, transparent 1.6px),
+        var(--bg-grad);
+      background-size: 18px 18px, 100% 100%;
+      background-position: 0 0, 0 0;
+    }
+
+    /* Fist-through-wall emblem: green fist bursting through jagged comic rip */
+    [data-hero="hulk"] .cap-shield-wrap { width: 100px; height: 92px; }
+    [data-hero="hulk"] .cap-shield-wrap::before {
+      background: radial-gradient(circle, var(--reactor-glow) 0%, transparent 65%);
+      animation: emblem-glow-pulse 1.3s ease-in-out infinite;
+    }
+    [data-hero="hulk"] .cap-shield {
+      width: 84px; height: 84px;
+      background: var(--reactor-glow);
+      border-radius: 0;
+      clip-path: polygon(50% 2%, 63% 18%, 82% 8%, 78% 28%, 98% 32%, 84% 46%, 100% 62%, 78% 64%, 84% 86%, 62% 76%, 50% 98%, 38% 76%, 16% 86%, 22% 64%, 0% 62%, 16% 46%, 2% 32%, 22% 28%, 18% 8%, 37% 18%);
+      box-shadow: 0 0 26px 6px var(--reactor-glow), inset 0 0 0 4px var(--accent2);
+      display: flex; align-items: center; justify-content: center;
+      animation: hulk-smash 1.4s cubic-bezier(0.36,0.07,0.19,0.97) infinite;
+    }
+    [data-hero="hulk"] .cap-star {
+      content: '';
+      font-size: 0; width: 0; height: 0; /* hide star glyph */
+    }
+    [data-hero="hulk"] .cap-shield::after {
+      content: '✊'; font-size: 2.1rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+    }
+    [data-hero="hulk"] .cap-shield::before {
+      content: 'SMASH!';
+      position: absolute; top: -14px; right: -34px;
+      font-family: 'Fraunces', serif; font-weight: 900; font-size: 0.62rem; letter-spacing: 0.03em;
+      color: var(--stripe-white); background: var(--accent2);
+      padding: 3px 7px; border-radius: 4px; transform: rotate(-10deg);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      opacity: 0; animation: smash-pop 3.5s ease-in-out infinite;
+    }
+    @keyframes hulk-smash {
+      0%, 55%, 100% { transform: scale(1) rotate(0deg); }
+      60% { transform: scale(1.22) rotate(-6deg); }
+      68% { transform: scale(0.9) rotate(4deg); }
+      75% { transform: scale(1.08) rotate(-2deg); }
+      82% { transform: scale(1) rotate(0deg); }
+    }
+    @keyframes smash-pop {
+      0%, 52%, 100% { opacity: 0; transform: rotate(-10deg) scale(0.6); }
+      58% { opacity: 1; transform: rotate(-10deg) scale(1.15); }
+      66% { opacity: 1; transform: rotate(-10deg) scale(1); }
+      80% { opacity: 0; transform: rotate(-10deg) scale(0.9); }
+    }
+
+    /* Cracked-ground jagged stripe instead of a smooth banner */
+    [data-hero="hulk"] .cap-stripe-banner {
+      height: 10px;
+      background: var(--accent);
+      clip-path: polygon(0% 100%, 3% 20%, 8% 100%, 13% 10%, 19% 100%, 25% 30%, 31% 100%, 37% 0%, 43% 100%, 49% 25%, 55% 100%, 61% 15%, 67% 100%, 73% 35%, 79% 100%, 85% 5%, 91% 100%, 96% 22%, 100% 100%);
+      animation: hulk-shake 3.2s ease-in-out infinite;
+    }
+    @keyframes hulk-shake {
+      0%, 88%, 100% { transform: translateX(0) translateY(0); }
+      90% { transform: translateX(-3px) translateY(1px); }
+      92% { transform: translateX(3px) translateY(-1px); }
+      94% { transform: translateX(-2px) translateY(1px); }
+      96% { transform: translateX(2px) translateY(0); }
+    }
+
+    [data-hero="hulk"] .header h1 {
+      text-shadow: 2px 2px 0 var(--accent2), 0 0 14px var(--reactor-glow);
+    }
+    [data-hero="hulk"] .period-card {
+      animation: hulk-card-tremor 6s ease-in-out infinite;
+    }
+    @keyframes hulk-card-tremor {
+      0%, 96%, 100% { transform: translateX(0); }
+      97% { transform: translateX(-1px); }
+      98% { transform: translateX(1px); }
+      99% { transform: translateX(-1px); }
+    }
+    [data-hero="hulk"] .period-card:hover {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+
+        /* ============ SPIDER-MAN THEME (Friday) ============ */
+    [data-hero="spiderman"][data-theme="light"] {
+      --sky-dawn:   #fef6f7;
+      --sky-mid:    #ffd1d7;
+      --sky-noon:   #f2a0aa;
+      --accent:     #e50914;
+      --accent2:    #0a1a3c;
+      --text:       #17070a;
+      --muted:      #7a3540;
+      --line:       #c0c0c0;
+      --line-soft:  rgba(192,192,192,0.36);
+      --card-bg:    rgba(255,250,251,0.95);
+      --card-solid: #fff7f8;
+      --shadow:     rgba(90,10,20,0.18);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --star:       #ffffff;
+      --stripe-red:   #e50914;
+      --stripe-blue:  #1e90ff;
+      --stripe-white: #c0c0c0;
+      --break-short-bg1: #ffe1e5;
+      --break-short-bg2: #ffc2ca;
+      --break-short-border: #e50914;
+      --break-short-title: #b31217;
+      --break-long-bg1: #ddeaff;
+      --break-long-bg2: #b9d5ff;
+      --break-long-border: #1e90ff;
+      --break-long-title: #0a3d8f;
+      --web-glow: #ff5b69;
+      --web-line: rgba(0,0,0,0.14);
+    }
+
+    [data-hero="spiderman"][data-theme="dark"] {
+      --sky-dawn:   #000000;
+      --sky-mid:    #07090f;
+      --sky-noon:   #101522;
+      --accent:     #ff1a1a;
+      --accent2:    #1e90ff;
+      --text:       #fff4f5;
+      --muted:      #ffb1b6;
+      --line:       #4a4a4a;
+      --line-soft:  rgba(255,255,255,0.12);
+      --card-bg:    rgba(12,12,16,0.94);
+      --card-solid: #111317;
+      --shadow:     rgba(0,0,0,0.72);
+      --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      --star:       #ffffff;
+      --stripe-red:   #ff1a1a;
+      --stripe-blue:  #1e90ff;
+      --stripe-white: #b7bcc8;
+      --break-short-bg1: #24070b;
+      --break-short-bg2: #360b10;
+      --break-short-border: #ff1a1a;
+      --break-short-title: #ff8e99;
+      --break-long-bg1: #071225;
+      --break-long-bg2: #0e1d3d;
+      --break-long-border: #1e90ff;
+      --break-long-title: #9dc3ff;
+      --web-glow: #ff5b69;
+      --web-line: rgba(255,255,255,0.10);
+    }
+
+    [data-hero="spiderman"] body {
+      background-image:
+        radial-gradient(circle at 20px 20px, var(--web-line) 1.1px, transparent 1.1px),
+        radial-gradient(circle at 0 0, transparent 7px, rgba(255,255,255,0.05) 7px, rgba(255,255,255,0.05) 8px, transparent 8px),
+        var(--bg-grad);
+      background-size: 20px 20px, 20px 20px, 100% 100%;
+    }
+    [data-hero="spiderman"] body::before,
+    [data-hero="spiderman"] body::after {
+      display: block; opacity: 0.28; filter: blur(42px);
+    }
+    [data-hero="spiderman"] body::before { background: var(--accent2); }
+    [data-hero="spiderman"] body::after { background: var(--accent); }
+    [data-hero="spiderman"] body > .corner-web {
+      position: fixed; width: 180px; height: 180px; pointer-events: none; z-index: 0;
+      opacity: 0.55; mix-blend-mode: screen;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-image:
+        radial-gradient(circle at 100% 0%, transparent 60px, var(--web-line) 60px 61px, transparent 61px),
+        radial-gradient(circle at 100% 0%, transparent 82px, var(--web-line) 82px 83px, transparent 83px),
+        radial-gradient(circle at 100% 0%, transparent 104px, var(--web-line) 104px 105px, transparent 105px),
+        radial-gradient(circle at 100% 0%, transparent 126px, var(--web-line) 126px 127px, transparent 127px),
+        linear-gradient(135deg, transparent 0 48%, var(--web-line) 48% 49%, transparent 49% 51%, var(--web-line) 51% 52%, transparent 52%),
+        linear-gradient(45deg, transparent 0 48%, var(--web-line) 48% 49%, transparent 49% 51%, var(--web-line) 51% 52%, transparent 52%);
+      animation: corner-web-breathe 4s ease-in-out infinite;
+    }
+    [data-hero="spiderman"] body > .corner-web.tl { top: 0; left: 0; transform: rotate(0deg); }
+    [data-hero="spiderman"] body > .corner-web.tr { top: 0; right: 0; transform: scaleX(-1); }
+    [data-hero="spiderman"] body > .corner-web.bl { bottom: 0; left: 0; transform: scaleY(-1); }
+    [data-hero="spiderman"] body > .corner-web.br { bottom: 0; right: 0; transform: scale(-1); }
+    @keyframes corner-web-breathe {
+      0%, 100% { opacity: 0.42; transform: scale(1) rotate(0deg); }
+      50% { opacity: 0.68; transform: scale(1.03) rotate(0deg); }
+    }
+
+    [data-hero="spiderman"] .cap-shield-wrap {
+      width: 112px; height: 100px;
+      position: relative;
+      perspective: 800px;
+    }
+    [data-hero="spiderman"] .cap-shield-wrap::before {
+      background:
+        radial-gradient(circle, var(--web-glow) 0%, transparent 68%),
+        radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 62%);
+      animation: web-glow 1.7s ease-in-out infinite;
+    }
+    [data-hero="spiderman"] .cap-shield {
+      width: 84px; height: 84px; border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 0 18px, rgba(255,255,255,0.0) 18px 100%),
+        radial-gradient(circle, var(--accent) 0 18px, var(--accent2) 18px 31px, var(--accent) 31px 42px);
+      box-shadow: 0 0 24px 6px var(--web-glow), 0 8px 22px var(--shadow), inset 0 0 0 3px var(--stripe-white);
+      animation: web-pulse 2.0s ease-in-out infinite, shield-spin 26s linear infinite;
+      position: relative;
+      overflow: visible;
+    }
+    [data-hero="spiderman"] .cap-shield::before {
+      content: '';
+      position: absolute; inset: 8px;
+      background:
+        linear-gradient(180deg, transparent 46%, var(--stripe-white) 46% 54%, transparent 54%),
+        linear-gradient(90deg, transparent 46%, var(--stripe-white) 46% 54%, transparent 54%),
+        linear-gradient(45deg, transparent 47%, var(--stripe-white) 47% 53%, transparent 53%),
+        linear-gradient(-45deg, transparent 47%, var(--stripe-white) 47% 53%, transparent 53%);
+      opacity: 0.9;
+      clip-path: circle(50% at 50% 50%);
+    }
+    [data-hero="spiderman"] .cap-shield::after {
+      content: '🕷';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.45));
+    }
+    [data-hero="spiderman"] .cap-star { display: none; }
+    [data-hero="spiderman"] .cap-stripe-banner {
+      height: 10px;
+      background:
+        repeating-linear-gradient(45deg, var(--accent) 0 16px, var(--stripe-white) 16px 19px, var(--accent2) 19px 35px, var(--stripe-white) 35px 38px);
+      background-blend-mode: screen;
+      clip-path: polygon(0% 50%, 8% 15%, 16% 85%, 24% 25%, 32% 85%, 40% 5%, 48% 85%, 56% 20%, 64% 85%, 72% 15%, 80% 85%, 88% 35%, 100% 50%);
+    }
+    [data-hero="spiderman"] .header h1 {
+      text-shadow: 1px 1px 0 var(--accent2), 0 0 12px var(--web-glow);
+    }
+    [data-hero="spiderman"] .month-chip.active,
+    [data-hero="spiderman"] .week-tab.active,
+    [data-hero="spiderman"] .day-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--stripe-white) inset, 0 6px 18px rgba(0,0,0,0.2);
+    }
+    [data-hero="spiderman"] .period-card {
+      border-left: 5px solid var(--accent);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.00)),
+        var(--card-bg);
+    }
+    [data-hero="spiderman"] .period-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      pointer-events: none;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, transparent 0 48%, rgba(255,255,255,0.04) 48% 52%, transparent 52%),
+        linear-gradient(45deg, transparent 0 68%, rgba(255,255,255,0.04) 68% 72%, transparent 72%);
+      opacity: 0.55;
+    }
+    [data-hero="spiderman"] .timeline::before {
+      background: linear-gradient(to bottom, var(--accent), var(--accent2));
+      animation: web-swing 2.6s ease-in-out infinite;
+      transform-origin: top center;
+    }
+    [data-hero="spiderman"] .t-item {
+      animation: web-slide-in 0.55s ease both;
+    }
+    [data-hero="spiderman"] .t-item:nth-child(1) { animation-delay: 0.02s; }
+    [data-hero="spiderman"] .t-item:nth-child(2) { animation-delay: 0.06s; }
+    [data-hero="spiderman"] .t-item:nth-child(3) { animation-delay: 0.10s; }
+    [data-hero="spiderman"] .t-item:nth-child(4) { animation-delay: 0.14s; }
+    [data-hero="spiderman"] .t-item:nth-child(5) { animation-delay: 0.18s; }
+    [data-hero="spiderman"] .t-item:nth-child(6) { animation-delay: 0.22s; }
+    @keyframes web-slide-in {
+      from { opacity: 0; transform: translate3d(-16px, 18px, 0) rotate(-1.5deg); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) rotate(0); }
+    }
+    @keyframes web-swing {
+      0%, 100% { transform: rotate(0deg) translateX(0); }
+      50% { transform: rotate(-1.5deg) translateX(1px); }
+    }
+    @keyframes web-pulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.06) rotate(-1deg); }
+    }
+    @keyframes web-glow {
+      0%, 100% { opacity: 0.35; transform: scale(0.98); }
+      50% { opacity: 0.72; transform: scale(1.08); }
+    }
+    .header h1 { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; line-height: 1.1; margin-top: 10px; text-shadow: 1px 1px 0 var(--accent2), -1px -1px 0 var(--stripe-white); }
+    .header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+    .header .notice { display: inline-block; margin-top: 10px; font-size: 0.75rem; color: var(--muted); background: var(--card-bg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+
+    /* JAIN TOGGLE */
+    .jain-toggle-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 0 12px; }
+    .jain-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: color-mix(in srgb, var(--line) 70%, #999); border-radius: 999px; cursor: pointer; transition: 0.3s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: var(--card-solid); border-radius: 50%; transition: 0.3s; }
+    .toggle input:checked + .toggle-slider { background: #4caf50; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* MONTH CHIPS */
+    .month-tabs { display: flex; gap: 8px; padding: 4px 20px 0; overflow-x: auto; scrollbar-width: none; }
+    .month-tabs::-webkit-scrollbar { display: none; }
+    .month-chip { flex: 0 0 auto; font-size: 0.78rem; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-bg); color: var(--muted); cursor: pointer; transition: all 0.18s; box-shadow: 0 1px 4px var(--shadow); }
+    .month-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 2px var(--stripe-white) inset; }
+
+    /* WEEK TABS */
+    .week-tabs { display: flex; gap: 6px; padding: 10px 20px 0; overflow-x: auto; scrollbar-width: none; }
+    .week-tabs::-webkit-scrollbar { display: none; }
+    .week-tab { flex: 0 0 auto; font-size: 0.75rem; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-bg); color: var(--muted); cursor: pointer; transition: all 0.15s; }
+    .week-tab.active { background: var(--accent2); border-color: var(--accent2); color: #fff; box-shadow: 0 0 0 2px var(--stripe-white) inset; }
+
+    /* DAY SELECTOR */
+    .day-selector { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px 4px; scrollbar-width: none; }
+    .day-selector::-webkit-scrollbar { display: none; }
+    .day-btn { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; background: var(--card-bg); border: 2px solid var(--line); border-radius: 14px; padding: 10px 14px 8px; cursor: pointer; transition: all 0.2s ease; min-width: 58px; box-shadow: 0 2px 8px var(--shadow); }
+    .day-btn:hover { transform: translateY(-2px); }
+    .day-btn.active { box-shadow: 0 6px 20px var(--shadow), 0 0 0 2px var(--stripe-white) inset; transform: translateY(-1px) scale(1.04); }
+    .day-btn .d-name { font-size: 0.7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .day-btn .d-num { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 800; color: var(--text); line-height: 1; margin: 2px 0; }
+    .day-btn .d-dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+    .day-btn.active { background: var(--accent); border-color: var(--accent); }
+    .day-btn.active .d-name, .day-btn.active .d-num { color: #fff; }
+    .day-btn.active .d-dot { background: var(--stripe-white); }
+    .day-btn.today-btn { border-color: var(--accent2); border-width: 2.5px; }
+    .day-btn.today-btn .d-dot { background: var(--accent2); }
+
+    /* TIMELINE */
+    .timeline-wrap { padding: 16px 16px 40px; }
+    .timeline { position: relative; padding-left: 62px; }
+    .timeline::before { content: ''; position: absolute; left: 34px; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--accent2), var(--accent)); border-radius: 2px; }
+    .t-time { position: absolute; left: 0; width: 58px; text-align: right; padding-right: 14px; font-size: 0.7rem; font-weight: 600; color: var(--muted); line-height: 1; top: 14px; }
+    .t-dot { position: absolute; left: 28px; top: 12px; width: 14px; height: 14px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--accent); background: var(--accent); z-index: 1; }
+    .t-item { position: relative; margin-bottom: 10px; animation: item-rise 0.4s ease both; }
+    .t-item:nth-child(1) { animation-delay: 0.02s; }
+    .t-item:nth-child(2) { animation-delay: 0.06s; }
+    .t-item:nth-child(3) { animation-delay: 0.10s; }
+    .t-item:nth-child(4) { animation-delay: 0.14s; }
+    .t-item:nth-child(5) { animation-delay: 0.18s; }
+    .t-item:nth-child(6) { animation-delay: 0.22s; }
+    .t-item:nth-child(n+7) { animation-delay: 0.26s; }
+    @keyframes item-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* PERIOD CARD */
+    .period-card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: var(--radius); padding: 11px 14px; border-left: 5px solid var(--accent2); border-top: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); box-shadow: 0 4px 18px var(--shadow); display: flex; align-items: center; gap: 10px; transition: transform 0.18s ease, box-shadow 0.18s ease; }
+    .period-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--shadow); }
+    .period-icon { font-size: 1.3rem; flex: 0 0 auto; }
+    .period-info { flex: 1; min-width: 0; }
+    .period-name { font-weight: 600; font-size: 0.95rem; color: var(--text); }
+    .period-time { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+    .period-teacher { font-size: 0.68rem; color: var(--text-faint, #a08a70); margin-top: 1px; }
+    .period-badge { font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; }
+
+    /* BREAK CARDS */
+    .break-card { border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+    .break-card.short-break { background: linear-gradient(135deg, var(--break-short-bg1), var(--break-short-bg2)); border: 1.5px dashed var(--break-short-border); }
+    .break-card.long-break { background: linear-gradient(135deg, var(--break-long-bg1), var(--break-long-bg2)); border: 1.5px dashed var(--break-long-border); }
+    .break-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .short-break .break-title { color: var(--break-short-title); }
+    .long-break .break-title { color: var(--break-long-title); }
+    .food-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .food-chip { background: var(--card-solid); border-radius: 10px; padding: 5px 10px; font-size: 0.78rem; font-weight: 500; display: flex; align-items: center; gap: 5px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .food-chip .fc-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 1px; }
+    .food-chip-inner { display: flex; flex-direction: column; }
+    .yummy-strip { background: linear-gradient(135deg,#fff3cd,#ffe8a1); border: 1.5px solid color-mix(in srgb, #f5c842 75%, var(--line)); border-radius: 12px; padding: 8px 12px; margin-top: 8px; font-size: 0.82rem; font-weight: 600; color: #8a6200; display: flex; align-items: center; gap: 6px; }
+    .snack-strip { background: linear-gradient(135deg,#fce4ec,#f8bbd0); border: 1.5px solid color-mix(in srgb, #f48fb1 75%, var(--line)); border-radius: 12px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; font-weight: 600; color: #880e4f; display: flex; align-items: center; gap: 6px; }
+
+    .day-end { text-align: center; padding: 18px 0 4px; color: var(--muted); font-size: 0.82rem; font-family: 'Fraunces', serif; font-style: italic; }
+    .footer { text-align: center; padding: 0 16px 32px; color: var(--muted); font-size: 0.78rem; }
+
+    .holiday-card { background: var(--card-bg); border-radius: 20px; padding: 40px 20px; text-align: center; border: 2px dashed var(--line); box-shadow: 0 8px 26px var(--shadow); margin-top: 10px; }
+    .holiday-card .h-emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
+    .holiday-card h3 { font-family: 'Fraunces', serif; font-size: 1.4rem; color: var(--accent); }
+    .holiday-card p { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
+
+    /* SUBJECT COLORS */
+    .c-circle    { border-color: #f57c00; } .c-circle    .t-dot, .c-circle    .period-badge { background: #f57c00; } .c-circle    .t-dot { box-shadow: 0 0 0 2px #f57c00; }
+    .c-english   { border-color: #8e44ad; } .c-english   .t-dot, .c-english   .period-badge { background: #8e44ad; } .c-english   .t-dot { box-shadow: 0 0 0 2px #8e44ad; }
+    .c-science   { border-color: #16a085; } .c-science   .t-dot, .c-science   .period-badge { background: #16a085; } .c-science   .t-dot { box-shadow: 0 0 0 2px #16a085; }
+    .c-math      { border-color: #2980b9; } .c-math      .t-dot, .c-math      .period-badge { background: #2980b9; } .c-math      .t-dot { box-shadow: 0 0 0 2px #2980b9; }
+    .c-dlc       { border-color: #3f51b5; } .c-dlc       .t-dot, .c-dlc       .period-badge { background: #3f51b5; } .c-dlc       .t-dot { box-shadow: 0 0 0 2px #3f51b5; }
+    .c-art       { border-color: #e84393; } .c-art       .t-dot, .c-art       .period-badge { background: #e84393; } .c-art       .t-dot { box-shadow: 0 0 0 2px #e84393; }
+    .c-pe        { border-color: #c0392b; } .c-pe        .t-dot, .c-pe        .period-badge { background: #c0392b; } .c-pe        .t-dot { box-shadow: 0 0 0 2px #c0392b; }
+    .c-marathi   { border-color: #ff7043; } .c-marathi   .t-dot, .c-marathi   .period-badge { background: #ff7043; } .c-marathi   .t-dot { box-shadow: 0 0 0 2px #ff7043; }
+    .c-social    { border-color: #795548; } .c-social    .t-dot, .c-social    .period-badge { background: #795548; } .c-social    .t-dot { box-shadow: 0 0 0 2px #795548; }
+    .c-games     { border-color: #558b2f; } .c-games     .t-dot, .c-games     .period-badge { background: #558b2f; } .c-games     .t-dot { box-shadow: 0 0 0 2px #558b2f; }
+    .c-piano     { border-color: #6a1b9a; } .c-piano     .t-dot, .c-piano     .period-badge { background: #6a1b9a; } .c-piano     .t-dot { box-shadow: 0 0 0 2px #6a1b9a; }
+    .c-hindi     { border-color: #e91e8c; } .c-hindi     .t-dot, .c-hindi     .period-badge { background: #e91e8c; } .c-hindi     .t-dot { box-shadow: 0 0 0 2px #e91e8c; }
+    .c-assembly  { border-color: #f39c12; } .c-assembly  .t-dot, .c-assembly  .period-badge { background: #f39c12; } .c-assembly  .t-dot { box-shadow: 0 0 0 2px #f39c12; }
+    .c-global    { border-color: #27ae60; } .c-global    .t-dot, .c-global    .period-badge { background: #27ae60; } .c-global    .t-dot { box-shadow: 0 0 0 2px #27ae60; }
+    .c-vocals    { border-color: #ad1457; } .c-vocals    .t-dot, .c-vocals    .period-badge { background: #ad1457; } .c-vocals    .t-dot { box-shadow: 0 0 0 2px #ad1457; }
+    .c-drama     { border-color: #6d4c41; } .c-drama     .t-dot, .c-drama     .period-badge { background: #6d4c41; } .c-drama     .t-dot { box-shadow: 0 0 0 2px #6d4c41; }
+    .c-steam     { border-color: #00bcd4; } .c-steam     .t-dot, .c-steam     .period-badge { background: #00bcd4; } .c-steam     .t-dot { box-shadow: 0 0 0 2px #00bcd4; }
+    .c-dance     { border-color: #d81b60; } .c-dance     .t-dot, .c-dance     .period-badge { background: #d81b60; } .c-dance     .t-dot { box-shadow: 0 0 0 2px #d81b60; }
+    .c-library   { border-color: #4e342e; } .c-library   .t-dot, .c-library   .period-badge { background: #4e342e; } .c-library   .t-dot { box-shadow: 0 0 0 2px #4e342e; }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --sky-dawn:   #060915;
+        --sky-mid:    #0b1130;
+        --sky-noon:   #121a4a;
+        --accent:     #4e63ff;
+        --accent2:    #ff2d3d;
+        --text:       #f4f6ff;
+        --muted:      #9aa6e8;
+        --line:       #2c3680;
+        --line-soft:  rgba(44,54,128,0.6);
+        --card-bg:    rgba(11,17,48,0.92);
+        --card-solid: #10163f;
+        --shadow:     rgba(0,0,0,0.55);
+        --bg-grad:    linear-gradient(160deg, var(--sky-dawn) 0%, var(--sky-mid) 55%, var(--sky-noon) 100%);
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="corner-web tl"></div>
+<div class="corner-web tr"></div>
+<div class="corner-web bl"></div>
+<div class="corner-web br"></div>
+
+
+<div class="header">
+  <div class="header-actions">
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle color mode">🌙</button>
+  </div>
+  <div class="cap-shield-wrap"><div class="cap-shield" aria-hidden="true"><span class="cap-star">★</span></div></div>
+  <h1>School Day & Dining</h1>
+  <p>July 2026 • Class 2A • Regular + Jain meals</p>
+  </div>
+
+<div class="cap-stripe-banner"></div>
+
+<div style="padding: 0 20px;">
+  <div class="jain-toggle-wrap">
+    <span class="jain-label">🌿 Jain Menu</span>
+    <label class="toggle">
+      <input type="checkbox" id="jainToggle" onchange="toggleJain()"/>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="month-tabs" id="monthTabs"></div>
+<div class="week-tabs" id="weekTabs"></div>
+<div class="day-selector" id="daySelector"></div>
+
+<div class="timeline-wrap" id="timelineWrap"></div>
+
+<div class="footer">Made with ❤️ for kids and parents — by a kid's father</div>
+
+<script>
+// ── SUBJECT META ──────────────────────────────────────────────────────────
+const SUBJECT_META = {
+  'Circle Time':        { icon: '🔵', cat: 'c-circle',   badge: 'Morning' },
+  'English':            { icon: '📖', cat: 'c-english',  badge: 'Core' },
+  'Science':            { icon: '🔬', cat: 'c-science',  badge: 'Core' },
+  'Mathematics':        { icon: '📐', cat: 'c-math',     badge: 'Core' },
+  'DL&C':                { icon: '💻', cat: 'c-dlc',      badge: 'Tech' },
+  'Art & Design':        { icon: '🎨', cat: 'c-art',      badge: 'Arts' },
+  'Physical Education':  { icon: '🏃', cat: 'c-pe',       badge: 'PE' },
+  'Marathi':             { icon: '📜', cat: 'c-marathi',  badge: 'Lang' },
+  'Hindi':                { icon: '🇮🇳', cat: 'c-hindi',    badge: 'Lang' },
+  'Social Studies':       { icon: '🏛️', cat: 'c-social',   badge: 'Social' },
+  'Games':                { icon: '⚽', cat: 'c-games',    badge: 'Sport' },
+  'Piano Practice':       { icon: '🎹', cat: 'c-piano',    badge: 'Music' },
+  'Piano Theory':         { icon: '🎹', cat: 'c-piano',    badge: 'Music' },
+  'Assembly':             { icon: '🎤', cat: 'c-assembly', badge: 'School' },
+  'Global Perspective':   { icon: '🌍', cat: 'c-global',   badge: 'GP' },
+  'Vocals':               { icon: '🎤', cat: 'c-vocals',   badge: 'Arts' },
+  'Drama':                { icon: '🎭', cat: 'c-drama',    badge: 'Arts' },
+  'STEAM':                { icon: '⚗️', cat: 'c-steam',    badge: 'STEAM' },
+  'Dance':                { icon: '💃', cat: 'c-dance',    badge: 'Arts' },
+  'Library':              { icon: '📚', cat: 'c-library',  badge: 'Lib' },
+};
+
+// ── WEEKLY TIMETABLE — Class 2A ─────────────────────────────────────────────
+const TIMETABLE = {
+  mon: [
+    ['8:15','8:55','Circle Time'],
+    ['8:55','9:35','English'],
+    ['9:35','10:05','SHORT_BREAK'],
+    ['10:05','10:45','Science'],
+    ['10:45','11:25','DL&C'],
+    ['11:25','12:05','Art & Design'],
+    ['12:05','12:45','LONG_BREAK'],
+    ['12:45','13:25','Mathematics'],
+    ['13:25','14:05','Physical Education'],
+    ['14:05','14:45','Marathi'],
+  ],
+  tue: [
+    ['8:15','8:55','Science'],
+    ['8:55','9:35','Social Studies'],
+    ['9:35','10:05','SHORT_BREAK'],
+    ['10:05','10:45','Mathematics'],
+    ['10:45','11:25','Games'],
+    ['11:25','12:05','Piano Practice'],
+    ['12:05','12:45','LONG_BREAK'],
+    ['12:45','13:25','English'],
+    ['13:25','14:05','DL&C'],
+    ['14:05','14:45','Hindi'],
+  ],
+  wed: [
+    ['8:15','8:55','Circle Time'],
+    ['8:55','9:35','Assembly'],
+    ['9:35','10:05','SHORT_BREAK'],
+    ['10:05','10:45','Global Perspective'],
+    ['10:45','11:25','Science'],
+    ['11:25','12:05','English'],
+    ['12:05','12:45','LONG_BREAK'],
+    ['12:45','13:25','Art & Design'],
+    ['13:25','14:05','Mathematics'],
+    ['14:05','14:45','Vocals'],
+  ],
+  thu: [
+    ['8:15','8:55','Circle Time'],
+    ['8:55','9:35','Drama'],
+    ['9:35','10:05','SHORT_BREAK'],
+    ['10:05','10:45','Science'],
+    ['10:45','11:25','English'],
+    ['11:25','12:05','Mathematics'],
+    ['12:05','12:45','LONG_BREAK'],
+    ['12:45','13:25','STEAM'],
+    ['13:25','14:05','Dance'],
+    ['14:05','14:45','Global Perspective'],
+  ],
+  fri: [
+    ['8:15','8:55','Circle Time'],
+    ['8:55','9:35','Games'],
+    ['9:35','10:05','SHORT_BREAK'],
+    ['10:05','10:45','English'],
+    ['10:45','11:25','Hindi'],
+    ['11:25','12:05','Library'],
+    ['12:05','12:45','LONG_BREAK'],
+    ['12:45','13:25','Science'],
+    ['13:25','14:05','Piano Theory'],
+    ['14:05','14:45','Mathematics'],
+  ],
+};
+
+// ── MENU DATA (from July xlsx) ───────────────────────────────────────────────
+const MENU = {"2026-07-13": {"breakfast": {"regular": {"opt1": "Oats Chocolate Pancake, Maple Syrup", "opt2": "Veg Puff, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Oats Chocolate Pancake, Maple Syrup", "opt2": "Veg Puff, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Ribbon  Salad", "raita": "Bondi Raita", "dessert": "Chocolate Doughnut", "main": "Palak Paneer", "dal": "Dal Tadka", "rice": "Peas Pulao", "bread": "Tawa Paratha", "yummy": "Pasta  in Pomodoro Souce"}, "jain": {"salad": "Ribbon  Salad", "raita": "Bondi Raita", "dessert": "Chocolate Doughnut", "main": "Palak Paneer", "dal": "Dal Tadka", "rice": "Peas Pulao", "bread": "Tawa Paratha", "yummy": "Pasta  in Pomodoro Souce"}}, "eveningSnack": {"regular": "Baked Sweet Potato", "jain": "Baked Sweet Potato"}}, "2026-07-14": {"breakfast": {"regular": {"opt1": "Mysore Bonda, Coconut Chutney", "opt2": "Soya Bhurje, Plain Paratha", "fruit": "Watermelon"}, "jain": {"opt1": "Mysore Bonda, Coconut Chutney", "opt2": "Soya Bhurje, Plain Paratha", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "", "main": "Paneer Buttar Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Khow Suey"}, "jain": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "", "main": "Paneer Buttar Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Khow Suey"}}, "eveningSnack": {"regular": "Veg Burger", "jain": "Veg Burger"}}, "2026-07-15": {"breakfast": {"regular": {"opt1": "Pav, Bhaji", "opt2": "Masala Uttapam, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Pav, Bhaji", "opt2": "Masala Uttapam, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Sprout Salad", "raita": "Veg Raita", "dessert": "Fruit Custard", "main": "Dahi Wali Bhindi", "dal": "Dhaba Dal", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Dahi Wada"}, "jain": {"salad": "Sprout Salad", "raita": "Veg Raita", "dessert": "Fruit Custard", "main": "Dahi Wali Bhindi", "dal": "Dhaba Dal", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Dahi Wada"}}, "eveningSnack": {"regular": "Paneer Tikka", "jain": "Paneer Tikka"}}, "2026-07-16": {"breakfast": {"regular": {"opt1": "Mix Veg Idli, Sambar", "opt2": "Aloo Paratha, Curd", "fruit": "Papaya"}, "jain": {"opt1": "Mix Veg Idli, Sambar", "opt2": "Paneer Paratha, Curd", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Toss Salad", "raita": "Buttar Milk", "dessert": "", "main": "Navratna Korma", "dal": "Dal Fry", "rice": "Tomato Rice", "bread": "Dhaniya Roti", "yummy": "Cheese Garlic Bread"}, "jain": {"salad": "Toss Salad", "raita": "Buttar Milk", "dessert": "", "main": "Navratna Korma", "dal": "Dal Fry", "rice": "Tomato Rice", "bread": "Dhaniya Roti", "yummy": "Cheese Garlic Bread"}}, "eveningSnack": {"regular": "Bhel", "jain": "Bhel"}}, "2026-07-17": {"breakfast": {"regular": {"opt1": "Corn Cheese Sandwich, Sweet Chutney", "opt2": "Dhokla, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Corn Cheese Sandwich, Sweet Chutney", "opt2": "Dhokla, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green moong Salad", "raita": "Lemon Coriander Soup", "dessert": "Coconut Burfi", "main": "Chole Masala", "dal": "Dahi Kadhi", "rice": "Moong Dal Khichidi", "bread": "Ajwaini Paratha", "yummy": "Veg Pizza"}, "jain": {"salad": "Green moong Salad", "raita": "Lemon Coriander Soup", "dessert": "Coconut Burfi", "main": "Chole Masala", "dal": "Dahi Kadhi", "rice": "Moong Dal Khichidi", "bread": "Ajwaini Paratha", "yummy": "Veg Pizza"}}, "eveningSnack": {"regular": "Mix Fruit", "jain": "Mix Fruit"}}, "2026-07-20": {"breakfast": {"regular": {"opt1": "Medu Wada, Sambar", "opt2": "Batata Poha, Sev", "fruit": "Watermelon"}, "jain": {"opt1": "Medu  Wada, Sambar", "opt2": "Peas Poha, Sev", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Seviyan Kheer", "main": "Paneer Mutter", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Kacchi Dabeli"}, "jain": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Seviyan Kheer", "main": "Paneer Mutter", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Kacchi Dabeli"}}, "eveningSnack": {"regular": "Paneer Tikka", "jain": "Paneer Tikka"}}, "2026-07-21": {"breakfast": {"regular": {"opt1": "Methi Thepla, Tomato Chutney", "opt2": "Corn Spinach Sandwich, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Methi Thepla, Tomato Chutney", "opt2": "Corn Spinach Sandwich, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Kachumber Salad", "raita": "Carrot Raita", "dessert": "", "main": "Home Style Rajma Masala", "dal": "Veg Korma", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Veg Hakka Noodles"}, "jain": {"salad": "Kachumber Salad", "raita": "Carrot Raita", "dessert": "", "main": "Home Style Rajma Masala", "dal": "Veg Korma", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Veg Hakka Noodles"}}, "eveningSnack": {"regular": "Layonaisse Potato", "jain": "Layonaisse Potato"}}, "2026-07-22": {"breakfast": {"regular": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Hakka Vermicelli, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Hakka Vermicelli, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Black Chana Salad", "raita": "Mint Cooler", "dessert": "Jalebi", "main": "Chatpata Beans", "dal": "Dal Panchmel", "rice": "Steam Rice", "bread": "Palak Roti", "yummy": "Penne Pasta"}, "jain": {"salad": "Black Chana Salad", "raita": "Mint Cooler", "dessert": "Jalebi", "main": "Chatpata Beans", "dal": "Dal Panchmel", "rice": "Steam Rice", "bread": "Palak Roti", "yummy": "Penne Pasta"}}, "eveningSnack": {"regular": "Paneer Paratha", "jain": "Paneer Paratha"}}, "2026-07-23": {"breakfast": {"regular": {"opt1": "Kathi Roll, Sweet Chutney", "opt2": "Veg Cutlet, coconut chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Kathi Roll, Sweet Chutney", "opt2": "Veg Cutlet, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Aloo Gobhi Mater", "dal": "Saboot Masoor Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Ragada Pattice"}, "jain": {"salad": "Corn Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Aloo Gobhi Mater", "dal": "Saboot Masoor Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Ragada Pattice"}}, "eveningSnack": {"regular": "Veg Roll", "jain": "Veg Roll"}}, "2026-07-24": {"breakfast": {"regular": {"opt1": "Set Dosa, Coconut Chutney", "opt2": "Oats Kheer", "fruit": "Mix Fruit"}, "jain": {"opt1": "Set Dosa, Coconut Chutney", "opt2": "Oats Kheer", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Three Beans Salad", "raita": "Bondi Raita", "dessert": "Gulan Jamun", "main": "Noodles", "dal": "Veg-Biryani", "rice": "Capsicum Salan", "bread": "Papad", "yummy": "Papdi Chaat"}, "jain": {"salad": "Three Beans Salad", "raita": "Bondi Raita", "dessert": "Gulan Jamun", "main": "Noodles", "dal": "Veg-Biryani", "rice": "Capsicum Salan", "bread": "Papad", "yummy": "Papdi Chaat"}}, "eveningSnack": {"regular": "Thepla", "jain": "Thepla"}}, "2026-07-27": {"breakfast": {"regular": {"opt1": "Veg Tikka Sandwich, Sweet Chutney", "opt2": "Veg Tomato Omlette, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Veg Tikka Sandwich, Sweet Chutney", "opt2": "Veg Tomato Omlette, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Chaat", "raita": "Palak raita", "dessert": "Rice Kheer", "main": "Kadhai Paneer", "dal": "Drumstick Dal", "rice": "Steamed Rice", "bread": "Chapati", "yummy": "Veg Manchurian"}, "jain": {"salad": "Corn Chaat", "raita": "Palak raita", "dessert": "Rice Kheer", "main": "Kadhai Paneer", "dal": "Drumstick Dal", "rice": "Steamed Rice", "bread": "Chapati", "yummy": "Veg Manchurian"}}, "eveningSnack": {"regular": "Cheese sandwich", "jain": "Cheese sandwich"}}, "2026-07-28": {"breakfast": {"regular": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Misal, Pav", "fruit": "Mix Fruit"}, "jain": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Misal, Pav", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Curd", "dessert": "", "main": "Jeera Aloo", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Mac & Cheese Pasta"}, "jain": {"salad": "Green  Salad", "raita": "Curd", "dessert": "", "main": "Jeera Aloo", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Mac & Cheese Pasta"}}, "eveningSnack": {"regular": "Veg Wrap", "jain": "Veg Wrap"}}, "2026-07-29": {"breakfast": {"regular": {"opt1": "Aloo Bonda, Sambar", "opt2": "Veg Vermicelli Upma, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Mix Veg Bonda, Sambar", "opt2": "Veg Vermicelli Upma, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green moong Salad", "raita": "Mint Cooler", "dessert": "Balusai", "main": "Mix Veg", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Paratha", "yummy": "Samosa"}, "jain": {"salad": "Green moong Salad", "raita": "Mint Cooler", "dessert": "Balusai", "main": "Mix Veg", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Paratha", "yummy": "Samosa"}}, "eveningSnack": {"regular": "Paneer Paratha", "jain": "Paneer Paratha"}}, "2026-07-30": {"breakfast": {"regular": {"opt1": "Veg Frankie, Sweet Chutney", "opt2": "Veg Croquette, Sweet Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Veg Frankie, Sweet Chutney", "opt2": "Veg Croquette, Sweet Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Rainbow Salad", "raita": "Palak raita", "dessert": "", "main": "Kofta Curry", "dal": "Dal Palak", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Penne Pasta"}, "jain": {"salad": "Rainbow Salad", "raita": "Palak raita", "dessert": "", "main": "Kofta Curry", "dal": "Dal Palak", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Penne Pasta"}}, "eveningSnack": {"regular": "Veg Pizza", "jain": "Veg Pizza"}}, "2026-07-31": {"breakfast": {"regular": {"opt1": "Chole, Kulcha", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Chole, Kulcha", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Carrot Pomegranate Salad", "raita": "Orange Tang", "dessert": "Tuti Futi Cake Slice", "main": "Stir Fry Vegetable", "dal": "Veg Hakka Noodles", "rice": "Veg Fried Rice", "bread": "", "yummy": "Veg Manchurian"}, "jain": {"salad": "Carrot Pomegranate Salad", "raita": "Orange Tang", "dessert": "Tuti Futi Cake Slice", "main": "Stir Fry Vegetable", "dal": "Veg Hakka Noodles", "rice": "Veg Fried Rice", "bread": "", "yummy": "Veg Manchurian"}}, "eveningSnack": {"regular": "Plain Doughnut", "jain": "Plain Doughnut"}}};
+
+// ── WEEKS ────────────────────────────────────────────────────────────────────
+const MONTHS = [
+  {
+    key: '2026-07',
+    label: 'July',
+    weeks: [
+      { label: 'Week 1 · Jul 13–17', days: ['2026-07-13','2026-07-14','2026-07-15','2026-07-16','2026-07-17'] },
+      { label: 'Week 2 · Jul 20–24', days: ['2026-07-20','2026-07-21','2026-07-22','2026-07-23','2026-07-24'] },
+      { label: 'Week 3 · Jul 27–31', days: ['2026-07-27','2026-07-28','2026-07-29','2026-07-30','2026-07-31'] },
+    ]
+  },
+];
+
+const DAY_NAMES = {
+  '2026-07-13':'Mon','2026-07-14':'Tue','2026-07-15':'Wed','2026-07-16':'Thu','2026-07-17':'Fri',
+  '2026-07-20':'Mon','2026-07-21':'Tue','2026-07-22':'Wed','2026-07-23':'Thu','2026-07-24':'Fri',
+  '2026-07-27':'Mon','2026-07-28':'Tue','2026-07-29':'Wed','2026-07-30':'Thu','2026-07-31':'Fri',
+};
+const WEEKDAY_BY_DATE = DAY_NAMES;
+const TT_KEY = { 'Mon':'mon','Tue':'tue','Wed':'wed','Thu':'thu','Fri':'fri' };
+
+let currentMonth = 0;
+let currentWeek = 0;
+let currentDay = null;
+let jainMode = false;
+
+function getWeeksForCurrentMonth() {
+  return MONTHS[currentMonth].weeks;
+}
+
+function findTodayPosition(todayStr) {
+  for (let m = 0; m < MONTHS.length; m++) {
+    for (let w = 0; w < MONTHS[m].weeks.length; w++) {
+      if (MONTHS[m].weeks[w].days.includes(todayStr)) return { month: m, week: w, day: todayStr };
+    }
+  }
+  return null;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  const todayStr = getTodayStr();
+  const found = findTodayPosition(todayStr);
+  if (found) {
+    currentMonth = found.month;
+    currentWeek = found.week;
+    currentDay = found.day;
+  } else {
+    currentMonth = 0;
+    currentWeek = 0;
+    currentDay = MONTHS[0].weeks[0].days[0];
+  }
+  renderMonthTabs();
+  renderWeekTabs();
+  renderDaySelector();
+  renderTimeline();
+}
+
+function getTodayStr() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+
+function renderMonthTabs() {
+  const wrap = document.getElementById('monthTabs');
+  wrap.innerHTML = '';
+  MONTHS.forEach((m, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'month-chip' + (i === currentMonth ? ' active' : '');
+    btn.textContent = m.label;
+    btn.onclick = () => {
+      currentMonth = i;
+      currentWeek = 0;
+      currentDay = MONTHS[i].weeks[0].days[0];
+      renderMonthTabs();
+      renderWeekTabs();
+      renderDaySelector();
+      renderTimeline();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderWeekTabs() {
+  const wrap = document.getElementById('weekTabs');
+  const weeks = getWeeksForCurrentMonth();
+  wrap.innerHTML = '';
+  weeks.forEach((w, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'week-tab' + (i === currentWeek ? ' active' : '');
+    btn.textContent = w.label;
+    btn.onclick = () => {
+      currentWeek = i;
+      currentDay = weeks[i].days[0];
+      renderWeekTabs();
+      renderDaySelector();
+      renderTimeline();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderDaySelector() {
+  const sel = document.getElementById('daySelector');
+  const todayStr = getTodayStr();
+  const weeks = getWeeksForCurrentMonth();
+  sel.innerHTML = '';
+  weeks[currentWeek].days.forEach(dateStr => {
+    const dd = dateStr.slice(8);
+    const dayAbbr = WEEKDAY_BY_DATE[dateStr] || DAY_NAMES[dateStr] || '';
+    const isToday = dateStr === todayStr;
+    const isActive = dateStr === currentDay;
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (isActive ? ' active' : '') + (isToday ? ' today-btn' : '');
+    btn.innerHTML = `<span class="d-name">${dayAbbr}</span><span class="d-num">${parseInt(dd)}</span><span class="d-dot"></span>`;
+    btn.onclick = () => { currentDay = dateStr; renderDaySelector(); renderTimeline(); };
+    sel.appendChild(btn);
+  });
+}
+
+function toggleJain() {
+  jainMode = document.getElementById('jainToggle').checked;
+  renderTimeline();
+}
+
+// ── RENDER TIMELINE ───────────────────────────────────────────────────────────
+function applyHeroTheme() {
+  const dayAbbr = WEEKDAY_BY_DATE[currentDay] || '';
+  const HERO_BY_DAY = { 'Tue': 'ironman', 'Wed': 'hulk', 'Fri': 'spiderman' };
+  const hero = HERO_BY_DAY[dayAbbr];
+  if (hero) {
+    document.documentElement.setAttribute('data-hero', hero);
+  } else {
+    document.documentElement.removeAttribute('data-hero');
+  }
+}
+
+function renderTimeline() {
+  applyHeroTheme();
+  const wrap = document.getElementById('timelineWrap');
+  const menuData = MENU[currentDay];
+  const dayAbbr = WEEKDAY_BY_DATE[currentDay] || '';
+  const ttKey = TT_KEY[dayAbbr];
+  const timetable = TIMETABLE[ttKey] || [];
+  const scheduleName = dayAbbr || 'today';
+  const mode = jainMode ? 'jain' : 'regular';
+
+  const dateObj = new Date(currentDay + 'T00:00:00');
+  const dateLabel = dateObj.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  let html = `<div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--accent);margin-bottom:14px;padding-left:2px;">${dateLabel}</div>`;
+
+  if (!menuData) {
+    html += `<div class="holiday-card"><span class="h-emoji">📅</span><h3>No data</h3><p>Menu not available for this date.</p></div>`;
+    wrap.innerHTML = html;
+    return;
+  }
+
+  const bf = menuData.breakfast[mode];
+  const ln = menuData.lunch[mode];
+  const es = menuData.eveningSnack ? menuData.eveningSnack[mode] : '';
+
+  html += `<div class="timeline">`;
+
+  timetable.forEach(([start, end, subject]) => {
+    if (subject === 'SHORT_BREAK') {
+      html += `
+        <div class="t-item" style="position:relative;">
+          <div class="t-time" style="top:16px;">${start}</div>
+          <div class="t-dot" style="background:#f39c12;box-shadow:0 0 0 2px #f39c12;"></div>
+          <div class="break-card short-break">
+            <div class="break-title">☕ Breakfast Break <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">${start}–${end}</span></div>
+            <div class="food-row">
+              <div class="food-chip">🥞 <div class="food-chip-inner"><span class="fc-label">Option 1</span>${bf.opt1}</div></div>
+              <div class="food-chip">🥙 <div class="food-chip-inner"><span class="fc-label">Option 2</span>${bf.opt2}</div></div>
+              <div class="food-chip">🍉 <div class="food-chip-inner"><span class="fc-label">Fruit</span>${bf.fruit}</div></div>
+            </div>
+          </div>
+        </div>`;
+    } else if (subject === 'LONG_BREAK') {
+      let lunchItems = `
+        <div class="food-chip">🥗 <div class="food-chip-inner"><span class="fc-label">Salad</span>${ln.salad}</div></div>
+        <div class="food-chip">🥛 <div class="food-chip-inner"><span class="fc-label">Raita/Soup</span>${ln.raita}</div></div>
+        <div class="food-chip">🍛 <div class="food-chip-inner"><span class="fc-label">Main Veg</span>${ln.main}</div></div>
+        <div class="food-chip">🫘 <div class="food-chip-inner"><span class="fc-label">Dal</span>${ln.dal}</div></div>
+        <div class="food-chip">🍚 <div class="food-chip-inner"><span class="fc-label">Rice</span>${ln.rice}</div></div>
+        <div class="food-chip">🫓 <div class="food-chip-inner"><span class="fc-label">Bread</span>${ln.bread}</div></div>`;
+      if (ln.dessert) lunchItems += `<div class="food-chip">🍮 <div class="food-chip-inner"><span class="fc-label">Dessert</span>${ln.dessert}</div></div>`;
+      html += `
+        <div class="t-item" style="position:relative;">
+          <div class="t-time" style="top:16px;">${start}</div>
+          <div class="t-dot" style="background:#27ae60;box-shadow:0 0 0 2px #27ae60;"></div>
+          <div class="break-card long-break">
+            <div class="break-title">🍱 Lunch Break <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">${start}–${end}</span></div>
+            <div class="food-row">${lunchItems}</div>
+            ${ln.yummy ? `<div class="yummy-strip">⭐ Yummy of the Day: ${ln.yummy}</div>` : ''}
+            ${es ? `<div class="snack-strip">🌆 Evening Snack: ${es}</div>` : ''}
+          </div>
+        </div>`;
+    } else {
+      const meta = SUBJECT_META[subject] || { icon:'📌', cat:'c-circle', badge:'Class' };
+      html += `
+        <div class="t-item ${meta.cat}" style="position:relative;">
+          <div class="t-time">${start}</div>
+          <div class="t-dot"></div>
+          <div class="period-card">
+            <span class="period-icon">${meta.icon}</span>
+            <div class="period-info">
+              <div class="period-name">${subject}</div>
+              <div class="period-time">${start} – ${end}</div>
+            </div>
+            <span class="period-badge">${meta.badge}</span>
+          </div>
+        </div>`;
+    }
+  });
+
+  // End of day marker
+  html += `
+    <div class="t-item" style="position:relative;">
+      <div class="t-time">15:00</div>
+      <div class="t-dot" style="background:var(--accent2);box-shadow:0 0 0 2px var(--accent2);width:18px;height:18px;left:26px;top:10px;"></div>
+      <div class="period-card" style="border-left-color:var(--accent2);background:linear-gradient(135deg,#fff5f5,#ffe8e8);">
+        <span class="period-icon">🏠</span>
+        <div class="period-info">
+          <div class="period-name">School Ends (HRT)</div>
+          <div class="period-time">See you next school day!</div>
+        </div>
+      </div>
+    </div>`;
+
+  html += `</div>`;
+  html += `<div class="day-end">— End of ${scheduleName}'s schedule —</div>`;
+
+  wrap.innerHTML = html;
+}
+
+init();
+</script>
+
+<script>
+(function(){
+  const root = document.documentElement;
+  const toggle = document.querySelector('[data-theme-toggle]');
+  let currentTheme = root.getAttribute('data-theme') || 'light';
+  function syncToggle(){
+    if(!toggle) return;
+    toggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    toggle.setAttribute('aria-label', currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    toggle.setAttribute('title', currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  root.setAttribute('data-theme', currentTheme);
+  syncToggle();
+  toggle && toggle.addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', currentTheme);
+    syncToggle();
+  });
+})();
+</script>
+
+</body>
+</html>
