@@ -906,6 +906,37 @@
     .holiday-card h3 { font-family: 'Fraunces', serif; font-size: 1.4rem; color: var(--accent); }
     .holiday-card p { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
 
+    /* SCHOOL CALENDAR — holidays + primary events */
+    .calendar-section { max-width: 900px; margin: 8px auto 0; padding: 0 16px 8px; }
+    .calendar-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .calendar-header h2 { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; color: var(--accent); }
+    .cal-toggle-btn { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-bg); color: var(--muted); cursor: pointer; transition: all 0.18s; box-shadow: 0 1px 4px var(--shadow); }
+    .cal-toggle-btn:hover { color: var(--text); border-color: var(--accent); }
+    .cal-legend { font-size: 0.75rem; color: var(--muted); margin-bottom: 14px; }
+
+    .cal-month-block { margin-bottom: 16px; }
+    .cal-month-title { font-family: 'Fraunces', serif; font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .cal-month-title::after { content: ''; flex: 1; height: 1px; background: var(--line-soft); }
+    .cal-card-grid { display: flex; flex-direction: column; gap: 8px; }
+    .cal-card { background: var(--card-bg); border-radius: 12px; padding: 10px 14px; border-left: 4px solid var(--accent2); box-shadow: 0 3px 12px var(--shadow); display: flex; align-items: center; gap: 10px; }
+    .cal-card.event { border-left-color: var(--accent); }
+    .cal-card-icon { font-size: 1.15rem; flex: 0 0 auto; }
+    .cal-card-info { flex: 1; min-width: 0; }
+    .cal-card-label { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+    .cal-card-date { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+    .cal-card-badge { font-size: 0.62rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; background: var(--accent2); }
+    .cal-card.event .cal-card-badge { background: var(--accent); }
+    .cal-empty { font-size: 0.82rem; color: var(--muted); padding: 8px 2px; font-style: italic; }
+
+    .calendar-full { margin-top: 10px; border-top: 1.5px dashed var(--line); padding-top: 14px; }
+    .cal-full-month { margin-bottom: 14px; }
+    .cal-full-month-title { font-family: 'Fraunces', serif; font-size: 0.85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .cal-full-row { display: flex; align-items: baseline; gap: 8px; font-size: 0.8rem; padding: 4px 2px; border-bottom: 1px solid var(--line-soft); }
+    .cal-full-row.holiday .cal-full-date { color: var(--accent2); }
+    .cal-full-row.event .cal-full-date { color: var(--accent); }
+    .cal-full-date { font-weight: 700; flex: 0 0 auto; min-width: 78px; }
+    .cal-full-label { color: var(--text); }
+
     /* SUBJECT COLORS */
     .c-circle    { border-color: #f57c00; } .c-circle    .t-dot, .c-circle    .period-badge { background: #f57c00; } .c-circle    .t-dot { box-shadow: 0 0 0 2px #f57c00; }
     .c-english   { border-color: #8e44ad; } .c-english   .t-dot, .c-english   .period-badge { background: #8e44ad; } .c-english   .t-dot { box-shadow: 0 0 0 2px #8e44ad; }
@@ -986,6 +1017,16 @@
 <div class="day-selector" id="daySelector"></div>
 
 <div class="timeline-wrap" id="timelineWrap"></div>
+
+<div class="calendar-section">
+  <div class="calendar-header">
+    <h2>📅 Holidays & School Events</h2>
+    <button class="cal-toggle-btn" id="calToggleBtn" type="button">View Full Year</button>
+  </div>
+  <div class="cal-legend">🎉 = Holiday (no school) &nbsp;·&nbsp; 📌 = School event (school is open)</div>
+  <div id="calendarHighlights"></div>
+  <div class="calendar-full" id="calendarFull" style="display:none;"></div>
+</div>
 
 <div class="footer">Made with ❤️ for kids and parents — by a kid's father</div>
 
@@ -1675,6 +1716,94 @@ init();
     });
   }
 })();
+</script>
+
+
+<script>
+// ── SCHOOL CALENDAR DATA — Holidays (AY 2026-27) + Primary (Gr 1-5) Events ──
+const HOLIDAYS_LIST = [{"start": "2026-08-15", "end": "2026-08-15", "day": "Saturday", "label": "Independence Day (NID) Grade 1-11", "type": "holiday"}, {"start": "2026-08-15", "end": "2026-08-15", "day": "Saturday", "label": "EY-Independence Day Holiday", "type": "holiday"}, {"start": "2026-08-16", "end": "2026-08-16", "day": "Sunday", "label": "Parsi New Year", "type": "holiday"}, {"start": "2026-08-26", "end": "2026-08-26", "day": "Wednesday", "label": "Eid-E-Milad", "type": "holiday"}, {"start": "2026-08-27", "end": "2026-08-27", "day": "Thursday", "label": "School wide holiday", "type": "holiday"}, {"start": "2026-08-28", "end": "2026-08-28", "day": "Friday", "label": "Raksha Bandhan", "type": "holiday"}, {"start": "2026-09-05", "end": "2026-09-05", "day": "Saturday", "label": "Dahi Handi / Teacher's Day", "type": "holiday"}, {"start": "2026-09-14", "end": "2026-09-14", "day": "Monday", "label": "Ganesh Chaturthi", "type": "holiday"}, {"start": "2026-09-18", "end": "2026-09-18", "day": "Friday", "label": "Gauri Pooja", "type": "holiday"}, {"start": "2026-09-19", "end": "2026-09-19", "day": "Saturday", "label": "Gauri Visarjan", "type": "holiday"}, {"start": "2026-09-25", "end": "2026-09-25", "day": "Friday", "label": "Anant Chaturdashi", "type": "holiday"}, {"start": "2026-10-02", "end": "2026-10-02", "day": "Friday", "label": "Mahatma Gandhi Jayanti", "type": "holiday"}, {"start": "2026-10-20", "end": "2026-10-20", "day": "Tuesday", "label": "Dusshera", "type": "holiday"}, {"start": "2026-11-06", "end": "2026-11-17", "day": "Friday\u2013Tuesday", "label": "Diwali Vacations", "type": "holiday"}, {"start": "2026-11-24", "end": "2026-11-24", "day": "Tuesday", "label": "Guru Nanak Jayanti", "type": "holiday"}, {"start": "2026-12-23", "end": "2027-01-03", "day": "Wednesday\u2013Sunday", "label": "Winter Vacations", "type": "holiday"}, {"start": "2027-01-15", "end": "2027-01-15", "day": "Friday", "label": "Makar Sankranti", "type": "holiday"}, {"start": "2027-01-26", "end": "2027-01-26", "day": "Tuesday", "label": "Republic Day (NID)", "type": "holiday"}, {"start": "2027-01-26", "end": "2027-01-26", "day": "Tuesday", "label": "EY-Republic Day (NID) - Holiday", "type": "holiday"}, {"start": "2027-02-19", "end": "2027-02-19", "day": "Friday", "label": "Shivaji Jayanti", "type": "holiday"}, {"start": "2027-03-06", "end": "2027-03-06", "day": "Saturday", "label": "Mahashivratri", "type": "holiday"}, {"start": "2027-03-10", "end": "2027-03-10", "day": "Wednesday", "label": "Eid-ul-Fitar", "type": "holiday"}, {"start": "2027-03-21", "end": "2027-03-21", "day": "Sunday", "label": "Navroze", "type": "holiday"}, {"start": "2027-03-22", "end": "2027-03-22", "day": "Monday", "label": "Holi", "type": "holiday"}, {"start": "2027-03-22", "end": "2027-03-28", "day": "Monday\u2013Sunday", "label": "Spring Break", "type": "holiday"}, {"start": "2027-03-26", "end": "2027-03-26", "day": "Friday", "label": "Good Friday", "type": "holiday"}, {"start": "2027-03-28", "end": "2027-03-28", "day": "Sunday", "label": "Easter Sunday", "type": "holiday"}, {"start": "2027-04-07", "end": "2027-04-07", "day": "Wednesday", "label": "Gudipadwa", "type": "holiday"}, {"start": "2027-04-14", "end": "2027-04-14", "day": "Wednesday", "label": "Dr. Ambedkar Jayanti", "type": "holiday"}, {"start": "2027-05-01", "end": "2027-05-01", "day": "Saturday", "label": "Maharashtra Day", "type": "holiday"}, {"start": "2027-05-17", "end": "2027-05-17", "day": "Monday", "label": "Eid-al-Adha", "type": "holiday"}, {"start": "2027-05-20", "end": "2027-05-20", "day": "Thursday", "label": "Summer Vacations Begin \u2014 Last Day of School, Early Years", "type": "holiday"}, {"start": "2027-05-21", "end": "2027-05-21", "day": "Friday", "label": "Summer Vacations Begin \u2014 Last Day of School, Grades 1-11", "type": "holiday"}];
+const PRIMARY_EVENTS = [{"start": "2026-07-07", "end": "2026-07-07", "day": "Tuesday", "label": "Primary Orientation Grades 1-2 & Uniform Distribution", "type": "event"}, {"start": "2026-07-08", "end": "2026-07-08", "day": "Wednesday", "label": "Primary Orientation Grades 3 & 4 & Uniform Distribution", "type": "event"}, {"start": "2026-07-09", "end": "2026-07-09", "day": "Thursday", "label": "Primary Orientation Grade 5 & Uniform Distribution", "type": "event"}, {"start": "2026-07-13", "end": "2026-07-13", "day": "Monday", "label": "School Re-opens", "type": "event"}, {"start": "2026-07-14", "end": "2026-07-17", "day": "Tuesday\u2013Friday", "label": "Interviews for Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-18", "end": "2026-07-18", "day": "Saturday", "label": "List of Finalists \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-20", "end": "2026-07-22", "day": "Monday\u2013Wednesday", "label": "Campaigning \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-23", "end": "2026-07-23", "day": "Thursday", "label": "Speeches & Voting \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-24", "end": "2026-07-24", "day": "Friday", "label": "Declaration of Results \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-27", "end": "2026-07-27", "day": "Monday", "label": "Primary Checkpoint Awards Grade 5 (2026-27 Gr 6)", "type": "event"}, {"start": "2026-07-31", "end": "2026-07-31", "day": "Friday", "label": "Early Exit to All Students", "type": "event"}, {"start": "2026-08-01", "end": "2026-08-01", "day": "Saturday", "label": "CNS Mumbai 10th Year Celebration", "type": "event"}, {"start": "2026-08-07", "end": "2026-08-07", "day": "Friday", "label": "PTA Elections", "type": "event"}, {"start": "2026-08-15", "end": "2026-08-15", "day": "Saturday", "label": "Independence Day Celebration & Student Council Investiture Ceremony", "type": "event"}, {"start": "2026-08-21", "end": "2026-08-21", "day": "Friday", "label": "Open House \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-08-22", "end": "2026-08-23", "day": "Saturday\u2013Sunday", "label": "Student-Council Off Site Leadership Session", "type": "event"}, {"start": "2026-08-22", "end": "2026-08-22", "day": "Saturday", "label": "Meet & Greet HRTs Grades 1-5 / PTA Interface", "type": "event"}, {"start": "2026-09-04", "end": "2026-09-04", "day": "Friday", "label": "Teacher's Day Celebration (Student Early Release)", "type": "event"}, {"start": "2026-09-11", "end": "2026-09-11", "day": "Friday", "label": "Grandparents Day Celebrations (Whole School)", "type": "event"}, {"start": "2026-10-19", "end": "2026-11-03", "day": "Monday\u2013Tuesday", "label": "1st Summative Assessments Grades 1-8", "type": "event"}, {"start": "2026-11-05", "end": "2026-11-05", "day": "Thursday", "label": "Children's Day Celebration, Picnic", "type": "event"}, {"start": "2026-11-06", "end": "2026-11-17", "day": "Friday\u2013Tuesday", "label": "Diwali Vacations", "type": "event"}, {"start": "2026-11-18", "end": "2026-11-18", "day": "Wednesday", "label": "School Reopens", "type": "event"}, {"start": "2026-12-05", "end": "2026-12-05", "day": "Saturday", "label": "Shree Chatrabhuj Narsee Jayanti (Gayatri Hawan)", "type": "event"}, {"start": "2026-12-11", "end": "2026-12-11", "day": "Friday", "label": "PTM Grades 3-5", "type": "event"}, {"start": "2026-12-11", "end": "2026-12-11", "day": "Friday", "label": "Primary Sports Day Grades 1-2", "type": "event"}, {"start": "2026-12-18", "end": "2026-12-18", "day": "Friday", "label": "Primary Sports Day Grades 3-5", "type": "event"}, {"start": "2026-12-21", "end": "2026-12-21", "day": "Monday", "label": "PTM Grades 1 & 2", "type": "event"}, {"start": "2026-12-22", "end": "2026-12-22", "day": "Tuesday", "label": "Christmas Celebrations Grades 1-5", "type": "event"}, {"start": "2026-12-23", "end": "2027-01-03", "day": "Wednesday\u2013Sunday", "label": "Winter Vacations", "type": "event"}, {"start": "2027-01-04", "end": "2027-01-04", "day": "Monday", "label": "School Reopens", "type": "event"}, {"start": "2027-01-05", "end": "2027-01-07", "day": "Tuesday\u2013Thursday", "label": "Primary Class Photo Grades 1-5", "type": "event"}, {"start": "2027-01-09", "end": "2027-01-09", "day": "Saturday", "label": "PTA Fiesta", "type": "event"}, {"start": "2027-01-23", "end": "2027-01-25", "day": "Saturday\u2013Monday", "label": "Quintessence V @ Mumbai", "type": "event"}, {"start": "2027-01-26", "end": "2027-01-26", "day": "Tuesday", "label": "78th Republic Day (NID)", "type": "event"}, {"start": "2027-02-02", "end": "2027-02-05", "day": "Tuesday\u2013Friday", "label": "Overnight Trip Grade 5", "type": "event"}, {"start": "2027-02-03", "end": "2027-02-05", "day": "Wednesday\u2013Friday", "label": "Overnight Trip Grade 4", "type": "event"}, {"start": "2027-03-11", "end": "2027-03-11", "day": "Thursday", "label": "Dress Rehearsal Grade 3", "type": "event"}, {"start": "2027-03-12", "end": "2027-03-12", "day": "Friday", "label": "Annual Day Grade 3", "type": "event"}, {"start": "2027-03-12", "end": "2027-03-12", "day": "Friday", "label": "Dress Rehearsal Grades 4 & 5", "type": "event"}, {"start": "2027-03-13", "end": "2027-03-13", "day": "Saturday", "label": "Annual Day Grades 4 & 5", "type": "event"}, {"start": "2027-03-14", "end": "2027-03-14", "day": "Sunday", "label": "Shree Narsee Monjee Birth Anniversary", "type": "event"}, {"start": "2027-03-19", "end": "2027-03-19", "day": "Friday", "label": "Dress Rehearsal Grades 1 & 2", "type": "event"}, {"start": "2027-03-20", "end": "2027-03-20", "day": "Saturday", "label": "Annual Day Grades 1 & 2", "type": "event"}, {"start": "2027-03-22", "end": "2027-03-28", "day": "Monday\u2013Sunday", "label": "Spring Break", "type": "event"}, {"start": "2027-03-29", "end": "2027-03-29", "day": "Monday", "label": "School Reopens", "type": "event"}, {"start": "2027-04-16", "end": "2027-04-16", "day": "Friday", "label": "PTM Grades 4-5", "type": "event"}, {"start": "2027-04-17", "end": "2027-04-17", "day": "Saturday", "label": "PTM Grades 1-3", "type": "event"}, {"start": "2027-05-03", "end": "2027-05-14", "day": "Monday\u2013Friday", "label": "2nd Summative Assessment Grades 1-5", "type": "event"}, {"start": "2027-05-12", "end": "2027-05-14", "day": "Wednesday\u2013Friday", "label": "Cambridge Primary Checkpoint Exam", "type": "event"}, {"start": "2027-05-18", "end": "2027-05-21", "day": "Tuesday\u2013Friday", "label": "School Team Tryouts", "type": "event"}, {"start": "2027-05-21", "end": "2027-05-21", "day": "Friday", "label": "Last Day of School Grades 1-11", "type": "event"}];
+const SCHOOL_CALENDAR = [...HOLIDAYS_LIST, ...PRIMARY_EVENTS].sort((a, b) => a.start.localeCompare(b.start));
+
+function ymKey(d) { return d.slice(0, 7); }
+
+function calDateLabel(item) {
+  const s = new Date(item.start + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  if (item.start === item.end) return s;
+  const eLbl = new Date(item.end + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  return `${s} – ${eLbl}`;
+}
+
+function inMonth(item, ym) {
+  return ymKey(item.start) <= ym && ymKey(item.end) >= ym;
+}
+
+function calCardHTML(e) {
+  const icon = e.type === 'holiday' ? '🎉' : '📌';
+  const badge = e.type === 'holiday' ? 'Holiday' : 'School Event';
+  return `<div class="cal-card ${e.type}">
+    <span class="cal-card-icon">${icon}</span>
+    <div class="cal-card-info">
+      <div class="cal-card-label">${e.label}</div>
+      <div class="cal-card-date">${calDateLabel(e)} · ${e.day}</div>
+    </div>
+    <span class="cal-card-badge">${badge}</span>
+  </div>`;
+}
+
+function renderCalendarHighlights() {
+  const todayStr = getTodayStr();
+  const curYM = ymKey(todayStr);
+  const nd = new Date(todayStr + 'T00:00:00');
+  nd.setMonth(nd.getMonth() + 1);
+  const nextYM = `${nd.getFullYear()}-${String(nd.getMonth() + 1).padStart(2, '0')}`;
+
+  const monthLabel = (ym) => new Date(ym + '-01T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  const thisMonthItems = SCHOOL_CALENDAR.filter(e => inMonth(e, curYM));
+  const nextMonthItems = SCHOOL_CALENDAR.filter(e => inMonth(e, nextYM));
+
+  let html = '';
+  html += `<div class="cal-month-block"><div class="cal-month-title">✨ This Month — ${monthLabel(curYM)}</div><div class="cal-card-grid">`;
+  html += thisMonthItems.length ? thisMonthItems.map(e => calCardHTML(e)).join('') : `<div class="cal-empty">No holidays or events this month.</div>`;
+  html += `</div></div>`;
+  html += `<div class="cal-month-block"><div class="cal-month-title">📆 Next Month — ${monthLabel(nextYM)}</div><div class="cal-card-grid">`;
+  html += nextMonthItems.length ? nextMonthItems.map(e => calCardHTML(e)).join('') : `<div class="cal-empty">No holidays or events next month.</div>`;
+  html += `</div></div>`;
+
+  document.getElementById('calendarHighlights').innerHTML = html;
+}
+
+function renderCalendarFull() {
+  const grouped = {};
+  SCHOOL_CALENDAR.forEach(e => {
+    const key = ymKey(e.start);
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(e);
+  });
+  const keys = Object.keys(grouped).sort();
+  let html = '';
+  keys.forEach(key => {
+    const label = new Date(key + '-01T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    html += `<div class="cal-full-month"><div class="cal-full-month-title">${label}</div>`;
+    grouped[key].forEach(e => {
+      const icon = e.type === 'holiday' ? '🎉' : '📌';
+      html += `<div class="cal-full-row ${e.type}"><span>${icon}</span><span class="cal-full-date">${calDateLabel(e)}</span><span class="cal-full-label">${e.label}</span></div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('calendarFull').innerHTML = html;
+}
+
+document.getElementById('calToggleBtn').addEventListener('click', () => {
+  const full = document.getElementById('calendarFull');
+  const btn = document.getElementById('calToggleBtn');
+  const isOpen = full.style.display !== 'none';
+  full.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? 'View Full Year' : 'Hide Full Year';
+});
+
+renderCalendarHighlights();
+renderCalendarFull();
 </script>
 
 </body>
