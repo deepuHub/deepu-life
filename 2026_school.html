@@ -824,6 +824,41 @@
 
     /* JAIN TOGGLE */
     .jain-toggle-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 0 12px; }
+
+    /* EXAM ALERT BANNER */
+    .exam-alert-banner {
+      margin: 12px 20px 0;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff;
+      border-radius: 14px;
+      padding: 11px 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 6px 20px var(--shadow);
+      animation: exam-alert-pulse 1.8s ease-in-out infinite;
+    }
+    .exam-alert-banner.show { display: flex; }
+    .exam-alert-icon { font-size: 1.3rem; flex: 0 0 auto; }
+    .exam-alert-count { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 800; margin: 0 2px; }
+    @keyframes exam-alert-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 6px 20px var(--shadow); }
+      50% { transform: scale(1.015); box-shadow: 0 10px 28px var(--shadow); }
+    }
+
+    /* EXAM SCHEDULE ROWS */
+    .exam-row { display: flex; align-items: center; gap: 10px; background: var(--card-bg); border-radius: 12px; padding: 9px 14px; box-shadow: 0 2px 10px var(--shadow); }
+    .exam-row.weekend { background: linear-gradient(135deg, #ffb454, #ff9800); color: #3a2200; }
+    .exam-row.blank { opacity: 0.6; }
+    .exam-row.examday { border-left: 4px solid var(--accent2); }
+    .exam-row-date { font-size: 0.72rem; font-weight: 700; color: var(--muted); min-width: 84px; flex: 0 0 auto; }
+    .exam-row.weekend .exam-row-date { color: #3a2200; }
+    .exam-row-badge { font-size: 0.62rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; background: var(--accent2); text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; }
+    .exam-row-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .exam-row-subject { font-weight: 700; font-size: 0.86rem; color: var(--text); }
+    .exam-row-topic { font-size: 0.74rem; color: var(--muted); }
     .jain-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
     .toggle { position: relative; width: 44px; height: 24px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
@@ -1019,6 +1054,11 @@
 
 <div class="cap-stripe-banner"></div>
 
+<div class="exam-alert-banner" id="examAlertBanner">
+  <span class="exam-alert-icon">📝</span>
+  <span id="examAlertText"></span>
+</div>
+
 <div style="padding: 0 20px;">
   <div class="jain-toggle-wrap">
     <span class="jain-label">🌿 Jain Menu</span>
@@ -1034,6 +1074,14 @@
 <div class="day-selector" id="daySelector"></div>
 
 <div class="timeline-wrap" id="timelineWrap"></div>
+
+<div class="calendar-section">
+  <div class="calendar-header">
+    <h2>📝 Formal CA1 Exam Schedule</h2>
+  </div>
+  <div class="cal-legend">🟧 = Weekend &nbsp;·&nbsp; 📝 = Exam day &nbsp;·&nbsp; — = No exam scheduled</div>
+  <div id="examScheduleList"></div>
+</div>
 
 <div class="calendar-section">
   <div class="calendar-header">
@@ -1871,6 +1919,88 @@ document.getElementById('calToggleBtn').addEventListener('click', () => {
 
 renderCalendarHighlights();
 renderCalendarFull();
+
+// ── FORMAL CA1 EXAM SCHEDULE ─────────────────────────────────────────────────
+const EXAM_SCHEDULE = [
+  { date: '2026-08-14', day: 'Friday',    subject: 'Science', topic: 'Unit 1: Plants are living things' },
+  { date: '2026-08-15', day: 'Saturday',  weekend: true },
+  { date: '2026-08-16', day: 'Sunday',    weekend: true },
+  { date: '2026-08-17', day: 'Monday',    subject: 'Math', topic: 'Unit 1: Numbers 1 to 1000' },
+  { date: '2026-08-18', day: 'Tuesday',   subject: 'DL&C', topic: 'Unit 1: Making programs clear' },
+  { date: '2026-08-19', day: 'Wednesday' },
+  { date: '2026-08-20', day: 'Thursday',  subject: 'Marathi', topic: 'Unit 2 — इ, ई ची मात्रा (pg 14–23)' },
+  { date: '2026-08-21', day: 'Friday',    subject: 'English', topic: 'Unit 1 — Dictation words' },
+  { date: '2026-08-22', day: 'Saturday',  weekend: true },
+  { date: '2026-08-23', day: 'Sunday',    weekend: true },
+  { date: '2026-08-24', day: 'Monday',    subject: 'Hindi', topic: "Swar, Vyanjan (पुनरावर्तन), Amaatrik Shabd (अमात्रिक शब्द), 'आ' की मात्रा" },
+];
+
+function examDateLabel(dateStr) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function renderExamSchedule() {
+  const wrap = document.getElementById('examScheduleList');
+  if (!wrap) return;
+  let html = '<div class="cal-card-grid">';
+  EXAM_SCHEDULE.forEach(row => {
+    const dateLabel = examDateLabel(row.date);
+    if (row.weekend) {
+      html += `<div class="exam-row weekend"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">Weekend</span></div>`;
+    } else if (row.subject) {
+      html += `<div class="exam-row examday">
+        <span class="exam-row-badge">📝 Exam</span>
+        <span class="exam-row-date">${dateLabel}</span>
+        <div class="exam-row-info">
+          <span class="exam-row-subject">${row.subject}</span>
+          <span class="exam-row-topic">${row.topic}</span>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="exam-row blank"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">No exam scheduled</span></div>`;
+    }
+  });
+  html += '</div><div class="cal-empty" style="margin-top:8px;">Schedule continues beyond 24 Aug — will be added as it becomes available.</div>';
+  wrap.innerHTML = html;
+}
+
+function daysBetween(fromStr, toStr) {
+  const a = new Date(fromStr + 'T00:00:00');
+  const b = new Date(toStr + 'T00:00:00');
+  return Math.round((b - a) / 86400000);
+}
+
+function renderExamAlert() {
+  const banner = document.getElementById('examAlertBanner');
+  const textEl = document.getElementById('examAlertText');
+  if (!banner || !textEl) return;
+
+  const examDays = EXAM_SCHEDULE.filter(r => r.subject);
+  if (examDays.length === 0) { banner.classList.remove('show'); return; }
+
+  const todayStr = getTodayStr();
+  const examStart = examDays[0].date;
+  const examEnd = examDays[examDays.length - 1].date;
+  const daysToStart = daysBetween(todayStr, examStart);
+
+  if (todayStr >= examStart && todayStr <= examEnd) {
+    const todaysExam = examDays.find(r => r.date === todayStr);
+    textEl.innerHTML = todaysExam
+      ? `Exam today: <strong>${todaysExam.subject}</strong> — All the best! 🌟`
+      : `CA1 Exams are underway — next paper coming up 📚`;
+    banner.classList.add('show');
+  } else if (daysToStart >= 0 && daysToStart <= 7) {
+    textEl.innerHTML = daysToStart === 0
+      ? `CA1 Exams start today — good luck! 🌟`
+      : `<span class="exam-alert-count">${daysToStart}</span> day${daysToStart === 1 ? '' : 's'} to go for CA1 Exams!`;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+renderExamSchedule();
+renderExamAlert();
 </script>
 
 </body>
