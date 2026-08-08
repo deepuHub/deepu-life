@@ -1,0 +1,69 @@
+/* ══════════════════════════════════════════════════════════════════
+   deepu-life — shared tracker theme
+   Single source of truth for index.html, todo.html, quotes.html.
+   Covers: reset, design tokens, base body styles, and the site nav.
+   Anything page-specific (hero, tabs, task list, quote cards, …)
+   stays local to that page's own <style> block.
+═══════════════════════════════════════════════════════════════════ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* surfaces */
+  --bg:#0a0f0d;--surface:#111a15;--surface2:#162019;--border:#243020;
+  --text:#e8ede9;--muted:#6b7d6e;--muted2:#3d5244;
+
+  /* activity accents (Run / Read / Grow / Cycle) */
+  --run:#c8f04a;--run-dim:#2a3a0e;
+  --read:#f0a83c;--read-dim:#3a2808;
+  --grow:#4acfa8;--grow-dim:#0a2e26;
+  --cycle:#a78bfa;--cycle-dim:#1e1535;
+
+  /* semantic aliases — used by todo.html's priority/status colors */
+  --accent:var(--run);--accent-dim:var(--run-dim);
+  --warning:var(--read);--warning-dim:var(--read-dim);
+  --success:var(--grow);--success-dim:var(--grow-dim);
+  --danger:#ef4444;--danger-dim:#2e0a0a;
+
+  /* layout */
+  --pad:clamp(1rem,5vw,4rem);--nav-h:60px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+}
+@media(max-width:480px){:root{--nav-h:56px}}
+
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Epilogue',sans-serif;font-weight:300;
+  min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:0.04;
+}
+
+/* ═══ NAV — identical shell on every tracker page ═══ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 calc(var(--pad) + var(--safe-r)) 0 calc(var(--pad) + var(--safe-l));
+  background:rgba(10,15,13,0.94);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(0.9rem,3vw,1.15rem);color:var(--text);text-decoration:none;flex-shrink:0}
+.nav-logo span{color:var(--run)}
+.nav-pills{display:flex;gap:0.3rem;overflow-x:auto;scrollbar-width:none;padding:0.2rem 0 0.2rem 0.5rem;align-items:center}
+.nav-pills::-webkit-scrollbar{display:none}
+.nav-pill{
+  padding:0.38rem 0.85rem;border-radius:999px;font-size:clamp(0.68rem,2vw,0.78rem);
+  font-weight:500;letter-spacing:0.03em;border:1px solid var(--border);
+  color:var(--muted);background:transparent;cursor:pointer;white-space:nowrap;
+  min-height:36px;display:inline-flex;align-items:center;gap:0.3rem;
+  font-family:'Epilogue',sans-serif;text-decoration:none;transition:all 0.2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-pill:hover{border-color:var(--muted);color:var(--text)}
+.nav-pill.active,.nav-pill[aria-current="page"]{background:var(--run-dim);border-color:var(--run);color:var(--run)}

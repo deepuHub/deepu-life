@@ -8,33 +8,9 @@
   <title>deepu-life — Running · Reading · Growing · Cycling</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
   <style>
-/* ═══════════════════════ TOKENS ═══════════════════════════ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0a0f0d;--surface:#111a15;--surface2:#162019;
-  --border:#243020;--text:#e8ede9;--muted:#6b7d6e;
-  --run:#c8f04a;--read:#f0a83c;--grow:#4acfa8;
-  --run-dim:#2a3a0e;--read-dim:#3a2808;--grow-dim:#0a2e26;
-  --cycle:#a78bfa;--cycle-dim:#1e1535;
-  --pad:clamp(1rem,5vw,4rem);--nav-h:60px;
-}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:'Epilogue',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  opacity:0.04}
-
-/* ═══════════════════════ NAV ══════════════════════════════ */
-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
-  display:flex;justify-content:space-between;align-items:center;padding:0 var(--pad);
-  background:rgba(10,15,13,0.92);border-bottom:1px solid var(--border);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(0.9rem,3vw,1.15rem);color:var(--text);text-decoration:none;flex-shrink:0}
-.nav-logo span{color:var(--run)}
-.nav-pills{display:flex;gap:0.3rem;overflow-x:auto;scrollbar-width:none;padding:0.2rem 0 0.2rem 0.5rem}
-.nav-pills::-webkit-scrollbar{display:none}
-.nav-pill{padding:0.38rem 0.85rem;border-radius:999px;font-size:clamp(0.68rem,2vw,0.78rem);font-weight:500;letter-spacing:0.03em;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:pointer;white-space:nowrap;min-height:36px;display:flex;align-items:center;font-family:'Epilogue',sans-serif;transition:all 0.2s}
+/* ═══════════════════════ TABS (page-specific tab coloring) ═══════ */
 .nav-pill[data-tab="run"].active{background:var(--run-dim);border-color:var(--run);color:var(--run)}
 .nav-pill[data-tab="read"].active{background:var(--read-dim);border-color:var(--read);color:var(--read)}
 .nav-pill[data-tab="grow"].active{background:var(--grow-dim);border-color:var(--grow);color:var(--grow)}
@@ -446,8 +422,10 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
     <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
     <button class="nav-pill"        data-tab="grow" onclick="showTab('grow')">🌱 Grow</button>
     <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>         
-    <a href="todo.html" class="nav-pill" style="text-decoration:none;">✅ To-Do</a>
-    <a href="quotes.html" class="nav-pill" style="text-decoration:none;">💬 Quotes</a>
+    <a href="todo.html" class="nav-pill">✅ To-Do</a>
+    <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+    <a href="2026_school.html" class="nav-pill">🏫 School</a>
+    <a href="health_dashboard.html" class="nav-pill">🩺 Health</a>
   </div>
 </nav>
 
