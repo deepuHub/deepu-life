@@ -47,10 +47,15 @@ No forms in the app. No localStorage. No data loss. Works from any device.
 ## Repo structure
 
 ```
-deepuu-life/
-├── index.html       ← the entire app (HTML + CSS + JS)
-├── AppScript.gs     ← paste into Google Apps Script
-├── _config.yml      ← GitHub Pages config
+deepu-life/
+├── index.html            ← the tracker app (HTML + CSS + JS)
+├── todo.html             ← to-do list
+├── quotes.html           ← saved quotes, reads from a Sheet
+├── 2026_school.html      ← school timings & food timetable
+├── health_dashboard.html ← personal health metrics
+├── AppScript.gs          ← paste into Google Apps Script
+├── _config.yml           ← GitHub Pages config
+├── .nojekyll             ← disables Jekyll processing (site is plain HTML)
 ├── README.md
-└── SETUP.md         ← setup guide
+└── SETUP.md              ← setup guide
 ```
