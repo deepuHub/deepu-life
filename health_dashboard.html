@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --card: #1e2335;
+    --border: #2a2f45;
+    --accent: #4f8ef7;
+    --accent2: #2dd4a0;
+    --warn: #f0a532;
+    --danger: #f0545c;
+    --text: #e8eaf2;
+    --muted: #8890a8;
+    --faint: #3a3f58;
+    --green: #2dd4a0;
+    --amber: #f0a532;
+    --red: #f0545c;
+    --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; }
+
+  /* ── Layout ── */
+  .shell { display: flex; min-height: 100vh; }
+  nav { width: 220px; background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; z-index: 100; }
+  main { margin-left: 220px; padding: 2rem 2.5rem; max-width: 1100px; width: 100%; }
+
+  /* ── Nav ── */
+  .nav-header { padding: 1.5rem 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+  .nav-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .nav-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .nav-links { padding: .5rem 0; }
+  .nav-links a { display: block; padding: .5rem 1.25rem; font-size: 12px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: all .15s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(79,142,247,.06); }
+  .nav-section { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--faint); padding: .75rem 1.25rem .25rem; }
+  .nav-export { padding: 1rem 1.25rem; border-top: 1px solid var(--border); }
+  .btn-export { display: block; width: 100%; padding: .5rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; font-family: var(--font); margin-bottom: 6px; transition: all .15s; text-align: center; }
+  .btn-export:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Sections ── */
+  section { margin-bottom: 3rem; scroll-margin-top: 1.5rem; }
+  .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: .75rem; }
+  .section-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .section-date { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+  /* ── Page header ── */
+  .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .page-title { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -.5px; }
+  .page-meta { display: flex; gap: 1.5rem; margin-top: .75rem; flex-wrap: wrap; }
+  .page-meta span { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .page-meta strong { color: var(--text); }
+
+  /* ── Cards grid ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1rem; }
+  .card-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .card-val { font-size: 22px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .card.ok .card-val { color: var(--green); }
+  .card.warn .card-val { color: var(--amber); }
+  .card.bad .card-val { color: var(--red); }
+
+  /* ── Charts ── */
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px; margin-bottom: 1.5rem; }
+  .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; }
+  .chart-title { font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+  .chart-wrap { position: relative; height: 180px; }
+
+  /* ── Flags ── */
+  .flags { display: flex; flex-direction: column; gap: 8px; }
+  .flag { padding: .75rem 1rem; border-radius: 8px; border-left: 3px solid; }
+  .flag.red { background: rgba(240,84,92,.08); border-color: var(--red); }
+  .flag.amber { background: rgba(240,165,50,.08); border-color: var(--amber); }
+  .flag.green { background: rgba(45,212,160,.08); border-color: var(--green); }
+  .flag-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .flag-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── Table ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { text-align: left; padding: .5rem .75rem; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .data-table td { padding: .55rem .75rem; border-bottom: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 12px; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table td.label { font-family: var(--font); color: var(--muted); font-size: 12px; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; font-family: var(--font); }
+  .b-ok { background: rgba(45,212,160,.15); color: var(--green); }
+  .b-warn { background: rgba(240,165,50,.15); color: var(--amber); }
+  .b-bad { background: rgba(240,84,92,.15); color: var(--red); }
+  .b-gray { background: var(--faint); color: var(--muted); }
+
+  /* ── ECG wave ── */
+  .ecg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 1rem; }
+  .ecg-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .ecg-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+  .ecg-date { font-size: 12px; font-weight: 500; color: var(--text); }
+  .ecg-meta { font-size: 11px; color: var(--muted); margin-bottom: .5rem; }
+  .ecg-wave { height: 70px; position: relative; }
+  .ecg-stats { display: flex; gap: 12px; margin-top: .6rem; flex-wrap: wrap; }
+  .ecg-stat { font-size: 11px; }
+  .ecg-stat span { color: var(--muted); }
+  .ecg-stat strong { color: var(--text); font-family: var(--mono); }
+
+  /* ── HRV bar ── */
+  .hrv-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .hrv-label { width: 70px; font-size: 11px; color: var(--muted); text-align: right; flex-shrink: 0; }
+  .hrv-bar-bg { flex: 1; height: 6px; background: var(--faint); border-radius: 3px; overflow: hidden; }
+  .hrv-bar { height: 6px; border-radius: 3px; transition: width .6s ease; }
+  .hrv-val { width: 55px; font-size: 12px; font-weight: 600; font-family: var(--mono); color: var(--text); flex-shrink: 0; }
+
+  /* ── Plan timeline ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item { display: flex; gap: 1rem; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; width: 28px; flex-shrink: 0; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 4px; }
+  .tl-line { flex: 1; width: 1px; background: var(--border); margin: 2px 0; }
+  .tl-content { padding-bottom: 1.25rem; flex: 1; }
+  .tl-when { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+  .tl-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .tl-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .tl-item:last-child .tl-line { display: none; }
+
+  /* ── Print ── */
+  @media print {
+    nav { display: none; }
+    main { margin-left: 0; padding: 1rem; }
+    .btn-export { display: none; }
+    body { background: white; color: black; }
+    .card { border: 1px solid #ddd; background: #fafafa; }
+    .chart-box { border: 1px solid #ddd; background: #fafafa; }
+  }
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { margin-left: 0; padding: 1rem; }
+    .chart-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- ── Sidebar nav ── -->
+<nav>
+  <div class="nav-header">
+    <div class="nav-name">Personal Record</div>
+    <div class="nav-sub">Health Dashboard · Age 38</div>
+  </div>
+  <div class="nav-links">
+    <div class="nav-section">Overview</div>
+    <a href="#vitals">Vitals</a>
+    <a href="#flags">Health flags</a>
+    <div class="nav-section">Lab Results</div>
+    <a href="#blood">Blood count</a>
+    <a href="#lipids">Lipid profile</a>
+    <a href="#liver">Liver & kidney</a>
+    <a href="#glucose">Glucose</a>
+    <div class="nav-section">Cardiac</div>
+    <a href="#ecg-clinical">Clinical ECG</a>
+    <a href="#ecg-watch">Watch ECG</a>
+    <a href="#hrv">HRV analysis</a>
+    <div class="nav-section">Action Plan</div>
+    <a href="#tests">Lab schedule</a>
+    <a href="#plan">6-month plan</a>
+  </div>
+  <div class="nav-export">
+    <button class="btn-export" onclick="window.print()">🖨 Print / Save PDF</button>
+    <button class="btn-export" onclick="exportJSON()">⬇ Export data (JSON)</button>
+    <button class="btn-export" onclick="exportCSV()">⬇ Export data (CSV)</button>
+  </div>
+</nav>
+
+<!-- ── Main content ── -->
+<main>
+
+  <div class="page-header">
+    <div class="page-title">Health Dashboard</div>
+    <div class="page-meta">
+      <span>Blood: <strong>O Rh+</strong></span>
+      <span>Reports: <strong>Dec 2021 · Mar 2023 · Mar 2026</strong></span>
+      <span>ECGs: <strong>Mar 2021 · Jul 2021 · Jul 2024 · Mar 2026</strong></span>
+      <span>Generated: <strong id="gen-date"></strong></span>
+    </div>
+  </div>
+
+  <!-- ── Vitals ── -->
+  <section id="vitals">
+    <div class="section-header">
+      <div class="section-title">Physical Vitals</div>
+      <div class="section-date">Latest: Mar 2026 — Occupational Health Screening</div>
+    </div>
+    <div class="cards">
+      <div class="card ok"><div class="card-label">Height</div><div class="card-val">175.5 cm</div><div class="card-sub">2026</div></div>
+      <div class="card ok"><div class="card-label">Weight</div><div class="card-val">67.4 kg</div><div class="card-sub">66 kg in 2023</div></div>
+      <div class="card ok"><div class="card-label">BMI</div><div class="card-val">21.9</div><div class="card-sub">Normal (18.5–24.9)</div></div>
+      <div class="card ok"><div class="card-label">Blood pressure</div><div class="card-val">120/80</div><div class="card-sub">Optimal</div></div>
+      <div class="card warn"><div class="card-label">Pulse (clinical)</div><div class="card-val">76 bpm</div><div class="card-sub">Target: 55–65 bpm</div></div>
+      <div class="card ok"><div class="card-label">Vision both eyes</div><div class="card-val">6/6</div><div class="card-sub">No correction needed</div></div>
+      <div class="card ok"><div class="card-label">Hearing</div><div class="card-val">Normal</div><div class="card-sub">Both ears</div></div>
+      <div class="card ok"><div class="card-label">Overall fitness</div><div class="card-val">Fit ✓</div><div class="card-sub">Physically fit — 2026</div></div>
+    </div>
+  </section>
+
+  <!-- ── Flags ── -->
+  <section id="flags">
+    <div class="section-header">
+      <div class="section-title">Health Flags</div>
+      <div class="section-date">Priority-ranked</div>
+    </div>
+    <div class="flags">
+      <div class="flag red">
+        <div class="flag-title">🔴 Eosinophils rising — 4% (2021) → 9.8% (2023) → 10% (2026)</div>
+        <div class="flag-body">Persistently above normal range (1–6%) and still climbing. Likely cause: environmental allergy, dust mites, or intestinal parasites. Needs allergy panel (IgE RAST) + stool parasite test — book within 2 weeks. Directly linked to lung restriction finding.</div>
+      </div>
+      <div class="flag red">
+        <div class="flag-title">🔴 LDL cholesterol rising — 91.8 (2021) → 115 mg/dL (2026)</div>
+        <div class="flag-body">25% increase over 5 years; now above optimal threshold of 100 mg/dL. Cholesterol:HDL ratio 4.14 (average risk zone). Doctor's advice: avoid oily/fatty food and exercise regularly. If LDL exceeds 130, medication discussion needed.</div>
+      </div>
+      <div class="flag amber">
+        <div class="flag-title">🟡 HDL falling — 54 (2021) → 42 mg/dL (2026)</div>
+        <div class="flag-body">Dropped 12 points over 5 years; now borderline low (optimal ≥60). Combined with rising LDL, cardiovascular risk is increasing. Consistent Zone 2 aerobic cardio 3×/week is the most effective intervention.</div>
+      </div>
+      <div class="flag amber">
+        <div class="flag-title">🟡 Borderline ECG — ST elevation in V4-V5 (March 2023 clinical)</div>
+        <div class="flag-body">Marked "Unconfirmed" in 2023; 2026 clinical exam recorded ECG as normal. Apple Watch ECGs all show sinus rhythm. Obtain stress ECG (TMT) before intense sport training for definitive clearance.</div>
+      </div>
+      <div class="flag amber">
+        <div class="flag-title">🟡 Mild restrictive lung pattern (Spirometry 2023)</div>
+        <div class="flag-body">FVC at 73% predicted — below normal. Airways clear (FEV1/FVC normal), issue is total lung volume. Likely linked to eosinophilia. Daily breathing exercises (diaphragmatic + pranayama) and treating the allergy should improve FVC.</div>
+      </div>
+      <div class="flag amber">
+        <div class="flag-title">🟡 Uric acid 6.0 mg/dL (2026)</div>
+        <div class="flag-body">Within normal range (3.4–7) but approaching upper limit. High-intensity exercise + dehydration can push higher. Stay hydrated 3L+/day, limit red meat, monitor annually.</div>
+      </div>
+      <div class="flag green">
+        <div class="flag-title">✅ Metabolic health — excellent and stable across all three reports</div>
+        <div class="flag-body">Fasting glucose, HbA1c, creatinine, AST, ALT, GGT, bilirubin, albumin — all within normal ranges. Triglycerides improved from 131 (2021) to 85 mg/dL (2026). No diabetes, liver disease, or kidney disease.</div>
+      </div>
+      <div class="flag green">
+        <div class="flag-title">✅ Declared physically fit — March 2026 screening</div>
+        <div class="flag-body">Physician: "Physically fit." No restrictions required. Physician comment: "Regular exercise. Avoid oily, fatty food."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Blood Count ── -->
+  <section id="blood">
+    <div class="section-header">
+      <div class="section-title">Complete Blood Count</div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-title">Haemoglobin (g/dL) · ref 13–17</div>
+        <div class="chart-wrap"><canvas id="c-hgb"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Eosinophils (%) · ref 1–6%</div>
+        <div class="chart-wrap"><canvas id="c-eos"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-title">RDW (%) · ref 11.6–14</div>
+        <div class="chart-wrap"><canvas id="c-rdw"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">WBC (/cumm) · ref 4000–10000</div>
+        <div class="chart-wrap"><canvas id="c-wbc"></canvas></div>
+      </div>
+    </div>
+    <table class="data-table">
+      <tr><th>Marker</th><th>Dec 2021</th><th>Mar 2023</th><th>Mar 2026</th><th>Ref</th><th>Trend</th></tr>
+      <tr><td class="label">Haemoglobin (g/dL)</td><td>15.6</td><td>16.1</td><td>15.0</td><td>13–17</td><td><span class="badge b-ok">Stable</span></td></tr>
+      <tr><td class="label">RBC (M/cumm)</td><td>5.2</td><td>5.29</td><td>5.03</td><td>4.5–6.5</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">PCV/HCT (%)</td><td>—</td><td>48.8</td><td>44.5</td><td>40–50</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">WBC (/cumm)</td><td>7300</td><td>5370</td><td>4470</td><td>4000–10000</td><td><span class="badge b-ok">Stable</span></td></tr>
+      <tr><td class="label">Eosinophils (%)</td><td>4</td><td>9.8</td><td>10</td><td>1–6</td><td><span class="badge b-bad">Rising ↑</span></td></tr>
+      <tr><td class="label">Neutrophils (%)</td><td>—</td><td>44.1</td><td>54</td><td>40–80</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">Lymphocytes (%)</td><td>—</td><td>35.4</td><td>30</td><td>20–40</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">RDW (%)</td><td>14.0</td><td>16.2</td><td>11.7</td><td>11.6–14</td><td><span class="badge b-ok">Improved ↓</span></td></tr>
+      <tr><td class="label">Platelets (/cumm)</td><td>220000</td><td>232000</td><td>—</td><td>150–400k</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">ESR (mm/hr)</td><td>5</td><td>3</td><td>—</td><td>&lt;15</td><td><span class="badge b-ok">Normal</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ── Lipids ── -->
+  <section id="lipids">
+    <div class="section-header">
+      <div class="section-title">Lipid Profile</div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-title">LDL Cholesterol (mg/dL) · optimal &lt;100</div>
+        <div class="chart-wrap"><canvas id="c-ldl"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">HDL Cholesterol (mg/dL) · optimal ≥60</div>
+        <div class="chart-wrap"><canvas id="c-hdl"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-title">Triglycerides (mg/dL) · ref &lt;150</div>
+        <div class="chart-wrap"><canvas id="c-tg"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Total Cholesterol (mg/dL) · ref &lt;200</div>
+        <div class="chart-wrap"><canvas id="c-tc"></canvas></div>
+      </div>
+    </div>
+    <table class="data-table">
+      <tr><th>Marker</th><th>Dec 2021</th><th>Mar 2026</th><th>Ref</th><th>Status</th></tr>
+      <tr><td class="label">Total Cholesterol (mg/dL)</td><td>172</td><td>174</td><td>&lt;200</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">LDL Cholesterol (mg/dL)</td><td>91.8</td><td>115</td><td>&lt;100</td><td><span class="badge b-bad">High ↑</span></td></tr>
+      <tr><td class="label">HDL Cholesterol (mg/dL)</td><td>54</td><td>42</td><td>≥60</td><td><span class="badge b-warn">Low ↓</span></td></tr>
+      <tr><td class="label">Triglycerides (mg/dL)</td><td>131</td><td>85</td><td>&lt;150</td><td><span class="badge b-ok">Improved ↓</span></td></tr>
+      <tr><td class="label">VLDL (mg/dL)</td><td>—</td><td>17</td><td>5–51</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">Cholesterol:HDL ratio</td><td>—</td><td>4.14</td><td>&lt;3.4 ideal</td><td><span class="badge b-warn">Average risk</span></td></tr>
+      <tr><td class="label">LDL:HDL ratio</td><td>—</td><td>2.74</td><td>&lt;3.3</td><td><span class="badge b-ok">Low risk</span></td></tr>
+      <tr><td class="label">TG:HDL ratio</td><td>—</td><td>2.02</td><td>&lt;2.0</td><td><span class="badge b-warn">Borderline</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ── Liver & kidney ── -->
+  <section id="liver">
+    <div class="section-header">
+      <div class="section-title">Liver & Kidney Function</div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-title">AST/SGOT (U/L) · ref 0–35</div>
+        <div class="chart-wrap"><canvas id="c-ast"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">ALT/SGPT (U/L) · ref 5–40</div>
+        <div class="chart-wrap"><canvas id="c-alt"></canvas></div>
+      </div>
+    </div>
+    <table class="data-table">
+      <tr><th>Marker</th><th>Dec 2021</th><th>Mar 2026</th><th>Ref</th><th>Status</th></tr>
+      <tr><td class="label">Total Bilirubin (mg/dL)</td><td>0.7</td><td>0.90</td><td>0–1.2</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">AST/SGOT (U/L)</td><td>35</td><td>28</td><td>0–35</td><td><span class="badge b-ok">Improved ↓</span></td></tr>
+      <tr><td class="label">ALT/SGPT (U/L)</td><td>31</td><td>19</td><td>5–40</td><td><span class="badge b-ok">Improved ↓</span></td></tr>
+      <tr><td class="label">GGT (U/L)</td><td>34</td><td>22</td><td>13–86</td><td><span class="badge b-ok">Improved ↓</span></td></tr>
+      <tr><td class="label">ALP (U/L)</td><td>—</td><td>152</td><td>75–275</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">Total Protein (g/dL)</td><td>—</td><td>7.51</td><td>6.4–8.3</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">Albumin (g/dL)</td><td>—</td><td>4.70</td><td>3.5–5.2</td><td><span class="badge b-ok">Normal</span></td></tr>
+      <tr><td class="label">Serum Creatinine (mg/dL)</td><td>0.8</td><td>0.83</td><td>0.6–1.2</td><td><span class="badge b-ok">Stable</span></td></tr>
+      <tr><td class="label">Serum Uric Acid (mg/dL)</td><td>—</td><td>6.00</td><td>3.4–7.0</td><td><span class="badge b-ok">Normal — monitor</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ── Glucose ── -->
+  <section id="glucose">
+    <div class="section-header">
+      <div class="section-title">Glucose & Metabolic</div>
+    </div>
+    <div class="cards">
+      <div class="card ok"><div class="card-label">Fasting glucose (2021)</div><div class="card-val">95 mg/dL</div><div class="card-sub">Normal &lt;100</div></div>
+      <div class="card ok"><div class="card-label">HbA1c (2021)</div><div class="card-val">5.3%</div><div class="card-sub">Normal &lt;5.7%</div></div>
+      <div class="card warn"><div class="card-label">Last tested</div><div class="card-val">2021</div><div class="card-sub">Recheck due — 5 years ago</div></div>
+    </div>
+    <div class="flag amber">
+      <div class="flag-title">⚠ Glucose & HbA1c not retested in 2023 or 2026 packages</div>
+      <div class="flag-body">Both were excellent in 2021 (glucose 95, HbA1c 5.3%). Request a retest in your next panel — at age 38 with rising LDL, an up-to-date baseline is important. Also add Vitamin D and B12 which have never been tested.</div>
+    </div>
+  </section>
+
+  <!-- ── Clinical ECG ── -->
+  <section id="ecg-clinical">
+    <div class="section-header">
+      <div class="section-title">Clinical ECG Results</div>
+      <div class="section-date">12-lead hospital ECG</div>
+    </div>
+    <div class="cards">
+      <div class="card warn"><div class="card-label">Mar 2023 — Clinic Visit</div><div class="card-val">Borderline</div><div class="card-sub">ST elevation V4-V5 · Unconfirmed</div></div>
+      <div class="card ok"><div class="card-label">Mar 2026 — Hospital Visit</div><div class="card-val">Normal</div><div class="card-sub">ECG General: Normal ✓</div></div>
+    </div>
+    <table class="data-table">
+      <tr><th>Parameter</th><th>Mar 2023</th><th>Ref</th></tr>
+      <tr><td class="label">Heart rate</td><td>62 bpm</td><td>60–100</td></tr>
+      <tr><td class="label">PR interval</td><td>137 ms</td><td>120–200</td></tr>
+      <tr><td class="label">QRS duration</td><td>76 ms</td><td>&lt;120</td></tr>
+      <tr><td class="label">QT interval</td><td>402 ms</td><td>—</td></tr>
+      <tr><td class="label">QTc</td><td>409 ms</td><td>&lt;440</td></tr>
+      <tr><td class="label">Finding</td><td colspan="2">Borderline ST elevation anterior leads V4, V5 — Sinus rhythm · Unconfirmed diagnosis</td></tr>
+    </table>
+  </section>
+
+  <!-- ── Watch ECG ── -->
+  <section id="ecg-watch">
+    <div class="section-header">
+      <div class="section-title">Apple Watch ECG Recordings</div>
+      <div class="section-date">Single-lead (Lead I) · 30-second recordings</div>
+    </div>
+    <div class="ecg-grid">
+      <div class="ecg-card">
+        <div class="ecg-head"><div class="ecg-date">Mar 25, 2021</div><span class="badge b-ok">Sinus Rhythm</span></div>
+        <div class="ecg-meta">Apple Watch Series 4 · 510.9 Hz · 8:50 PM</div>
+        <div class="ecg-wave"><canvas id="ecg-w2021"></canvas></div>
+        <div class="ecg-stats">
+          <div class="ecg-stat"><span>HR </span><strong>84 bpm</strong></div>
+          <div class="ecg-stat"><span>RMSSD </span><strong>213 ms</strong></div>
+          <div class="ecg-stat"><span>SDNN </span><strong>141 ms</strong></div>
+          <div class="ecg-stat"><span>pNN50 </span><strong>52%</strong></div>
+        </div>
+      </div>
+      <div class="ecg-card">
+        <div class="ecg-head"><div class="ecg-date">Jul 27, 2021</div><span class="badge b-warn">Poor Recording</span></div>
+        <div class="ecg-meta">Apple Watch Series 4 · 510.9 Hz · 4:38 PM</div>
+        <div style="height:70px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;">Signal too noisy — Watch flagged as poor quality. Excluded from HRV analysis.</div>
+        <div class="ecg-stats">
+          <div class="ecg-stat"><span>Status </span><strong>Discarded</strong></div>
+        </div>
+      </div>
+      <div class="ecg-card">
+        <div class="ecg-head"><div class="ecg-date">Jul 10, 2024</div><span class="badge b-ok">Sinus Rhythm</span></div>
+        <div class="ecg-meta">Apple Watch Series 7 · 512 Hz · 3:08 PM</div>
+        <div class="ecg-wave"><canvas id="ecg-w2024"></canvas></div>
+        <div class="ecg-stats">
+          <div class="ecg-stat"><span>HR </span><strong>86 bpm</strong></div>
+          <div class="ecg-stat"><span>RMSSD </span><strong>24 ms</strong></div>
+          <div class="ecg-stat"><span>SDNN </span><strong>22 ms</strong></div>
+          <div class="ecg-stat"><span>pNN50 </span><strong>5%</strong></div>
+        </div>
+      </div>
+      <div class="ecg-card">
+        <div class="ecg-head"><div class="ecg-date">Mar 10, 2026</div><span class="badge b-ok">Sinus Rhythm</span></div>
+        <div class="ecg-meta">Apple Watch Series 7 · 512 Hz · 10:54 AM</div>
+        <div class="ecg-wave"><canvas id="ecg-w2026"></canvas></div>
+        <div class="ecg-stats">
+          <div class="ecg-stat"><span>HR </span><strong>78 bpm</strong></div>
+          <div class="ecg-stat"><span>RMSSD </span><strong>340 ms</strong></div>
+          <div class="ecg-stat"><span>SDNN </span><strong>254 ms</strong></div>
+          <div class="ecg-stat"><span>pNN50 </span><strong>30%</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HRV ── -->
+  <section id="hrv">
+    <div class="section-header">
+      <div class="section-title">Heart Rate Variability</div>
+      <div class="section-date">Computed from Apple Watch ECG signals</div>
+    </div>
+    <div class="chart-box" style="margin-bottom:1rem">
+      <div class="chart-title">Resting heart rate trend (bpm)</div>
+      <div class="chart-wrap"><canvas id="c-hr"></canvas></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem">
+      <div class="chart-title" style="margin-bottom:.75rem">RMSSD (ms) — short-term HRV · higher is healthier</div>
+      <div class="hrv-row"><div class="hrv-label">Mar 2021</div><div class="hrv-bar-bg"><div class="hrv-bar" style="width:63%;background:var(--green)"></div></div><div class="hrv-val">213 ms</div><span class="badge b-ok">Excellent</span></div>
+      <div class="hrv-row"><div class="hrv-label">Jul 2024</div><div class="hrv-bar-bg"><div class="hrv-bar" style="width:7%;background:var(--red)"></div></div><div class="hrv-val">24 ms</div><span class="badge b-bad">Very low</span></div>
+      <div class="hrv-row"><div class="hrv-label">Mar 2026</div><div class="hrv-bar-bg"><div class="hrv-bar" style="width:100%;background:var(--accent)"></div></div><div class="hrv-val">340 ms</div><span class="badge b-ok">High</span></div>
+    </div>
+    <div class="flag amber">
+      <div class="flag-title">⚠ July 2024 HRV crash (RMSSD 24 ms) — likely stress or fatigue state</div>
+      <div class="flag-body">Dramatic drop from 213 ms (2021) to 24 ms (2024). Single snapshot — but if this was a resting morning measurement, it indicates the body was under significant physiological load. The 2026 rebound to 340 ms suggests full recovery. Aim to take multiple morning readings to track your personal baseline over time.</div>
+    </div>
+  </section>
+
+  <!-- ── Lab schedule ── -->
+  <section id="tests">
+    <div class="section-header">
+      <div class="section-title">Upcoming Lab Schedule</div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Book this week</div>
+          <div class="tl-title">Allergy panel (IgE RAST) + Stool parasite exam</div>
+          <div class="tl-body">Identify allergen driving 5-year eosinophil rise. Intestinal parasites are common in India and cause persistent eosinophilia. Results will guide treatment that may also improve lung function.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Book this week</div>
+          <div class="tl-title">Stress ECG / Treadmill Test (TMT)</div>
+          <div class="tl-body">Clarify the 2023 borderline ST elevation finding before beginning any high-intensity sport training. 2026 clinical ECG was normal, but a stress test provides definitive exercise clearance.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Within 1 month</div>
+          <div class="tl-title">Full PFT / Spirometry recheck</div>
+          <div class="tl-body">Confirm current FVC — it was 73% predicted in 2023 (mild restriction). Check if it has changed. Will also guide breathing exercise programme.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--amber)"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Month 3</div>
+          <div class="tl-title">Lipid profile recheck + CBC with differential</div>
+          <div class="tl-body">Check LDL and HDL response to diet + exercise changes. Verify eosinophil count has responded to treatment. Add uric acid — exercise can push it higher.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--green)"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Month 6</div>
+          <div class="tl-title">Full annual panel</div>
+          <div class="tl-body">CBC, lipids, LFT, RFT, HbA1c, fasting glucose, uric acid, Vitamin D, Vitamin B12 (never tested — common Indian deficiency), spirometry recheck.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 6-month plan ── -->
+  <section id="plan">
+    <div class="section-header">
+      <div class="section-title">6-Month Improvement Plan</div>
+    </div>
+    <div class="cards" style="margin-bottom:1.5rem">
+      <div class="card warn"><div class="card-label">LDL target</div><div class="card-val">115→&lt;100</div><div class="card-sub">Diet + exercise</div></div>
+      <div class="card warn"><div class="card-label">HDL target</div><div class="card-val">42→55+</div><div class="card-sub">Zone 2 cardio</div></div>
+      <div class="card warn"><div class="card-label">Resting HR</div><div class="card-val">76→60</div><div class="card-sub">Aerobic base</div></div>
+      <div class="card warn"><div class="card-label">FVC target</div><div class="card-val">73%→80%+</div><div class="card-sub">Breathing + Rx</div></div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Month 1–2 · Build base</div>
+          <div class="tl-title">Training: Zone 2 jog 3×/week (35–40 min) · Bodyweight strength 2×/week · Breathing drills 10 min daily</div>
+          <div class="tl-body">Nutrition: Cut all fried snacks, switch to olive/mustard oil, add psyllium husk daily, oats 5×/week, fatty fish 2×/week, 5–7 walnuts daily.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Month 3–4 · Build intensity</div>
+          <div class="tl-title">Training: Zone 2 45–55 min · Add 1 tempo run/week · Gym strength 2×/week · Pranayama 15 min/day</div>
+          <div class="tl-body">Nutrition: Increase plant protein (dal, chana, tofu) · Replace white rice with millets 3×/week · Add flaxseed to curd · Limit alcohol. Recheck lipids and eosinophils at month 3.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-when">Month 5–6 · Performance</div>
+          <div class="tl-title">Training: 4–5 sessions/week · Long run/cycle 60–75 min · VO2max intervals (if stress ECG clear) · Sport-specific training</div>
+          <div class="tl-body">Full annual panel at month 6. Compare all markers against March 2026 baseline. Repeat spirometry. Book annual physical for March 2027.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="padding:1.5rem 0;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.8">
+    <strong style="color:var(--text)">Data sources:</strong> Employer occupational health screenings (Dec 2021, Mar 2023, Mar 2026) · Apple Watch ECG exports (Mar 2021, Jul 2021, Jul 2024, Mar 2026) ·
+    <strong style="color:var(--text)">Disclaimer:</strong> This dashboard is a personal health record tool and does not constitute medical advice. Consult a physician for diagnosis and treatment decisions.
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── Date ──
+document.getElementById('gen-date').textContent = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+// ── Shared chart defaults ──
+const YEARS = ['Dec 2021','Mar 2023','Mar 2026'];
+const Y2 = ['Dec 2021','Mar 2026'];
+const ACCENT = '#4f8ef7';
+const GREEN = '#2dd4a0';
+const AMBER = '#f0a532';
+const RED = '#f0545c';
+Chart.defaults.color = '#8890a8';
+Chart.defaults.borderColor = '#2a2f45';
+Chart.defaults.font.family = "'Inter','Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size = 11;
+
+function lineChart(id, labels, datasets, refLines) {
+  const annotations = {};
+  if(refLines) refLines.forEach((r,i) => {
+    annotations['line'+i] = {type:'line',yMin:r.v,yMax:r.v,borderColor:r.c||'rgba(255,255,255,.15)',borderWidth:1,borderDash:[4,4],label:{content:r.label,display:true,color:'rgba(255,255,255,.3)',font:{size:10}}};
+  });
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels, datasets: datasets.map(d => ({ tension:0.3, pointRadius:5, pointHoverRadius:7, fill:false, ...d })) },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{mode:'index',intersect:false}, annotation:{annotations} },
+      scales:{ x:{grid:{color:'rgba(255,255,255,.05)'}}, y:{grid:{color:'rgba(255,255,255,.05)'}} }
+    }
+  });
+}
+
+// Blood charts
+lineChart('c-hgb', YEARS, [{label:'Haemoglobin',data:[15.6,16.1,15.0],borderColor:GREEN,backgroundColor:GREEN+'22'}], [{v:13,label:'min 13'},{v:17,label:'max 17'}]);
+lineChart('c-eos', YEARS, [{label:'Eosinophils %',data:[4,9.8,10],borderColor:RED,backgroundColor:RED+'22'}], [{v:6,label:'max 6%',c:'rgba(240,84,92,.4)'}]);
+lineChart('c-rdw', YEARS, [{label:'RDW %',data:[14.0,16.2,11.7],borderColor:AMBER,backgroundColor:AMBER+'22'}], [{v:14,label:'max 14%'}]);
+lineChart('c-wbc', YEARS, [{label:'WBC',data:[7300,5370,4470],borderColor:ACCENT,backgroundColor:ACCENT+'22'}], [{v:4000,label:'min 4000'},{v:10000,label:'max 10000'}]);
+
+// Lipid charts
+lineChart('c-ldl', Y2, [{label:'LDL',data:[91.8,115],borderColor:RED,backgroundColor:RED+'22'}], [{v:100,label:'optimal <100',c:'rgba(240,84,92,.4)'}]);
+lineChart('c-hdl', Y2, [{label:'HDL',data:[54,42],borderColor:GREEN,backgroundColor:GREEN+'22'}], [{v:60,label:'optimal ≥60'}]);
+lineChart('c-tg',  Y2, [{label:'Triglycerides',data:[131,85],borderColor:AMBER,backgroundColor:AMBER+'22'}], [{v:150,label:'max 150'}]);
+lineChart('c-tc',  Y2, [{label:'Total Cholesterol',data:[172,174],borderColor:ACCENT,backgroundColor:ACCENT+'22'}], [{v:200,label:'max 200'}]);
+
+// Liver
+lineChart('c-ast', Y2, [{label:'AST',data:[35,28],borderColor:ACCENT,backgroundColor:ACCENT+'22'}], [{v:35,label:'max 35'}]);
+lineChart('c-alt', Y2, [{label:'ALT',data:[31,19],borderColor:GREEN,backgroundColor:GREEN+'22'}], [{v:40,label:'max 40'}]);
+
+// HR trend
+lineChart('c-hr', ['Mar 2021','Jul 2024','Mar 2026'], [{label:'Resting HR (bpm)',data:[84,86,78],borderColor:ACCENT,backgroundColor:ACCENT+'22'}], [{v:60,label:'target 60 bpm'},{v:100,label:'max 100'}]);
+
+// ── ECG waveforms ──
+const w2021=[-0.384,-0.26,-0.119,-0.005,0.077,0.139,0.18,0.186,0.166,0.144,0.139,0.238,0.184,-0.116,-0.418,0.557,-0.641,-0.468,-0.462,-0.417,-0.299,-0.18,-0.072,0.041,0.165,0.282,0.371,0.437,0.523,0.674,0.849,0.978,1.0,0.605,0.04,-0.339,-0.634,-0.786,-0.783,-0.724,-0.69,-0.7,-0.767,-0.898,-0.357,-1.0,-0.714,-0.772,-0.79,-0.759,-0.686,-0.629,-0.62,-0.663,-0.722,-0.761,-0.764,-0.745,-0.723,-0.702,-0.676,-0.636,-0.58,-0.516,-0.454,-0.4,-0.35,-0.3,-0.243,-0.183,-0.13,-0.062,-0.04,0.003,0.482,0.157,0.279,0.214,0.215,0.239,0.31,0.385,0.436,0.444,0.409,0.352,0.293,0.24,0.191,0.142,0.097,0.067,0.057,0.064,0.079,0.098,0.128,0.179,0.243,0.292,0.29,0.241,0.175,0.091,-0.035,0.866,-0.135,-0.114,-0.138,-0.178,-0.169,-0.168,-0.167,-0.15,-0.118,-0.098,-0.118,-0.172,-0.22,-0.224,-0.188,-0.153,-0.161,-0.217,-0.29,-0.346,-0.37,-0.357,-0.31,-0.245,-0.189,-0.155,-0.098,-0.098,-0.085,0.699,-0.129,0.11,0.075,0.06,0.136,0.235,0.292,0.306,0.301,0.297,0.287,0.255,0.199,0.143,0.117,0.125,0.14,0.133,0.102,0.067,0.039,0.016,-0.01,-0.039,-0.068,-0.107,-0.155,-0.186,-0.284,-0.41,0.72,-0.403,-0.278,-0.31,-0.345,-0.308,-0.262,-0.225,-0.196,-0.168,-0.138,-0.108,-0.087,-0.083,-0.096,-0.1,-0.065,0.012,0.086,0.103,0.054,-0.015,-0.056,-0.065,-0.075,-0.112,-0.167,-0.182,-0.215,-0.274,0.656,-0.446,-0.111,-0.084,-0.054,0.032,0.123,0.196,0.262,0.325,0.362,0.336,0.233,0.099,0.008,-0.001,0.043];
+const w2024=[0.004,0.661,-0.184,0.632,0.537,0.462,0.491,0.459,0.411,0.387,0.328,0.283,0.281,0.332,0.415,0.488,0.517,0.5,0.467,0.445,0.444,0.457,0.471,0.472,0.45,0.413,0.385,0.385,0.382,0.456,0.54,-0.369,0.827,0.409,0.484,0.471,0.478,0.456,0.43,0.387,0.342,0.33,0.38,0.476,0.576,0.641,0.664,0.663,0.66,0.666,0.682,0.706,0.73,0.741,0.726,0.69,0.657,0.64,0.61,0.616,0.628,-0.167,0.677,0.454,0.492,0.465,0.447,0.387,0.327,0.256,0.182,0.142,0.173,0.271,0.385,0.464,0.491,0.49,0.49,0.5,0.513,0.526,0.538,0.548,0.544,0.526,0.505,0.46,0.493,0.569,0.546,0.522,-0.289,0.498,0.538,0.501,0.52,0.484,0.446,0.395,0.319,0.247,0.226,0.281,0.381,0.468,0.502,0.488,0.459,0.443,0.45,0.475,0.502,0.511,0.489,0.448,0.419,0.418,0.416,0.378,0.348,0.324,-1.0,0.523,0.157,0.231,0.262,0.237,0.193,0.139,0.07,0.006,-0.016,0.035,0.15,0.286,0.402,0.487,0.552,0.607,0.655,0.698,0.739,0.773,0.789,0.778,0.748,0.727,0.719,0.704,0.74,0.693,-0.473,1.0,0.542,0.538,0.499,0.454,0.382,0.311,0.227,0.145,0.103,0.13,0.217,0.326,0.424,0.492,0.521,0.513,0.476,0.435,0.413,0.419,0.438,0.448,0.437,0.429,0.384,0.401,0.535,0.571,0.51,-0.301,0.492,0.466,0.407,0.401,0.343,0.287,0.234,0.18,0.152,0.187,0.292,0.423,0.525,0.569,0.57,0.556,0.542,0.529,0.517,0.51,0.514,0.521,0.514,0.487,0.457,0.445,0.431,0.478,0.454,0.181];
+const w2026=[0.46,0.426,0.432,0.452,0.44,0.364,0.204,0.078,0.036,0.011,0.024,0.056,0.11,0.19,0.292,0.42,0.513,0.641,0.799,0.977,0.457,0.355,0.281,0.206,0.202,0.207,0.216,0.225,0.22,0.184,0.118,0.048,-0.001,-0.023,-0.031,-0.038,-0.05,-0.06,-0.059,-0.042,-0.007,0.036,0.077,0.114,0.153,0.203,0.268,0.353,0.389,0.409,0.957,0.195,0.387,0.398,0.396,0.42,0.432,0.441,0.465,0.497,0.515,0.497,0.45,0.399,0.363,0.346,0.35,0.384,0.444,0.504,0.537,0.546,0.555,0.584,0.621,0.648,0.656,0.656,0.664,0.615,0.587,1.0,0.369,0.499,0.467,0.419,0.415,0.418,0.421,0.429,0.446,0.467,0.485,0.495,0.503,0.51,0.479,0.462,0.444,0.426,0.408,0.393,0.38,0.365,0.339,0.297,0.247,0.204,0.193,0.191,0.175,0.372,0.122,0.147,0.203,0.236,0.286,0.346,0.413,0.494,0.575,0.628,0.631,0.581,0.498,0.403,0.318,0.251,0.198,0.152,0.118,0.078,0.015,-0.004,-0.192,-0.607,-1.0,-0.689,-0.29,-0.397,-0.67,-0.488,-0.061,0.168,0.429,0.61,0.708,0.757,0.787,0.786,0.734,0.635,0.518,0.417,0.347,0.305,0.28,0.263,0.251,0.245,0.245,0.249,0.254,0.26,0.273,0.299,0.33,0.351,0.362,0.375,0.352,0.376,0.734,0.418,0.418,0.425,0.421,0.449,0.482,0.519,0.557,0.584,0.582,0.542,0.475,0.411,0.375,0.376,0.398,0.413,0.4,0.365,0.329,0.299,0.303,0.302,0.299,0.29,0.281,0.291,0.293,0.23,0.747,0.143,0.272,0.271,0.269,0.291,0.297,0.299,0.312,0.332,0.334,0.303];
+
+function ecgWave(id, data, color) {
+  new Chart(document.getElementById(id), {
+    type:'line',
+    data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,borderWidth:1.5,pointRadius:0,fill:false,tension:0.1}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false,min:-1.3,max:1.3}}}
+  });
+}
+ecgWave('ecg-w2021', w2021, GREEN);
+ecgWave('ecg-w2024', w2024, AMBER);
+ecgWave('ecg-w2026', w2026, ACCENT);
+
+// ── Nav active state on scroll ──
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if(window.scrollY >= s.offsetTop - 80) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#'+current); });
+});
+
+// ── Export data ──
+const healthData = {
+  patient: { bloodGroup:"O Rh+" },
+  reports: [
+    { date:"2021-12-17", source:"Insurance Medical", weight_kg:null, height_cm:null,
+      cbc:{ haemoglobin:15.6, rbc:5.2, wbc:7300, eosinophils_pct:4, rdw:14.0, platelets:220000, esr:5 },
+      lipids:{ total_cholesterol:172, ldl:91.8, hdl:54, triglycerides:131 },
+      lft:{ bilirubin_total:0.7, ast:35, alt:31, ggt:34 },
+      rft:{ creatinine:0.8 },
+      glucose:{ fasting:95, hba1c:5.3 }
+    },
+    { date:"2023-03-17", source:"Employer Periodic Screening — Clinic Visit",
+      weight_kg:66, height_cm:174,
+      cbc:{ haemoglobin:16.1, rbc:5.29, wbc:5370, eosinophils_pct:9.8, rdw:16.2, platelets:232000, esr:3 },
+      ecg_clinical:{ hr_bpm:62, pr_ms:137, qrs_ms:76, qt_ms:402, qtc:409, finding:"Borderline ST elevation V4-V5 — Sinus rhythm — Unconfirmed" },
+      spirometry:{ fvc_pct_predicted:73, fev1_pct_predicted:88, pattern:"Mild restrictive" }
+    },
+    { date:"2026-03-10", source:"Employer Periodic Screening — Hospital Visit",
+      weight_kg:67.4, height_cm:175.5, bmi:21.9, bp_systolic:120, bp_diastolic:80, pulse:76,
+      cbc:{ haemoglobin:15.0, rbc:5.03, wbc:4470, eosinophils_pct:10, rdw_cv:11.7, neutrophils_pct:54, lymphocytes_pct:30 },
+      lipids:{ total_cholesterol:174, ldl:115, hdl:42, triglycerides:85, vldl:17, chol_hdl_ratio:4.14, ldl_hdl_ratio:2.74, tg_hdl_ratio:2.02 },
+      lft:{ bilirubin_total:0.90, bilirubin_conjugated:0.21, ast:28, alt:19, alp:152, ggt:22, total_protein:7.51, albumin:4.70 },
+      rft:{ creatinine:0.83, uric_acid:6.00 },
+      ecg_clinical:{ finding:"Normal" }
+    }
+  ],
+  ecg_watch: [
+    { date:"2021-03-25", device:"Apple Watch S4", classification:"Sinus Rhythm", hr_bpm:84, rmssd_ms:213, sdnn_ms:141, pnn50_pct:52 },
+    { date:"2021-07-27", device:"Apple Watch S4", classification:"Poor Recording", note:"Excluded from analysis" },
+    { date:"2024-07-10", device:"Apple Watch S7", classification:"Sinus Rhythm", hr_bpm:86, rmssd_ms:24, sdnn_ms:22, pnn50_pct:5 },
+    { date:"2026-03-10", device:"Apple Watch S7", classification:"Sinus Rhythm", hr_bpm:78, rmssd_ms:340, sdnn_ms:254, pnn50_pct:30 }
+  ]
+};
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(healthData, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'health_data.json'; a.click();
+}
+
+function exportCSV() {
+  const rows = [
+    ['Date','Source','Haemoglobin','WBC','Eosinophils%','LDL','HDL','Triglycerides','TotalCholesterol','AST','ALT','Creatinine','UricAcid','HR_bpm_clinical'],
+    ['2021-12-17','Insurance Medical',15.6,7300,4,91.8,54,131,172,35,31,0.8,'',62],
+    ['2023-03-17','Clinic Visit',16.1,5370,9.8,'','','','','','','','',62],
+    ['2026-03-10','Hospital Visit',15.0,4470,10,115,42,85,174,28,19,0.83,6.0,76],
+  ];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'health_data.csv'; a.click();
+}
+</script>
+</body>
+</html>
