@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0a0f0d"/>
+<title>Kid — deepu-life</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<style>
+  :root{
+    --card: var(--surface2);
+    --hgreen:#2dd4a0; --hamber:#f0a532; --hred:#f0545c; --hblue:#4f8ef7;
+  }
+  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 3rem;max-width:1000px;margin:0 auto}
+
+  /* ── Sign-in gate ── */
+  .gate{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;text-align:center}
+  .gate-icon{font-size:2.5rem}
+  .gate h1{font-family:'Fraunces',serif;font-weight:900;font-size:1.8rem}
+  .gate p{color:var(--muted);max-width:380px;font-size:0.9rem;line-height:1.6}
+  .btn-signin{display:inline-flex;align-items:center;gap:0.6rem;padding:0.7rem 1.4rem;border-radius:999px;
+    background:var(--hblue);color:#fff;border:none;font-weight:600;font-size:0.9rem;cursor:pointer;transition:opacity 0.2s}
+  .btn-signin:hover{opacity:0.85}
+  .gate-error{color:var(--hred);font-size:0.82rem;max-width:380px}
+  .render-error{background:rgba(240,84,92,.1);border:1px solid var(--hred);color:var(--hred);
+    border-radius:8px;padding:0.75rem 1rem;font-size:0.78rem;line-height:1.6;margin-bottom:1.5rem}
+
+  /* ── App shell ── */
+  #app{display:none}
+  .page-head{margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+  .page-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem}
+  .page-meta{display:flex;gap:1.25rem;margin-top:0.6rem;flex-wrap:wrap;font-size:0.78rem;color:var(--muted)}
+  .page-meta strong{color:var(--text)}
+
+  section{margin-bottom:2.5rem}
+  .sec-title{font-size:0.95rem;font-weight:600;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem}
+  .card-label{font-size:0.68rem;color:var(--muted);margin-bottom:0.25rem}
+  .card-val{font-size:1.25rem;font-weight:600}
+  .card-sub{font-size:0.68rem;color:var(--muted);margin-top:0.2rem}
+  .card.ok .card-val{color:var(--hgreen)}
+  .card.warn .card-val{color:var(--hamber)}
+  .card.bad .card-val{color:var(--hred)}
+
+  .flag{padding:0.75rem 1rem;border-radius:8px;border-left:3px solid;margin-bottom:0.85rem}
+  .flag.green{background:rgba(45,212,160,.08);border-color:var(--hgreen)}
+  .flag-title{font-size:0.82rem;font-weight:500;margin-bottom:0.2rem}
+  .flag-body{font-size:0.76rem;color:var(--muted);line-height:1.55}
+
+  .chart-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem;margin-bottom:0.85rem}
+  .chart-box-title{font-size:0.7rem;color:var(--muted);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.03em}
+  .chart-wrap{position:relative;height:140px}
+
+  table.data-table{width:100%;border-collapse:collapse;font-size:0.76rem}
+  .data-table th{text-align:left;padding:0.4rem 0.6rem;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);font-size:0.65rem;text-transform:uppercase}
+  .data-table td{padding:0.4rem 0.6rem;border-bottom:1px solid var(--border)}
+  .data-table tr:last-child td{border-bottom:none}
+
+  .grade-pill{display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:0.15rem 0.4rem;
+    border-radius:6px;font-size:0.72rem;font-weight:700}
+  .grade-pill.ok{background:var(--success-dim);color:var(--success)}
+  .grade-pill.warn{background:var(--warning-dim);color:var(--warning)}
+  .grade-pill.bad{background:var(--danger-dim);color:var(--danger)}
+  .effort-note{font-size:0.62rem;color:var(--muted);margin-left:0.3rem}
+
+  .skills-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem}
+  .skill-group-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.6rem}
+  .skill-row{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;padding:0.4rem 0;
+    border-bottom:1px solid var(--border);font-size:0.78rem}
+  .skill-row:last-child{border-bottom:none}
+  .skill-name{flex:1}
+  .rating-pill{flex-shrink:0;padding:0.12rem 0.5rem;border-radius:999px;font-size:0.66rem;font-weight:600}
+  .rating-pill.ok{background:var(--success-dim);color:var(--success)}
+  .rating-pill.warn{background:var(--warning-dim);color:var(--warning)}
+  .rating-pill.bad{background:var(--danger-dim);color:var(--danger)}
+
+  .timeline{display:flex;flex-direction:column}
+  .tl-item{display:flex;gap:0.85rem}
+  .tl-left{display:flex;flex-direction:column;align-items:center;width:22px;flex-shrink:0}
+  .tl-dot{width:9px;height:9px;border-radius:50%;background:var(--hblue);margin-top:4px;flex-shrink:0}
+  .tl-line{flex:1;width:1px;background:var(--border);margin:2px 0}
+  .tl-item:last-child .tl-line{display:none}
+  .tl-content{padding-bottom:1.25rem;flex:1}
+  .tl-when{font-size:0.65rem;font-weight:600;color:var(--hblue);text-transform:uppercase;letter-spacing:0.05em}
+  .tl-title2{font-size:0.82rem;font-weight:500;margin:0.15rem 0}
+  .tl-body{font-size:0.75rem;color:var(--muted);line-height:1.6}
+
+  .empty-st{color:var(--muted);font-size:0.85rem;padding:1rem 0}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
+  <div class="nav-right">
+    <div class="nav-pills">
+      <a href="index.html" class="nav-pill">🏃 Tracker</a>
+      <a href="todo.html" class="nav-pill">✅ To-Do</a>
+      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+      <a href="2026_school.html" class="nav-pill">🏫 School</a>
+      <a href="kid-private.html" class="nav-pill active" aria-current="page">🎒 Kid</a>
+      <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h1>Private report card record</h1>
+    <p>This page reads directly from a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <div id="app">
+    <div class="render-error" id="render-error" style="display:none"></div>
+    <div class="page-head">
+      <div class="page-title" id="page-title">Report Card</div>
+      <div class="page-meta" id="page-meta"></div>
+    </div>
+
+    <section id="sec-attendance">
+      <div class="sec-title">Attendance — Latest Term</div>
+      <div class="cards" id="attendance-cards"></div>
+      <div id="promotion-flag"></div>
+      <div class="chart-box" id="attendance-chart-box" style="display:none;margin-top:0.85rem">
+        <div class="chart-box-title">Attendance % across terms</div>
+        <div class="chart-wrap"><canvas id="attendance-chart"></canvas></div>
+      </div>
+    </section>
+
+    <section id="sec-grades">
+      <div class="sec-title">Grades by Subject</div>
+      <div style="overflow-x:auto"><table class="data-table" id="grades-table"></table></div>
+    </section>
+
+    <section id="sec-skills">
+      <div class="sec-title">Skills &amp; Behaviour — Latest Term</div>
+      <div class="skills-groups" id="skills-groups"></div>
+    </section>
+
+    <section id="sec-comments">
+      <div class="sec-title">Advisor Comments</div>
+      <div class="timeline" id="comments-timeline"></div>
+    </section>
+  </div>
+
+</div>
+
+<script src="assets/js/theme.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1yDv_PhuoqJXF5EhMDSdNAtY7c61_p76OJmfADrbq3SQ';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+const DB = { meta: [], grades: [], skills: [] };
+let tokenClient, accessToken = null;
+let charts = [];
+
+function initAuth() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (resp) => {
+      if (resp.error) { showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  document.getElementById('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+function showGateError(msg) { document.getElementById('gate-error').textContent = msg; }
+
+async function onSignedIn() {
+  try {
+    await loadData();
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    render();
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+function rowsToObjects(rows) {
+  if (!rows || !rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = row[i] !== undefined ? row[i] : '');
+    return obj;
+  });
+}
+
+async function loadData() {
+  const sheetNames = ['Report Meta','Subject Grades','Behavior Skills'];
+  const qs = sheetNames.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Kid sheet.');
+  if (!res.ok) throw new Error(`Could not load sheet (HTTP ${res.status})`);
+  const data = await res.json();
+  const [meta, grades, skills] = data.valueRanges.map(vr => rowsToObjects(vr.values));
+  DB.meta = meta; DB.grades = grades; DB.skills = skills;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════ */
+function termsSorted() {
+  return [...DB.meta].sort((a, b) => Number(a.Term) - Number(b.Term));
+}
+function latestTerm() {
+  const t = termsSorted();
+  return t.length ? t[t.length - 1] : null;
+}
+
+function render() {
+  charts.forEach(c => c.destroy());
+  charts = [];
+  const sections = [renderHead, renderAttendance, renderGrades, renderSkills, renderComments];
+  const errors = [];
+  sections.forEach(fn => {
+    try { fn(); }
+    catch (e) { console.error(`${fn.name} failed:`, e); errors.push(`${fn.name}: ${e.message}`); }
+  });
+  const banner = document.getElementById('render-error');
+  if (errors.length) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<strong>Some sections failed to render — check column headers in the sheet match exactly.</strong><br>${errors.join('<br>')}`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function renderHead() {
+  const latest = latestTerm();
+  document.getElementById('page-title').textContent = `Report Card — Term ${latest ? latest.Term : ''}`;
+  document.getElementById('page-meta').innerHTML = latest ? `
+    <span>Grade: <strong>${latest.Grade}</strong></span>
+    <span>Division: <strong>${latest.Division}</strong></span>
+    <span>House: <strong>${latest.House}</strong></span>
+    <span>Year: <strong>${latest.SchoolYear}</strong></span>
+  ` : '';
+}
+
+function renderAttendance() {
+  const latest = latestTerm();
+  const el = document.getElementById('attendance-cards');
+  if (!latest) { el.innerHTML = `<p class="empty-st">No terms yet.</p>`; return; }
+  const pct = Number(latest.AttendancePct);
+  const pctClass = isNaN(pct) ? '' : (pct >= 90 ? 'ok' : pct >= 75 ? 'warn' : 'bad');
+  el.innerHTML = `
+    <div class="card ${pctClass}">
+      <div class="card-label">% Present</div>
+      <div class="card-val">${latest.AttendancePct}%</div>
+      <div class="card-sub">Term ${latest.Term} · ${latest.PreparedDate}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Days Present</div>
+      <div class="card-val">${latest.Present}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Days Absent</div>
+      <div class="card-val">${latest.Absent}</div>
+    </div>`;
+
+  const promoEl = document.getElementById('promotion-flag');
+  if (latest.Promoted && latest.Promoted !== 'No') {
+    promoEl.innerHTML = `<div class="flag green"><div class="flag-title">🎉 Promoted</div><div class="flag-body">${latest.Promoted}</div></div>`;
+  } else {
+    promoEl.innerHTML = '';
+  }
+
+  const terms = termsSorted();
+  const box = document.getElementById('attendance-chart-box');
+  if (terms.length >= 2) {
+    box.style.display = 'block';
+    const labels = terms.map(t => `Term ${t.Term}`);
+    const vals = terms.map(t => Number(t.AttendancePct));
+    const chart = new Chart(document.getElementById('attendance-chart'), {
+      type: 'line',
+      data: { labels, datasets: [{ data: vals, borderColor: '#4f8ef7', backgroundColor: '#4f8ef722', tension: 0.3, pointRadius: 4, fill: false }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{color:'rgba(255,255,255,.05)'}}} }
+    });
+    charts.push(chart);
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function gradeClass(g) {
+  if (!g) return '';
+  if (g.startsWith('A')) return 'ok';
+  if (g === 'B' || g === 'C') return 'warn';
+  return 'bad';
+}
+
+function renderGrades() {
+  const terms = termsSorted();
+  const table = document.getElementById('grades-table');
+  if (!terms.length) { table.innerHTML = `<tr><td class="empty-st">No grades yet.</td></tr>`; return; }
+
+  const subjects = [];
+  DB.grades.forEach(g => { if (!subjects.includes(g.Subject)) subjects.push(g.Subject); });
+
+  const byKey = {};
+  DB.grades.forEach(g => { byKey[`${g.Term}|${g.Subject}`] = g; });
+
+  table.innerHTML = `<tr><th>Subject</th>${terms.map(t => `<th>Term ${t.Term}</th>`).join('')}</tr>` +
+    subjects.map(s => {
+      const cells = terms.map(t => {
+        const row = byKey[`${t.Term}|${s}`];
+        if (!row) return `<td>—</td>`;
+        return `<td><span class="grade-pill ${gradeClass(row.TermGrade)}">${row.TermGrade}</span><span class="effort-note">Effort ${row.EffortGrade}</span></td>`;
+      }).join('');
+      return `<tr><td>${s}</td>${cells}</tr>`;
+    }).join('');
+}
+
+const RATING_CLASS = { Always: 'ok', Often: 'warn', Sometimes: 'warn', Rarely: 'bad', Never: 'bad' };
+
+function renderSkills() {
+  const latest = latestTerm();
+  const el = document.getElementById('skills-groups');
+  if (!latest) { el.innerHTML = `<p class="empty-st">No skills data yet.</p>`; return; }
+  const rows = DB.skills.filter(s => s.Term === latest.Term);
+  const categories = [];
+  rows.forEach(r => { if (!categories.includes(r.Category)) categories.push(r.Category); });
+
+  el.innerHTML = categories.map(cat => `
+    <div class="skill-group">
+      <div class="skill-group-title">${cat}</div>
+      ${rows.filter(r => r.Category === cat).map(r => `
+        <div class="skill-row">
+          <span class="skill-name">${r.Skill}</span>
+          <span class="rating-pill ${RATING_CLASS[r.Rating] || ''}">${r.Rating}</span>
+        </div>`).join('')}
+    </div>`).join('') || `<p class="empty-st">No skills data yet.</p>`;
+}
+
+function renderComments() {
+  const terms = [...termsSorted()].reverse();
+  const el = document.getElementById('comments-timeline');
+  el.innerHTML = terms.map(t => `
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-when">Term ${t.Term} · ${t.PreparedDate}</div>
+        <div class="tl-title2">Homeroom Advisor</div>
+        <div class="tl-body">${t.AdvisorComment}</div>
+      </div>
+    </div>`).join('') || `<p class="empty-st">No comments yet.</p>`;
+}
+
+initAuth();
+</script>
+</body>
+</html>
