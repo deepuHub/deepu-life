@@ -66,6 +66,27 @@
     .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
     .sync-dot.ok{background:var(--success);box-shadow:0 0 6px var(--success)}
     .sync-dot.err{background:var(--danger)}
+
+    /* ── Special liquid-glow treatment for the training timeline ──
+       Run/Cycle's glow comes from a huge tl-stat number; our slides
+       only carry a smaller tl-headline, so instead of just matching
+       theirs we give this page its own animated aurora blob that
+       drifts around the title. Scoped to this page only. */
+    .tl-slide-inner{position:relative}
+    .tl-slide-inner::before{
+      content:'';position:absolute;z-index:-1;pointer-events:none;
+      top:-70px;left:-90px;width:340px;height:340px;
+      background:radial-gradient(circle, var(--plan) 0%, transparent 70%);
+      filter:blur(50px);opacity:0.4;
+      animation:hm-blob-drift 11s ease-in-out infinite;
+    }
+    @keyframes hm-blob-drift{
+      0%,100%{transform:translate(0,0) scale(1);opacity:0.32}
+      22%{transform:translate(38px,-24px) scale(1.18);opacity:0.42}
+      50%{transform:translate(-18px,30px) scale(0.88);opacity:0.36}
+      78%{transform:translate(22px,18px) scale(1.08);opacity:0.44}
+    }
+    @media(prefers-reduced-motion:reduce){.tl-slide-inner::before{animation:none}}
   </style>
 </head>
 <body>
