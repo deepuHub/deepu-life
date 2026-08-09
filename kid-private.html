@@ -31,10 +31,21 @@
 
   /* ── App shell ── */
   #app{display:none}
-  .page-head{margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+  .page-head{margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
   .page-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem}
   .page-meta{display:flex;gap:1.25rem;margin-top:0.6rem;flex-wrap:wrap;font-size:0.78rem;color:var(--muted)}
   .page-meta strong{color:var(--text)}
+
+  /* ── Chip navigation ── */
+  .chip-nav{margin-bottom:2rem}
+  .chip-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem}
+  .chip-row:last-child{margin-bottom:0}
+  .chip{padding:0.4rem 0.9rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+    color:var(--muted);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;
+    font-family:'Epilogue',sans-serif;-webkit-tap-highlight-color:transparent}
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#0a0f0d}
+  .chip.term-chip{font-size:0.74rem;padding:0.32rem 0.75rem}
 
   section{margin-bottom:2.5rem}
   .sec-title{font-size:0.95rem;font-weight:600;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border)}
@@ -80,16 +91,9 @@
   .rating-pill.warn{background:var(--warning-dim);color:var(--warning)}
   .rating-pill.bad{background:var(--danger-dim);color:var(--danger)}
 
-  .timeline{display:flex;flex-direction:column}
-  .tl-item{display:flex;gap:0.85rem}
-  .tl-left{display:flex;flex-direction:column;align-items:center;width:22px;flex-shrink:0}
-  .tl-dot{width:9px;height:9px;border-radius:50%;background:var(--hblue);margin-top:4px;flex-shrink:0}
-  .tl-line{flex:1;width:1px;background:var(--border);margin:2px 0}
-  .tl-item:last-child .tl-line{display:none}
-  .tl-content{padding-bottom:1.25rem;flex:1}
-  .tl-when{font-size:0.65rem;font-weight:600;color:var(--hblue);text-transform:uppercase;letter-spacing:0.05em}
-  .tl-title2{font-size:0.82rem;font-weight:500;margin:0.15rem 0}
-  .tl-body{font-size:0.75rem;color:var(--muted);line-height:1.6}
+  .comment-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.15rem}
+  .comment-when{font-size:0.65rem;font-weight:600;color:var(--hblue);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem}
+  .comment-body{font-size:0.82rem;color:var(--text);line-height:1.65}
 
   .empty-st{color:var(--muted);font-size:0.85rem;padding:1rem 0}
 </style>
@@ -132,12 +136,17 @@
       <div class="page-meta" id="page-meta"></div>
     </div>
 
+    <div class="chip-nav">
+      <div class="chip-row" id="grade-chips"></div>
+      <div class="chip-row" id="term-chips"></div>
+    </div>
+
     <section id="sec-attendance">
-      <div class="sec-title">Attendance — Latest Term</div>
+      <div class="sec-title">Attendance</div>
       <div class="cards" id="attendance-cards"></div>
       <div id="promotion-flag"></div>
       <div class="chart-box" id="attendance-chart-box" style="display:none;margin-top:0.85rem">
-        <div class="chart-box-title">Attendance % across terms</div>
+        <div class="chart-box-title">Attendance % across every term on record</div>
         <div class="chart-wrap"><canvas id="attendance-chart"></canvas></div>
       </div>
     </section>
@@ -148,13 +157,13 @@
     </section>
 
     <section id="sec-skills">
-      <div class="sec-title">Skills &amp; Behaviour — Latest Term</div>
+      <div class="sec-title">Skills &amp; Behaviour</div>
       <div class="skills-groups" id="skills-groups"></div>
     </section>
 
     <section id="sec-comments">
-      <div class="sec-title">Advisor Comments</div>
-      <div class="timeline" id="comments-timeline"></div>
+      <div class="sec-title">Advisor Comment</div>
+      <div id="comment-body"></div>
     </section>
   </div>
 
@@ -173,6 +182,7 @@ const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 const DB = { meta: [], grades: [], skills: [] };
 let tokenClient, accessToken = null;
 let charts = [];
+let selectedTermID = null;
 
 function initAuth() {
   tokenClient = google.accounts.oauth2.initTokenClient({
@@ -194,6 +204,8 @@ async function onSignedIn() {
     await loadData();
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    const all = allTermsSorted();
+    selectedTermID = all.length ? all[all.length - 1].TermID : null;
     render();
   } catch (e) {
     showGateError(e.message);
@@ -223,20 +235,42 @@ async function loadData() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   RENDER
+   TERM / GRADE HELPERS — TermID (e.g. G1-T1) is the real join
+   key across the three tabs and across school years. Plain
+   Term (1/2) repeats every year, so it's display-only.
 ══════════════════════════════════════════════════════════ */
-function termsSorted() {
-  return [...DB.meta].sort((a, b) => Number(a.Term) - Number(b.Term));
+function allTermsSorted() {
+  return [...DB.meta].sort((a, b) => Number(a.Grade) - Number(b.Grade) || Number(a.Term) - Number(b.Term));
 }
-function latestTerm() {
-  const t = termsSorted();
-  return t.length ? t[t.length - 1] : null;
+function uniqueGrades() {
+  const grades = [];
+  allTermsSorted().forEach(m => { if (!grades.includes(m.Grade)) grades.push(m.Grade); });
+  return grades;
+}
+function termsForGrade(grade) {
+  return allTermsSorted().filter(m => m.Grade === grade);
+}
+function selectedMeta() {
+  return DB.meta.find(m => m.TermID === selectedTermID) || null;
+}
+function selectGrade(grade) {
+  const terms = termsForGrade(grade);
+  if (!terms.length) return;
+  selectedTermID = terms[terms.length - 1].TermID;
+  render();
+}
+function selectTerm(termID) {
+  selectedTermID = termID;
+  render();
 }
 
+/* ══════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════ */
 function render() {
   charts.forEach(c => c.destroy());
   charts = [];
-  const sections = [renderHead, renderAttendance, renderGrades, renderSkills, renderComments];
+  const sections = [renderChips, renderHead, renderAttendance, renderGrades, renderSkills, renderComment];
   const errors = [];
   sections.forEach(fn => {
     try { fn(); }
@@ -251,51 +285,68 @@ function render() {
   }
 }
 
+function renderChips() {
+  const current = selectedMeta();
+  const grades = uniqueGrades();
+  const gradeEl = document.getElementById('grade-chips');
+  gradeEl.innerHTML = grades.map(g => {
+    const sample = termsForGrade(g)[0];
+    const active = current && current.Grade === g ? 'active' : '';
+    return `<button class="chip ${active}" onclick="selectGrade('${g}')">Grade ${g}${sample.Division || ''}</button>`;
+  }).join('') || `<p class="empty-st">No terms yet.</p>`;
+
+  const termEl = document.getElementById('term-chips');
+  if (!current) { termEl.innerHTML = ''; return; }
+  const terms = termsForGrade(current.Grade);
+  termEl.innerHTML = terms.map(t => {
+    const active = t.TermID === selectedTermID ? 'active' : '';
+    return `<button class="chip term-chip ${active}" onclick="selectTerm('${t.TermID}')">Term ${t.Term}</button>`;
+  }).join('');
+}
+
 function renderHead() {
-  const latest = latestTerm();
-  document.getElementById('page-title').textContent = `Report Card — Term ${latest ? latest.Term : ''}`;
-  document.getElementById('page-meta').innerHTML = latest ? `
-    <span>Grade: <strong>${latest.Grade}</strong></span>
-    <span>Division: <strong>${latest.Division}</strong></span>
-    <span>House: <strong>${latest.House}</strong></span>
-    <span>Year: <strong>${latest.SchoolYear}</strong></span>
+  const m = selectedMeta();
+  document.getElementById('page-title').textContent = m ? `Report Card — Grade ${m.Grade}${m.Division || ''}, Term ${m.Term}` : 'Report Card';
+  document.getElementById('page-meta').innerHTML = m ? `
+    <span>Grade: <strong>${m.Grade}</strong></span>
+    <span>Division: <strong>${m.Division}</strong></span>
+    <span>House: <strong>${m.House}</strong></span>
+    <span>Year: <strong>${m.SchoolYear}</strong></span>
+    <span>Prepared: <strong>${m.PreparedDate}</strong></span>
   ` : '';
 }
 
 function renderAttendance() {
-  const latest = latestTerm();
+  const m = selectedMeta();
   const el = document.getElementById('attendance-cards');
-  if (!latest) { el.innerHTML = `<p class="empty-st">No terms yet.</p>`; return; }
-  const pct = Number(latest.AttendancePct);
+  if (!m) { el.innerHTML = `<p class="empty-st">No terms yet.</p>`; return; }
+  const pct = Number(m.AttendancePct);
   const pctClass = isNaN(pct) ? '' : (pct >= 90 ? 'ok' : pct >= 75 ? 'warn' : 'bad');
   el.innerHTML = `
     <div class="card ${pctClass}">
       <div class="card-label">% Present</div>
-      <div class="card-val">${latest.AttendancePct}%</div>
-      <div class="card-sub">Term ${latest.Term} · ${latest.PreparedDate}</div>
+      <div class="card-val">${m.AttendancePct}%</div>
     </div>
     <div class="card">
       <div class="card-label">Days Present</div>
-      <div class="card-val">${latest.Present}</div>
+      <div class="card-val">${m.Present}</div>
     </div>
     <div class="card">
       <div class="card-label">Days Absent</div>
-      <div class="card-val">${latest.Absent}</div>
+      <div class="card-val">${m.Absent}</div>
     </div>`;
 
   const promoEl = document.getElementById('promotion-flag');
-  if (latest.Promoted && latest.Promoted !== 'No') {
-    promoEl.innerHTML = `<div class="flag green"><div class="flag-title">🎉 Promoted</div><div class="flag-body">${latest.Promoted}</div></div>`;
-  } else {
-    promoEl.innerHTML = '';
-  }
+  promoEl.innerHTML = (m.Promoted && m.Promoted !== 'No')
+    ? `<div class="flag green"><div class="flag-title">🎉 Promoted</div><div class="flag-body">${m.Promoted}</div></div>`
+    : '';
 
-  const terms = termsSorted();
+  const all = allTermsSorted();
   const box = document.getElementById('attendance-chart-box');
-  if (terms.length >= 2) {
+  if (all.length >= 2) {
     box.style.display = 'block';
-    const labels = terms.map(t => `Term ${t.Term}`);
-    const vals = terms.map(t => Number(t.AttendancePct));
+    const labels = all.map(t => t.TermID);
+    const vals = all.map(t => Number(t.AttendancePct));
     const chart = new Chart(document.getElementById('attendance-chart'), {
       type: 'line',
       data: { labels, datasets: [{ data: vals, borderColor: '#4f8ef7', backgroundColor: '#4f8ef722', tension: 0.3, pointRadius: 4, fill: false }] },
@@ -315,34 +366,20 @@ function gradeClass(g) {
 }
 
 function renderGrades() {
-  const terms = termsSorted();
   const table = document.getElementById('grades-table');
-  if (!terms.length) { table.innerHTML = `<tr><td class="empty-st">No grades yet.</td></tr>`; return; }
-
-  const subjects = [];
-  DB.grades.forEach(g => { if (!subjects.includes(g.Subject)) subjects.push(g.Subject); });
-
-  const byKey = {};
-  DB.grades.forEach(g => { byKey[`${g.Term}|${g.Subject}`] = g; });
-
-  table.innerHTML = `<tr><th>Subject</th>${terms.map(t => `<th>Term ${t.Term}</th>`).join('')}</tr>` +
-    subjects.map(s => {
-      const cells = terms.map(t => {
-        const row = byKey[`${t.Term}|${s}`];
-        if (!row) return `<td>—</td>`;
-        return `<td><span class="grade-pill ${gradeClass(row.TermGrade)}">${row.TermGrade}</span><span class="effort-note">Effort ${row.EffortGrade}</span></td>`;
-      }).join('');
-      return `<tr><td>${s}</td>${cells}</tr>`;
-    }).join('');
+  if (!selectedTermID) { table.innerHTML = `<tr><td class="empty-st">No grades yet.</td></tr>`; return; }
+  const rows = DB.grades.filter(g => g.TermID === selectedTermID);
+  table.innerHTML = `<tr><th>Subject</th><th>Grade</th><th>Effort</th></tr>` +
+    (rows.map(r => `<tr><td>${r.Subject}</td><td><span class="grade-pill ${gradeClass(r.TermGrade)}">${r.TermGrade}</span></td><td>${r.EffortGrade}</td></tr>`).join('')
+      || `<tr><td class="empty-st" colspan="3">No grades for this term.</td></tr>`);
 }
 
 const RATING_CLASS = { Always: 'ok', Often: 'warn', Sometimes: 'warn', Rarely: 'bad', Never: 'bad' };
 
 function renderSkills() {
-  const latest = latestTerm();
   const el = document.getElementById('skills-groups');
-  if (!latest) { el.innerHTML = `<p class="empty-st">No skills data yet.</p>`; return; }
-  const rows = DB.skills.filter(s => s.Term === latest.Term);
+  if (!selectedTermID) { el.innerHTML = `<p class="empty-st">No skills data yet.</p>`; return; }
+  const rows = DB.skills.filter(s => s.TermID === selectedTermID);
   const categories = [];
   rows.forEach(r => { if (!categories.includes(r.Category)) categories.push(r.Category); });
 
@@ -354,21 +391,18 @@ function renderSkills() {
           <span class="skill-name">${r.Skill}</span>
           <span class="rating-pill ${RATING_CLASS[r.Rating] || ''}">${r.Rating}</span>
         </div>`).join('')}
-    </div>`).join('') || `<p class="empty-st">No skills data yet.</p>`;
+    </div>`).join('') || `<p class="empty-st">No skills data for this term.</p>`;
 }
 
-function renderComments() {
-  const terms = [...termsSorted()].reverse();
-  const el = document.getElementById('comments-timeline');
-  el.innerHTML = terms.map(t => `
-    <div class="tl-item">
-      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
-      <div class="tl-content">
-        <div class="tl-when">Term ${t.Term} · ${t.PreparedDate}</div>
-        <div class="tl-title2">Homeroom Advisor</div>
-        <div class="tl-body">${t.AdvisorComment}</div>
-      </div>
-    </div>`).join('') || `<p class="empty-st">No comments yet.</p>`;
+function renderComment() {
+  const m = selectedMeta();
+  const el = document.getElementById('comment-body');
+  if (!m || !m.AdvisorComment) { el.innerHTML = `<p class="empty-st">No comment for this term.</p>`; return; }
+  el.innerHTML = `
+    <div class="comment-card">
+      <div class="comment-when">Term ${m.Term} · ${m.PreparedDate}</div>
+      <div class="comment-body">${m.AdvisorComment}</div>
+    </div>`;
 }
 
 initAuth();
