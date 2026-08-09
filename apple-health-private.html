@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Apple Health Overview</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍎%3C/text%3E%3C/svg%3E" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --card: #151821;
+    --border: #262a35;
+    --text: #e8eaf0;
+    --muted: #9aa0ae;
+    --accent: #ff5a5f;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    padding: 32px 24px 80px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { margin-bottom: 32px; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; }
+  h2 { font-size: 18px; margin: 40px 0 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-bottom: 8px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 26px; font-weight: 600; margin: 4px 0; }
+  .card .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; margin-top: 4px; }
+  .tag.bad { background: rgba(248,113,113,.15); color: var(--bad); }
+  .tag.warn { background: rgba(251,191,36,.15); color: var(--warn); }
+  .tag.good { background: rgba(52,211,153,.15); color: var(--good); }
+  .narrative { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; line-height: 1.6; font-size: 14.5px; color: #d3d6de; }
+  .narrative b { color: var(--text); }
+  .narrative ul { margin: 8px 0; padding-left: 20px; }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .chart-box h3 { font-size: 13px; margin: 0 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  canvas { max-height: 240px; }
+  footer { margin-top: 50px; color: var(--muted); font-size: 12px; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 16px; }
+  @media (max-width: 800px) { .chart-grid { grid-template-columns: 1fr; } }
+
+  /* ── Sign-in gate ── */
+  .gate{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;text-align:center}
+  .gate-icon{font-size:2.5rem}
+  .gate h1{font-size:1.8rem}
+  .gate p{color:var(--muted);max-width:380px;font-size:0.9rem;line-height:1.6}
+  .btn-signin{display:inline-flex;align-items:center;gap:0.6rem;padding:0.7rem 1.4rem;border-radius:999px;
+    background:var(--accent);color:#fff;border:none;font-weight:600;font-size:0.9rem;cursor:pointer;transition:opacity 0.2s}
+  .btn-signin:hover{opacity:0.85}
+  .gate-error{color:var(--bad);font-size:0.82rem;max-width:380px}
+  .render-error{background:rgba(248,113,113,.1);border:1px solid var(--bad);color:var(--bad);
+    border-radius:10px;padding:14px 18px;font-size:0.82rem;line-height:1.6;margin-bottom:24px}
+  #app{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h1>Private health record</h1>
+    <p>This page reads directly from a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <div id="app">
+    <div class="render-error" id="render-error" style="display:none"></div>
+
+    <header>
+      <h1>Apple Health Overview</h1>
+      <div class="sub" id="header-sub">—</div>
+    </header>
+
+    <h2>At a glance</h2>
+    <div class="cards" id="snapshot-cards"></div>
+
+    <h2>Summary</h2>
+    <div class="narrative" id="narrative"></div>
+
+    <h2>Trends over time</h2>
+    <div class="chart-grid">
+      <div class="chart-box"><h3>Sleep — avg hours/night (monthly)</h3><canvas id="c_sleep"></canvas></div>
+      <div class="chart-box"><h3>Resting Heart Rate — bpm (monthly)</h3><canvas id="c_rhr"></canvas></div>
+      <div class="chart-box"><h3>HRV (SDNN) — ms (monthly)</h3><canvas id="c_hrv"></canvas></div>
+      <div class="chart-box"><h3>VO2 Max — ml/kg/min (monthly)</h3><canvas id="c_vo2"></canvas></div>
+      <div class="chart-box"><h3>Steps — avg/day (monthly)</h3><canvas id="c_steps"></canvas></div>
+      <div class="chart-box"><h3>Active Energy — kcal/day (monthly)</h3><canvas id="c_energy"></canvas></div>
+      <div class="chart-box"><h3>Exercise Minutes — min/day (monthly)</h3><canvas id="c_ex"></canvas></div>
+      <div class="chart-box"><h3>Heart Rate Recovery — 1 min, bpm (monthly)</h3><canvas id="c_recov"></canvas></div>
+      <div class="chart-box"><h3>Respiratory Rate — breaths/min (monthly)</h3><canvas id="c_resp"></canvas></div>
+      <div class="chart-box"><h3>Blood Oxygen — % (monthly)</h3><canvas id="c_spo2"></canvas></div>
+    </div>
+
+    <footer id="footer">
+      Generated from your Apple Health export. Sleep hours computed from HKCategoryTypeIdentifierSleepAnalysis "asleep" segments;
+      other metrics from HealthKit quantity samples aggregated to daily then monthly averages.
+      <span id="footer-disclaimer"></span>
+    </footer>
+  </div>
+
+</div>
+
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1Bh3t86oaS8cNOvBj_UhY2kX-mLCKrER644pDolSTg3A';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+const DB = { profile: [], snapshot: [], monthly: [], summary: [] };
+let tokenClient, accessToken = null;
+let charts = [];
+
+function initAuth() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (resp) => {
+      if (resp.error) { showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  document.getElementById('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+function showGateError(msg) { document.getElementById('gate-error').textContent = msg; }
+
+async function onSignedIn() {
+  try {
+    await loadData();
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    render();
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+function rowsToObjects(rows) {
+  if (!rows || !rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = row[i] !== undefined ? row[i] : '');
+    return obj;
+  });
+}
+
+async function loadData() {
+  const sheetNames = ['Profile', 'Snapshot Cards', 'Monthly Metrics', 'Summary'];
+  const qs = sheetNames.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to this sheet.');
+  if (!res.ok) throw new Error(`Could not load sheet (HTTP ${res.status})`);
+  const data = await res.json();
+  const [profile, snapshot, monthly, summary] = data.valueRanges.map(vr => rowsToObjects(vr.values));
+  DB.profile = profile; DB.snapshot = snapshot; DB.monthly = monthly; DB.summary = summary;
+}
+
+function profileVal(field) {
+  const row = DB.profile.find(p => p.Field === field);
+  return row ? row.Value : '';
+}
+
+function latestReportID(rows) {
+  const ids = [...new Set(rows.map(r => r.ReportID))].filter(Boolean);
+  if (!ids.length) return null;
+  return ids.sort((a, b) => Number(b) - Number(a))[0];
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════ */
+function render() {
+  charts.forEach(c => c.destroy());
+  charts = [];
+  const sections = [renderHeader, renderSnapshotCards, renderNarrative, renderCharts];
+  const errors = [];
+  sections.forEach(fn => {
+    try { fn(); }
+    catch (e) { console.error(`${fn.name} failed:`, e); errors.push(`${fn.name}: ${e.message}`); }
+  });
+  const banner = document.getElementById('render-error');
+  if (errors.length) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<strong>Some sections failed to render — check column headers in the sheet match exactly.</strong><br>${errors.join('<br>')}`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function renderHeader() {
+  document.getElementById('header-sub').textContent =
+    `${profileVal('Name')} · ${profileVal('Age')} · ${profileVal('Sex')}  |  Data range: ${profileVal('DataRange')}  |  Generated from Apple Health export`;
+  document.getElementById('footer-disclaimer').textContent = profileVal('Disclaimer');
+}
+
+function renderSnapshotCards() {
+  const el = document.getElementById('snapshot-cards');
+  const latest = latestReportID(DB.snapshot);
+  const rows = DB.snapshot.filter(r => r.ReportID === latest).sort((a, b) => Number(a.Order) - Number(b.Order));
+  el.innerHTML = rows.map(r => `
+    <div class="card">
+      <div class="label">${r.Label}</div>
+      <div class="value">${r.Value}</div>
+      <span class="tag ${r.TagType}">${r.Tag}</span>
+    </div>`).join('') || `<p style="color:var(--muted)">No snapshot data yet.</p>`;
+}
+
+function renderNarrative() {
+  const el = document.getElementById('narrative');
+  const latest = latestReportID(DB.summary);
+  const rows = DB.summary.filter(r => r.ReportID === latest).sort((a, b) => Number(a.Order) - Number(b.Order));
+
+  let html = '';
+  let bulletBuffer = [];
+  const flushBullets = () => {
+    if (bulletBuffer.length) { html += `<ul>${bulletBuffer.map(b => `<li>${b}</li>`).join('')}</ul>`; bulletBuffer = []; }
+  };
+  rows.forEach(r => {
+    if (r.Type === 'bullet') { bulletBuffer.push(r.Text); return; }
+    flushBullets();
+    if (r.Type === 'heading') html += `<p><b>${r.Text}</b></p>`;
+    else html += `<p>${r.Lead ? `<b>${r.Lead}</b> ` : ''}${r.Text}</p>`;
+  });
+  flushBullets();
+  el.innerHTML = html || `<p style="color:var(--muted)">No summary yet.</p>`;
+}
+
+function monthlySeries(label) {
+  const rows = DB.monthly.filter(r => r.Metric === label);
+  const obj = {};
+  rows.forEach(r => obj[r.Month] = Number(r.Value));
+  return obj;
+}
+
+function toPoints(obj) {
+  const keys = Object.keys(obj).sort();
+  return { labels: keys, values: keys.map(k => obj[k]) };
+}
+
+function lineChart(id, obj, color) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const { labels, values } = toPoints(obj);
+  const chart = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: color,
+        backgroundColor: color + '22',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#9aa0ae', maxTicksLimit: 8, font: { size: 10 } }, grid: { color: '#262a35' } },
+        y: { ticks: { color: '#9aa0ae', font: { size: 10 } }, grid: { color: '#262a35' } }
+      }
+    }
+  });
+  charts.push(chart);
+}
+
+function renderCharts() {
+  lineChart('c_sleep',  monthlySeries('Sleep (hrs/night)'),           '#f87171');
+  lineChart('c_rhr',    monthlySeries('Resting HR (bpm)'),            '#fbbf24');
+  lineChart('c_hrv',    monthlySeries('HRV SDNN (ms)'),               '#60a5fa');
+  lineChart('c_vo2',    monthlySeries('VO2 Max (ml/kg/min)'),         '#a78bfa');
+  lineChart('c_steps',  monthlySeries('Steps (avg/day)'),             '#34d399');
+  lineChart('c_energy', monthlySeries('Active Energy (kcal/day)'),    '#f472b6');
+  lineChart('c_ex',     monthlySeries('Exercise Minutes (min/day)'),  '#38bdf8');
+  lineChart('c_recov',  monthlySeries('HR Recovery 1min (bpm)'),      '#4ade80');
+  lineChart('c_resp',   monthlySeries('Respiratory Rate (breaths/min)'), '#facc15');
+  lineChart('c_spo2',   monthlySeries('Blood Oxygen (%)'),            '#22d3ee');
+}
+
+initAuth();
+</script>
+</body>
+</html>
