@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semester Results · A Celebration</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎓%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF4EC;
+    --pearl:#F1E9DC;
+    --pearl-line:#E4D6C3;
+    --card:#FFFDF9;
+    --rose:#C08497;
+    --rose-deep:#A6677A;
+    --plum:#3F2A44;
+    --plum-soft:#6B5470;
+    --gold:#C9A66B;
+    --sage:#8FA07A;
+    --shadow: 0 10px 30px -12px rgba(63,42,68,0.25);
+    --ring: rgba(192,132,151,0.35);
+  }
+  [data-theme="dark"]{
+    --cream:#231A28;
+    --pearl:#2C2131;
+    --pearl-line:#4A3A50;
+    --card:#2A1F30;
+    --rose:#D8A0AF;
+    --rose-deep:#E3B4C0;
+    --plum:#F3E8EE;
+    --plum-soft:#CBB8CE;
+    --gold:#E4C48C;
+    --sage:#AABF92;
+    --shadow: 0 10px 30px -12px rgba(0,0,0,0.6);
+    --ring: rgba(216,160,175,0.25);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% 0%, var(--pearl) 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, var(--pearl) 0%, transparent 40%),
+      var(--cream);
+    color:var(--plum);
+    font-family:'Lora', serif;
+    transition:background .4s ease, color .4s ease;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+
+  h1,h2,h3{font-family:'Playfair Display', serif; margin:0;}
+  .eyebrow{
+    font-family:'Poppins',sans-serif;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-size:.68rem;
+    color:var(--rose-deep);
+    font-weight:600;
+  }
+
+  /* pearl string divider */
+  .pearl-string{
+    display:flex; justify-content:center; align-items:center; gap:10px;
+    padding: 6px 0 18px;
+  }
+  .pearl-string span{
+    width:9px;height:9px;border-radius:50%;
+    background: radial-gradient(circle at 32% 28%, #fff 0%, var(--gold) 40%, var(--pearl-line) 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  }
+  .pearl-string span:nth-child(4n){ width:13px;height:13px; }
+
+  /* top bar */
+  .topbar{
+    max-width:1080px;margin:0 auto;padding:22px 24px 0;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .brandmark{font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--rose-deep); display:flex; gap:8px; align-items:center;}
+  .theme-toggle{
+    border:1px solid var(--pearl-line); background:var(--card); color:var(--plum);
+    border-radius:999px; padding:8px 16px; font-family:'Poppins',sans-serif; font-size:.78rem;
+    cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow:var(--shadow);
+    transition:transform .2s ease;
+  }
+  .theme-toggle:hover{transform:translateY(-1px);}
+  .theme-toggle:focus-visible, button:focus-visible, .locket:focus-visible{outline:3px solid var(--ring); outline-offset:3px;}
+
+  /* hero */
+  .hero{
+    max-width:900px;margin:28px auto 10px; padding:0 24px; text-align:center; position:relative;
+  }
+  .hero .frame{
+    border:1px solid var(--pearl-line);
+    border-radius:28px;
+    padding:44px 28px 36px;
+    background: linear-gradient(180deg, var(--card), var(--pearl));
+    box-shadow: var(--shadow);
+    position:relative;
+  }
+  .hero .frame::before, .hero .frame::after{
+    content:"❀";
+    position:absolute; top:14px; font-size:1.4rem; color:var(--rose); opacity:.55;
+  }
+  .hero .frame::before{left:20px;}
+  .hero .frame::after{right:20px; transform:scaleX(-1);}
+  .hero h1{
+    font-size:clamp(1.9rem, 4.2vw, 2.75rem);
+    color:var(--rose-deep);
+    line-height:1.15;
+    font-weight:700;
+  }
+  .hero p.sub{
+    font-family:'Lora',serif; font-style:italic; color:var(--plum-soft);
+    margin-top:10px; font-size:1.05rem;
+  }
+  .hero .stats{
+    display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:26px;
+  }
+  .stat-pill{
+    background:var(--cream); border:1px solid var(--pearl-line); border-radius:16px;
+    padding:14px 22px; min-width:130px;
+  }
+  .stat-pill .num{font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--plum); font-weight:700;}
+  .stat-pill .lbl{font-family:'Poppins',sans-serif; font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--rose-deep); margin-top:2px;}
+
+  /* sign-in gate + error banner (reuses .hero .frame look) */
+  .btn-signin{
+    display:inline-flex; align-items:center; gap:10px; margin-top:22px;
+    background:var(--rose-deep); color:#fff; border:none; border-radius:999px;
+    padding:12px 24px; font-family:'Poppins',sans-serif; font-weight:600; font-size:.85rem;
+    cursor:pointer; box-shadow:var(--shadow); transition:transform .2s ease, opacity .2s ease;
+  }
+  .btn-signin:hover{transform:translateY(-1px); opacity:.92;}
+  .gate-error{color:var(--rose-deep); font-family:'Poppins',sans-serif; font-size:.78rem; margin-top:14px;}
+  .render-error{
+    max-width:900px; margin:20px auto 0; background:rgba(166,103,122,0.1); border:1px solid var(--rose-deep);
+    color:var(--rose-deep); border-radius:16px; padding:14px 20px; font-family:'Poppins',sans-serif;
+    font-size:.78rem; line-height:1.7;
+  }
+
+  /* sections */
+  .section{max-width:1080px; margin:56px auto; padding:0 24px;}
+  .section-head{text-align:center; margin-bottom:30px;}
+  .section-head h2{font-size:clamp(1.4rem,3vw,1.9rem); color:var(--plum);}
+  .section-head p{color:var(--plum-soft); font-style:italic; margin-top:6px;}
+
+  /* subject garden grid */
+  .garden{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr)); gap:26px 22px;
+  }
+  .locket{
+    perspective:1200px; height:236px; cursor:pointer;
+  }
+  .locket-inner{
+    position:relative; width:100%; height:100%; transition:transform .7s cubic-bezier(.2,.8,.2,1);
+    transform-style:preserve-3d;
+  }
+  .locket.flipped .locket-inner{transform:rotateY(180deg);}
+  .locket-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:20px;
+    background:var(--card); border:1px solid var(--pearl-line); box-shadow:var(--shadow);
+    padding:20px; display:flex; flex-direction:column;
+  }
+  .locket-face.back{transform:rotateY(180deg); justify-content:center;}
+  .locket-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .course-code{font-family:'Poppins',sans-serif; font-size:.66rem; color:var(--plum-soft); letter-spacing:.08em;}
+  .grade-badge{
+    font-family:'Poppins',sans-serif; font-weight:700; font-size:.72rem;
+    padding:4px 10px; border-radius:999px; color:#fff;
+  }
+  .grade-O{background:var(--gold);}
+  .grade-Aplus{background:var(--rose-deep);}
+  .grade-A{background:var(--rose);}
+  .course-name{
+    font-family:'Playfair Display',serif; font-size:1.06rem; margin-top:12px; color:var(--plum); line-height:1.28;
+    min-height:52px;
+  }
+  .score-row{display:flex; align-items:baseline; gap:6px; margin-top:auto;}
+  .score-row .scored{font-family:'Playfair Display',serif; font-size:1.7rem; font-weight:700; color:var(--rose-deep);}
+  .score-row .outof{font-family:'Poppins',sans-serif; font-size:.82rem; color:var(--plum-soft);}
+  .range-bar{
+    position:relative; height:8px; border-radius:999px; background:var(--pearl-line); margin-top:12px; overflow:visible;
+  }
+  .range-fill{
+    position:absolute; top:0; left:0; height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--sage), var(--gold));
+  }
+  .range-marker{
+    position:absolute; top:-4px; width:16px; height:16px; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #fff, var(--rose-deep) 70%);
+    border:2px solid var(--card); transform:translateX(-50%);
+  }
+  .range-labels{display:flex; justify-content:space-between; font-family:'Poppins',sans-serif; font-size:.6rem; color:var(--plum-soft); margin-top:4px;}
+  .tap-hint{font-family:'Poppins',sans-serif; font-size:.6rem; color:var(--plum-soft); text-align:center; margin-top:8px; letter-spacing:.05em;}
+
+  .badge-row{position:absolute; top:-10px; left:14px; display:flex; gap:6px;}
+  .special-badge{
+    font-family:'Poppins',sans-serif; font-size:.6rem; font-weight:600; padding:4px 9px; border-radius:999px;
+    box-shadow:0 3px 8px rgba(0,0,0,.15); white-space:nowrap;
+  }
+  .special-badge.top{background:var(--gold); color:#3a2a10;}
+  .special-badge.grow{background:var(--sage); color:#1f2b18;}
+
+  .back-title{font-family:'Poppins',sans-serif; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--rose-deep); text-align:center;}
+  .back-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin-top:14px;}
+  .back-item{text-align:center;}
+  .back-item .v{font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--plum); font-weight:700;}
+  .back-item .l{font-family:'Poppins',sans-serif; font-size:.6rem; color:var(--plum-soft); text-transform:uppercase; letter-spacing:.06em;}
+
+  /* SGPA dial */
+  .dial-wrap{display:flex; justify-content:center; align-items:center; gap:48px; flex-wrap:wrap;}
+  .dial{
+    width:220px; height:220px; border-radius:50%;
+    background:conic-gradient(var(--rose-deep) calc(var(--pct) * 1%), var(--pearl-line) 0);
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); position:relative;
+  }
+  .dial::before{
+    content:""; position:absolute; inset:14px; border-radius:50%; background:var(--card);
+    box-shadow: inset 0 0 0 1px var(--pearl-line);
+  }
+  .dial-center{position:relative; text-align:center;}
+  .dial-center .big{font-family:'Playfair Display',serif; font-size:2.3rem; font-weight:700; color:var(--rose-deep);}
+  .dial-center .small{font-family:'Poppins',sans-serif; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--plum-soft);}
+  .dial-legend{max-width:280px;}
+  .dial-legend p{color:var(--plum-soft); font-style:italic; line-height:1.6;}
+  .result-chip{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Poppins',sans-serif; font-weight:600;
+    background:var(--sage); color:#1f2b18; padding:8px 16px; border-radius:999px; font-size:.8rem; margin-top:10px;
+  }
+
+  /* CGPA timeline */
+  .timeline{
+    display:flex; align-items:flex-start; gap:0; overflow-x:auto; padding:20px 6px 10px;
+  }
+  .tl-item{
+    display:flex; flex-direction:column; align-items:center; min-width:110px; position:relative;
+  }
+  .tl-item:not(:last-child)::after{
+    content:""; position:absolute; top:24px; left:56%; width:100%; height:2px;
+    background:repeating-linear-gradient(90deg, var(--pearl-line) 0 6px, transparent 6px 11px);
+  }
+  .tl-pearl{
+    width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.95rem; z-index:1;
+    box-shadow:var(--shadow);
+  }
+  .tl-pearl.done{background:radial-gradient(circle at 32% 28%, #fff, var(--gold) 55%, var(--rose-deep) 100%); color:#3a2a10;}
+  .tl-pearl.pending{background:var(--pearl); border:2px dashed var(--pearl-line); color:var(--plum-soft);}
+  .tl-label{font-family:'Poppins',sans-serif; font-size:.68rem; margin-top:8px; color:var(--plum);}
+  .tl-sub{font-family:'Poppins',sans-serif; font-size:.6rem; color:var(--plum-soft); margin-top:2px;}
+
+  footer{
+    text-align:center; padding:40px 24px 60px; color:var(--plum-soft); font-style:italic; font-family:'Lora',serif; font-size:.9rem;
+  }
+
+  canvas#petals{position:fixed; inset:0; pointer-events:none; z-index:999;}
+
+  @media (max-width:560px){
+    .dial-wrap{gap:22px;}
+    .stat-pill{min-width:100px; padding:12px 16px;}
+  }
+</style>
+</head>
+<body data-theme="light">
+<canvas id="petals"></canvas>
+
+<div class="topbar">
+  <div class="brandmark">❀ Semester Results</div>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙 <span id="themeLabel">Dark mode</span></button>
+</div>
+
+<section class="hero" id="gate-section">
+  <div class="frame">
+    <div style="font-size:2rem;margin-bottom:4px;">🔒</div>
+    <h1 style="font-size:1.5rem;">A private letter, just for us</h1>
+    <p class="sub">This page reads directly from a private Google Sheet. Sign in with the Google account that has access.</p>
+    <button class="btn-signin" id="signin-btn">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+</section>
+
+<div id="app" style="display:none">
+  <div class="render-error" id="render-error" style="display:none"></div>
+
+  <div class="pearl-string" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <section class="hero">
+    <div class="frame">
+      <p class="eyebrow" id="eyebrow">B.Ed · Semester</p>
+      <h1>🌸 Congratulations, My Love! 🌸</h1>
+      <p class="sub">You've blossomed with brilliance in every subject.</p>
+      <div class="stats">
+        <div class="stat-pill"><div class="num" id="stat-sgpa">—</div><div class="lbl">SGPA</div></div>
+        <div class="stat-pill"><div class="num" id="stat-gp">—</div><div class="lbl">Credit Points</div></div>
+        <div class="stat-pill"><div class="num" id="stat-credits">—</div><div class="lbl">Credits</div></div>
+        <div class="stat-pill"><div class="num" id="stat-result">—</div><div class="lbl">Result</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="garden">
+    <div class="section-head">
+      <h2>Your Subject Garden</h2>
+      <p>Tap any bloom to open the locket and see how it grew.</p>
+    </div>
+    <div class="garden" id="gardenGrid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>This Semester, at a Glance</h2>
+      <p>Every petal of effort, gathered into one number.</p>
+    </div>
+    <div class="dial-wrap">
+      <div class="dial" id="dial" style="--pct:0">
+        <div class="dial-center">
+          <div class="big" id="dial-big">—</div>
+          <div class="small">SGPA</div>
+        </div>
+      </div>
+      <div class="dial-legend">
+        <p id="dial-legend-text"></p>
+        <div class="result-chip" id="dial-result-chip">✓ Result: —</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>The Road Ahead</h2>
+      <p>A string of pearls — one for every semester still to come.</p>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <footer>
+    ❀ made with love, for the one who never stops growing ❀
+  </footer>
+</div>
+
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1wsao2JqaMDmTaZXrJPdJgTL3-Enh6UiWTfP7uW7n00E';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+const TOTAL_SEMESTER_SLOTS = 8;
+
+const DB = { meta: [], courses: [] };
+let tokenClient, accessToken = null;
+
+function initAuth() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (resp) => {
+      if (resp.error) { showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  document.getElementById('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+function showGateError(msg) { document.getElementById('gate-error').textContent = msg; }
+
+async function onSignedIn() {
+  try {
+    await loadData();
+    document.getElementById('gate-section').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    render();
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+function rowsToObjects(rows) {
+  if (!rows || !rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = row[i] !== undefined ? row[i] : '');
+    return obj;
+  });
+}
+
+async function loadData() {
+  const sheetNames = ['Semester Meta', 'Course Results'];
+  const qs = sheetNames.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to this sheet.');
+  if (!res.ok) throw new Error(`Could not load sheet (HTTP ${res.status})`);
+  const data = await res.json();
+  const [meta, courses] = data.valueRanges.map(vr => rowsToObjects(vr.values));
+  DB.meta = meta; DB.courses = courses;
+}
+
+function semestersSorted() { return [...DB.meta].sort((a, b) => Number(a.Semester) - Number(b.Semester)); }
+function latestSemester() { const s = semestersSorted(); return s.length ? s[s.length - 1] : null; }
+
+/* ══════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════ */
+function render() {
+  const sections = [renderHero, renderGarden, renderDial, renderTimeline];
+  const errors = [];
+  sections.forEach(fn => {
+    try { fn(); }
+    catch (e) { console.error(`${fn.name} failed:`, e); errors.push(`${fn.name}: ${e.message}`); }
+  });
+  const banner = document.getElementById('render-error');
+  if (errors.length) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<strong>Some sections failed to render — check column headers in the sheet match exactly.</strong><br>${errors.join('<br>')}`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function coursesFor(semesterID) { return DB.courses.filter(c => c.SemesterID === semesterID); }
+
+function renderHero() {
+  const latest = latestSemester();
+  if (!latest) return;
+  const courses = coursesFor(latest.SemesterID);
+  const totalCredits = courses.reduce((sum, c) => sum + Number(c.Credits || 0), 0);
+  const totalGP = courses.reduce((sum, c) => sum + Number(c.CreditPoints || 0), 0);
+  document.getElementById('eyebrow').textContent = `${latest.Program || 'B.Ed'} · Semester ${latest.Semester}`;
+  document.getElementById('stat-sgpa').textContent = latest.SGPA || '—';
+  document.getElementById('stat-gp').textContent = totalGP;
+  document.getElementById('stat-credits').textContent = totalCredits;
+  document.getElementById('stat-result').textContent = (latest.Result || '').toUpperCase();
+}
+
+const letterClass = l => l === 'O' ? 'grade-O' : (l === 'A+' ? 'grade-Aplus' : 'grade-A');
+
+function renderGarden() {
+  const grid = document.getElementById('gardenGrid');
+  grid.innerHTML = '';
+  const latest = latestSemester();
+  if (!latest) return;
+
+  const subjects = coursesFor(latest.SemesterID).map(c => ({
+    code: c.CourseCode, name: c.CourseName,
+    max: Number(c.MaxMarks), min: Number(c.MinMarks),
+    se: c.SEMarks === '' ? null : Number(c.SEMarks), ia: Number(c.IAMarks),
+    scored: Number(c.MarksScored), credits: Number(c.Credits),
+    gp: Number(c.CreditPoints), letter: c.LetterGrade,
+  }));
+  if (!subjects.length) return;
+
+  subjects.forEach(s => s.pct = (s.scored / s.max) * 100);
+  const maxPct = Math.max(...subjects.map(s => s.pct));
+  const minPct = Math.min(...subjects.map(s => s.pct));
+
+  subjects.forEach((s) => {
+    const fillPct = ((s.scored - s.min) / (s.max - s.min)) * 100;
+    const markerPct = fillPct;
+    const isTop = s.pct === maxPct;
+    const isGrow = s.pct === minPct;
+
+    const el = document.createElement('div');
+    el.className = 'locket';
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', `${s.name}, scored ${s.scored} out of ${s.max}, grade ${s.letter}. Tap for details.`);
+    el.innerHTML = `
+      <div class="locket-inner">
+        <div class="locket-face front">
+          ${isTop ? '<div class="badge-row"><span class="special-badge top">🌟 Top Bloom</span></div>' : ''}
+          ${isGrow ? '<div class="badge-row"><span class="special-badge grow">🌱 Growing</span></div>' : ''}
+          <div class="locket-top">
+            <span class="course-code">${s.code}</span>
+            <span class="grade-badge ${letterClass(s.letter)}">${s.letter}</span>
+          </div>
+          <div class="course-name">${s.name}</div>
+          <div class="score-row">
+            <span class="scored">${s.scored}</span>
+            <span class="outof">/ ${s.max}</span>
+          </div>
+          <div class="range-bar">
+            <div class="range-fill" style="width:${fillPct}%"></div>
+            <div class="range-marker" style="left:${markerPct}%"></div>
+          </div>
+          <div class="range-labels"><span>Min ${s.min}</span><span>Max ${s.max}</span></div>
+          <div class="tap-hint">✦ tap to open ✦</div>
+        </div>
+        <div class="locket-face back">
+          <div class="back-title">${s.code}</div>
+          <div class="back-grid">
+            <div class="back-item"><div class="v">${s.se ?? '—'}</div><div class="l">SE Marks</div></div>
+            <div class="back-item"><div class="v">${s.ia}</div><div class="l">IA Marks</div></div>
+            <div class="back-item"><div class="v">${s.credits}</div><div class="l">Credits</div></div>
+            <div class="back-item"><div class="v">${s.gp}</div><div class="l">Credit Pts</div></div>
+          </div>
+          <div class="tap-hint">✦ tap to close ✦</div>
+        </div>
+      </div>
+    `;
+    const toggle = () => {
+      el.classList.toggle('flipped');
+      const rect = el.getBoundingClientRect();
+      burstPetals(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    };
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    grid.appendChild(el);
+  });
+}
+
+function renderDial() {
+  const latest = latestSemester();
+  if (!latest) return;
+  const sgpa = Number(latest.SGPA) || 0;
+  const courses = coursesFor(latest.SemesterID);
+  const totalCredits = courses.reduce((sum, c) => sum + Number(c.Credits || 0), 0);
+  document.getElementById('dial').style.setProperty('--pct', sgpa * 10);
+  document.getElementById('dial-big').textContent = latest.SGPA || '—';
+  document.getElementById('dial-legend-text').textContent =
+    `${courses.length} subjects, ${totalCredits} credits, and a beautiful stretch of hard work behind you.`;
+  document.getElementById('dial-result-chip').textContent = `✓ Result: ${(latest.Result || '').toUpperCase()}`;
+}
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  const sems = semestersSorted();
+  const totalSlots = Math.max(TOTAL_SEMESTER_SLOTS, sems.length);
+  for (let i = 1; i <= totalSlots; i++) {
+    const row = sems.find(s => Number(s.Semester) === i);
+    const item = document.createElement('div');
+    item.className = 'tl-item';
+    item.innerHTML = row ? `
+      <div class="tl-pearl done">${row.SGPA}</div>
+      <div class="tl-label">Semester ${i}</div>
+      <div class="tl-sub">SGPA earned</div>` : `
+      <div class="tl-pearl pending">${i}</div>
+      <div class="tl-label">Semester ${i}</div>
+      <div class="tl-sub">Upcoming</div>`;
+    tl.appendChild(item);
+  }
+}
+
+/* ---------- Petal confetti ---------- */
+const canvas = document.getElementById('petals');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+let particles = [];
+const petalColors = ['#C08497','#E3B4C0','#C9A66B','#F1E9DC','#8FA07A'];
+
+function burstPetals(x, y){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const count = reduced ? 0 : 26;
+  for(let i=0;i<count;i++){
+    const angle = Math.random()*Math.PI*2;
+    const speed = 2 + Math.random()*4;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed - 2,
+      size: 6 + Math.random()*7,
+      rot: Math.random()*Math.PI*2,
+      vr: (Math.random()-0.5)*0.2,
+      color: petalColors[Math.floor(Math.random()*petalColors.length)],
+      life: 1
+    });
+  }
+}
+
+function drawPetal(p){
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.rot);
+  ctx.globalAlpha = Math.max(p.life, 0);
+  ctx.fillStyle = p.color;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, p.size*0.55, p.size, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.vy += 0.05;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+    p.life -= 0.012;
+    drawPetal(p);
+  });
+  particles = particles.filter(p => p.life > 0 && p.y < canvas.height + 40);
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ---------- Theme toggle ---------- */
+const toggleBtn = document.getElementById('themeToggle');
+const themeLabel = document.getElementById('themeLabel');
+toggleBtn.addEventListener('click', () => {
+  const body = document.body;
+  const isDark = body.getAttribute('data-theme') === 'dark';
+  body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeLabel.textContent = isDark ? 'Dark mode' : 'Light mode';
+  toggleBtn.firstChild.textContent = isDark ? '🌙 ' : '☀️ ';
+});
+
+initAuth();
+</script>
+</body>
+</html>
