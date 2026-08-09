@@ -188,11 +188,11 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
       <a href="todo.html" class="nav-pill">✅ To-Do</a>
       <a href="quotes.html" class="nav-pill">💬 Quotes</a>
       <a href="2026_school.html" class="nav-pill">🏫 School</a>
-      <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-      <a href="health-private.html" class="nav-pill">🩺 Health</a>
-      <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
       <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+      <a href="kid-private.html" class="nav-pill">🎒 Progress Report</a>
+      <a href="results-private.html" class="nav-pill">🎓 Results</a>
+      <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
     </div>
     <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
@@ -216,9 +216,9 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
     <div class="nav-drawer-group">
       <div class="nav-drawer-label">🔒 Private</div>
       <div class="nav-drawer-list">
-        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
+        <a href="kid-private.html" class="nav-pill">🎒 Progress Report</a>
+        <a href="results-private.html" class="nav-pill">🎓 Results</a>
         <a href="health-private.html" class="nav-pill">🩺 Health</a>
-        <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
         <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
       </div>
     </div>
@@ -338,12 +338,54 @@ function showLoader(msg='Loading from Google Sheets…') {
   if (!el) {
     el = document.createElement('div');
     el.id = 'gs-loader';
-    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,15,13,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;font-family:Epilogue,sans-serif;color:#6b7d6e;font-size:0.88rem;letter-spacing:0.06em;backdrop-filter:blur(8px)';
+    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,15,13,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;font-family:Epilogue,sans-serif;color:#6b7d6e;font-size:0.88rem;letter-spacing:0.06em;backdrop-filter:blur(8px)';
     el.innerHTML = `
-      <div style="width:38px;height:38px;border:2px solid #243020;border-top-color:#c8f04a;border-radius:50%;animation:gs-spin 0.7s linear infinite"></div>
+      <svg class="gs-athlete" viewBox="0 0 100 100" width="76" height="76" fill="none" stroke="#c8f04a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <g class="gs-scene gs-scene-run">
+          <g class="gs-run-bob">
+            <circle class="gs-frame-a" cx="62" cy="16" r="7"/>
+            <path class="gs-frame-a" d="M60,23 Q54,37 48,52 M56,28 L44,26 L36,36 M56,28 L66,36 L72,50 M48,52 L38,58 L42,74 M48,52 L60,64 L74,68"/>
+            <circle class="gs-frame-b" cx="62" cy="16" r="7"/>
+            <path class="gs-frame-b" d="M60,23 Q54,37 48,52 M56,28 L68,24 L76,32 M56,28 L46,38 L38,50 M48,52 L60,56 L66,72 M48,52 L36,62 L20,64"/>
+          </g>
+        </g>
+        <g class="gs-scene gs-scene-cycle">
+          <circle cx="18" cy="80" r="13" stroke-width="3.5"/>
+          <circle cx="72" cy="80" r="13" stroke-width="3.5"/>
+          <path d="M18,80 L44,72 L72,80 M44,72 L36,46 M36,46 L60,48 L72,80" stroke-width="3.5"/>
+          <circle cx="50" cy="20" r="7"/>
+          <path d="M47,27 L38,46 M42,31 L60,48"/>
+          <g class="gs-pedal-a"><path d="M44,72 L30,60 L23,70"/></g>
+          <g class="gs-pedal-b"><path d="M44,72 L30,60 L23,70"/></g>
+        </g>
+        <g class="gs-scene gs-scene-swim">
+          <path d="M6,72 Q13,66 20,72 T34,72" stroke-width="3" opacity="0.45"/>
+          <path d="M42,80 Q49,74 56,80 T70,80" stroke-width="3" opacity="0.45"/>
+          <circle cx="20" cy="38" r="7"/>
+          <path d="M27,40 L70,46"/>
+          <path class="gs-frame-a" d="M29,39 L44,20 L58,14 M29,40 L24,54 L14,64 M70,46 L84,38 L96,30"/>
+          <path class="gs-frame-b" d="M29,40 L24,54 L14,64 M29,39 L44,20 L58,14 M70,46 L84,54 L96,66"/>
+        </g>
+      </svg>
       <div id="gs-loader-msg">${msg}</div>`;
     const s = document.createElement('style');
-    s.textContent = '@keyframes gs-spin{to{transform:rotate(360deg)}}';
+    s.textContent = `
+      @keyframes gs-swap{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
+      @keyframes gs-bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+      @keyframes gs-pedal{to{transform:rotate(360deg)}}
+      @keyframes gs-scene-run-k{0%,32%{opacity:1}33%,100%{opacity:0}}
+      @keyframes gs-scene-cycle-k{0%,32%{opacity:0}33%,65%{opacity:1}66%,100%{opacity:0}}
+      @keyframes gs-scene-swim-k{0%,65%{opacity:0}66%,99%{opacity:1}100%{opacity:0}}
+      .gs-scene{opacity:0}
+      .gs-scene-run{animation:gs-scene-run-k 6s steps(1) infinite}
+      .gs-scene-cycle{animation:gs-scene-cycle-k 6s steps(1) infinite}
+      .gs-scene-swim{animation:gs-scene-swim-k 6s steps(1) infinite}
+      .gs-frame-a{animation:gs-swap 0.7s steps(1) infinite}
+      .gs-frame-b{opacity:0;animation:gs-swap 0.7s steps(1) infinite reverse}
+      .gs-run-bob{animation:gs-bob 0.35s ease-in-out infinite alternate}
+      .gs-pedal-a,.gs-pedal-b{transform-origin:45px 70px;animation:gs-pedal 1s linear infinite}
+      .gs-pedal-b{animation-delay:-0.5s}
+    `;
     document.head.appendChild(s);
     document.body.appendChild(el);
   } else {
