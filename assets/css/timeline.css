@@ -72,6 +72,7 @@
   font-size:clamp(1.8rem,5vw,3.8rem);
   line-height:1.05;letter-spacing:-0.03em;
   color:var(--ac,var(--text));
+  filter:drop-shadow(0 0 60px var(--ac,transparent));
 }
 .tl-meta{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center}
 .tl-note{
