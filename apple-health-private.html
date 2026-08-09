@@ -50,7 +50,7 @@
   .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
   .chart-box h3 { font-size: 13px; margin: 0 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-  canvas { max-height: 240px; }
+  .chart-wrap { position: relative; height: 220px; }
   footer { margin-top: 50px; color: var(--muted); font-size: 12px; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 16px; }
   @media (max-width: 800px) { .chart-grid { grid-template-columns: 1fr; } }
 
@@ -98,16 +98,16 @@
 
     <h2>Trends over time</h2>
     <div class="chart-grid">
-      <div class="chart-box"><h3>Sleep — avg hours/night (monthly)</h3><canvas id="c_sleep"></canvas></div>
-      <div class="chart-box"><h3>Resting Heart Rate — bpm (monthly)</h3><canvas id="c_rhr"></canvas></div>
-      <div class="chart-box"><h3>HRV (SDNN) — ms (monthly)</h3><canvas id="c_hrv"></canvas></div>
-      <div class="chart-box"><h3>VO2 Max — ml/kg/min (monthly)</h3><canvas id="c_vo2"></canvas></div>
-      <div class="chart-box"><h3>Steps — avg/day (monthly)</h3><canvas id="c_steps"></canvas></div>
-      <div class="chart-box"><h3>Active Energy — kcal/day (monthly)</h3><canvas id="c_energy"></canvas></div>
-      <div class="chart-box"><h3>Exercise Minutes — min/day (monthly)</h3><canvas id="c_ex"></canvas></div>
-      <div class="chart-box"><h3>Heart Rate Recovery — 1 min, bpm (monthly)</h3><canvas id="c_recov"></canvas></div>
-      <div class="chart-box"><h3>Respiratory Rate — breaths/min (monthly)</h3><canvas id="c_resp"></canvas></div>
-      <div class="chart-box"><h3>Blood Oxygen — % (monthly)</h3><canvas id="c_spo2"></canvas></div>
+      <div class="chart-box"><h3>Sleep — avg hours/night (monthly)</h3><div class="chart-wrap"><canvas id="c_sleep"></canvas></div></div>
+      <div class="chart-box"><h3>Resting Heart Rate — bpm (monthly)</h3><div class="chart-wrap"><canvas id="c_rhr"></canvas></div></div>
+      <div class="chart-box"><h3>HRV (SDNN) — ms (monthly)</h3><div class="chart-wrap"><canvas id="c_hrv"></canvas></div></div>
+      <div class="chart-box"><h3>VO2 Max — ml/kg/min (monthly)</h3><div class="chart-wrap"><canvas id="c_vo2"></canvas></div></div>
+      <div class="chart-box"><h3>Steps — avg/day (monthly)</h3><div class="chart-wrap"><canvas id="c_steps"></canvas></div></div>
+      <div class="chart-box"><h3>Active Energy — kcal/day (monthly)</h3><div class="chart-wrap"><canvas id="c_energy"></canvas></div></div>
+      <div class="chart-box"><h3>Exercise Minutes — min/day (monthly)</h3><div class="chart-wrap"><canvas id="c_ex"></canvas></div></div>
+      <div class="chart-box"><h3>Heart Rate Recovery — 1 min, bpm (monthly)</h3><div class="chart-wrap"><canvas id="c_recov"></canvas></div></div>
+      <div class="chart-box"><h3>Respiratory Rate — breaths/min (monthly)</h3><div class="chart-wrap"><canvas id="c_resp"></canvas></div></div>
+      <div class="chart-box"><h3>Blood Oxygen — % (monthly)</h3><div class="chart-wrap"><canvas id="c_spo2"></canvas></div></div>
     </div>
 
     <footer id="footer">
@@ -276,13 +276,20 @@ function lineChart(id, obj, color) {
         backgroundColor: color + '22',
         borderWidth: 2,
         pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHitRadius: 20,
         tension: 0.3,
         fill: true,
       }]
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true, backgroundColor: '#1a1d27', borderColor: '#262a35', borderWidth: 1, titleColor: '#e8eaf0', bodyColor: '#e8eaf0' }
+      },
       scales: {
         x: { ticks: { color: '#9aa0ae', maxTicksLimit: 8, font: { size: 10 } }, grid: { color: '#262a35' } },
         y: { ticks: { color: '#9aa0ae', font: { size: 10 } }, grid: { color: '#262a35' } }
