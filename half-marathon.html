@@ -19,11 +19,22 @@
     .head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
 
     /* ── COUNTDOWN ── */
-    .countdown{display:flex;gap:0.5rem;margin-top:1.5rem;flex-wrap:wrap}
-    .cd-unit{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;min-width:64px;text-align:center}
-    .cd-val{font-family:'Fraunces',serif;font-weight:900;font-size:1.7rem;line-height:1;color:var(--plan);font-variant-numeric:tabular-nums}
-    .cd-lbl{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:0.25rem}
-    .cd-done{font-family:'Fraunces',serif;font-weight:900;font-size:1.3rem;color:var(--plan)}
+    .countdown-panel{position:relative;margin-top:1.75rem;padding:1.5rem clamp(1rem,4vw,2rem) 1.75rem;
+      border:1px solid var(--plan-dim);border-radius:14px;overflow:hidden;
+      background:radial-gradient(ellipse 130% 100% at 50% -10%, var(--plan-dim) 0%, var(--surface) 65%)}
+    .countdown-eyebrow{display:flex;align-items:center;gap:0.7rem;font-size:0.68rem;letter-spacing:0.22em;
+      text-transform:uppercase;color:var(--plan);margin-bottom:1.1rem;position:relative;z-index:1}
+    .countdown-eyebrow::after{content:'';flex:1;height:1px;background:var(--plan-dim)}
+    .countdown{display:flex;gap:clamp(0.3rem,2.5vw,1rem);flex-wrap:nowrap;position:relative;z-index:1}
+    .cd-unit{flex:1;min-width:0;text-align:center}
+    .cd-val{font-family:'Fraunces',serif;font-weight:900;line-height:1;color:var(--plan);
+      font-size:clamp(1.7rem,7.5vw,3.4rem);letter-spacing:-0.03em;font-variant-numeric:tabular-nums;
+      filter:drop-shadow(0 0 26px color-mix(in srgb, var(--plan) 55%, transparent))}
+    .cd-lbl{font-size:clamp(0.52rem,1.6vw,0.62rem);letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:0.45rem}
+    .cd-sec .cd-val{animation:cdPulse 1s ease-in-out infinite}
+    @keyframes cdPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+    @media(prefers-reduced-motion:reduce){.cd-sec .cd-val{animation:none}}
+    .cd-done{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.3rem,4vw,2rem);color:var(--plan);text-align:center;position:relative;z-index:1}
 
     .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0.5rem;max-width:820px;margin:1.5rem auto}
     .summary-chip{background:var(--surface);border:1px solid var(--border);padding:0.85rem 1rem;border-radius:6px;display:flex;flex-direction:column;gap:0.15rem}
@@ -83,7 +94,10 @@
         Add in Sheets
       </a>
     </div>
-    <div class="countdown" id="countdown"></div>
+    <div class="countdown-panel" id="countdown-panel" style="display:none">
+      <div class="countdown-eyebrow" id="countdown-eyebrow">🏅 Race day</div>
+      <div class="countdown" id="countdown"></div>
+    </div>
   </div>
 
   <div class="summary-strip" id="plan-sum"></div>
@@ -219,13 +233,16 @@ function buildTimeline(sorted) {
 ══════════════════════════════════════════════════════════ */
 function startCountdown(sorted) {
   if (countdownTimer) clearInterval(countdownTimer);
+  const panel = document.getElementById('countdown-panel');
   const withDates = sorted.filter(s => s.date);
   if (!withDates.length) {
-    document.getElementById('countdown').innerHTML = '';
+    panel.style.display = 'none';
     return;
   }
+  panel.style.display = '';
   const raceDay = withDates[withDates.length - 1].date;
   const target = new Date(raceDay + 'T00:00:00').getTime();
+  document.getElementById('countdown-eyebrow').textContent = `🏅 Race day — ${fmtFull(raceDay)}`;
 
   function tick() {
     const el = document.getElementById('countdown');
@@ -243,7 +260,7 @@ function startCountdown(sorted) {
     const secs  = sec % 60;
     el.innerHTML = [
       [weeks, 'Weeks'], [days, 'Days'], [hours, 'Hours'], [mins, 'Min'], [secs, 'Sec']
-    ].map(([v, l]) => `<div class="cd-unit"><div class="cd-val">${String(v).padStart(2,'0')}</div><div class="cd-lbl">${l}</div></div>`).join('');
+    ].map(([v, l], i) => `<div class="cd-unit${i===4?' cd-sec':''}"><div class="cd-val">${String(v).padStart(2,'0')}</div><div class="cd-lbl">${l}</div></div>`).join('');
   }
   tick();
   countdownTimer = setInterval(tick, 1000);
@@ -256,7 +273,7 @@ function render() {
   if (!PLAN.length) {
     sumEl.innerHTML = '';
     document.getElementById('plan-tv').innerHTML = '';
-    document.getElementById('countdown').innerHTML = '';
+    document.getElementById('countdown-panel').style.display = 'none';
     bodyEl.innerHTML = `<p class="empty-st">No plan yet — paste the 14-week schedule into the <strong>Plan</strong> tab in Google Sheets.</p>`;
     return;
   }
