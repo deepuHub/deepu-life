@@ -1,46 +1,49 @@
-# deepu-life 🏃📚🌱🚴
+# deepu-life 🏃📚🚴
 
-> Deepu's personal life tracker — Running · Reading · Hydroponics · Cycling
+> Deepu's personal life tracker & family dashboard
 
 **Live at:** https://deepuhub.github.io/deepu-life
 
 ---
 
-## What it tracks
+## Pages
 
-| Tab | What you log | Auto-calculated |
-|-----|-------------|------------------|
-| 🏃 Run | Date, distance (mi), duration, notes | Pace (min/mile) |
-| 📚 Read | Title, author, category, status, quotes | Books finished / reading / planned |
-| 🌱 Grow | Plant, start date, hydro system, status, notes | Days growing |
-| 🚴 Cycle | Date, distance (km), duration, route, notes | Pace (min/km), total km |
+| Page | What it is | Access |
+|---|---|---|
+| 🏃 Tracker (`index.html`) | Run / Read / Cycle logs, hero stats, cinematic timeline | Public |
+| ✅ To-Do (`todo.html`) | Checklists, local-only storage | Public |
+| 💬 Quotes (`quotes.html`) | Saved quotes, reads from a Sheet | Public |
+| 🏫 School (`2026_school.html`) | School timings, food timetable, exam countdown | Public |
+| 🏅 Half Marathon (`half-marathon.html`) | Training plan with live race-day countdown | Public |
+| 🎒 Kid (`kid-private.html`) | Report cards by grade/term, chip navigation | Private — Google Sign-In |
+| 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
+| 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
+
+Private pages render nothing until Google authenticates the one account with access to that page's Sheet — enforced by Google, not by the page.
 
 ---
 
 ## How it works
 
-Data lives in **Google Sheets** — add a row in the sheet, reload the site, it appears.
+**Public tracker** — one shared Google Sheet + one Apps Script web app (`AppScript.gs`), read by `index.html`, `quotes.html`, and `half-marathon.html`:
 
 ```
-Google Sheets → Apps Script Web App → deepu-life site
-  (you edit)       (read-only API)       (displays it)
+Google Sheets  →  Apps Script Web App (doGet)  →  site fetches JSON
 ```
 
-No forms in the app. No localStorage. No data loss. Works from any device.
+**Private pages** — each has its own private Google Sheet (Restricted sharing) with no public web app. The page itself uses Google Identity Services (OAuth) to get an access token for the signed-in user, then reads the Sheet directly via the Sheets API. Each private Sheet also has its own Apps Script for auto-computed fields (e.g. Health's trend flags) — those scripts are bound to the Sheet itself and are not part of this repo, since they're personal.
+
+No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, reload the page, it appears.
 
 ---
 
 ## Features
 
-- **Cinematic timeline** — full-screen slide view per tab, draggable scrubber, keyboard navigation (← →), touch swipe
-- **List view** — sortable table on desktop, card layout on mobile
-- **Quotes modal** — stored in Sheets, opens on click
-- **Live sync status** — green dot in nav shows last sync time
-- **"Add in Sheets" button** — deep-links directly to the right tab in your Sheet
-- **Hero stats** — total miles, books finished, plants growing, total km cycled, live from Sheets
-- Fully responsive — mobile, tablet, desktop
+- **Cinematic timeline** — full-screen slide view, draggable scrubber, keyboard nav, touch swipe (shared across Tracker and Half Marathon)
+- **Light / dark mode** — toggle in the nav, persisted, applied before first paint
+- **Mobile nav** — pill row on desktop collapses into a hamburger drawer below 860px, grouped into Public / 🔒 Private
+- **Chip navigation** — Kid and BEd Results pages navigate by Grade/Term or Semester via pill chips instead of one long page
 - Zero npm, zero build step — pure HTML/CSS/JS
-- Google Analytics UA-139981219-1
 
 ---
 
@@ -48,14 +51,23 @@ No forms in the app. No localStorage. No data loss. Works from any device.
 
 ```
 deepu-life/
-├── index.html            ← the tracker app (HTML + CSS + JS)
-├── todo.html             ← to-do list
-├── quotes.html           ← saved quotes, reads from a Sheet
-├── 2026_school.html      ← school timings & food timetable
-├── health_dashboard.html ← personal health metrics
-├── AppScript.gs          ← paste into Google Apps Script
-├── _config.yml           ← GitHub Pages config
-├── .nojekyll             ← disables Jekyll processing (site is plain HTML)
-├── README.md
-└── SETUP.md              ← setup guide
+├── index.html              ← tracker app (Run/Read/Cycle)
+├── todo.html                ← to-do list
+├── quotes.html               ← saved quotes, reads from a Sheet
+├── 2026_school.html          ← school timings & food timetable (standalone theme)
+├── half-marathon.html        ← training plan + race countdown
+├── health-private.html       ← private health dashboard (Google Sign-In)
+├── kid-private.html          ← private report-card dashboard (Google Sign-In)
+├── results-private.html      ← private BEd results dashboard (Google Sign-In)
+├── assets/
+│   ├── css/
+│   │   ├── tracker-theme.css ← shared design tokens, nav, light/dark palette
+│   │   └── timeline.css      ← shared cinematic timeline styles
+│   └── js/
+│       ├── theme.js          ← light/dark toggle
+│       ├── nav.js            ← mobile hamburger drawer
+│       └── timeline.js       ← shared cinematic timeline engine
+├── AppScript.gs               ← paste into the public tracker's Apps Script
+├── .nojekyll                  ← disables Jekyll processing (site is plain HTML)
+└── README.md
 ```
