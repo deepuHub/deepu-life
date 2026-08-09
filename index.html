@@ -193,8 +193,33 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
       <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
     </div>
     <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
   </div>
 </nav>
+<div class="nav-drawer-backdrop"></div>
+<div class="nav-drawer">
+  <div class="nav-drawer-inner">
+    <div class="nav-drawer-group">
+      <div class="nav-drawer-label">Public</div>
+      <div class="nav-drawer-list">
+        <button class="nav-pill" data-tab="run" onclick="showTab('run')">🏃 Run</button>
+        <button class="nav-pill" data-tab="read" onclick="showTab('read')">📚 Read</button>
+        <button class="nav-pill" data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
+        <a href="todo.html" class="nav-pill">✅ To-Do</a>
+        <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+        <a href="2026_school.html" class="nav-pill">🏫 School</a>
+        <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+      </div>
+    </div>
+    <div class="nav-drawer-group">
+      <div class="nav-drawer-label">🔒 Private</div>
+      <div class="nav-drawer-list">
+        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
+        <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -286,6 +311,7 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
 </footer>
 
 <script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
 <script src="assets/js/timeline.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════
@@ -433,7 +459,7 @@ function showTab(tab) {
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   tlSetActiveTab(tab);
   window.scrollTo({ top: document.querySelector('.hero').offsetHeight, behavior:'smooth' });
 }

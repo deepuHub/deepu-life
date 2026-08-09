@@ -99,6 +99,36 @@ nav{
 .nav-pill:hover{border-color:var(--muted);color:var(--text)}
 .nav-pill.active,.nav-pill[aria-current="page"]{background:var(--run-dim);border-color:var(--run);color:var(--run)}
 
+/* ═══ MOBILE NAV — hamburger + drawer replaces the pill row below the breakpoint ═══ */
+.nav-toggle{
+  display:none;width:36px;height:36px;flex-shrink:0;border-radius:8px;
+  border:1px solid var(--border);background:transparent;color:var(--text);
+  cursor:pointer;font-size:1.1rem;align-items:center;justify-content:center;
+  transition:all 0.2s;-webkit-tap-highlight-color:transparent;
+}
+.nav-toggle:hover{border-color:var(--run);color:var(--run)}
+.nav-drawer-backdrop{position:fixed;inset:0;z-index:298;background:rgba(0,0,0,0.3);opacity:0;pointer-events:none;transition:opacity 0.2s}
+.nav-drawer-backdrop.open{opacity:1;pointer-events:auto}
+.nav-drawer{
+  display:none;position:fixed;top:var(--nav-h);left:0;right:0;z-index:299;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  max-height:0;overflow:hidden;transition:max-height 0.25s ease;
+  box-shadow:0 12px 24px rgba(0,0,0,0.25);
+}
+.nav-drawer.open{max-height:80vh;overflow-y:auto}
+.nav-drawer-inner{padding:1rem calc(var(--pad) + var(--safe-r)) 1.25rem calc(var(--pad) + var(--safe-l))}
+.nav-drawer-group{margin-bottom:1rem}
+.nav-drawer-group:last-child{margin-bottom:0}
+.nav-drawer-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem}
+.nav-drawer-list{display:flex;flex-direction:column;gap:0.35rem}
+.nav-drawer .nav-pill{width:100%;justify-content:flex-start}
+
+@media(max-width:860px){
+  .nav-pills{display:none}
+  .nav-toggle{display:flex}
+  .nav-drawer{display:block}
+}
+
 /* ═══ STATUS BADGES — shared by Cycle rides, the Half Marathon plan, etc. ═══ */
 .badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:999px;font-size:0.67rem;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
 .b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}
