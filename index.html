@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#0a0f0d"/>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox=%220%200%2032%2032%22%3E%3Crect%20width=%2232%22%20height=%2232%22%20rx=%226%22%20fill=%22%230a0f0d%22%2F%3E%3Ctext%20x=%2216%22%20y=%2223%22%20font-family=%22Georgia%2Cserif%22%20font-weight=%22900%22%20font-size=%2222%22%20text-anchor=%22middle%22%20fill=%22%23c8f04a%22%3Ed%3C%2Ftext%3E%3Ccircle%20cx=%2226%22%20cy=%2226%22%20r=%223%22%20fill=%22%23c8f04a%22%2F%3E%3C%2Fsvg%3E"/>
@@ -179,15 +180,18 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="#">deepu<span>-life</span></a>
-  <div class="nav-pills">
-    <button class="nav-pill active" data-tab="run"  onclick="showTab('run')">🏃 Run</button>
-    <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
-    <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
-    <a href="todo.html" class="nav-pill">✅ To-Do</a>
-    <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-    <a href="2026_school.html" class="nav-pill">🏫 School</a>
-    <a href="health-private.html" class="nav-pill">🩺 Health</a>
-    <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+  <div class="nav-right">
+    <div class="nav-pills">
+      <button class="nav-pill active" data-tab="run"  onclick="showTab('run')">🏃 Run</button>
+      <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
+      <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
+      <a href="todo.html" class="nav-pill">✅ To-Do</a>
+      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+      <a href="2026_school.html" class="nav-pill">🏫 School</a>
+      <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
   </div>
 </nav>
 
@@ -280,6 +284,7 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
   </div>
 </footer>
 
+<script src="assets/js/theme.js"></script>
 <script src="assets/js/timeline.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════

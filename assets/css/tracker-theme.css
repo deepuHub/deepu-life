@@ -25,6 +25,7 @@
   --warning:var(--read);--warning-dim:var(--read-dim);
   --success:var(--grow);--success-dim:var(--grow-dim);
   --danger:#ef4444;--danger-dim:#2e0a0a;
+  --info:#8888ff;--info-dim:#1a1a2a;
 
   /* layout */
   --pad:clamp(1rem,5vw,4rem);--nav-h:60px;
@@ -34,11 +35,31 @@
 }
 @media(max-width:480px){:root{--nav-h:56px}}
 
+/* ═══ LIGHT MODE — toggled via data-theme on <html>, same convention
+   2026_school.html already uses. Dark stays the default look. ═══ */
+:root[data-theme="light"]{
+  --bg:#f7f8f5;--surface:#ffffff;--surface2:#eef1ea;--border:#dde2d5;
+  --text:#14201a;--muted:#5c6b5e;--muted2:#93a091;
+
+  --run:#5c8a1a;--run-dim:#e3f0c8;
+  --read:#b5720f;--read-dim:#fbe8cf;
+  --grow:#1f9174;--grow-dim:#d7f2ea;
+  --cycle:#7458d1;--cycle-dim:#ece5fb;
+  --plan:#a67d0a;--plan-dim:#f7ecc9;
+
+  --accent:var(--run);--accent-dim:var(--run-dim);
+  --warning:var(--read);--warning-dim:var(--read-dim);
+  --success:var(--grow);--success-dim:var(--grow-dim);
+  --danger:#c53030;--danger-dim:#fbdede;
+  --info:#5548b8;--info-dim:#e7e4f9;
+}
+
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   background:var(--bg);color:var(--text);
   font-family:'Epilogue',sans-serif;font-weight:300;
   min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  transition:background 0.2s,color 0.2s;
 }
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -51,9 +72,18 @@ nav{
   position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
   display:flex;justify-content:space-between;align-items:center;
   padding:0 calc(var(--pad) + var(--safe-r)) 0 calc(var(--pad) + var(--safe-l));
-  background:rgba(10,15,13,0.94);border-bottom:1px solid var(--border);
+  background:color-mix(in srgb, var(--bg) 94%, transparent);border-bottom:1px solid var(--border);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transition:background 0.2s;
 }
+.nav-right{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
+.theme-toggle{
+  width:34px;height:34px;flex-shrink:0;border-radius:50%;
+  border:1px solid var(--border);background:transparent;color:var(--muted);
+  cursor:pointer;font-size:0.95rem;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;-webkit-tap-highlight-color:transparent;
+}
+.theme-toggle:hover{border-color:var(--run);color:var(--run)}
 .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(0.9rem,3vw,1.15rem);color:var(--text);text-decoration:none;flex-shrink:0}
 .nav-logo span{color:var(--run)}
 .nav-pills{display:flex;gap:0.3rem;overflow-x:auto;scrollbar-width:none;padding:0.2rem 0 0.2rem 0.5rem;align-items:center}
@@ -72,5 +102,5 @@ nav{
 /* ═══ STATUS BADGES — shared by Cycle rides, the Half Marathon plan, etc. ═══ */
 .badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:999px;font-size:0.67rem;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
 .b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}
-.b-done{background:#1a2a1a;color:#4acfa8}.b-prog{background:#2a2005;color:#f0a83c}.b-plan{background:#1a1a2a;color:#8888ff}
-.b-fail{background:#2a0a0a;color:#ff8080}.b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.b-done{background:var(--success-dim);color:var(--success)}.b-prog{background:var(--warning-dim);color:var(--warning)}.b-plan{background:var(--info-dim);color:var(--info)}
+.b-fail{background:var(--danger-dim);color:var(--danger)}.b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}

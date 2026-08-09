@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#0a0f0d"/>
 <title>Health — deepu-life</title>
@@ -85,13 +86,16 @@
 
 <nav>
   <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
-  <div class="nav-pills">
-    <a href="index.html" class="nav-pill">🏃 Tracker</a>
-    <a href="todo.html" class="nav-pill">✅ To-Do</a>
-    <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-    <a href="2026_school.html" class="nav-pill">🏫 School</a>
-    <a href="health-private.html" class="nav-pill active" aria-current="page">🩺 Health</a>
-    <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+  <div class="nav-right">
+    <div class="nav-pills">
+      <a href="index.html" class="nav-pill">🏃 Tracker</a>
+      <a href="todo.html" class="nav-pill">✅ To-Do</a>
+      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+      <a href="2026_school.html" class="nav-pill">🏫 School</a>
+      <a href="health-private.html" class="nav-pill active" aria-current="page">🩺 Health</a>
+      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
   </div>
 </nav>
 
@@ -139,6 +143,7 @@
 
 </div>
 
+<script src="assets/js/theme.js"></script>
 <script src="https://accounts.google.com/gsi/client"></script>
 <script>
 /* ══════════════════════════════════════════════════════════

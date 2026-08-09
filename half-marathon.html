@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#0a0f0d"/>
   <title>Half Marathon — deepu-life</title>
@@ -46,8 +47,8 @@
     .week-hd{font-family:'Fraunces',serif;font-weight:700;font-size:0.95rem;margin-bottom:0.7rem;color:var(--plan)}
     .session{display:flex;gap:0.7rem;align-items:baseline;flex-wrap:wrap;padding:0.5rem 0 0.5rem 0.7rem;border-top:1px solid var(--border);border-left:3px solid var(--border);transition:border-color 0.2s}
     .session:first-of-type{border-top:none}
-    .session.is-done{border-left-color:#4acfa8}
-    .session.is-skipped{border-left-color:#ff8080}
+    .session.is-done{border-left-color:var(--success)}
+    .session.is-skipped{border-left-color:var(--danger)}
     .session.is-planned{border-left-color:var(--border)}
     .s-daydate{width:4.2rem;flex-shrink:0;display:flex;flex-direction:column;gap:0.05rem}
     .s-day{color:var(--muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em}
@@ -62,21 +63,24 @@
     .sheets-btn:hover{background:var(--plan);color:#0a0f0d}
     .sync-badge{font-size:0.63rem;color:var(--muted);letter-spacing:0.06em;display:flex;align-items:center;gap:0.35rem;margin-top:0.5rem}
     .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-    .sync-dot.ok{background:#4acfa8;box-shadow:0 0 6px #4acfa8}
-    .sync-dot.err{background:#ff8080}
+    .sync-dot.ok{background:var(--success);box-shadow:0 0 6px var(--success)}
+    .sync-dot.err{background:var(--danger)}
   </style>
 </head>
 <body>
 
 <nav>
   <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
-  <div class="nav-pills">
-    <a href="index.html" class="nav-pill">🏃 Tracker</a>
-    <a href="todo.html" class="nav-pill">✅ To-Do</a>
-    <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-    <a href="2026_school.html" class="nav-pill">🏫 School</a>
-    <a href="health-private.html" class="nav-pill">🩺 Health</a>
-    <a href="half-marathon.html" class="nav-pill active" aria-current="page">🏅 Half Marathon</a>
+  <div class="nav-right">
+    <div class="nav-pills">
+      <a href="index.html" class="nav-pill">🏃 Tracker</a>
+      <a href="todo.html" class="nav-pill">✅ To-Do</a>
+      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+      <a href="2026_school.html" class="nav-pill">🏫 School</a>
+      <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      <a href="half-marathon.html" class="nav-pill active" aria-current="page">🏅 Half Marathon</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
   </div>
 </nav>
 
@@ -108,6 +112,7 @@
   </div>
 </div>
 
+<script src="assets/js/theme.js"></script>
 <script src="assets/js/timeline.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════
@@ -286,8 +291,8 @@ function render() {
 
   sumEl.innerHTML = `
     <div class="summary-chip"><span class="chip-lbl">Sessions</span><span class="chip-val">${PLAN.length}</span></div>
-    <div class="summary-chip"><span class="chip-lbl">Done</span><span class="chip-val" style="color:#4acfa8">${done}</span></div>
-    <div class="summary-chip"><span class="chip-lbl">Skipped</span><span class="chip-val" style="color:#ff8080">${skipped}</span></div>
+    <div class="summary-chip"><span class="chip-lbl">Done</span><span class="chip-val" style="color:var(--success)">${done}</span></div>
+    <div class="summary-chip"><span class="chip-lbl">Skipped</span><span class="chip-val" style="color:var(--danger)">${skipped}</span></div>
     <div class="summary-chip"><span class="chip-lbl">Upcoming</span><span class="chip-val">${upcoming}</span></div>
   `;
 
