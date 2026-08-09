@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0a0f0d"/>
+<title>Health — deepu-life</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<style>
+  :root{
+    --card: var(--surface2);
+    --hgreen:#2dd4a0; --hamber:#f0a532; --hred:#f0545c; --hblue:#4f8ef7;
+  }
+  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 3rem;max-width:1000px;margin:0 auto}
+
+  /* ── Sign-in gate ── */
+  .gate{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;text-align:center}
+  .gate-icon{font-size:2.5rem}
+  .gate h1{font-family:'Fraunces',serif;font-weight:900;font-size:1.8rem}
+  .gate p{color:var(--muted);max-width:380px;font-size:0.9rem;line-height:1.6}
+  .btn-signin{display:inline-flex;align-items:center;gap:0.6rem;padding:0.7rem 1.4rem;border-radius:999px;
+    background:var(--hblue);color:#fff;border:none;font-weight:600;font-size:0.9rem;cursor:pointer;transition:opacity 0.2s}
+  .btn-signin:hover{opacity:0.85}
+  .gate-error{color:var(--hred);font-size:0.82rem;max-width:380px}
+
+  /* ── App shell ── */
+  #app{display:none}
+  .page-head{margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+  .page-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem}
+  .page-meta{display:flex;gap:1.25rem;margin-top:0.6rem;flex-wrap:wrap;font-size:0.78rem;color:var(--muted)}
+  .page-meta strong{color:var(--text)}
+
+  section{margin-bottom:2.5rem}
+  .sec-title{font-size:0.95rem;font-weight:600;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem}
+  .card-label{font-size:0.68rem;color:var(--muted);margin-bottom:0.25rem}
+  .card-val{font-size:1.25rem;font-weight:600}
+  .card-sub{font-size:0.68rem;color:var(--muted);margin-top:0.2rem}
+  .card.ok .card-val{color:var(--hgreen)}
+  .card.warn .card-val{color:var(--hamber)}
+  .card.bad .card-val{color:var(--hred)}
+
+  .flags{display:flex;flex-direction:column;gap:0.5rem}
+  .flag{padding:0.75rem 1rem;border-radius:8px;border-left:3px solid}
+  .flag.red{background:rgba(240,84,92,.08);border-color:var(--hred)}
+  .flag.amber{background:rgba(240,165,50,.08);border-color:var(--hamber)}
+  .flag.green{background:rgba(45,212,160,.08);border-color:var(--hgreen)}
+  .flag-title{font-size:0.82rem;font-weight:500;margin-bottom:0.2rem}
+  .flag-body{font-size:0.76rem;color:var(--muted);line-height:1.55}
+  .flag-src{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted2,var(--muted));margin-left:0.4rem}
+
+  .panel-block{margin-bottom:1.75rem}
+  .panel-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.6rem}
+  .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0.85rem;margin-bottom:0.85rem}
+  .chart-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem}
+  .chart-box-title{font-size:0.7rem;color:var(--muted);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.03em}
+  .chart-wrap{position:relative;height:150px}
+
+  table.data-table{width:100%;border-collapse:collapse;font-size:0.76rem}
+  .data-table th{text-align:left;padding:0.4rem 0.6rem;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);font-size:0.65rem;text-transform:uppercase}
+  .data-table td{padding:0.4rem 0.6rem;border-bottom:1px solid var(--border)}
+  .data-table tr:last-child td{border-bottom:none}
+
+  .timeline{display:flex;flex-direction:column}
+  .tl-item{display:flex;gap:0.85rem}
+  .tl-left{display:flex;flex-direction:column;align-items:center;width:22px;flex-shrink:0}
+  .tl-dot{width:9px;height:9px;border-radius:50%;background:var(--hblue);margin-top:4px;flex-shrink:0}
+  .tl-line{flex:1;width:1px;background:var(--border);margin:2px 0}
+  .tl-item:last-child .tl-line{display:none}
+  .tl-content{padding-bottom:1rem;flex:1}
+  .tl-when{font-size:0.65rem;font-weight:600;color:var(--hblue);text-transform:uppercase;letter-spacing:0.05em}
+  .tl-title2{font-size:0.82rem;font-weight:500;margin:0.15rem 0}
+  .tl-body{font-size:0.75rem;color:var(--muted);line-height:1.55}
+
+  .empty-st{color:var(--muted);font-size:0.85rem;padding:1rem 0}
+  footer.disclaimer{padding-top:1.5rem;border-top:1px solid var(--border);font-size:0.7rem;color:var(--muted);line-height:1.7}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
+  <div class="nav-pills">
+    <a href="index.html" class="nav-pill">🏃 Tracker</a>
+    <a href="todo.html" class="nav-pill">✅ To-Do</a>
+    <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+    <a href="2026_school.html" class="nav-pill">🏫 School</a>
+    <a href="health-private.html" class="nav-pill active" aria-current="page">🩺 Health</a>
+    <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h1>Private health record</h1>
+    <p>This page reads directly from a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <div id="app">
+    <div class="page-head">
+      <div class="page-title">Health Record</div>
+      <div class="page-meta" id="page-meta"></div>
+    </div>
+
+    <section id="sec-vitals">
+      <div class="sec-title">Latest Vitals</div>
+      <div class="cards" id="vitals-cards"></div>
+    </section>
+
+    <section id="sec-flags">
+      <div class="sec-title">Health Flags</div>
+      <div class="flags" id="flags-list"></div>
+    </section>
+
+    <section id="sec-panels">
+      <div class="sec-title">Lab Results by Panel</div>
+      <div id="panels-body"></div>
+    </section>
+
+    <section id="sec-plan">
+      <div class="sec-title">Action Plan</div>
+      <div class="timeline" id="plan-timeline"></div>
+    </section>
+
+    <footer class="disclaimer" id="disclaimer"></footer>
+  </div>
+
+</div>
+
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG — fill these in after completing the Cloud Console
+   setup (OAuth Client ID + Spreadsheet ID).
+══════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1FFfKmYaraxyTjWe-E0ts325uqvOuCuZCJ3sBItzu1u0';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+const DB = { profile:[], metrics:[], readings:[], flags:[], actionPlan:[] };
+let tokenClient, accessToken = null;
+let charts = [];
+
+function initAuth() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (resp) => {
+      if (resp.error) { showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  document.getElementById('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+function showGateError(msg) { document.getElementById('gate-error').textContent = msg; }
+
+async function onSignedIn() {
+  try {
+    await loadData();
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    render();
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+function rowsToObjects(rows) {
+  if (!rows || !rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = row[i] !== undefined ? row[i] : '');
+    return obj;
+  });
+}
+
+async function loadData() {
+  const sheetNames = ['Profile','Metrics','Readings','Flags','Action Plan'];
+  const qs = sheetNames.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Health sheet.');
+  if (!res.ok) throw new Error(`Could not load sheet (HTTP ${res.status})`);
+  const data = await res.json();
+  const [profile, metrics, readings, flags, actionPlan] = data.valueRanges.map(vr => rowsToObjects(vr.values));
+  DB.profile = profile; DB.metrics = metrics; DB.readings = readings; DB.flags = flags; DB.actionPlan = actionPlan;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════ */
+function render() {
+  charts.forEach(c => c.destroy());
+  charts = [];
+  renderProfile();
+  renderVitals();
+  renderFlags();
+  renderPanels();
+  renderActionPlan();
+}
+
+function profileVal(field) {
+  const row = DB.profile.find(p => p.Field === field);
+  return row ? row.Value : '';
+}
+function renderProfile() {
+  document.getElementById('page-meta').innerHTML = `
+    <span>Blood: <strong>${profileVal('Blood Group')}</strong></span>
+    <span>Reports: <strong>${profileVal('Reports')}</strong></span>
+    <span>ECGs: <strong>${profileVal('ECGs')}</strong></span>
+  `;
+  document.getElementById('disclaimer').textContent = profileVal('Disclaimer');
+}
+
+const VITAL_METRICS = ['Height','Weight','BMI','BP Systolic','BP Diastolic','Pulse Clinical','Vision Both Eyes','Hearing','Overall Fitness'];
+function latestReading(metric) {
+  const rows = DB.readings.filter(r => r.Metric === metric).sort((a,b) => a.Date < b.Date ? -1 : 1);
+  return rows.length ? rows[rows.length-1] : null;
+}
+function metricCfg(metric) { return DB.metrics.find(m => m.Metric === metric); }
+function statusClass(metric, value) {
+  const cfg = metricCfg(metric);
+  if (!cfg) return '';
+  const num = Number(value);
+  if (isNaN(num)) return 'ok';
+  const min = cfg.Min === '' ? null : Number(cfg.Min);
+  const max = cfg.Max === '' ? null : Number(cfg.Max);
+  if ((min !== null && num < min) || (max !== null && num > max)) return 'bad';
+  return 'ok';
+}
+function renderVitals() {
+  const el = document.getElementById('vitals-cards');
+  const cards = VITAL_METRICS.map(m => {
+    const r = latestReading(m);
+    if (!r) return '';
+    const cfg = metricCfg(m) || {};
+    return `<div class="card ${statusClass(m, r.Value)}">
+      <div class="card-label">${m}</div>
+      <div class="card-val">${r.Value}${cfg.Unit && cfg.Unit !== 'qualitative' ? ' ' + cfg.Unit : ''}</div>
+      <div class="card-sub">${r.Date}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = cards || `<p class="empty-st">No vitals yet.</p>`;
+}
+
+function renderFlags() {
+  const el = document.getElementById('flags-list');
+  const order = { Red: 0, Amber: 1, Green: 2 };
+  const sorted = [...DB.flags].sort((a,b) => (order[a.Severity] ?? 9) - (order[b.Severity] ?? 9));
+  const icon = { Red: '🔴', Amber: '🟡', Green: '✅' };
+  const cls = { Red: 'red', Amber: 'amber', Green: 'green' };
+  el.innerHTML = sorted.map(f => `
+    <div class="flag ${cls[f.Severity] || ''}">
+      <div class="flag-title">${icon[f.Severity] || ''} ${f.Title}<span class="flag-src">${f.Source || ''}</span></div>
+      <div class="flag-body">${f.Body}</div>
+    </div>`).join('') || `<p class="empty-st">No flags yet.</p>`;
+}
+
+function renderPanels() {
+  const panels = [...new Set(DB.metrics.map(m => m.Panel).filter(Boolean))];
+  const el = document.getElementById('panels-body');
+  el.innerHTML = panels.map(p => `
+    <div class="panel-block">
+      <div class="panel-title">${p}</div>
+      <div class="chart-grid" id="charts-${slug(p)}"></div>
+      <div style="overflow-x:auto"><table class="data-table" id="table-${slug(p)}"></table></div>
+    </div>`).join('');
+
+  panels.forEach(p => buildPanel(p));
+}
+
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
+
+function buildPanel(panel) {
+  const metricsInPanel = DB.metrics.filter(m => m.Panel === panel);
+  const dateSet = new Set();
+  const seriesByMetric = {};
+  metricsInPanel.forEach(m => {
+    const rows = DB.readings.filter(r => r.Metric === m.Metric).sort((a,b) => a.Date < b.Date ? -1 : 1);
+    seriesByMetric[m.Metric] = rows;
+    rows.forEach(r => dateSet.add(r.Date));
+  });
+  const dates = [...dateSet].sort();
+
+  // charts: one per metric with 2+ numeric points
+  const chartHost = document.getElementById(`charts-${slug(panel)}`);
+  metricsInPanel.forEach(m => {
+    const rows = seriesByMetric[m.Metric] || [];
+    const numericVals = rows.map(r => Number(r.Value)).filter(v => !isNaN(v));
+    if (numericVals.length < 2) return;
+    const box = document.createElement('div');
+    box.className = 'chart-box';
+    const canvasId = `c-${slug(panel)}-${slug(m.Metric)}`;
+    box.innerHTML = `<div class="chart-box-title">${m.Metric}${m.Unit ? ' ('+m.Unit+')' : ''}</div><div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>`;
+    chartHost.appendChild(box);
+    const labels = rows.filter(r => !isNaN(Number(r.Value))).map(r => r.Date);
+    const chart = new Chart(document.getElementById(canvasId), {
+      type: 'line',
+      data: { labels, datasets: [{ data: numericVals, borderColor: '#4f8ef7', backgroundColor: '#4f8ef722', tension: 0.3, pointRadius: 4, fill: false }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{color:'rgba(255,255,255,.05)'}},y:{grid:{color:'rgba(255,255,255,.05)'}}} }
+    });
+    charts.push(chart);
+  });
+
+  // table: metric rows x date columns
+  const table = document.getElementById(`table-${slug(panel)}`);
+  const refCol = metricsInPanel.some(m => m.Min || m.Max) ? '<th>Ref</th>' : '';
+  table.innerHTML = `<tr><th>Marker</th>${dates.map(d => `<th>${d}</th>`).join('')}${refCol}</tr>` +
+    metricsInPanel.map(m => {
+      const byDate = {};
+      (seriesByMetric[m.Metric] || []).forEach(r => byDate[r.Date] = r.Value);
+      const ref = (m.Min || m.Max) ? `${m.Min || '—'} – ${m.Max || '—'}` : '';
+      return `<tr><td>${m.Metric}${m.Unit ? ' ('+m.Unit+')' : ''}</td>${dates.map(d => `<td>${byDate[d] ?? '—'}</td>`).join('')}${refCol ? `<td>${ref}</td>` : ''}</tr>`;
+    }).join('');
+}
+
+function renderActionPlan() {
+  const el = document.getElementById('plan-timeline');
+  el.innerHTML = DB.actionPlan.map(a => `
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-when">${a.TargetDate}${a.Status ? ' · ' + a.Status : ''}</div>
+        <div class="tl-title2">${a.Action}</div>
+        <div class="tl-body">${a.Reason}</div>
+      </div>
+    </div>`).join('') || `<p class="empty-st">No action items yet.</p>`;
+}
+
+initAuth();
+</script>
+</body>
+</html>
