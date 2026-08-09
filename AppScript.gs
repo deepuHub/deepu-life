@@ -9,6 +9,8 @@
  *   Books → id | title | author | cat | status | added | quotes
  *   Plants → id | name | date | system | status | note
  *   Rides → id | week | date | type | duration | zone | note | dist | status
+ *   Plan  → id | week | day | type | target | status | date | note
+ *           (status: planned/done/skipped — used by half-marathon.html)
  */
 // ─── CORS / response helper ───────────────────────────────────────────────────
 function respond(data) {
@@ -25,6 +27,7 @@ function doGet(e) {
       books:   sheetToObjects(ss.getSheetByName('Books')),
       plants:  sheetToObjects(ss.getSheetByName('Plants')),
       cycling: sheetToObjects(ss.getSheetByName('Rides'), { cleanRide: true }),
+      plan:    sheetToObjects(ss.getSheetByName('Plan')),
     });
   } catch (err) {
     return respond({ error: err.message });
@@ -80,6 +83,7 @@ function setupSheets() {
     'Books':  ['id','title','author','cat','status','added','quotes'],
     'Plants': ['id','name','date','system','status','note'],
     'Rides':  ['id','week','date','type','duration','zone','note','dist','status'],
+    'Plan':   ['id','week','day','type','target','status','date','note'],
   };
   Object.entries(tabDefs).forEach(([name, headers]) => {
     let sheet = ss.getSheetByName(name);

@@ -18,6 +18,7 @@
   --read:#f0a83c;--read-dim:#3a2808;
   --grow:#4acfa8;--grow-dim:#0a2e26;
   --cycle:#a78bfa;--cycle-dim:#1e1535;
+  --plan:#f0c94a;--plan-dim:#3a3008;
 
   /* semantic aliases — used by todo.html's priority/status colors */
   --accent:var(--run);--accent-dim:var(--run-dim);
@@ -67,3 +68,9 @@ nav{
 }
 .nav-pill:hover{border-color:var(--muted);color:var(--text)}
 .nav-pill.active,.nav-pill[aria-current="page"]{background:var(--run-dim);border-color:var(--run);color:var(--run)}
+
+/* ═══ STATUS BADGES — shared by Cycle rides, the Half Marathon plan, etc. ═══ */
+.badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:999px;font-size:0.67rem;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
+.b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}
+.b-done{background:#1a2a1a;color:#4acfa8}.b-prog{background:#2a2005;color:#f0a83c}.b-plan{background:#1a1a2a;color:#8888ff}
+.b-fail{background:#2a0a0a;color:#ff8080}.b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}

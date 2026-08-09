@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <link rel="stylesheet" href="assets/css/timeline.css">
   <style>
 /* ═══════════════════════ TABS (page-specific tab coloring) ═══════ */
 .nav-pill[data-tab="run"].active{background:var(--run-dim);border-color:var(--run);color:var(--run)}
@@ -18,7 +19,7 @@
 
 /* ═══════════════════════ HERO ═════════════════════════════ */
 .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h)+3rem) var(--pad) 3rem;border-bottom:1px solid var(--border)}
-.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
+.hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
 .hero-cell{background:var(--surface);padding:clamp(0.9rem,2.5vw,2rem);display:flex;flex-direction:column;gap:0.35rem;opacity:0;animation:fadeUp 0.7s forwards}
 .hero-cell:nth-child(1){animation-delay:.1s}.hero-cell:nth-child(2){animation-delay:.25s}.hero-cell:nth-child(3){animation-delay:.4s}
 .hero-cell-icon{font-size:clamp(1.2rem,3vw,1.8rem)}
@@ -78,221 +79,8 @@
 .ecard-meta{display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center}
 .ecard-note{font-size:0.78rem;color:var(--muted);line-height:1.4}
 
-/* ═══════════════════════ BADGES ═══════════════════════════ */
-.badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:999px;font-size:0.67rem;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
-.b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}
-.b-done{background:#1a2a1a;color:#4acfa8}.b-prog{background:#2a2005;color:#f0a83c}.b-plan{background:#1a1a2a;color:#8888ff}
-.b-fail{background:#2a0a0a;color:#ff8080}.b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-
 .empty-st{text-align:center;padding:4rem 2rem;color:var(--muted)}
 .empty-st .emo{font-size:2.5rem;display:block;margin-bottom:1rem}
-
-/* ═══════════════════════════════════════════════════════════
-   ★ CINEMATIC TIMELINE — Knight Lab–style ★
-═══════════════════════════════════════════════════════════ */
-
-/* Outer shell, full viewport height */
-.tl-shell{
-  position:relative;width:100%;
-  height:calc(85svh - var(--nav-h));min-height:500px;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  background:var(--bg);
-  user-select:none;-webkit-user-select:none;
-}
-
-/* ── AMBIENT GLOW LAYER ──────────────────────────────── */
-.tl-glow{
-  position:absolute;inset:0;z-index:0;pointer-events:none;
-  transition:background 0.9s cubic-bezier(0.4,0,0.2,1);
-  background:radial-gradient(ellipse 55% 45% at 50% 55%, var(--ac) 0%, transparent 70%);
-  opacity:0.10;
-}
-
-/* ── STAGE: big slide display area ─────────────────── */
-.tl-stage{
-  flex:1;position:relative;overflow:hidden;z-index:1;
-  display:flex;align-items:center;justify-content:center;
-}
-
-/* Slides */
-.tl-slide{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  padding:2rem var(--pad);
-  pointer-events:none;
-  will-change:opacity,transform;
-}
-.tl-slide.active{pointer-events:all}
-
-.tl-slide-inner{
-  max-width:680px;width:100%;
-  display:flex;flex-direction:column;gap:1.2rem;
-}
-
-/* Date eyebrow */
-.tl-date{
-  font-size:0.7rem;letter-spacing:0.28em;text-transform:uppercase;
-  color:var(--ac,var(--muted));
-  display:flex;align-items:center;gap:0.75rem;
-}
-.tl-date::before{content:'';width:36px;height:1px;background:var(--ac,var(--muted));flex-shrink:0}
-
-/* Big stat / title */
-.tl-stat{
-  font-family:'Fraunces',serif;font-weight:900;
-  font-size:clamp(4.5rem,14vw,10rem);
-  line-height:0.85;letter-spacing:-0.05em;
-  color:var(--ac,var(--text));
-  filter:drop-shadow(0 0 60px var(--ac,transparent));
-}
-.tl-stat small{
-  font-size:0.22em;font-family:'Epilogue',sans-serif;
-  font-weight:300;color:var(--muted);letter-spacing:0.05em;
-  vertical-align:middle;
-}
-.tl-headline{
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:clamp(1.8rem,5vw,3.8rem);
-  line-height:1.05;letter-spacing:-0.03em;
-  color:var(--ac,var(--text));
-}
-.tl-meta{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center}
-.tl-note{
-  font-size:clamp(0.9rem,2vw,1.1rem);color:var(--muted);
-  line-height:1.65;max-width:520px;font-style:italic;
-  border-left:2px solid var(--ac,var(--border));padding-left:1rem;
-}
-
-/* Prev/Next title teasers (like Knight Lab) */
-.tl-prev-teaser,.tl-next-teaser{
-  position:absolute;bottom:50%;transform:translateY(50%);
-  z-index:5;display:flex;flex-direction:column;gap:0.2rem;
-  cursor:pointer;padding:1rem 0.5rem;transition:opacity 0.2s;
-}
-.tl-prev-teaser{left:0;align-items:flex-start}
-.tl-next-teaser{right:0;align-items:flex-end}
-.tl-prev-teaser:hover,.tl-next-teaser:hover{opacity:1!important}
-.teaser-arrow{font-size:1.4rem;color:var(--ac,var(--muted));line-height:1}
-.teaser-date{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
-.teaser-title{font-family:'Fraunces',serif;font-weight:700;font-size:0.85rem;color:var(--text);max-width:120px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* Slide counter */
-.tl-counter{
-  position:absolute;top:1.5rem;right:var(--pad);
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;z-index:5;
-}
-
-/* ── NAV BAR ──────────────────────────────────────── */
-.tl-nav{
-  flex-shrink:0;height:160px;
-  background:rgba(10,15,13,0.97);
-  border-top:1px solid var(--border);
-  position:relative;overflow:hidden;z-index:10;
-}
-
-/* Thin progress line at very top of nav */
-.tl-progress{
-  position:absolute;top:0;left:0;height:2px;
-  background:var(--ac,var(--muted));
-  box-shadow:0 0 10px var(--ac,transparent);
-  transition:width 0.45s cubic-bezier(0.4,0,0.2,1);
-  z-index:2;pointer-events:none;
-}
-
-/* Drag track container */
-.tl-track-outer{
-  position:absolute;inset:0;overflow:hidden;cursor:grab;
-}
-.tl-track-outer.dragging{cursor:grabbing}
-.tl-track-outer::before,.tl-track-outer::after{
-  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:3;pointer-events:none;
-}
-.tl-track-outer::before{left:0;background:linear-gradient(to right,var(--bg) 0%,transparent 100%)}
-.tl-track-outer::after{right:0;background:linear-gradient(to left,var(--bg) 0%,transparent 100%)}
-
-/* The actual scrolling track */
-.tl-track{
-  position:absolute;top:0;bottom:0;
-  display:flex;align-items:flex-end;
-  padding:0 50%;          /* centering trick: active marker always centered */
-  transition:left 0.55s cubic-bezier(0.4,0,0.2,1);
-  gap:0;
-}
-.tl-track.no-transition{transition:none}
-
-/* Horizontal axis line */
-.tl-axis{
-  position:absolute;bottom:52px;left:0;right:0;height:1px;background:var(--border);z-index:0;pointer-events:none;
-}
-
-/* Each marker */
-.tl-marker{
-  width:100px;flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  padding-bottom:8px;cursor:pointer;position:relative;
-  transition:opacity 0.25s;
-}
-.tl-marker:hover .tl-dot{transform:scale(1.5)}
-.tl-marker:hover .tl-mlabel{color:var(--text)}
-
-/* Bar that grows from axis to indicate magnitude (for runs: height = distance) */
-.tl-bar{
-  width:3px;border-radius:2px 2px 0 0;
-  background:var(--border);
-  transition:height 0.4s cubic-bezier(0.4,0,0.2,1),background 0.3s;
-  min-height:4px;
-  margin-bottom:0;
-}
-.tl-marker.active .tl-bar{background:var(--ac,var(--muted))}
-
-.tl-dot{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--border);border:2px solid var(--border);
-  transition:transform 0.25s,background 0.2s,box-shadow 0.2s;
-  flex-shrink:0;
-}
-.tl-marker.active .tl-dot{
-  background:var(--ac,var(--text));border-color:var(--ac,var(--text));
-  box-shadow:0 0 14px var(--ac,transparent),0 0 40px color-mix(in srgb,var(--ac,transparent) 30%,transparent);
-}
-
-.tl-mlabel{
-  font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--muted);margin-top:6px;text-align:center;
-  max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  transition:color 0.2s;
-}
-.tl-marker.active .tl-mlabel{color:var(--ac,var(--text));font-weight:600}
-
-.tl-mval{
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:0.7rem;color:var(--muted);margin-top:2px;
-  transition:color 0.2s;
-}
-.tl-marker.active .tl-mval{color:var(--ac,var(--text))}
-
-/* Prev / Next arrow buttons */
-.tl-btn-prev,.tl-btn-next{
-  position:absolute;bottom:12px;z-index:20;
-  width:36px;height:36px;border-radius:50%;
-  background:var(--surface);border:1px solid var(--border);
-  color:var(--muted);font-size:1rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.2s;font-family:'Epilogue',sans-serif;
-}
-.tl-btn-prev{left:var(--pad)}.tl-btn-next{left:calc(var(--pad) + 44px)}
-.tl-btn-prev:hover,.tl-btn-next:hover{background:var(--border);color:var(--text)}
-.tl-btn-prev:disabled,.tl-btn-next:disabled{opacity:0.2;cursor:default}
-
-/* Keyboard hint */
-.tl-keyhint{position:absolute;bottom:18px;right:var(--pad);font-size:0.6rem;color:var(--muted);display:flex;gap:0.4rem;align-items:center;z-index:20}
-.key{display:inline-block;padding:0.08rem 0.32rem;border:1px solid var(--border);border-radius:3px;font-size:0.58rem}
-
-/* Empty state */
-.tl-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;color:var(--muted);font-size:0.9rem;z-index:5}
-.tl-empty-ico{font-size:3rem}
 
 /* ═══════════════════════ QUOTES MODAL ═════════════════════ */
 .qmodal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.2s ease}
@@ -316,32 +104,6 @@
 
 
 
-
-/* ── Year separator on timeline track ── */
-.tl-year-marker{
-  flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:flex-end;padding-bottom:8px;
-  pointer-events:none;
-  /* Slightly wider so the label has room */
-  width:52px;
-}
-.tl-year-stem{
-  width:1px;height:40px;
-  background:var(--border);
-  margin-bottom:2px;
-}
-.tl-year-label{
-  font-family:'Fraunces',serif;font-weight:700;
-  font-size:0.68rem;color:var(--ac,var(--muted));
-  letter-spacing:0.04em;white-space:nowrap;
-  /* pill background so it pops against markers */
-  background:var(--bg);
-  padding:0.1rem 0.3rem;
-  border:1px solid var(--border);
-  border-radius:3px;
-  margin-top:4px;
-}
 
 /* ═══ LIST SECTION LABEL ════════════════════════════════ */
 .list-section-label{
@@ -420,12 +182,12 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
   <div class="nav-pills">
     <button class="nav-pill active" data-tab="run"  onclick="showTab('run')">🏃 Run</button>
     <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
-    <button class="nav-pill"        data-tab="grow" onclick="showTab('grow')">🌱 Grow</button>
-    <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>         
+    <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
     <a href="todo.html" class="nav-pill">✅ To-Do</a>
     <a href="quotes.html" class="nav-pill">💬 Quotes</a>
     <a href="2026_school.html" class="nav-pill">🏫 School</a>
     <a href="health_dashboard.html" class="nav-pill">🩺 Health</a>
+    <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
   </div>
 </nav>
 
@@ -440,10 +202,6 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
       <span class="hero-cell-label">Books finished</span>
       <div class="hero-cell-stat read-c" id="h-books">0</div>
       <span class="hero-cell-sub" id="h-reading">0 total in list</span></div></div>
-    <div class="hero-cell"><span class="hero-cell-icon">🌱</span><div>
-      <span class="hero-cell-label">Plants growing</span>
-      <div class="hero-cell-stat grow-c" id="h-plants">0</div>
-      <span class="hero-cell-sub" id="h-harvests">0 harvests</span></div></div>
           <div class="hero-cell"><span class="hero-cell-icon">🚴</span><div>
           <span class="hero-cell-label">Total distance</span>
           <div class="hero-cell-stat cycle-c" id="h-km">0 <small>km</small></div>
@@ -522,6 +280,7 @@ footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inse
   </div>
 </footer>
 
+<script src="assets/js/timeline.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════
    CONFIG
@@ -664,151 +423,14 @@ const parseQuotes = q => !q||typeof q!=='string' ? [] : q.split('|').map(s=>s.tr
 /* ══════════════════════════════════════════════════════════
    TAB / VIEW STATE
 ══════════════════════════════════════════════════════════ */
-let activeTab = 'run';
 function showTab(tab) {
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-  activeTab = tab;
+  tlSetActiveTab(tab);
   window.scrollTo({ top: document.querySelector('.hero').offsetHeight, behavior:'smooth' });
 }
-
-
-/* ══════════════════════════════════════════════════════════
-   CINEMATIC TIMELINE ENGINE
-══════════════════════════════════════════════════════════ */
-const TL = {};
-
-function tlBuild(tab, items, cfg) {
-  const container = document.getElementById(`${tab}-tv`);
-  container.innerHTML = '';
-  const state = TL[tab] = { idx:0, items, cfg, dragging:false };
-  if (!items.length) {
-    container.innerHTML = `<div class="tl-shell" style="--ac:${cfg.color}"><div class="tl-empty"><div class="tl-empty-ico">${cfg.icon}</div><div>Nothing here yet — add a row in Google Sheets!</div></div></div>`;
-    return;
-  }
-  container.innerHTML = `
-  <div class="tl-shell" id="${tab}-shell" style="--ac:${cfg.color}">
-    <div class="tl-glow" style="--ac:${cfg.color}"></div>
-    <div class="tl-stage" id="${tab}-stage">
-      <div class="tl-counter" id="${tab}-counter"></div>
-      <div class="tl-prev-teaser" id="${tab}-prev-t" onclick="tlPrev('${tab}')">
-        <div class="teaser-arrow">←</div>
-        <div class="teaser-date" id="${tab}-prev-date"></div>
-        <div class="teaser-title" id="${tab}-prev-title"></div>
-      </div>
-      <div class="tl-next-teaser" id="${tab}-next-t" onclick="tlNext('${tab}')">
-        <div class="teaser-arrow" style="text-align:right">→</div>
-        <div class="teaser-date" id="${tab}-next-date"></div>
-        <div class="teaser-title" id="${tab}-next-title"></div>
-      </div>
-    </div>
-    <div class="tl-nav" id="${tab}-nav">
-      <div class="tl-progress" id="${tab}-prog"></div>
-      <div class="tl-axis"></div>
-      <div class="tl-track-outer" id="${tab}-to"><div class="tl-track" id="${tab}-track"></div></div>
-      <button class="tl-btn-prev" id="${tab}-prev" onclick="tlPrev('${tab}')">←</button>
-      <button class="tl-btn-next" id="${tab}-next" onclick="tlNext('${tab}')">→</button>
-      <div class="tl-keyhint"><span class="key">←</span><span class="key">→</span> navigate · drag track</div>
-    </div>
-  </div>`;
-
-  const stage   = document.getElementById(`${tab}-stage`);
-  const maxVal  = Math.max(...items.map(cfg.getBarH), 1);
-
-  items.forEach((item, i) => {
-    const slide = document.createElement('div');
-    slide.className = 'tl-slide'; slide.id = `${tab}-slide-${i}`;
-    slide.style.cssText = `opacity:0;transform:translateX(${i===0?'0':'60px'});transition:opacity 0.55s cubic-bezier(0.4,0,0.2,1),transform 0.55s cubic-bezier(0.4,0,0.2,1)`;
-    slide.innerHTML = cfg.makeSlide(item);
-    stage.insertBefore(slide, document.getElementById(`${tab}-prev-t`));
-  });
-
-  const track  = document.getElementById(`${tab}-track`);
-  const NAV_H  = parseInt(getComputedStyle(document.getElementById(`${tab}-nav`)).height) || 160;
-  const BAR_MAX = NAV_H - 80;
-  let lastYear = null;
-  items.forEach((item, i) => {
-    // ── Year separator marker ───────────────────────────────
-    const itemYear = String(cfg.getDate(item)).split('-')[0];
-    if (itemYear && itemYear !== lastYear) {
-      const ym = document.createElement('div');
-      ym.className = 'tl-year-marker';
-      ym.innerHTML = `<div class="tl-year-stem"></div><div class="tl-year-label">${itemYear}</div>`;
-      track.appendChild(ym);
-      lastYear = itemYear;
-    }
-    // ── Item marker ─────────────────────────────────────────
-    const marker = document.createElement('div');
-    marker.className = 'tl-marker'; marker.dataset.idx = i; marker.onclick = () => tlGoTo(tab, i);
-    const barH = Math.max(4, Math.round((cfg.getBarH(item)/maxVal)*BAR_MAX));
-    marker.innerHTML = `<div class="tl-bar" style="height:${barH}px"></div><div class="tl-dot"></div><div class="tl-mlabel">${fmtS(cfg.getDate(item))}</div><div class="tl-mval">${cfg.makeMarkerVal(item)}</div>`;
-    track.appendChild(marker);
-  });
-
-  tlInitDrag(tab); tlInitSwipe(tab);
-  const startIdx = tab === 'run' ? items.length - 1 : 0;
-  requestAnimationFrame(() => tlGoTo(tab, startIdx, true));
-}
-
-function tlGoTo(tab, newIdx, initial=false) {
-  const state = TL[tab]; if (!state || newIdx<0 || newIdx>=state.items.length) return;
-  state.idx = newIdx;
-  const items = state.items; const n = items.length;
-  items.forEach((_, i) => {
-    const el = document.getElementById(`${tab}-slide-${i}`); if (!el) return;
-    if (i===newIdx) { el.style.transition=initial?'opacity 0.7s':'opacity 0.55s cubic-bezier(0.4,0,0.2,1),transform 0.55s cubic-bezier(0.4,0,0.2,1)'; el.style.opacity='1'; el.style.transform='translateX(0)'; el.style.zIndex='2'; el.classList.add('active'); }
-    else { const off=i<newIdx?-60:60; el.style.transition=initial?'none':'opacity 0.4s,transform 0.4s'; el.style.opacity='0'; el.style.transform=`translateX(${off}px)`; el.style.zIndex='1'; el.classList.remove('active'); }
-  });
-  document.querySelectorAll(`#${tab}-track .tl-marker`).forEach((m,i) => m.classList.toggle('active', i===newIdx));
-  const pct = n>1 ? ((newIdx/(n-1))*100) : 100;
-  document.getElementById(`${tab}-prog`).style.width = pct + '%';
-  document.getElementById(`${tab}-counter`).textContent = `${String(newIdx+1).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
-  document.getElementById(`${tab}-prev`).disabled = newIdx===0;
-  document.getElementById(`${tab}-next`).disabled = newIdx===n-1;
-  const pt = document.getElementById(`${tab}-prev-t`);
-  const nt = document.getElementById(`${tab}-next-t`);
-  if (newIdx>0) { pt.style.opacity='0.6'; document.getElementById(`${tab}-prev-date`).textContent=fmtS(state.cfg.getDate(items[newIdx-1])); document.getElementById(`${tab}-prev-title`).textContent=state.cfg.getTeaserTitle(items[newIdx-1]); }
-  else pt.style.opacity='0';
-  if (newIdx<n-1) { nt.style.opacity='0.6'; document.getElementById(`${tab}-next-date`).textContent=fmtS(state.cfg.getDate(items[newIdx+1])); document.getElementById(`${tab}-next-title`).textContent=state.cfg.getTeaserTitle(items[newIdx+1]); }
-  else nt.style.opacity='0';
-  tlScrollToActive(tab);
-}
-function tlScrollToActive(tab) {
-  const state = TL[tab]; if (!state) return;
-  const track = document.getElementById(`${tab}-track`); if (!track) return;
-  const outer = document.getElementById(`${tab}-to`);
-  const markers = [...track.querySelectorAll('.tl-marker')];
-  const active = markers[state.idx]; if (!active) return;
-  const outerW = outer.offsetWidth;
-  const markerMid = active.offsetLeft + active.offsetWidth/2;
-  const clampedLeft = Math.min(0, Math.max(-(track.scrollWidth-outerW), outerW/2-markerMid));
-  if (!state.dragging) { track.classList.remove('no-transition'); track.style.left = clampedLeft + 'px'; }
-}
-function tlPrev(tab) { const s=TL[tab]; if(s) tlGoTo(tab,s.idx-1); }
-function tlNext(tab) { const s=TL[tab]; if(s) tlGoTo(tab,s.idx+1); }
-
-function tlInitDrag(tab) {
-  const outer = document.getElementById(`${tab}-to`);
-  const track = document.getElementById(`${tab}-track`);
-  const state = TL[tab]; let startX=0, startLeft=0;
-  const getLeft = () => parseInt(track.style.left||'0');
-  const onDown = e => { state.dragging=true; outer.classList.add('dragging'); track.classList.add('no-transition'); startX=(e.touches?e.touches[0]:e).clientX; startLeft=getLeft(); e.preventDefault(); };
-  const onMove = e => { if(!state.dragging) return; const x=(e.touches?e.touches[0]:e).clientX; const dx=x-startX; const outerW=outer.offsetWidth; const maxRight=-(track.scrollWidth-outerW); track.style.left=Math.min(0,Math.max(maxRight,startLeft+dx))+'px'; };
-  const onUp = () => { if(!state.dragging) return; state.dragging=false; outer.classList.remove('dragging'); track.classList.remove('no-transition'); const outerW=outer.offsetWidth; const currentLeft=parseInt(track.style.left||'0'); const markers=[...track.querySelectorAll('.tl-marker')]; let closest=0,minDist=Infinity; markers.forEach((m,i)=>{const c=m.offsetLeft+m.offsetWidth/2+currentLeft; const d=Math.abs(c-outerW/2); if(d<minDist){minDist=d;closest=i;}}); tlGoTo(tab,closest); };
-  outer.addEventListener('mousedown',onDown); outer.addEventListener('mousemove',onMove); outer.addEventListener('mouseup',onUp); outer.addEventListener('mouseleave',onUp);
-  outer.addEventListener('touchstart',onDown,{passive:false}); outer.addEventListener('touchmove',onMove,{passive:true}); outer.addEventListener('touchend',onUp);
-}
-function tlInitSwipe(tab) {
-  const stage = document.getElementById(`${tab}-stage`); let sx=0, sy=0;
-  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-  stage.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;const dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>44){dx<0?tlNext(tab):tlPrev(tab);}});
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowLeft')  tlPrev(activeTab);
-  if (e.key === 'ArrowRight') tlNext(activeTab);
-});
 
 /* ══════════════════════════════════════════════════════════
    🏃 RUN RENDERER
@@ -1001,8 +623,10 @@ function updateHero() {
   document.getElementById('h-reading').textContent = `${books.length} total in list`;
   const growing   = plants.filter(p=>p.status==='growing').length;
   const harvested = plants.filter(p=>p.status==='harvested').length;
-  document.getElementById('h-plants').textContent   = growing;
-  document.getElementById('h-harvests').textContent = `${harvested} harvest${harvested!==1?'s':''}`;
+  const hPlants = document.getElementById('h-plants');
+  if (hPlants) hPlants.textContent = growing;
+  const hHarvests = document.getElementById('h-harvests');
+  if (hHarvests) hHarvests.textContent = `${harvested} harvest${harvested!==1?'s':''}`;
     const rides = DB.cycling || [];
   const km = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);
   const hkm = document.getElementById('h-km');
@@ -1045,6 +669,7 @@ function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 /* ══════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════ */
+tlSetActiveTab('run');
 setSheetLinks();
 gsGet();
 </script>

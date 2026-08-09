@@ -1,0 +1,235 @@
+/* ═══════════════════════════════════════════════════════════
+   ★ CINEMATIC TIMELINE — Knight Lab–style ★
+   Shared by index.html (Run/Read/Cycle) and half-marathon.html.
+   Pairs with assets/js/timeline.js (tlBuild/tlGoTo/tlPrev/tlNext).
+   Every page using this must define --ac per-instance via the
+   cfg.color passed into tlBuild(), and a .{tab}-c text-color class
+   isn't required — tl-stat/tl-headline/tl-date all read var(--ac).
+═══════════════════════════════════════════════════════════════ */
+
+/* Outer shell, full viewport height */
+.tl-shell{
+  position:relative;width:100%;
+  height:calc(85svh - var(--nav-h));min-height:500px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  user-select:none;-webkit-user-select:none;
+}
+
+/* ── AMBIENT GLOW LAYER ──────────────────────────────── */
+.tl-glow{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  transition:background 0.9s cubic-bezier(0.4,0,0.2,1);
+  background:radial-gradient(ellipse 55% 45% at 50% 55%, var(--ac) 0%, transparent 70%);
+  opacity:0.10;
+}
+
+/* ── STAGE: big slide display area ─────────────────── */
+.tl-stage{
+  flex:1;position:relative;overflow:hidden;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Slides */
+.tl-slide{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem var(--pad);
+  pointer-events:none;
+  will-change:opacity,transform;
+}
+.tl-slide.active{pointer-events:all}
+
+.tl-slide-inner{
+  max-width:680px;width:100%;
+  display:flex;flex-direction:column;gap:1.2rem;
+}
+
+/* Date eyebrow */
+.tl-date{
+  font-size:0.7rem;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--ac,var(--muted));
+  display:flex;align-items:center;gap:0.75rem;
+}
+.tl-date::before{content:'';width:36px;height:1px;background:var(--ac,var(--muted));flex-shrink:0}
+
+/* Big stat / title */
+.tl-stat{
+  font-family:'Fraunces',serif;font-weight:900;
+  font-size:clamp(4.5rem,14vw,10rem);
+  line-height:0.85;letter-spacing:-0.05em;
+  color:var(--ac,var(--text));
+  filter:drop-shadow(0 0 60px var(--ac,transparent));
+}
+.tl-stat small{
+  font-size:0.22em;font-family:'Epilogue',sans-serif;
+  font-weight:300;color:var(--muted);letter-spacing:0.05em;
+  vertical-align:middle;
+}
+.tl-headline{
+  font-family:'Fraunces',serif;font-weight:700;
+  font-size:clamp(1.8rem,5vw,3.8rem);
+  line-height:1.05;letter-spacing:-0.03em;
+  color:var(--ac,var(--text));
+}
+.tl-meta{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center}
+.tl-note{
+  font-size:clamp(0.9rem,2vw,1.1rem);color:var(--muted);
+  line-height:1.65;max-width:520px;font-style:italic;
+  border-left:2px solid var(--ac,var(--border));padding-left:1rem;
+}
+
+/* Prev/Next title teasers (like Knight Lab) */
+.tl-prev-teaser,.tl-next-teaser{
+  position:absolute;bottom:50%;transform:translateY(50%);
+  z-index:5;display:flex;flex-direction:column;gap:0.2rem;
+  cursor:pointer;padding:1rem 0.5rem;transition:opacity 0.2s;
+}
+.tl-prev-teaser{left:0;align-items:flex-start}
+.tl-next-teaser{right:0;align-items:flex-end}
+.tl-prev-teaser:hover,.tl-next-teaser:hover{opacity:1!important}
+.teaser-arrow{font-size:1.4rem;color:var(--ac,var(--muted));line-height:1}
+.teaser-date{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+.teaser-title{font-family:'Fraunces',serif;font-weight:700;font-size:0.85rem;color:var(--text);max-width:120px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Slide counter */
+.tl-counter{
+  position:absolute;top:1.5rem;right:var(--pad);
+  font-family:'Fraunces',serif;font-weight:700;
+  font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;z-index:5;
+}
+
+/* ── NAV BAR ──────────────────────────────────────── */
+.tl-nav{
+  flex-shrink:0;height:160px;
+  background:rgba(10,15,13,0.97);
+  border-top:1px solid var(--border);
+  position:relative;overflow:hidden;z-index:10;
+}
+
+/* Thin progress line at very top of nav */
+.tl-progress{
+  position:absolute;top:0;left:0;height:2px;
+  background:var(--ac,var(--muted));
+  box-shadow:0 0 10px var(--ac,transparent);
+  transition:width 0.45s cubic-bezier(0.4,0,0.2,1);
+  z-index:2;pointer-events:none;
+}
+
+/* Drag track container */
+.tl-track-outer{
+  position:absolute;inset:0;overflow:hidden;cursor:grab;
+}
+.tl-track-outer.dragging{cursor:grabbing}
+.tl-track-outer::before,.tl-track-outer::after{
+  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:3;pointer-events:none;
+}
+.tl-track-outer::before{left:0;background:linear-gradient(to right,var(--bg) 0%,transparent 100%)}
+.tl-track-outer::after{right:0;background:linear-gradient(to left,var(--bg) 0%,transparent 100%)}
+
+/* The actual scrolling track */
+.tl-track{
+  position:absolute;top:0;bottom:0;
+  display:flex;align-items:flex-end;
+  padding:0 50%;          /* centering trick: active marker always centered */
+  transition:left 0.55s cubic-bezier(0.4,0,0.2,1);
+  gap:0;
+}
+.tl-track.no-transition{transition:none}
+
+/* Horizontal axis line */
+.tl-axis{
+  position:absolute;bottom:52px;left:0;right:0;height:1px;background:var(--border);z-index:0;pointer-events:none;
+}
+
+/* Each marker */
+.tl-marker{
+  width:100px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:8px;cursor:pointer;position:relative;
+  transition:opacity 0.25s;
+}
+.tl-marker:hover .tl-dot{transform:scale(1.5)}
+.tl-marker:hover .tl-mlabel{color:var(--text)}
+
+/* Bar that grows from axis to indicate magnitude (for runs: height = distance) */
+.tl-bar{
+  width:3px;border-radius:2px 2px 0 0;
+  background:var(--border);
+  transition:height 0.4s cubic-bezier(0.4,0,0.2,1),background 0.3s;
+  min-height:4px;
+  margin-bottom:0;
+}
+.tl-marker.active .tl-bar{background:var(--ac,var(--muted))}
+
+.tl-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--border);border:2px solid var(--border);
+  transition:transform 0.25s,background 0.2s,box-shadow 0.2s;
+  flex-shrink:0;
+}
+.tl-marker.active .tl-dot{
+  background:var(--ac,var(--text));border-color:var(--ac,var(--text));
+  box-shadow:0 0 14px var(--ac,transparent),0 0 40px color-mix(in srgb,var(--ac,transparent) 30%,transparent);
+}
+
+.tl-mlabel{
+  font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:6px;text-align:center;
+  max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:color 0.2s;
+}
+.tl-marker.active .tl-mlabel{color:var(--ac,var(--text));font-weight:600}
+
+.tl-mval{
+  font-family:'Fraunces',serif;font-weight:700;
+  font-size:0.7rem;color:var(--muted);margin-top:2px;
+  transition:color 0.2s;
+}
+.tl-marker.active .tl-mval{color:var(--ac,var(--text))}
+
+/* Prev / Next arrow buttons */
+.tl-btn-prev,.tl-btn-next{
+  position:absolute;bottom:12px;z-index:20;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;font-family:'Epilogue',sans-serif;
+}
+.tl-btn-prev{left:var(--pad)}.tl-btn-next{left:calc(var(--pad) + 44px)}
+.tl-btn-prev:hover,.tl-btn-next:hover{background:var(--border);color:var(--text)}
+.tl-btn-prev:disabled,.tl-btn-next:disabled{opacity:0.2;cursor:default}
+
+/* Keyboard hint */
+.tl-keyhint{position:absolute;bottom:18px;right:var(--pad);font-size:0.6rem;color:var(--muted);display:flex;gap:0.4rem;align-items:center;z-index:20}
+.key{display:inline-block;padding:0.08rem 0.32rem;border:1px solid var(--border);border-radius:3px;font-size:0.58rem}
+
+/* Empty state */
+.tl-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;color:var(--muted);font-size:0.9rem;z-index:5}
+.tl-empty-ico{font-size:3rem}
+
+/* ── Year separator on timeline track ── */
+.tl-year-marker{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;padding-bottom:8px;
+  pointer-events:none;
+  width:52px;
+}
+.tl-year-stem{
+  width:1px;height:40px;
+  background:var(--border);
+  margin-bottom:2px;
+}
+.tl-year-label{
+  font-family:'Fraunces',serif;font-weight:700;
+  font-size:0.68rem;color:var(--ac,var(--muted));
+  letter-spacing:0.04em;white-space:nowrap;
+  background:var(--bg);
+  padding:0.1rem 0.3rem;
+  border:1px solid var(--border);
+  border-radius:3px;
+  margin-top:4px;
+}
