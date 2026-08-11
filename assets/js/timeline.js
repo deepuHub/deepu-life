@@ -24,7 +24,7 @@ function tlSetActiveTab(tab) { TL.activeTab = tab; }
 function tlBuild(tab, items, cfg) {
   const container = document.getElementById(`${tab}-tv`);
   container.innerHTML = '';
-  const state = TL[tab] = { idx: 0, items, cfg, dragging: false };
+  const state = TL[tab] = { idx: 0, items, cfg, dragging: false, mounted: new Map() };
   if (!items.length) {
     container.innerHTML = `<div class="tl-shell" style="--ac:${cfg.color}"><div class="tl-empty"><div class="tl-empty-ico">${cfg.icon}</div><div>Nothing here yet — add a row in Google Sheets!</div></div></div>`;
     return;
@@ -55,16 +55,7 @@ function tlBuild(tab, items, cfg) {
     </div>
   </div>`;
 
-  const stage  = document.getElementById(`${tab}-stage`);
   const maxVal = Math.max(...items.map(cfg.getBarH), 1);
-
-  items.forEach((item, i) => {
-    const slide = document.createElement('div');
-    slide.className = 'tl-slide'; slide.id = `${tab}-slide-${i}`;
-    slide.style.cssText = `opacity:0;transform:translateX(${i===0?'0':'60px'});transition:opacity 0.55s cubic-bezier(0.4,0,0.2,1),transform 0.55s cubic-bezier(0.4,0,0.2,1)`;
-    slide.innerHTML = cfg.makeSlide(item);
-    stage.insertBefore(slide, document.getElementById(`${tab}-prev-t`));
-  });
 
   const track  = document.getElementById(`${tab}-track`);
   const NAV_H  = parseInt(getComputedStyle(document.getElementById(`${tab}-nav`)).height) || 160;
@@ -91,15 +82,42 @@ function tlBuild(tab, items, cfg) {
   requestAnimationFrame(() => tlGoTo(tab, startIdx, true));
 }
 
+/* Only the active slide and its immediate neighbors are ever mounted —
+   with 70+ items (e.g. the Half Marathon plan) building every slide's
+   full markup up front pinned dozens of full-viewport, filtered
+   elements in memory/GPU layers at once, enough to crash some mobile
+   browsers. Off-active slides were always invisible (opacity:0) either
+   way, so windowing to ±1 is visually identical and far cheaper. */
+function tlMountSlide(tab, i) {
+  const state = TL[tab];
+  if (state.mounted.has(i)) return state.mounted.get(i);
+  const stage  = document.getElementById(`${tab}-stage`);
+  const anchor = document.getElementById(`${tab}-prev-t`);
+  const slide = document.createElement('div');
+  slide.className = 'tl-slide'; slide.id = `${tab}-slide-${i}`;
+  slide.style.cssText = 'opacity:0;transform:translateX(60px)';
+  slide.innerHTML = state.cfg.makeSlide(state.items[i]);
+  stage.insertBefore(slide, anchor);
+  state.mounted.set(i, slide);
+  return slide;
+}
+function tlUnmountSlide(tab, i) {
+  const state = TL[tab];
+  const el = state.mounted.get(i);
+  if (el) { el.remove(); state.mounted.delete(i); }
+}
+
 function tlGoTo(tab, newIdx, initial=false) {
   const state = TL[tab]; if (!state || newIdx<0 || newIdx>=state.items.length) return;
-  state.idx = newIdx;
   const items = state.items; const n = items.length;
-  items.forEach((_, i) => {
-    const el = document.getElementById(`${tab}-slide-${i}`); if (!el) return;
+  const keep = new Set([newIdx-1, newIdx, newIdx+1].filter(i => i>=0 && i<n));
+  keep.forEach(i => tlMountSlide(tab, i));
+  state.idx = newIdx;
+  state.mounted.forEach((el, i) => {
     if (i===newIdx) { el.style.transition=initial?'opacity 0.7s':'opacity 0.55s cubic-bezier(0.4,0,0.2,1),transform 0.55s cubic-bezier(0.4,0,0.2,1)'; el.style.opacity='1'; el.style.transform='translateX(0)'; el.style.zIndex='2'; el.classList.add('active'); }
     else { const off=i<newIdx?-60:60; el.style.transition=initial?'none':'opacity 0.4s,transform 0.4s'; el.style.opacity='0'; el.style.transform=`translateX(${off}px)`; el.style.zIndex='1'; el.classList.remove('active'); }
   });
+  [...state.mounted.keys()].forEach(i => { if (!keep.has(i)) tlUnmountSlide(tab, i); });
   document.querySelectorAll(`#${tab}-track .tl-marker`).forEach((m,i) => m.classList.toggle('active', i===newIdx));
   const pct = n>1 ? ((newIdx/(n-1))*100) : 100;
   document.getElementById(`${tab}-prog`).style.width = pct + '%';
