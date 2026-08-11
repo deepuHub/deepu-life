@@ -73,7 +73,7 @@
        theirs we give this page its own animated aurora blob that
        drifts around the title. Scoped to this page only. */
     .tl-slide-inner{position:relative}
-    .tl-slide-inner::before{
+    .tl-slide.active .tl-slide-inner::before{
       content:'';position:absolute;z-index:-1;pointer-events:none;
       top:-70px;left:-90px;width:340px;height:340px;
       background:radial-gradient(circle, var(--plan) 0%, transparent 70%);
@@ -86,7 +86,7 @@
       50%{transform:translate(-18px,30px) scale(0.88);opacity:0.36}
       78%{transform:translate(22px,18px) scale(1.08);opacity:0.44}
     }
-    @media(prefers-reduced-motion:reduce){.tl-slide-inner::before{animation:none}}
+    @media(prefers-reduced-motion:reduce){.tl-slide.active .tl-slide-inner::before{animation:none}}
   </style>
 </head>
 <body>
