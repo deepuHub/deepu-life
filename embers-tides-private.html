@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0a0f0d"/>
+<title>Embers &amp; Tides — deepu-life</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🔥%3C/text%3E%3C/svg%3E" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<style>
+  :root{ --ember:var(--read); --ember-dim:var(--read-dim); --tide:var(--cycle); --tide-dim:var(--cycle-dim); }
+  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem;max-width:1040px;margin:0 auto}
+
+  .page-head{margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+  .page-title{font-family:'Fraunces',serif;font-weight:900;font-size:2rem;letter-spacing:-.01em}
+  .page-title .amp{color:var(--muted2);font-style:italic;font-weight:300}
+  .page-sub{color:var(--muted);font-size:.85rem;margin-top:.45rem;line-height:1.6;max-width:56ch}
+
+  section{margin-bottom:2.75rem}
+  .sec-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+    margin-bottom:1rem;padding-bottom:.55rem;border-bottom:1px solid var(--border)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:.65rem}
+  .stat{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
+  .stat-l{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.35rem}
+  .stat-v{font-family:'Fraunces',serif;font-weight:900;font-size:1.85rem;line-height:1;letter-spacing:-.02em}
+  .stat-s{font-size:.68rem;color:var(--muted);margin-top:.4rem;line-height:1.45}
+  .stat.e .stat-v{color:var(--ember)} .stat.t .stat-v{color:var(--tide)}
+
+  .chart-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
+  .chart-wrap{position:relative;height:230px}
+  .chart-wrap.sm{height:170px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:.7rem}
+
+  .legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.68rem;color:var(--muted);margin-top:.7rem}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:.35rem;vertical-align:-1px}
+
+  /* coupling */
+  .cp{display:flex;flex-direction:column;gap:.5rem}
+  .cp-row{display:grid;grid-template-columns:88px 1fr auto 1fr;gap:.7rem;align-items:center;
+    background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem}
+  .cp-d{font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .cp-side{font-size:.78rem;display:flex;align-items:baseline;gap:.45rem;min-width:0}
+  .cp-side b{font-variant-numeric:tabular-nums;font-weight:600}
+  .cp-t{color:var(--tide)} .cp-e{color:var(--ember)}
+  .cp-gap{font-size:.62rem;color:var(--muted);white-space:nowrap;text-align:center;
+    border:1px dashed var(--border);border-radius:99px;padding:.15rem .5rem}
+  .cp-note{font-size:.62rem;color:var(--muted2)}
+
+  .note{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--muted2);
+    border-radius:10px;padding:1rem 1.15rem;font-size:.8rem;line-height:1.7;color:var(--muted)}
+  .note b{color:var(--text);font-weight:600}
+  .note .big{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--text)}
+
+  table.dt{width:100%;border-collapse:collapse;font-size:.76rem;min-width:520px}
+  .dt th{text-align:left;padding:.45rem .6rem;color:var(--muted);font-weight:500;
+    border-bottom:1px solid var(--border);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em}
+  .dt td{padding:.45rem .6rem;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+  .dt tr:last-child td{border-bottom:none}
+  .dt .num{text-align:right}
+  .scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tag{font-size:.6rem;padding:.1rem .4rem;border-radius:4px;border:1px solid var(--border);color:var(--muted)}
+  .tag.m{color:var(--ember);border-color:var(--ember)}
+
+  footer.foot{padding-top:1.5rem;border-top:1px solid var(--border);font-size:.68rem;color:var(--muted2);line-height:1.7}
+  .loading{color:var(--muted);font-size:.85rem;padding:2rem 0}
+
+  /* ── Sign-in gate ── */
+  .gate{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:1.1rem;text-align:center}
+  .gate-icon{font-size:2.4rem}
+  .gate h1{font-family:'Fraunces',serif;font-weight:900;font-size:1.7rem}
+  .gate p{color:var(--muted);max-width:400px;font-size:.87rem;line-height:1.65}
+  .btn-signin{display:inline-flex;align-items:center;gap:.6rem;padding:.7rem 1.4rem;border-radius:999px;
+    background:var(--info);color:#fff;border:none;font-weight:600;font-size:.9rem;cursor:pointer}
+  .btn-signin:hover{opacity:.85}
+  .gate-error{color:var(--danger);font-size:.8rem;max-width:400px}
+
+  /* The four-column coupling row cannot fit a phone; stack it so the two
+     sides still read as a before/after pair, with the gap between them. */
+  @media (max-width:560px){
+    .cp-row{grid-template-columns:1fr auto;grid-template-areas:"d d" "t g" "e g";row-gap:.35rem}
+    .cp-d{grid-area:d} .cp-side.cp-t{grid-area:t} .cp-side.cp-e{grid-area:e}
+    .cp-gap{grid-area:g;align-self:center}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
+  <div class="nav-right">
+    <div class="nav-pills">
+      <a href="index.html" class="nav-pill">🏃 Tracker</a>
+      <a href="todo.html" class="nav-pill">✅ To-Do</a>
+      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+      <a href="2026_school.html" class="nav-pill">🏫 School</a>
+      <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
+      <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
+      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
+      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+      <a href="embers-tides-private.html" class="nav-pill active" aria-current="page">🔥 Embers</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</nav>
+<div class="nav-drawer-backdrop"></div>
+<div class="nav-drawer">
+  <div class="nav-drawer-inner">
+    <div class="nav-drawer-group">
+      <div class="nav-drawer-label">Public</div>
+      <div class="nav-drawer-list">
+        <a href="index.html" class="nav-pill">🏃 Tracker</a>
+        <a href="todo.html" class="nav-pill">✅ To-Do</a>
+        <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+        <a href="2026_school.html" class="nav-pill">🏫 School</a>
+        <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+        <a href="embers-tides-private.html" class="nav-pill active" aria-current="page">🔥 Embers</a>
+      </div>
+    </div>
+    <div class="nav-drawer-group">
+      <div class="nav-drawer-label">🔒 Private</div>
+      <div class="nav-drawer-list">
+        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
+        <a href="health-private.html" class="nav-pill">🩺 Health</a>
+        <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
+        <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-head">
+    <div class="page-title">Embers <span class="amp">&amp;</span> Tides</div>
+    <div class="page-sub">An index built from settled ledgers, not from memory. Every counter here
+      is a floor, never a total — it can only see what left a trace.</div>
+  </div>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h1>Not for passing eyes</h1>
+    <p>Sign in with the account that owns the sheet. Nothing is stored in this page —
+      Google refuses the read unless it is you.</p>
+    <button class="btn-signin" id="signin-btn">Sign in with Google</button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <div id="app" style="display:none"><div class="loading">Reading the ledger…</div></div>
+
+  <footer class="foot">
+    Read live from a private sheet. Codes stand in for every counterparty —
+    nothing here names anyone. Regenerate the seed with <code>scripts/extract_et.py</code>.
+  </footer>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+const CSS = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+let charts = [];
+
+/* ══════════════════════════════════════════════════════════
+   CONFIG — the Sheet is Restricted-shared, so Google itself
+   refuses the read unless the signed-in account has access.
+   Nothing sensitive lives in this repo.
+══════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = 'PASTE_SPREADSHEET_ID_HERE';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+const TABS = ['Embers', 'Tides'];
+
+let tokenClient, accessToken = null;
+
+function initAuth() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: resp => {
+      if (resp.error) { showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    }
+  });
+  document.getElementById('signin-btn')
+    .addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+window.addEventListener('load', () => {
+  if (window.google && google.accounts) initAuth();
+  else showGateError('Google sign-in did not load.');
+});
+
+const showGateError = m => { document.getElementById('gate-error').textContent = m; };
+
+async function onSignedIn() {
+  try {
+    const d = derive(await loadData());
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = '';
+    render(d);
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+function rowsToObjects(rows) {
+  if (!rows || !rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1)
+    .filter(r => r.length && r[0])
+    .map(r => Object.fromEntries(headers.map((h, i) => [h, r[i] !== undefined ? r[i] : ''])));
+}
+
+async function loadData() {
+  if (SPREADSHEET_ID.startsWith('PASTE_')) {
+    throw new Error('Not wired to a sheet yet — set SPREADSHEET_ID in this page.');
+  }
+  const qs = TABS.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This account does not have access to that sheet.');
+  if (res.status === 404) throw new Error('Sheet not found — check the ID.');
+  if (!res.ok) throw new Error(`Could not load the sheet (HTTP ${res.status})`);
+  const data = await res.json();
+  const [embers, tides] = data.valueRanges.map(vr => rowsToObjects(vr.values));
+  if (!embers.length && !tides.length) throw new Error('The sheet is empty.');
+  return { embers, tides };
+}
+
+/* ══════════════════════════════════════════════════════════
+   DERIVE — everything on the page is computed from the two
+   ledgers, so adding a row in the sheet updates all of it.
+══════════════════════════════════════════════════════════ */
+const num = v => { const n = parseFloat(String(v).replace(/[^0-9.\-]/g, '')); return isFinite(n) ? n : 0; };
+const dayIdx = iso => (new Date(iso + 'T00:00:00').getDay() + 6) % 7;   // Mon=0
+const spanOf = ds => Math.round((new Date(ds[ds.length - 1]) - new Date(ds[0])) / 864e5) + 1;
+
+function derive(raw) {
+  const ledger = [];
+  raw.embers.forEach(r => ledger.push({
+    d: r.date, t: (r.time || '').slice(0, 5), code: r.src,
+    ch: (r.channel || 'day').toLowerCase(), amt: num(r.inr),
+    n: Math.round(num(r.embers)), shared: /^(y|yes|true|1)$/i.test(r.shared || '')
+  }));
+  raw.tides.forEach(r => ledger.push({
+    d: r.date, t: (r.time || '').slice(0, 5), code: r.src, ch: 'tide',
+    amt: num(r.inr), n: 0
+  }));
+  ledger.sort((a, b) => a.d.localeCompare(b.d) || a.t.localeCompare(b.t));
+
+  const E = ledger.filter(e => e.ch === 'day' || e.ch === 'night');
+  const T = ledger.filter(e => e.ch === 'tide');
+  const sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
+
+  const eDays = [...new Set(E.map(e => e.d))].sort();
+  const allDays = [...new Set(ledger.map(e => e.d))].sort();
+  const eSpan = eDays.length ? spanOf(eDays) : 1;
+  const embers = sum(E, e => e.n);
+  const shared = sum(E.filter(e => e.shared), e => e.n);
+
+  const dow = [0, 0, 0, 0, 0, 0, 0];
+  const hours = {};
+  E.forEach(e => {
+    dow[dayIdx(e.d)]++;
+    if (e.t) hours[parseInt(e.t, 10)] = (hours[parseInt(e.t, 10)] || 0) + 1;
+  });
+
+  // Coupling: a Tide followed by a night purchase within 90 minutes. Same-minute
+  // payments are one tab split in two, so merge before pairing.
+  const mins = t => t ? (+t.slice(0, 2) * 60 + +t.slice(3, 5)) : null;
+  const byDay = {};
+  ledger.filter(e => (e.ch === 'tide' || e.ch === 'night') && e.t)
+        .forEach(e => (byDay[e.d] = byDay[e.d] || []).push(e));
+  const coupling = [];
+  Object.keys(byDay).sort().forEach(day => {
+    const merged = {};
+    byDay[day].forEach(e => {
+      const k = e.t + '|' + e.ch;
+      merged[k] = merged[k] ? { ...merged[k], amt: merged[k].amt + e.amt } : { ...e };
+    });
+    const evs = Object.values(merged).sort((a, b) => a.t.localeCompare(b.t));
+    const used = new Set();
+    evs.forEach((a, i) => {
+      if (a.ch !== 'tide') return;
+      for (let j = i + 1; j < evs.length; j++) {
+        const b = evs[j];
+        if (b.ch !== 'night' || used.has(j)) continue;
+        const gap = mins(b.t) - mins(a.t);
+        if (gap >= 0 && gap <= 90) {
+          used.add(j);
+          coupling.push({ d: day, tideT: a.t, tideA: a.amt, embT: b.t, embA: b.amt,
+                          gap, n: b.n, shared: !!b.shared });
+          break;
+        }
+      }
+    });
+  });
+
+  const eYears = new Set(E.map(e => +e.d.slice(0, 4)));
+  const tYears = new Set(T.map(e => +e.d.slice(0, 4)));
+  const years = [];
+  for (let y = 2006; y <= 2026; y++) {
+    const hasE = eYears.has(y), hasT = tYears.has(y);
+    if (!hasE && !hasT) { years.push({ y, e: null, t: null, confE: 'guess', confT: 'guess' }); continue; }
+    const ey = E.filter(e => +e.d.slice(0, 4) === y);
+    const ty = T.filter(e => +e.d.slice(0, 4) === y);
+    const ad = new Set(ey.map(e => e.d)).size;
+    const n = sum(ey, e => e.n);
+    years.push({
+      y, e: hasE ? n : null, t: hasT ? ty.length : null,
+      confE: hasE ? 'measured' : 'guess', confT: hasT ? 'measured' : 'guess',
+      spendE: hasE ? Math.round(sum(ey, e => e.amt)) : null,
+      spendT: hasT ? Math.round(sum(ty, e => e.amt)) : null,
+      activeDays: hasE ? ad : null,
+      perActiveDay: hasE && ad ? Math.round(n / ad * 10) / 10 : null
+    });
+  }
+
+  return {
+    meta: { measuredFrom: allDays[0], measuredTo: allDays[allDays.length - 1],
+            spanDays: allDays.length ? spanOf(allDays) : 0 },
+    totals: {
+      embers, day: sum(E.filter(e => e.ch === 'day'), e => e.n),
+      night: sum(E.filter(e => e.ch === 'night'), e => e.n),
+      spendE: Math.round(sum(E, e => e.amt)),
+      tideEvents: T.length, spendT: Math.round(sum(T, e => e.amt)),
+      shared, soloEmbers: embers - shared,
+      perDay: Math.round(embers / eSpan * 100) / 100,
+      packYears: Math.round(embers / eSpan / 20 * (eSpan / 365.25) * 1000) / 1000,
+      emberSpanDays: eSpan, emberCoverageDays: eDays.length,
+      emberFrom: eDays[0], emberTo: eDays[eDays.length - 1]
+    },
+    dow, hours, coupling, years, ledger
+  };
+}
+
+function render(d) {
+  const t = d.totals, m = d.meta;
+  const nightPct = Math.round(t.night / t.embers * 100);
+  const app = document.getElementById('app');
+
+  app.innerHTML = `
+    <section>
+      <div class="hero">
+        <div class="stat e"><div class="stat-l">Embers</div><div class="stat-v">${t.embers}</div>
+          <div class="stat-s">${t.day} day · ${t.night} night</div></div>
+        <div class="stat e"><div class="stat-l">Density</div><div class="stat-v">${t.packYears}</div>
+          <div class="stat-s">over ${(t.emberSpanDays/365.25).toFixed(1)} yrs observed</div></div>
+        <div class="stat t"><div class="stat-l">Tides</div><div class="stat-v">${t.tideEvents}</div>
+          <div class="stat-s">distinct occasions</div></div>
+        <div class="stat"><div class="stat-l">Outflow</div><div class="stat-v">${inr(t.spendE + t.spendT)}</div>
+          <div class="stat-s">${inr(t.spendE)} + ${inr(t.spendT)}</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">The seasons</div>
+      <div class="chart-box"><div class="chart-wrap"><canvas id="cSeasons"></canvas></div>
+        <div class="legend">
+          <span><i style="background:${CSS('--ember')}"></i>Embers — recorded</span>
+          <span><i style="background:${CSS('--tide')}"></i>Tides — recorded</span>
+          <span><i style="background:${CSS('--border')}"></i>no ledger reaches this far back</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">Two rhythms, not one</div>
+      <div class="grid2">
+        <div class="chart-box"><div class="chart-wrap sm"><canvas id="cDow"></canvas></div>
+          <div class="legend"><span>By weekday — the day channel is an office habit</span></div></div>
+        <div class="chart-box"><div class="chart-wrap sm"><canvas id="cHours"></canvas></div>
+          <div class="legend"><span>By hour — two peaks, ten hours apart</span></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">The coupling</div>
+      <div class="cp">${d.coupling.map(c => `
+        <div class="cp-row">
+          <div class="cp-d">${c.d}</div>
+          <div class="cp-side cp-t">🌊 <b>${c.tideT}</b> <span>${inr(c.tideA)}</span></div>
+          <div class="cp-gap">${c.gap} min</div>
+          <div class="cp-side cp-e">🔥 <b>${c.embT}</b> <span>${inr(c.embA)}</span>
+            ${c.shared ? '<span class="cp-note">· shared</span>' : ''}</div>
+        </div>`).join('')}
+      </div>
+      <div class="note" style="margin-top:.8rem">
+        <b>${d.coupling.length} times</b>, one followed the other within
+        <b>${Math.max(...d.coupling.map(c => c.gap))} minutes</b> — median
+        <b>${median(d.coupling.map(c => c.gap))} min</b>. The night channel is
+        <b>${nightPct}%</b> of everything counted here, and it does not begin on its own.
+        This is the one pattern on the page that is triggered rather than chosen,
+        which also makes it the one with a door in it.
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">Cumulative outflow</div>
+      <div class="chart-box"><div class="chart-wrap"><canvas id="cCost"></canvas></div></div>
+    </section>
+
+    <section>
+      <div class="sec-title">Season by season</div>
+      <div class="chart-box scroll-x">
+        <table class="dt">
+          <thead><tr><th>Season</th><th class="num">Embers</th><th class="num">Per active day</th>
+            <th class="num">Tides</th><th class="num">Outflow</th><th>Basis</th></tr></thead>
+          <tbody>${d.years.filter(y => y.e !== null || y.t !== null).map(y => `
+            <tr><td>${y.y}</td>
+              <td class="num">${y.e ?? '—'}</td>
+              <td class="num">${y.perActiveDay ?? '—'}</td>
+              <td class="num">${y.t ?? '—'}</td>
+              <td class="num">${inr((y.spendE || 0) + (y.spendT || 0))}</td>
+              <td><span class="tag ${y.confE === 'measured' ? 'm' : ''}">${
+                y.confE === 'measured' ? 'recorded' : 'tides only'}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">What this cannot see</div>
+      <div class="note">
+        <span class="big">${t.emberCoverageDays} days out of ${t.emberSpanDays}.</span><br>
+        That is how much of the window left a trace — about
+        <b>${Math.round(t.emberCoverageDays / t.emberSpanDays * 100)}%</b>. Anything settled in
+        cash is invisible here, and the counters below the fold are built only from what settled
+        through a ledger. <b>${t.embers} is a floor.</b> The true figure is higher by an unknown
+        amount, and no honest arithmetic on this page can tell you by how much.<br><br>
+        Of those ${t.embers}, <b>${t.shared}</b> came from single purchases too large to be one
+        evening's own — counted, but flagged, leaving <b>${t.soloEmbers}</b> unambiguous.
+        Two ledgers feed this: one reaches back to ${m.measuredFrom}, the other only to
+        ${t.emberFrom}, and only the second can see Embers at all. Seasons before that are blank
+        here by honesty, not by absence.
+      </div>
+    </section>`;
+
+  drawSeasons(d); drawDow(d); drawHours(d); drawCost(d);
+  window.addEventListener('deepu-theme-change', () => { charts.forEach(c => c.destroy()); charts = [];
+    drawSeasons(d); drawDow(d); drawHours(d); drawCost(d); });
+}
+
+const median = a => { const s = [...a].sort((x, y) => x - y); const h = s.length >> 1;
+  return s.length % 2 ? s[h] : ((s[h - 1] + s[h]) / 2); };
+
+function baseOpts(extra) {
+  const grid = CSS('--border'), tick = CSS('--muted');
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: grid, drawBorder: false }, ticks: { color: tick, font: { size: 10 } } },
+      y: { grid: { color: grid, drawBorder: false }, ticks: { color: tick, font: { size: 10 } },
+           beginAtZero: true }
+    }
+  }, extra || {});
+}
+
+function drawSeasons(d) {
+  const ys = d.years;
+  charts.push(new Chart(document.getElementById('cSeasons'), {
+    type: 'bar',
+    data: { labels: ys.map(y => y.y),
+      datasets: [
+        { label: 'Embers', data: ys.map(y => y.e), backgroundColor: CSS('--ember'), borderRadius: 3 },
+        { label: 'Tides',  data: ys.map(y => y.t), backgroundColor: CSS('--tide'),  borderRadius: 3 }
+      ] },
+    options: baseOpts()
+  }));
+}
+
+function drawDow(d) {
+  charts.push(new Chart(document.getElementById('cDow'), {
+    type: 'bar',
+    data: { labels: DOW, datasets: [{ data: d.dow, borderRadius: 3,
+      backgroundColor: d.dow.map((_, i) => i >= 4 ? CSS('--muted2') : CSS('--ember')) }] },
+    options: baseOpts()
+  }));
+}
+
+function drawHours(d) {
+  const hrs = []; for (let h = 6; h <= 23; h++) hrs.push(h);
+  charts.push(new Chart(document.getElementById('cHours'), {
+    type: 'bar',
+    data: { labels: hrs.map(h => String(h).padStart(2, '0')),
+      datasets: [{ data: hrs.map(h => d.hours[h] || 0), borderRadius: 3,
+        backgroundColor: hrs.map(h => h >= 19 ? CSS('--tide') : CSS('--ember')) }] },
+    options: baseOpts()
+  }));
+}
+
+function drawCost(d) {
+  const byDay = {};
+  d.ledger.forEach(e => {
+    if (e.ch === 'transfer') return;
+    (byDay[e.d] = byDay[e.d] || { e: 0, t: 0 })[e.ch === 'tide' ? 't' : 'e'] += e.amt;
+  });
+  const days = Object.keys(byDay).sort();
+  let ce = 0, ct = 0;
+  const se = [], st = [];
+  days.forEach(k => { ce += byDay[k].e; ct += byDay[k].t; se.push(ce); st.push(ct); });
+  charts.push(new Chart(document.getElementById('cCost'), {
+    type: 'line',
+    data: { labels: days, datasets: [
+      { label: 'Embers', data: se, borderColor: CSS('--ember'), backgroundColor: CSS('--ember-dim'),
+        fill: true, pointRadius: 0, borderWidth: 2, tension: .1 },
+      { label: 'Tides', data: st, borderColor: CSS('--tide'), backgroundColor: CSS('--tide-dim'),
+        fill: true, pointRadius: 0, borderWidth: 2, tension: .1 }
+    ] },
+    options: baseOpts({ scales: {
+      x: { grid: { display: false }, ticks: { color: CSS('--muted'), font: { size: 9 },
+           maxTicksLimit: 8, autoSkip: true } },
+      y: { grid: { color: CSS('--border'), drawBorder: false },
+           ticks: { color: CSS('--muted'), font: { size: 10 }, callback: v => '₹' + (v / 1000) + 'k' },
+           beginAtZero: true } } })
+  }));
+}
+</script>
+</body>
+</html>

@@ -104,6 +104,7 @@
       <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
       <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
       <a href="half-marathon.html" class="nav-pill active" aria-current="page">🏅 Half Marathon</a>
+      <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
     </div>
     <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
@@ -120,6 +121,7 @@
         <a href="quotes.html" class="nav-pill">💬 Quotes</a>
         <a href="2026_school.html" class="nav-pill">🏫 School</a>
         <a href="half-marathon.html" class="nav-pill active" aria-current="page">🏅 Half Marathon</a>
+        <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
       </div>
     </div>
     <div class="nav-drawer-group">
@@ -180,11 +182,17 @@ let PLAN = [];
 let countdownTimer = null;
 
 const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 function fmtDate(d) {
   if (!d) return '';
   const p = String(d).split('-');
   if (p.length !== 3) return d;
   return `${MO[+p[1]-1]} ${+p[2]}`;
+}
+function getDayOfWeek(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr + 'T00:00:00Z');
+  return DW[date.getUTCDay()];
 }
 function fmtFull(d) {
   if (!d) return '';
@@ -266,12 +274,15 @@ const planCfg = {
   getBarH: s => s.type === 'Long Run' ? 3 : s.type === 'Speed Run' ? 2 : 1,
   makeMarkerVal: s => s.type === 'Long Run' ? 'LR' : s.type === 'Speed Run' ? 'SR' : 'RR',
   getTeaserTitle: s => s.type || '',
-  makeSlide: s => `<div class="tl-slide-inner">
-      <div class="tl-date">${s.day ? s.day.toUpperCase() + ' · ' : ''}Week ${s.week}${s.date ? ' · ' + fmtFull(s.date) : ''}</div>
+  makeSlide: s => {
+    const dayStr = s.date ? getDayOfWeek(s.date) : s.day;
+    return `<div class="tl-slide-inner">
+      <div class="tl-date">${dayStr ? dayStr.toUpperCase() + ' · ' : ''}Week ${s.week}${s.date ? ' · ' + fmtFull(s.date) : ''}</div>
       <div class="tl-headline" style="color:var(--plan)">${s.type || ''}</div>
       <div class="tl-meta">${statusBadge(s.status)}</div>
       ${s.target ? `<div class="tl-note">${s.target}</div>` : ''}
-    </div>`,
+    </div>`;
+  },
 };
 
 function buildTimeline(sorted) {
@@ -353,15 +364,18 @@ function render() {
   bodyEl.innerHTML = groupByWeek(PLAN).map(([wk, sessions]) => `
     <div class="week">
       <div class="week-hd">Week ${wk}</div>
-      ${sessions.map(s => `
+      ${sessions.map(s => {
+        const dayStr = s.date ? getDayOfWeek(s.date) : s.day;
+        return `
         <div class="session ${statusClass(s.status)}">
           <span class="s-daydate">
-            <span class="s-day">${s.day || ''}</span>
+            <span class="s-day">${dayStr || ''}</span>
             <span class="s-date">${fmtDate(s.date) || '—'}</span>
           </span>
           <span class="s-type">${s.type || ''}</span>
           ${statusBadge(s.status)}
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>`).join('');
 }
 

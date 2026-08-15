@@ -1,2 +1,12 @@
 .DS_Store
 apple_health_export/
+
+# Coded intake data — generated locally by scripts/extract_et.py. These are the
+# seed you paste into the private Sheet, plus an audit copy; the page itself
+# reads the Sheet, not these. Never committed: a static site cannot gate a file
+# served from its own repo, so nothing sensitive is allowed in here at all.
+data/et.json
+data/*.tsv
+
+# Holds payee names, venue names and statement paths. Never commit.
+scripts/*.local.json

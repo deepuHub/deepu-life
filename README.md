@@ -18,6 +18,7 @@
 | 🎒 Kid (`kid-private.html`) | Report cards by grade/term, chip navigation | Private — Google Sign-In |
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
+| 🔥 Embers & Tides (`embers-tides-private.html`) | Coded intake index; every counterparty is a code | Private — Google Sign-In |
 
 Private pages render nothing until Google authenticates the one account with access to that page's Sheet — enforced by Google, not by the page.
 
@@ -59,6 +60,7 @@ deepu-life/
 ├── health-private.html       ← private health dashboard (Google Sign-In)
 ├── kid-private.html          ← private report-card dashboard (Google Sign-In)
 ├── results-private.html      ← private BEd results dashboard (Google Sign-In)
+├── embers-tides-private.html ← coded intake index (private Sheet; seed built by scripts/)
 ├── assets/
 │   ├── css/
 │   │   ├── tracker-theme.css ← shared design tokens, nav, light/dark palette
