@@ -15,6 +15,7 @@
 | 💬 Quotes (`quotes.html`) | Saved quotes, reads from a Sheet | Public |
 | 🏫 School (`2026_school.html`) | School timings, food timetable, exam countdown | Public |
 | 🏅 Half Marathon (`half-marathon.html`) | Training plan with live race-day countdown | Public |
+| 🧮 Exams (`exam.html`) | Touch-friendly practice tests, Regular/Hulk-mode Harder, reads from a Sheet, auto-scores | Public |
 | 🎒 Kid (`kid-private.html`) | Report cards by grade/term, chip navigation | Private — Google Sign-In |
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
@@ -31,6 +32,12 @@ Private pages render nothing until Google authenticates the one account with acc
 ```
 Google Sheets  →  Apps Script Web App (doGet)  →  site fetches JSON
 ```
+
+**Exams** — questions live in a Google Sheet (one tab per test), published to web as CSV and fetched
+directly by `exam.html` (same CSV pattern as `quotes.html`). Grading happens client-side. Each submitted
+result is saved to `localStorage` (so the in-page history always works) and also POSTed to a separate,
+private results Sheet via `ExamAppScript.gs` for a durable record. See the setup comment block at the
+top of `exam.html`'s `<script>` for the one-time publish/deploy steps.
 
 **Private pages** — each has its own private Google Sheet (Restricted sharing) with no public web app. The page itself uses Google Identity Services (OAuth) to get an access token for the signed-in user, then reads the Sheet directly via the Sheets API. Each private Sheet also has its own Apps Script for auto-computed fields (e.g. Health's trend flags) — those scripts are bound to the Sheet itself and are not part of this repo, since they're personal.
 
@@ -57,6 +64,7 @@ deepu-life/
 ├── quotes.html               ← saved quotes, reads from a Sheet
 ├── 2026_school.html          ← school timings & food timetable (standalone theme)
 ├── half-marathon.html        ← training plan + race countdown
+├── exam.html                  ← practice tests, hero-themed per test, reads from a Sheet
 ├── health-private.html       ← private health dashboard (Google Sign-In)
 ├── kid-private.html          ← private report-card dashboard (Google Sign-In)
 ├── results-private.html      ← private BEd results dashboard (Google Sign-In)
@@ -70,6 +78,7 @@ deepu-life/
 │       ├── nav.js            ← mobile hamburger drawer
 │       └── timeline.js       ← shared cinematic timeline engine
 ├── AppScript.gs               ← paste into the public tracker's Apps Script
+├── ExamAppScript.gs            ← paste into the private Exam Results Sheet's Apps Script
 ├── .nojekyll                  ← disables Jekyll processing (site is plain HTML)
 └── README.md
 ```

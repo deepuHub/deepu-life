@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0a0f0d"/>
+<title>Exams — deepu-life</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AE%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<style>
+  :root{
+    --card: var(--surface2);
+    --hgreen:#2dd4a0; --hamber:#f0a532; --hred:#f0545c; --hblue:#4f8ef7;
+  }
+  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem;max-width:760px;margin:0 auto}
+
+  /* ═══ HERO THEMES — each test wears a different superhero mode,
+     same trick as 2026_school.html: swap CSS custom properties off a
+     data-hero attribute, everything downstream (buttons, chips,
+     progress bar) already reads var(--accent) so it re-skins for free ═══ */
+  [data-hero="cap"]{ --accent:#3a5fe0; --accent-dim:rgba(58,95,224,.16); --hero-glow:#d0121b; }
+  :root[data-theme="light"] [data-hero="cap"]{ --accent:#1b2a68; --accent-dim:#e7ecff; }
+  [data-hero="hulk"]{ --accent:#4ade52; --accent-dim:rgba(74,222,82,.16); --hero-glow:#b34dff; }
+  :root[data-theme="light"] [data-hero="hulk"]{ --accent:#2e7d32; --accent-dim:#e3ffd6; }
+
+  .hero-badge{
+    width:64px;height:64px;border-radius:50%;margin-bottom:0.9rem;display:flex;align-items:center;
+    justify-content:center;font-size:1.7rem;box-shadow:0 0 22px 5px var(--hero-glow),0 4px 14px rgba(0,0,0,.25);
+    position:relative;transition:box-shadow .3s;
+  }
+  [data-hero="cap"] .hero-badge{
+    background:repeating-radial-gradient(circle,#d0121b 0 9px,#f4f6ff 9px 18px,#1b2a68 18px 27px,#f4f6ff 27px 33px,#d0121b 33px 35px);
+    animation:hero-spin 14s linear infinite;
+  }
+  [data-hero="hulk"] .hero-badge{
+    background:radial-gradient(circle,#7cff3f 0%,#2e7d32 75%);
+    animation:hero-smash 1.5s cubic-bezier(.36,.07,.19,.97) infinite;
+  }
+  @keyframes hero-spin{to{transform:rotate(360deg)}}
+  @keyframes hero-smash{
+    0%,55%,100%{transform:scale(1) rotate(0)}
+    60%{transform:scale(1.18) rotate(-6deg)}
+    68%{transform:scale(0.92) rotate(4deg)}
+    75%{transform:scale(1.06) rotate(-2deg)}
+    82%{transform:scale(1) rotate(0)}
+  }
+  .hero-tag{
+    display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:0.28rem 0.75rem;border-radius:999px;background:var(--accent-dim);color:var(--accent);margin-bottom:0.7rem;
+  }
+
+  .hero{margin-bottom:2rem}
+  .hero-eyebrow{font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin-bottom:0.6rem}
+  .hero p{color:var(--muted);font-size:0.9rem;line-height:1.6;max-width:480px}
+
+  /* ── Chip picker ── */
+  .picker-block{margin-bottom:1.75rem}
+  .picker-label{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.6rem}
+  .chip-row{display:flex;gap:0.55rem;flex-wrap:wrap}
+  .big-chip{
+    padding:0.75rem 1.2rem;border-radius:14px;border:1px solid var(--border);background:var(--surface);
+    color:var(--text);font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .15s;
+    font-family:'Epilogue',sans-serif;min-height:52px;display:inline-flex;align-items:center;gap:0.5rem;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .big-chip:hover{border-color:var(--accent)}
+  .big-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+  .big-chip[disabled]{opacity:0.4;cursor:not-allowed}
+  .big-chip small{font-weight:400;color:var(--muted);font-size:0.7rem}
+
+  .name-input{
+    width:100%;max-width:320px;padding:0.85rem 1rem;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);font-family:'Epilogue',sans-serif;font-size:1rem;
+  }
+  .name-input:focus{outline:none;border-color:var(--accent)}
+
+  .start-btn{
+    margin-top:1.5rem;padding:0.95rem 2rem;border-radius:999px;border:none;background:var(--accent);
+    color:#0a0f0d;font-weight:700;font-size:0.95rem;cursor:pointer;transition:opacity .15s;
+    font-family:'Epilogue',sans-serif;min-height:52px;display:inline-flex;align-items:center;gap:0.5rem;
+  }
+  .start-btn:hover{opacity:0.85}
+  .start-btn[disabled]{opacity:0.35;cursor:not-allowed}
+
+  /* ── Exam card ── */
+  #exam-view{display:none}
+  .exam-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:1rem}
+  .exam-progress-label{font-size:0.78rem;color:var(--muted);font-weight:600;white-space:nowrap}
+  .progress-track{flex:1;height:8px;border-radius:999px;background:var(--surface2);overflow:hidden}
+  .progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .25s ease}
+
+  .q-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.25rem}
+  .q-topic{display:inline-block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;
+    padding:0.25rem 0.65rem;border-radius:999px;background:var(--surface2);color:var(--muted);margin-bottom:0.9rem}
+  .q-text{font-family:'Fraunces',serif;font-weight:700;font-size:1.2rem;line-height:1.45;margin-bottom:1.3rem}
+
+  .opt-list{display:flex;flex-direction:column;gap:0.6rem}
+  .opt-btn{
+    width:100%;text-align:left;padding:0.95rem 1.1rem;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface2);color:var(--text);font-size:0.95rem;font-weight:500;cursor:pointer;
+    font-family:'Epilogue',sans-serif;transition:all .12s;min-height:56px;display:flex;align-items:center;gap:0.7rem;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .opt-btn:hover{border-color:var(--accent)}
+  .opt-btn.selected{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-weight:700}
+  .opt-letter{width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0}
+  .opt-btn.selected .opt-letter{background:var(--accent);color:#0a0f0d;border-color:var(--accent)}
+
+  .symbol-row{display:flex;gap:0.8rem}
+  .symbol-btn{flex:1;padding:1.4rem;border-radius:12px;border:1px solid var(--border);background:var(--surface2);
+    font-size:2rem;font-weight:700;cursor:pointer;color:var(--text);transition:all .12s;min-height:80px}
+  .symbol-btn.selected{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+  .text-answer{width:100%;padding:0.95rem 1.1rem;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface2);color:var(--text);font-size:1.1rem;font-family:'Epilogue',sans-serif;min-height:56px}
+  .text-answer:focus{outline:none;border-color:var(--accent)}
+
+  .exam-nav{display:flex;justify-content:space-between;gap:0.75rem}
+  .nav-btn{flex:1;padding:0.9rem 1rem;border-radius:12px;border:1px solid var(--border);background:var(--surface);
+    color:var(--text);font-weight:600;font-size:0.88rem;cursor:pointer;font-family:'Epilogue',sans-serif;min-height:50px}
+  .nav-btn:hover{border-color:var(--accent)}
+  .nav-btn[disabled]{opacity:0.35;cursor:not-allowed}
+  .nav-btn.primary{background:var(--accent);color:#0a0f0d;border-color:var(--accent)}
+  .nav-btn.submit{background:var(--hgreen);color:#0a0f0d;border-color:var(--hgreen)}
+
+  .qgrid{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1.25rem}
+  .qdot{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
+    color:var(--muted);font-size:0.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .qdot.answered{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+  .qdot.current{border-color:var(--text);color:var(--text)}
+
+  /* ── Results ── */
+  #results-view{display:none;text-align:center}
+  .score-emoji{font-size:3.5rem;margin-bottom:0.5rem}
+  .score-big{font-family:'Fraunces',serif;font-weight:900;font-size:3rem;margin-bottom:0.25rem}
+  .score-sub{color:var(--muted);font-size:0.9rem;margin-bottom:1.75rem}
+  .topic-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1.75rem;text-align:left}
+  .tb-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem}
+  .tb-topic{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem}
+  .tb-score{font-size:1.15rem;font-weight:700}
+
+  .review-list{text-align:left;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.75rem}
+  .review-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1.1rem;
+    border-left:3px solid var(--border)}
+  .review-item.correct{border-left-color:var(--hgreen)}
+  .review-item.wrong{border-left-color:var(--hred)}
+  .review-q{font-size:0.85rem;font-weight:600;margin-bottom:0.35rem;display:flex;gap:0.5rem;align-items:flex-start}
+  .review-a{font-size:0.78rem;color:var(--muted);line-height:1.5}
+  .review-a b{color:var(--text)}
+
+  .result-actions{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+
+  /* ── History ── */
+  .history-block{margin-top:2.5rem;padding-top:1.75rem;border-top:1px solid var(--border)}
+  .hist-row{display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid var(--border);font-size:0.82rem}
+  .hist-row:last-child{border-bottom:none}
+  .hist-name{font-weight:600}
+  .hist-meta{color:var(--muted);font-size:0.72rem}
+  .hist-score{font-weight:700}
+  .empty-hist{color:var(--muted);font-size:0.82rem;padding:0.5rem 0}
+
+  .setup-note{background:rgba(240,165,50,.08);border:1px solid var(--hamber);color:var(--hamber);
+    border-radius:10px;padding:0.85rem 1rem;font-size:0.78rem;line-height:1.6;margin-bottom:1.5rem;display:none}
+
+  .confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:500;pointer-events:none;border-radius:2px}
+
+  footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-size:0.75rem;color:var(--muted)}
+  footer a{color:var(--text);text-decoration:none}
+  footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
+  <div class="nav-right">
+    <div class="nav-pills">
+      <a href="index.html" class="nav-pill">🏃 Tracker</a>
+      <a href="todo.html" class="nav-pill">✅ To-Do</a>
+      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+      <a href="2026_school.html" class="nav-pill">🏫 School</a>
+      <a href="exam.html" class="nav-pill active" aria-current="page">🧮 Exams</a>
+      <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
+      <a href="health-private.html" class="nav-pill">🩺 Health</a>
+      <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
+      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
+      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+      <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</nav>
+<div class="nav-drawer-backdrop"></div>
+<div class="nav-drawer">
+  <div class="nav-drawer-inner">
+    <div class="nav-drawer-group">
+      <div class="nav-drawer-label">Public</div>
+      <div class="nav-drawer-list">
+        <a href="index.html" class="nav-pill">🏃 Tracker</a>
+        <a href="todo.html" class="nav-pill">✅ To-Do</a>
+        <a href="quotes.html" class="nav-pill">💬 Quotes</a>
+        <a href="2026_school.html" class="nav-pill">🏫 School</a>
+        <a href="exam.html" class="nav-pill active" aria-current="page">🧮 Exams</a>
+        <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
+        <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
+      </div>
+    </div>
+    <div class="nav-drawer-group">
+      <div class="nav-drawer-label">🔒 Private</div>
+      <div class="nav-drawer-list">
+        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
+        <a href="health-private.html" class="nav-pill">🩺 Health</a>
+        <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
+        <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-root" data-hero="cap">
+
+  <section class="hero">
+    <div class="hero-badge" id="hero-badge">🛡️</div>
+    <p class="hero-tag" id="hero-tag">Captain America Mode</p>
+    <h1 id="hero-title">Practice time!</h1>
+    <p id="hero-sub">Pick a subject and a test, then tap your way through 20 questions. Scores are saved so we can watch progress over time.</p>
+  </section>
+
+  <div class="setup-note" id="setup-note">
+    <strong>Heads up:</strong> the question source isn't wired up yet. Open <code>exam.html</code> and fill in
+    <code>SHEET_CSV</code> (published Google Sheet CSV links) near the bottom of the file. See the comment block there for steps.
+  </div>
+
+  <!-- ═══ PICKER ═══ -->
+  <div id="picker-view">
+    <div class="picker-block">
+      <div class="picker-label">Subject</div>
+      <div class="chip-row" id="subject-chips">
+        <button class="big-chip active" data-subject="maths">🔢 Mathematics</button>
+        <button class="big-chip" disabled>🔤 English <small>soon</small></button>
+        <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
+      </div>
+    </div>
+
+    <div class="picker-block">
+      <div class="picker-label">Test</div>
+      <div class="chip-row" id="test-chips">
+        <button class="big-chip active" data-test="Test A - Regular" data-hero="cap">🛡️ Regular <small>Captain America mode</small></button>
+        <button class="big-chip" data-test="Test B - Harder" data-hero="hulk">👊 Harder <small>Hulk SMASH mode</small></button>
+      </div>
+    </div>
+
+    <div class="picker-block">
+      <div class="picker-label">Who's taking this test?</div>
+      <input type="text" class="name-input" id="student-name" placeholder="Type your name" value="Udhbhav"/>
+    </div>
+
+    <button class="start-btn" id="start-btn">▶ Start test</button>
+
+    <div class="history-block">
+      <div class="picker-label">Past attempts</div>
+      <div id="history-list"><div class="empty-hist">No attempts yet — take a test to start your history!</div></div>
+    </div>
+  </div>
+
+  <!-- ═══ EXAM ═══ -->
+  <div id="exam-view">
+    <div class="exam-topbar">
+      <span class="exam-progress-label" id="progress-label">Question 1 of 20</span>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-topic" id="q-topic">Place Value</span>
+      <div class="q-text" id="q-text">Loading…</div>
+      <div id="q-input-area"></div>
+    </div>
+
+    <div class="exam-nav">
+      <button class="nav-btn" id="prev-btn">← Back</button>
+      <button class="nav-btn primary" id="next-btn">Next →</button>
+      <button class="nav-btn submit" id="submit-btn" style="display:none">✓ Submit test</button>
+    </div>
+
+    <div class="qgrid" id="qgrid"></div>
+  </div>
+
+  <!-- ═══ RESULTS ═══ -->
+  <div id="results-view">
+    <div class="score-emoji" id="score-emoji">🎉</div>
+    <div class="score-big" id="score-big">0/100</div>
+    <div class="score-sub" id="score-sub"></div>
+
+    <div class="topic-breakdown" id="topic-breakdown"></div>
+
+    <div class="result-actions">
+      <button class="start-btn" id="retake-btn">🔁 Try again</button>
+      <button class="nav-btn" id="home-btn">🏠 Pick another test</button>
+    </div>
+
+    <div class="picker-label" style="text-align:left;margin-bottom:0.8rem">Review</div>
+    <div class="review-list" id="review-list"></div>
+  </div>
+
+</div>
+
+<footer>
+  deepu-life &nbsp;·&nbsp;
+  <a href="index.html">Home</a> &nbsp;·&nbsp;
+  <a href="https://deepuhub.github.io" target="_blank">DeepuHub</a> &nbsp;·&nbsp;
+  Made with ❤️ for kids and parents — by a kid's father
+</footer>
+
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   deepu-life — Exams
+   Reads questions from a published Google Sheet (CSV export), same
+   pattern as quotes.html. Grades client-side, logs results to a
+   Google Apps Script Web App (see ExamAppScript.gs in this repo) so
+   scores can be reviewed over time, and always keeps a local backup
+   in localStorage in case the network call fails.
+
+   ── ONE-TIME SETUP ──────────────────────────────────────────────
+   1. Upload Grade2_Maths_Numbers_to_1000.xlsx to Google Drive → it
+      converts to a Google Sheet automatically (or File ▸ Save as
+      Google Sheets).
+   2. File ▸ Share ▸ Publish to web ▸ pick the "Test A - Regular" tab
+      ▸ Comma-separated values (.csv) ▸ Publish. Copy the URL.
+      Repeat for the "Test B - Harder" tab. Paste both below.
+   3. Deploy ExamAppScript.gs as a Web App (Deploy ▸ New deployment ▸
+      Web app ▸ Execute as: Me ▸ Who has access: Anyone). Paste the
+      resulting /exec URL into RESULTS_GS_URL below.
+   ════════════════════════════════════════════════════════════════ */
+
+const SHEET_CSV = {
+  "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=0&single=true&output=csv",
+  "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=288074401&single=true&output=csv",
+};
+const RESULTS_GS_URL = "https://script.google.com/macros/s/AKfycbzX-GXOlaiuOOhfGbIi3Nz0-_Em5mK4uDzWQPb_AlO1qph3jkhRwHLt1lPxRDriVlnu/exec";
+
+const TOPIC_EMOJI = {
+  "Place Value": "🔢",
+  "Comparing & Ordering": "⚖️",
+  "Estimating & Rounding": "🎯",
+};
+
+// Each test wears a hero identity — badge, tag line, headline and confetti
+// colors all switch together. Add more entries here as more tests show up.
+const HERO_THEME = {
+  cap: {
+    badge: "🛡️", tag: "Captain America Mode",
+    title: "Assemble and ace it!",
+    sub: "The regular test — steady, fair, and straight down the middle. You've got this, soldier.",
+    confetti: ["#d0121b", "#f4f6ff", "#1b2a68"],
+    cheer: "Captain America salutes your effort! 🛡️",
+  },
+  hulk: {
+    badge: "👊", tag: "Hulk SMASH Mode",
+    title: "SMASH this test!",
+    sub: "The harder test — trickier numbers, bigger brain muscles. Hulk believes in you.",
+    confetti: ["#4ade52", "#b34dff", "#0f1c0d"],
+    cheer: "Hulk says: you SMASHED it! 💪",
+  },
+};
+
+let CURRENT_QUESTIONS = [];
+let CURRENT_TEST = "Test A - Regular";
+let CURRENT_HERO = "cap";
+let CURRENT_ANSWERS = {};
+let CURRENT_INDEX = 0;
+let STUDENT_NAME = "Udhbhav";
+
+function updateHeroUI() {
+  const h = HERO_THEME[CURRENT_HERO];
+  document.getElementById('page-root').setAttribute('data-hero', CURRENT_HERO);
+  document.getElementById('hero-badge').textContent = h.badge;
+  document.getElementById('hero-tag').textContent = h.tag;
+  const titleEl = document.getElementById('hero-title');
+  const subEl = document.getElementById('hero-sub');
+  if (titleEl) titleEl.textContent = h.title;
+  if (subEl) subEl.textContent = h.sub;
+}
+
+// ── CSV parser (handles quoted fields with commas), same as quotes.html ──
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        fields.push(cur.trim()); cur = '';
+      } else cur += ch;
+    }
+    fields.push(cur.trim());
+    rows.push(fields);
+  }
+  return rows;
+}
+
+function rowsToQuestions(rows) {
+  if (rows.length < 2) return [];
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const idx = {
+    qnum: header.indexOf('q#'),
+    topic: header.indexOf('topic'),
+    type: header.indexOf('type'),
+    question: header.indexOf('question'),
+    a: header.indexOf('option a'),
+    b: header.indexOf('option b'),
+    c: header.indexOf('option c'),
+    d: header.indexOf('option d'),
+    correct: header.indexOf('correct answer'),
+    points: header.indexOf('points'),
+  };
+  return rows.slice(1)
+    .filter(r => r[idx.question] && r[idx.question].trim())
+    .map(r => ({
+      qnum: r[idx.qnum],
+      topic: r[idx.topic] || 'General',
+      type: (r[idx.type] || 'Short Answer').trim(),
+      question: r[idx.question],
+      options: [r[idx.a], r[idx.b], r[idx.c], r[idx.d]].filter(o => o && o.trim()),
+      correct: (r[idx.correct] || '').trim(),
+      points: Number(r[idx.points]) || 5,
+    }));
+}
+
+async function loadQuestions(testName) {
+  const url = SHEET_CSV[testName];
+  if (!url) { document.getElementById('setup-note').style.display = 'block'; return []; }
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+  return rowsToQuestions(parseCSV(text));
+}
+
+// ── PICKER ──────────────────────────────────────────────────────────
+document.querySelectorAll('#test-chips .big-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#test-chips .big-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    CURRENT_TEST = btn.dataset.test;
+    CURRENT_HERO = btn.dataset.hero || 'cap';
+    updateHeroUI();
+  });
+});
+
+document.getElementById('student-name').addEventListener('input', e => {
+  STUDENT_NAME = e.target.value.trim() || 'Student';
+});
+
+document.getElementById('start-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('start-btn');
+  btn.textContent = 'Loading…'; btn.disabled = true;
+  try {
+    CURRENT_QUESTIONS = await loadQuestions(CURRENT_TEST);
+    if (!CURRENT_QUESTIONS.length) { btn.textContent = '▶ Start test'; btn.disabled = false; return; }
+    CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
+    document.getElementById('picker-view').style.display = 'none';
+    document.getElementById('exam-view').style.display = 'block';
+    buildQGrid();
+    renderQuestion();
+  } catch (err) {
+    alert('Could not load questions. ' + err.message);
+  }
+  btn.textContent = '▶ Start test'; btn.disabled = false;
+});
+
+// ── EXAM RENDER ─────────────────────────────────────────────────────
+function buildQGrid() {
+  const grid = document.getElementById('qgrid');
+  grid.innerHTML = '';
+  CURRENT_QUESTIONS.forEach((q, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'qdot';
+    dot.textContent = i + 1;
+    dot.addEventListener('click', () => { CURRENT_INDEX = i; renderQuestion(); });
+    grid.appendChild(dot);
+  });
+}
+
+function renderQuestion() {
+  const q = CURRENT_QUESTIONS[CURRENT_INDEX];
+  const total = CURRENT_QUESTIONS.length;
+  document.getElementById('progress-label').textContent = `Question ${CURRENT_INDEX + 1} of ${total}`;
+  document.getElementById('progress-fill').style.width = `${((CURRENT_INDEX + 1) / total) * 100}%`;
+  document.getElementById('q-topic').textContent = `${TOPIC_EMOJI[q.topic] || '📘'} ${q.topic}`;
+  document.getElementById('q-text').textContent = q.question;
+
+  const area = document.getElementById('q-input-area');
+  area.innerHTML = '';
+  const saved = CURRENT_ANSWERS[CURRENT_INDEX];
+
+  if (q.type === 'MCQ' || q.type === 'True/False') {
+    const wrap = document.createElement('div');
+    wrap.className = 'opt-list';
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      const b = document.createElement('button');
+      b.className = 'opt-btn' + (saved === letter ? ' selected' : '');
+      b.innerHTML = `<span class="opt-letter">${letter}</span><span>${opt}</span>`;
+      b.addEventListener('click', () => { CURRENT_ANSWERS[CURRENT_INDEX] = letter; renderQuestion(); });
+      wrap.appendChild(b);
+    });
+    area.appendChild(wrap);
+  } else if (q.correct === '<' || q.correct === '>') {
+    const wrap = document.createElement('div');
+    wrap.className = 'symbol-row';
+    ['<', '>'].forEach(sym => {
+      const b = document.createElement('button');
+      b.className = 'symbol-btn' + (saved === sym ? ' selected' : '');
+      b.textContent = sym;
+      b.addEventListener('click', () => { CURRENT_ANSWERS[CURRENT_INDEX] = sym; renderQuestion(); });
+      wrap.appendChild(b);
+    });
+    area.appendChild(wrap);
+  } else {
+    const isNumeric = /^-?\d+$/.test(q.correct);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'text-answer';
+    input.inputMode = isNumeric ? 'numeric' : 'text';
+    input.placeholder = 'Type your answer';
+    input.value = saved || '';
+    input.addEventListener('input', e => { CURRENT_ANSWERS[CURRENT_INDEX] = e.target.value; });
+    area.appendChild(input);
+  }
+
+  document.getElementById('prev-btn').disabled = CURRENT_INDEX === 0;
+  document.getElementById('next-btn').style.display = CURRENT_INDEX === total - 1 ? 'none' : 'flex';
+  document.getElementById('submit-btn').style.display = CURRENT_INDEX === total - 1 ? 'flex' : 'none';
+
+  document.querySelectorAll('.qdot').forEach((d, i) => {
+    d.classList.toggle('answered', CURRENT_ANSWERS[i] !== undefined && CURRENT_ANSWERS[i] !== '');
+    d.classList.toggle('current', i === CURRENT_INDEX);
+  });
+}
+
+document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
+document.getElementById('next-btn').addEventListener('click', () => { if (CURRENT_INDEX < CURRENT_QUESTIONS.length - 1) { CURRENT_INDEX++; renderQuestion(); } });
+document.getElementById('submit-btn').addEventListener('click', submitExam);
+
+// ── GRADING ─────────────────────────────────────────────────────────
+function normalize(v) { return String(v || '').trim().toLowerCase().replace(/\s+/g, ' '); }
+
+function submitExam() {
+  const unanswered = CURRENT_QUESTIONS.filter((_, i) => !CURRENT_ANSWERS[i]).length;
+  if (unanswered > 0 && !confirm(`${unanswered} question(s) still unanswered. Submit anyway?`)) return;
+
+  let scored = 0, maxScore = 0;
+  const topicScores = {};
+  const reviewRows = [];
+
+  CURRENT_QUESTIONS.forEach((q, i) => {
+    maxScore += q.points;
+    topicScores[q.topic] = topicScores[q.topic] || { got: 0, max: 0 };
+    topicScores[q.topic].max += q.points;
+
+    let given = CURRENT_ANSWERS[i] || '';
+    let correctDisplay = q.correct;
+    let isCorrect;
+    if (q.type === 'MCQ' || q.type === 'True/False') {
+      const idx = { A: 0, B: 1, C: 2, D: 3 }[q.correct];
+      correctDisplay = q.options[idx];
+      isCorrect = given === q.correct;
+      given = given ? q.options[{ A: 0, B: 1, C: 2, D: 3 }[given]] : '(no answer)';
+    } else {
+      isCorrect = normalize(given) === normalize(q.correct);
+      given = given || '(no answer)';
+    }
+
+    if (isCorrect) { scored += q.points; topicScores[q.topic].got += q.points; }
+    reviewRows.push({ q: q.question, given, correctDisplay, isCorrect, topic: q.topic });
+  });
+
+  showResults(scored, maxScore, topicScores, reviewRows);
+  logResult(scored, maxScore);
+}
+
+function showResults(scored, maxScore, topicScores, reviewRows) {
+  document.getElementById('exam-view').style.display = 'none';
+  document.getElementById('results-view').style.display = 'block';
+
+  const pct = Math.round((scored / maxScore) * 100);
+  document.getElementById('score-big').textContent = `${scored}/${maxScore}`;
+  document.getElementById('score-emoji').textContent = pct >= 90 ? '🎉' : pct >= 70 ? '👍' : '💪';
+  const heroLine = pct >= 90 ? HERO_THEME[CURRENT_HERO].cheer
+    : pct >= 70 ? 'Solid effort!' : 'Keep practicing — you\'ll get there!';
+  document.getElementById('score-sub').textContent =
+    `${STUDENT_NAME} scored ${pct}% on ${CURRENT_TEST} — ${heroLine}`;
+
+  const tb = document.getElementById('topic-breakdown');
+  tb.innerHTML = '';
+  Object.entries(topicScores).forEach(([topic, s]) => {
+    const card = document.createElement('div');
+    card.className = 'tb-card';
+    card.innerHTML = `<div class="tb-topic">${TOPIC_EMOJI[topic] || '📘'} ${topic}</div><div class="tb-score">${s.got}/${s.max}</div>`;
+    tb.appendChild(card);
+  });
+
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  reviewRows.forEach((r, i) => {
+    const item = document.createElement('div');
+    item.className = 'review-item ' + (r.isCorrect ? 'correct' : 'wrong');
+    item.innerHTML = `<div class="review-q">${r.isCorrect ? '✅' : '❌'} <span>Q${i+1}. ${r.q}</span></div>
+      <div class="review-a">Your answer: <b>${r.given}</b>${r.isCorrect ? '' : ` &nbsp;·&nbsp; Correct answer: <b>${r.correctDisplay}</b>`}</div>`;
+    list.appendChild(item);
+  });
+
+  if (pct >= 90) fireConfetti();
+}
+
+function fireConfetti() {
+  const colors = HERO_THEME[CURRENT_HERO].confetti;
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.transform = `rotate(${Math.random() * 360}deg)`;
+    document.body.appendChild(el);
+    const duration = 1800 + Math.random() * 1200;
+    el.animate(
+      [{ transform: el.style.transform, top: '-10px', opacity: 1 },
+       { transform: `rotate(${Math.random() * 720}deg)`, top: '100vh', opacity: 0.8 }],
+      { duration, easing: 'ease-in' }
+    ).onfinish = () => el.remove();
+  }
+}
+
+// ── PERSIST RESULTS ─────────────────────────────────────────────────
+function logResult(scored, maxScore) {
+  const entry = {
+    name: STUDENT_NAME, test: CURRENT_TEST, score: scored, max: maxScore,
+    pct: Math.round((scored / maxScore) * 100), date: new Date().toISOString(),
+  };
+  try {
+    const key = 'deepu-exam-history';
+    const hist = JSON.parse(localStorage.getItem(key) || '[]');
+    hist.unshift(entry);
+    localStorage.setItem(key, JSON.stringify(hist.slice(0, 50)));
+    renderHistory();
+  } catch (e) {}
+
+  if (RESULTS_GS_URL) {
+    fetch(RESULTS_GS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight on Apps Script
+      body: JSON.stringify(entry),
+    }).catch(() => {}); // silent — local copy already saved
+  }
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('deepu-exam-history') || '[]'); } catch (e) {}
+  if (!hist.length) { el.innerHTML = '<div class="empty-hist">No attempts yet — take a test to start your history!</div>'; return; }
+  el.innerHTML = hist.slice(0, 8).map(h => `
+    <div class="hist-row">
+      <div><div class="hist-name">${h.name} — ${h.test}</div><div class="hist-meta">${new Date(h.date).toLocaleDateString()}</div></div>
+      <div class="hist-score">${h.score}/${h.max} (${h.pct}%)</div>
+    </div>`).join('');
+}
+
+// ── RESET / RETAKE ──────────────────────────────────────────────────
+document.getElementById('retake-btn').addEventListener('click', () => {
+  CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
+  document.getElementById('results-view').style.display = 'none';
+  document.getElementById('exam-view').style.display = 'block';
+  buildQGrid(); renderQuestion();
+});
+document.getElementById('home-btn').addEventListener('click', () => {
+  document.getElementById('results-view').style.display = 'none';
+  document.getElementById('picker-view').style.display = 'block';
+});
+
+updateHeroUI();
+renderHistory();
+</script>
+</body>
+</html>
