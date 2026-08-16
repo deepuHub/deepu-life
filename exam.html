@@ -566,6 +566,7 @@ function submitExam() {
   let scored = 0, maxScore = 0;
   const topicScores = {};
   const reviewRows = [];
+  const wrongQuestions = [];
 
   CURRENT_QUESTIONS.forEach((q, i) => {
     maxScore += q.points;
@@ -586,11 +587,12 @@ function submitExam() {
     }
 
     if (isCorrect) { scored += q.points; topicScores[q.topic].got += q.points; }
+    else { wrongQuestions.push(i + 1); }
     reviewRows.push({ q: q.question, given, correctDisplay, isCorrect, topic: q.topic });
   });
 
   showResults(scored, maxScore, topicScores, reviewRows);
-  logResult(scored, maxScore);
+  logResult(scored, maxScore, wrongQuestions);
 }
 
 function showResults(scored, maxScore, topicScores, reviewRows) {
@@ -646,10 +648,11 @@ function fireConfetti() {
 }
 
 // ── PERSIST RESULTS ─────────────────────────────────────────────────
-function logResult(scored, maxScore) {
+function logResult(scored, maxScore, wrongQuestions) {
   const entry = {
     name: STUDENT_NAME, test: CURRENT_TEST, score: scored, max: maxScore,
     pct: Math.round((scored / maxScore) * 100), date: new Date().toISOString(),
+    wrong: (wrongQuestions || []).join(','),
   };
   try {
     const key = 'deepu-exam-history';

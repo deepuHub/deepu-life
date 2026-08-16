@@ -16,7 +16,9 @@
  * 5. Copy the /exec URL it gives you and paste it into RESULTS_GS_URL near
  *    the bottom of exam.html.
  *
- * Sheet tab "Results" columns: timestamp | name | test | score | max | pct
+ * Sheet tab "Results" columns: timestamp | name | test | score | max | pct | wrong questions
+ * "Wrong questions" is a comma-separated list of question numbers the
+ * student got wrong, e.g. "4,6,9" — empty if a perfect score.
  */
 
 const RESULTS_SHEET_NAME = 'Results';
@@ -26,7 +28,7 @@ function setupSheet() {
   let sheet = ss.getSheetByName(RESULTS_SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(RESULTS_SHEET_NAME);
   if (!sheet.getRange(1, 1).getValue()) {
-    const headers = ['Timestamp', 'Name', 'Test', 'Score', 'Max', 'Percent'];
+    const headers = ['Timestamp', 'Name', 'Test', 'Score', 'Max', 'Percent', 'Wrong Questions'];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
   }
@@ -53,6 +55,7 @@ function doPost(e) {
       body.score || 0,
       body.max || 0,
       body.pct || 0,
+      body.wrong || '',
     ]);
 
     return respond({ status: 'ok' });
