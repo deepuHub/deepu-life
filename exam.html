@@ -260,6 +260,7 @@
       <div class="picker-label">Subject</div>
       <div class="chip-row" id="subject-chips">
         <button class="big-chip active" data-subject="maths">🔢 Mathematics</button>
+        <button class="big-chip" data-subject="dlc">💻 DL&amp;C <small>Digital Learning &amp; Computers</small></button>
         <button class="big-chip" disabled>🔤 English <small>soon</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
       </div>
@@ -348,18 +349,29 @@
    ── ONE-TIME SETUP ──────────────────────────────────────────────
    1. Upload Grade2_Maths_Numbers_to_1000.xlsx to Google Drive → it
       converts to a Google Sheet automatically (or File ▸ Save as
-      Google Sheets).
-   2. File ▸ Share ▸ Publish to web ▸ pick the "Test A - Regular" tab
-      ▸ Comma-separated values (.csv) ▸ Publish. Copy the URL.
-      Repeat for the "Test B - Harder" tab. Paste both below.
+      Google Sheets). Every subject's tests live as extra tabs in
+      this same spreadsheet — e.g. Maths' "Test A - Regular" /
+      "Test B - Harder", DL&C's "Test A - Regular" / "Test B - Harder".
+   2. File ▸ Share ▸ Publish to web ▸ pick a tab ▸ Comma-separated
+      values (.csv) ▸ Publish. Copy the URL. Repeat per tab. Paste
+      each into SHEET_CSV below, nested under its subject key
+      (maths / dlc / …).
    3. Deploy ExamAppScript.gs as a Web App (Deploy ▸ New deployment ▸
       Web app ▸ Execute as: Me ▸ Who has access: Anyone). Paste the
       resulting /exec URL into RESULTS_GS_URL below.
    ════════════════════════════════════════════════════════════════ */
 
+// Keyed by subject, then by test name — each subject picks its tests from
+// its own set of published-to-web CSV tabs, all living in one spreadsheet.
 const SHEET_CSV = {
-  "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=0&single=true&output=csv",
-  "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=288074401&single=true&output=csv",
+  maths: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=0&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=288074401&single=true&output=csv",
+  },
+  dlc: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1148713995&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=120015731&single=true&output=csv",
+  },
 };
 const RESULTS_GS_URL = "https://script.google.com/macros/s/AKfycbzX-GXOlaiuOOhfGbIi3Nz0-_Em5mK4uDzWQPb_AlO1qph3jkhRwHLt1lPxRDriVlnu/exec";
 
@@ -367,6 +379,12 @@ const TOPIC_EMOJI = {
   "Place Value": "🔢",
   "Comparing & Ordering": "⚖️",
   "Estimating & Rounding": "🎯",
+  "Algorithms": "🧩",
+  "Editing Algorithms": "✏️",
+  "Efficient Programs": "⚡",
+  "Scratch Blocks": "🧱",
+  "Resetting Objects": "🔄",
+  "Keywords": "🔑",
 };
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
@@ -389,6 +407,7 @@ const HERO_THEME = {
 };
 
 let CURRENT_QUESTIONS = [];
+let CURRENT_SUBJECT = "maths";
 let CURRENT_TEST = "Test A - Regular";
 let CURRENT_HERO = "cap";
 let CURRENT_ANSWERS = {};
@@ -458,7 +477,7 @@ function rowsToQuestions(rows) {
 }
 
 async function loadQuestions(testName) {
-  const url = SHEET_CSV[testName];
+  const url = (SHEET_CSV[CURRENT_SUBJECT] || {})[testName];
   if (!url) { document.getElementById('setup-note').style.display = 'block'; return []; }
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -467,6 +486,14 @@ async function loadQuestions(testName) {
 }
 
 // ── PICKER ──────────────────────────────────────────────────────────
+document.querySelectorAll('#subject-chips .big-chip[data-subject]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#subject-chips .big-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    CURRENT_SUBJECT = btn.dataset.subject;
+  });
+});
+
 document.querySelectorAll('#test-chips .big-chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#test-chips .big-chip').forEach(b => b.classList.remove('active'));
