@@ -276,7 +276,7 @@
 
     <div class="picker-block">
       <div class="picker-label">Who's taking this test?</div>
-      <input type="text" class="name-input" id="student-name" placeholder="Type your name" value="Udhbhav"/>
+      <input type="text" class="name-input" id="student-name" placeholder="Type your name" value="RoadRunner"/>
     </div>
 
     <button class="start-btn" id="start-btn">▶ Start test</button>
@@ -412,7 +412,12 @@ let CURRENT_TEST = "Test A - Regular";
 let CURRENT_HERO = "cap";
 let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
-let STUDENT_NAME = "Udhbhav";
+let STUDENT_NAME = "RoadRunner";
+
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C" };
+// The exact test name logged/shown everywhere — includes the subject, so
+// "Test A - Regular" is distinguishable between Mathematics and DL&C.
+function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
 
 function updateHeroUI() {
   const h = HERO_THEME[CURRENT_HERO];
@@ -508,11 +513,22 @@ document.getElementById('student-name').addEventListener('input', e => {
   STUDENT_NAME = e.target.value.trim() || 'Student';
 });
 
+// Fisher–Yates — used so questions don't appear in the same order every
+// attempt (both a fresh start and a retake reshuffle).
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 document.getElementById('start-btn').addEventListener('click', async () => {
   const btn = document.getElementById('start-btn');
   btn.textContent = 'Loading…'; btn.disabled = true;
   try {
-    CURRENT_QUESTIONS = await loadQuestions(CURRENT_TEST);
+    CURRENT_QUESTIONS = shuffleArray(await loadQuestions(CURRENT_TEST));
     if (!CURRENT_QUESTIONS.length) { btn.textContent = '▶ Start test'; btn.disabled = false; return; }
     CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
     document.getElementById('picker-view').style.display = 'none';
@@ -630,7 +646,7 @@ function submitExam() {
     }
 
     if (isCorrect) { scored += q.points; topicScores[q.topic].got += q.points; }
-    else { wrongQuestions.push(i + 1); }
+    else { wrongQuestions.push(q.qnum || (i + 1)); }
     reviewRows.push({ q: q.question, given, correctDisplay, isCorrect, topic: q.topic });
   });
 
@@ -651,7 +667,7 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
     : pct >= 90 ? HERO_THEME[CURRENT_HERO].cheer
     : pct >= 70 ? 'Solid effort!' : 'Keep practicing — you\'ll get there!';
   document.getElementById('score-sub').textContent =
-    `${STUDENT_NAME} scored ${pct}% on ${CURRENT_TEST} — ${heroLine}`;
+    `${STUDENT_NAME} scored ${pct}% on ${fullTestLabel()} — ${heroLine}`;
 
   const tb = document.getElementById('topic-breakdown');
   tb.innerHTML = '';
@@ -778,10 +794,13 @@ function firePerfectScoreShow() {
 
 // ── PERSIST RESULTS ─────────────────────────────────────────────────
 function logResult(scored, maxScore, wrongQuestions) {
+  // Sort numerically — CURRENT_QUESTIONS is shuffled per attempt, so
+  // wrongQuestions no longer arrives in ascending order on its own.
+  const sortedWrong = (wrongQuestions || []).slice().sort((a, b) => Number(a) - Number(b));
   const entry = {
-    name: STUDENT_NAME, test: CURRENT_TEST, score: scored, max: maxScore,
+    name: STUDENT_NAME, test: fullTestLabel(), score: scored, max: maxScore,
     pct: Math.round((scored / maxScore) * 100), date: new Date().toISOString(),
-    wrong: (wrongQuestions || []).join(','),
+    wrong: sortedWrong.join(','),
   };
   try {
     const key = 'deepu-exam-history';
@@ -814,6 +833,7 @@ function renderHistory() {
 
 // ── RESET / RETAKE ──────────────────────────────────────────────────
 document.getElementById('retake-btn').addEventListener('click', () => {
+  CURRENT_QUESTIONS = shuffleArray(CURRENT_QUESTIONS);
   CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
   document.getElementById('results-view').style.display = 'none';
   document.getElementById('exam-view').style.display = 'block';
