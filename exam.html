@@ -154,6 +154,24 @@
     mix-blend-mode:screen;filter:blur(0.5px);
   }
   .firework-particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:600}
+
+  .hero-speech-bubble{
+    position:fixed;top:34%;left:50%;transform:translate(-50%,-50%) scale(0.3);
+    background:#fff;color:#0a0f0d;padding:1.1rem 1.5rem;border-radius:22px;
+    border:4px solid #0a0f0d;max-width:min(86vw,380px);text-align:center;
+    font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.05rem,4.2vw,1.4rem);
+    line-height:1.3;z-index:602;opacity:0;pointer-events:none;
+    box-shadow:0 12px 30px rgba(0,0,0,0.45);
+  }
+  .hero-speech-bubble::after{
+    content:'';position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
+    border-width:18px 14px 0 14px;border-style:solid;border-color:#0a0f0d transparent transparent transparent;
+  }
+  .hero-speech-bubble::before{
+    content:'';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);
+    border-width:13px 10px 0 10px;border-style:solid;border-color:#fff transparent transparent transparent;
+    z-index:1;
+  }
   .score-big{font-family:'Fraunces',serif;font-weight:900;font-size:3rem;margin-bottom:0.25rem}
   .score-sub{color:var(--muted);font-size:0.9rem;margin-bottom:1.75rem}
   .topic-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1.75rem;text-align:left}
@@ -401,6 +419,12 @@ const HERO_THEME = {
     sub: "The regular test — steady, fair, and straight down the middle. You've got this, soldier.",
     confetti: ["#d0121b", "#f4f6ff", "#1b2a68"],
     cheer: "Captain America salutes your effort! 🛡️",
+    // Spoken on a perfect score via the browser's built-in text-to-speech —
+    // not a real actor's voice, just pitch/rate tuned for a "commanding
+    // hero" feel. bubbleText is the short version shown in the comic bubble.
+    voiceLine: "Soldier... I salute you. Outstanding work today!",
+    bubbleText: "I SALUTE YOU, SOLDIER! 🛡️",
+    voicePitch: 1.0, voiceRate: 0.9,
   },
   hulk: {
     badge: "👊", tag: "Hulk SMASH Mode",
@@ -408,6 +432,9 @@ const HERO_THEME = {
     sub: "The harder test — trickier numbers, bigger brain muscles. Hulk believes in you.",
     confetti: ["#4ade52", "#b34dff", "#0f1c0d"],
     cheer: "Hulk says: you SMASHED it! 💪",
+    voiceLine: "Hulk... says... you SMASHED it!",
+    bubbleText: "YOU SMASHED IT!! 💪",
+    voicePitch: 0.45, voiceRate: 0.75,
   },
 };
 
@@ -715,8 +742,85 @@ function fireConfetti() {
   }
 }
 
+// ── Synthesized cinematic "boom" — no audio files, just oscillators/noise ──
+function playImpactBoom() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const now = ctx.currentTime;
+
+    // low-frequency thump, sweeping down
+    const osc = ctx.createOscillator();
+    const oscGain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.45);
+    oscGain.gain.setValueAtTime(0.9, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc.connect(oscGain).connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.5);
+
+    // short noise burst layered on top for "impact crack"
+    const bufferSize = ctx.sampleRate * 0.2;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.5, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    noise.connect(noiseGain).connect(ctx.destination);
+    noise.start(now);
+
+    setTimeout(() => ctx.close(), 900);
+  } catch (e) { /* Web Audio unsupported — visuals still carry the moment */ }
+}
+
+// ── Hero "voice line" — browser text-to-speech (not a real actor's voice),
+//    paired with a comic speech bubble. Pitch/rate give each hero a
+//    distinct feel: commanding for Cap, deep and choppy for Hulk.
+//    IMPORTANT: speak() must fire synchronously inside the click handler's
+//    call stack — iOS Safari silently drops speech requested from a
+//    setTimeout callback, since it's no longer "inside" the user gesture.
+//    The bubble is pure visual, so it's fine to stagger via animate()'s
+//    own delay option instead of a setTimeout. ──
+function fireHeroVoiceLine() {
+  const h = HERO_THEME[CURRENT_HERO];
+
+  const bubble = document.createElement('div');
+  bubble.className = 'hero-speech-bubble';
+  bubble.textContent = h.bubbleText;
+  document.body.appendChild(bubble);
+  bubble.animate(
+    [
+      { transform: 'translate(-50%,-50%) scale(0.2) rotate(-6deg)', opacity: 0 },
+      { transform: 'translate(-50%,-50%) scale(1.12) rotate(2deg)', opacity: 1, offset: 0.18 },
+      { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1, offset: 0.82 },
+      { transform: 'translate(-50%,-50%) scale(0.85) rotate(-2deg)', opacity: 0 },
+    ],
+    { duration: 3600, delay: 1200, easing: 'ease-in-out', fill: 'both' }
+  ).onfinish = () => bubble.remove();
+
+  try {
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(h.voiceLine);
+    utter.pitch = h.voicePitch;
+    utter.rate = h.voiceRate;
+    utter.volume = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice = voices.find(v => /en([-_]|$)/i.test(v.lang) && /male/i.test(v.name))
+      || voices.find(v => /en([-_]|$)/i.test(v.lang));
+    if (enVoice) utter.voice = enVoice;
+    window.speechSynthesis.cancel(); // clear any queued speech first
+    window.speechSynthesis.speak(utter);
+  } catch (e) { /* speech unsupported — bubble text still lands the joke */ }
+}
+
 // ── PERFECT SCORE: fireworks + laser show ────────────────────────────
 function firePerfectScoreShow() {
+  playImpactBoom();
+
   // white screen flash for impact
   const flash = document.createElement('div');
   flash.className = 'perfect-flash';
@@ -725,6 +829,11 @@ function firePerfectScoreShow() {
     [{ opacity: 0 }, { opacity: 0.85, offset: 0.08 }, { opacity: 0 }],
     { duration: 550, easing: 'ease-out' }
   ).onfinish = () => flash.remove();
+
+  // Called synchronously (not setTimeout) so speechSynthesis.speak() still
+  // counts as user-gesture-triggered on iOS Safari; the bubble's own
+  // animation delay handles staggering it after the PERFECT SCORE banner.
+  fireHeroVoiceLine();
 
   // big banner text, themed to whichever hero is active
   const banner = document.createElement('div');
