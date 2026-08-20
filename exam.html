@@ -246,7 +246,7 @@
     <div class="hero-badge" id="hero-badge">🛡️</div>
     <p class="hero-tag" id="hero-tag">Captain America Mode</p>
     <h1 id="hero-title">Practice time!</h1>
-    <p id="hero-sub">Pick a subject and a test, then tap your way through 20 questions. Scores are saved so we can watch progress over time.</p>
+    <p id="hero-sub">Pick a subject and a test, then tap your way through the questions. Scores are saved so we can watch progress over time.</p>
   </section>
 
   <div class="setup-note" id="setup-note">
@@ -261,7 +261,7 @@
       <div class="chip-row" id="subject-chips">
         <button class="big-chip active" data-subject="maths">🔢 Mathematics</button>
         <button class="big-chip" data-subject="dlc">💻 DL&amp;C <small>Digital Learning &amp; Computers</small></button>
-        <button class="big-chip" disabled>🔤 English <small>soon</small></button>
+        <button class="big-chip" data-subject="english">🔤 English <small>Dictation Words</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
       </div>
     </div>
@@ -372,6 +372,10 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1148713995&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=120015731&single=true&output=csv",
   },
+  english: {
+    "Test A - Regular": "",   // ← paste published CSV link for the "English A - Regular" tab
+    "Test B - Harder":  "",   // ← paste published CSV link for the "English B - Harder" tab
+  },
 };
 const RESULTS_GS_URL = "https://script.google.com/macros/s/AKfycbzX-GXOlaiuOOhfGbIi3Nz0-_Em5mK4uDzWQPb_AlO1qph3jkhRwHLt1lPxRDriVlnu/exec";
 
@@ -385,6 +389,7 @@ const TOPIC_EMOJI = {
   "Scratch Blocks": "🧱",
   "Resetting Objects": "🔄",
   "Keywords": "🔑",
+  "Dictation Words": "📖",
 };
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
@@ -414,7 +419,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English" };
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
