@@ -280,6 +280,7 @@
         <button class="big-chip active" data-subject="maths">🔢 Mathematics</button>
         <button class="big-chip" data-subject="dlc">💻 DL&amp;C <small>Digital Learning &amp; Computers</small></button>
         <button class="big-chip" data-subject="english">🔤 English <small>Dictation Words</small></button>
+        <button class="big-chip" data-subject="social">🌍 Social Studies <small>The Wider World</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
       </div>
     </div>
@@ -394,6 +395,10 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=2022759136&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=335836378&single=true&output=csv",
   },
+  social: {
+    "Test A - Regular": "",   // ← paste published CSV link for the "Social A - Regular" tab
+    "Test B - Harder":  "",   // ← paste published CSV link for the "Social B - Harder" tab
+  },
 };
 const RESULTS_GS_URL = "https://script.google.com/macros/s/AKfycbzX-GXOlaiuOOhfGbIi3Nz0-_Em5mK4uDzWQPb_AlO1qph3jkhRwHLt1lPxRDriVlnu/exec";
 
@@ -408,6 +413,11 @@ const TOPIC_EMOJI = {
   "Resetting Objects": "🔄",
   "Keywords": "🔑",
   "Dictation Words": "📖",
+  "Continents": "🗺️",
+  "Countries": "🏳️",
+  "Oceans & Seas": "🌊",
+  "Communities & Traditions": "🤝",
+  "Planet Earth": "🌎",
 };
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
@@ -446,7 +456,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies" };
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
