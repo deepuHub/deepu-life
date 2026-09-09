@@ -16,7 +16,7 @@
 | 🏫 School (`2026_school.html`) | School timings, food timetable, exam countdown | Public |
 | 🏅 Half Marathon (`half-marathon.html`) | Training plan with live race-day countdown | Public |
 | 🧮 Exams (`exam.html`) | Touch-friendly practice tests, Regular/Hulk-mode Harder, reads from a Sheet, auto-scores | Public |
-| 🎒 Kid (`kid-private.html`) | Report cards by grade/term, chip navigation | Private — Google Sign-In |
+| 🎒 Kid (`kid-private.html`) | Report cards by grade/term + Continuous Assessment (CA) results, chip navigation | Private — Google Sign-In |
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
 | 🔥 Embers & Tides (`embers-tides-private.html`) | Coded intake index; every counterparty is a code | Private — Google Sign-In |
@@ -40,6 +40,8 @@ private results Sheet via `ExamAppScript.gs` for a durable record. See the setup
 top of `exam.html`'s `<script>` for the one-time publish/deploy steps.
 
 **Private pages** — each has its own private Google Sheet (Restricted sharing) with no public web app. The page itself uses Google Identity Services (OAuth) to get an access token for the signed-in user, then reads the Sheet directly via the Sheets API. Each private Sheet also has its own Apps Script for auto-computed fields (e.g. Health's trend flags) — those scripts are bound to the Sheet itself and are not part of this repo, since they're personal.
+
+**Kid's CA Results** — the Kid Sheet has a 4th tab, `CA Results` (alongside `Report Meta`, `Subject Grades`, `Behavior Skills`), columns `CAID | CAName | Grade | Subject | MarksObtained | TotalMarks | Remark | Date`. `CAID` (e.g. `G2-CA1`) groups one assessment's subject rows together, same pattern as `TermID`. This tab is optional — fetched separately from the other three so the page still renders if it hasn't been added yet.
 
 No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, reload the page, it appears.
 

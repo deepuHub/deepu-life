@@ -188,6 +188,17 @@
       <div style="overflow-x:auto"><table class="data-table" id="grades-table"></table></div>
     </section>
 
+    <section id="sec-ca">
+      <div class="sec-title">Continuous Assessments</div>
+      <div class="chip-row" id="ca-chips" style="margin-bottom:1rem"></div>
+      <div class="cards" id="ca-summary-cards"></div>
+      <div style="overflow-x:auto;margin-top:0.85rem"><table class="data-table" id="ca-table"></table></div>
+      <div class="chart-box" id="ca-chart-box" style="margin-top:0.85rem;display:none">
+        <div class="chart-box-title">Marks by subject (%)</div>
+        <div class="chart-wrap"><canvas id="ca-chart"></canvas></div>
+      </div>
+    </section>
+
     <section id="sec-skills">
       <div class="sec-title">Skills &amp; Behaviour</div>
       <div class="skills-groups" id="skills-groups"></div>
@@ -212,10 +223,11 @@ const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googl
 const SPREADSHEET_ID = '1yDv_PhuoqJXF5EhMDSdNAtY7c61_p76OJmfADrbq3SQ';
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
-const DB = { meta: [], grades: [], skills: [] };
+const DB = { meta: [], grades: [], skills: [], ca: [] };
 let tokenClient, accessToken = null;
 let charts = [];
 let selectedTermID = null;
+let selectedCAID = null;
 
 function initAuth() {
   tokenClient = google.accounts.oauth2.initTokenClient({
@@ -239,6 +251,8 @@ async function onSignedIn() {
     document.getElementById('app').style.display = 'block';
     const all = allTermsSorted();
     selectedTermID = all.length ? all[all.length - 1].TermID : null;
+    const cas = allCAsSorted();
+    selectedCAID = cas.length ? cas[cas.length - 1] : null;
     render();
   } catch (e) {
     showGateError(e.message);
@@ -256,6 +270,7 @@ function rowsToObjects(rows) {
 }
 
 async function loadData() {
+  // Core tabs — these must exist, so one request, and a failure here is fatal.
   const sheetNames = ['Report Meta','Subject Grades','Behavior Skills'];
   const qs = sheetNames.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
@@ -265,6 +280,16 @@ async function loadData() {
   const data = await res.json();
   const [meta, grades, skills] = data.valueRanges.map(vr => rowsToObjects(vr.values));
   DB.meta = meta; DB.grades = grades; DB.skills = skills;
+
+  // "CA Results" is a separate, optional tab — fetched on its own so that if
+  // it hasn't been added to the sheet yet, the rest of the page still works.
+  try {
+    const caUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent('CA Results')}`;
+    const caRes = await fetch(caUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    DB.ca = caRes.ok ? rowsToObjects((await caRes.json()).values) : [];
+  } catch (e) {
+    DB.ca = [];
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -298,12 +323,32 @@ function selectTerm(termID) {
 }
 
 /* ══════════════════════════════════════════════════════════
+   CA (Continuous Assessment) HELPERS — CAID (e.g. G2-CA1) is
+   the join key within the "CA Results" tab; sheet-row order is
+   preserved as chronological order.
+══════════════════════════════════════════════════════════ */
+function allCAsSorted() {
+  const ids = [];
+  DB.ca.forEach(r => { if (r.CAID && !ids.includes(r.CAID)) ids.push(r.CAID); });
+  return ids;
+}
+function caRows(caid) { return DB.ca.filter(r => r.CAID === caid); }
+function caMeta(caid) {
+  const rows = caRows(caid);
+  return rows.length ? { CAName: rows[0].CAName || caid, Grade: rows[0].Grade } : null;
+}
+function selectCA(caid) {
+  selectedCAID = caid;
+  render();
+}
+
+/* ══════════════════════════════════════════════════════════
    RENDER
 ══════════════════════════════════════════════════════════ */
 function render() {
   charts.forEach(c => c.destroy());
   charts = [];
-  const sections = [renderChips, renderHead, renderAttendance, renderGrades, renderSkills, renderComment];
+  const sections = [renderChips, renderHead, renderAttendance, renderGrades, renderCA, renderSkills, renderComment];
   const errors = [];
   sections.forEach(fn => {
     try { fn(); }
@@ -405,6 +450,78 @@ function renderGrades() {
   table.innerHTML = `<tr><th>Subject</th><th>Grade</th><th>Effort</th></tr>` +
     (rows.map(r => `<tr><td>${r.Subject}</td><td><span class="grade-pill ${gradeClass(r.TermGrade)}">${r.TermGrade}</span></td><td>${r.EffortGrade}</td></tr>`).join('')
       || `<tr><td class="empty-st" colspan="3">No grades for this term.</td></tr>`);
+}
+
+function renderCA() {
+  const chipsEl = document.getElementById('ca-chips');
+  const cardsEl = document.getElementById('ca-summary-cards');
+  const tableEl = document.getElementById('ca-table');
+  const box = document.getElementById('ca-chart-box');
+  const ids = allCAsSorted();
+
+  if (!ids.length) {
+    chipsEl.innerHTML = '';
+    cardsEl.innerHTML = `<p class="empty-st">No CA results yet — add a "CA Results" tab to the Sheet.</p>`;
+    tableEl.innerHTML = '';
+    box.style.display = 'none';
+    return;
+  }
+  if (!selectedCAID || !ids.includes(selectedCAID)) selectedCAID = ids[ids.length - 1];
+
+  chipsEl.innerHTML = ids.map(id => {
+    const m = caMeta(id);
+    const active = id === selectedCAID ? 'active' : '';
+    return `<button class="chip term-chip ${active}" onclick="selectCA('${id}')">${m.CAName}</button>`;
+  }).join('');
+
+  const rows = caRows(selectedCAID);
+  const totalObtained = rows.reduce((s, r) => s + Number(r.MarksObtained || 0), 0);
+  const totalMax = rows.reduce((s, r) => s + Number(r.TotalMarks || 0), 0);
+  const pct = totalMax ? (totalObtained / totalMax * 100) : 0;
+  const pctClass = pct >= 90 ? 'ok' : pct >= 75 ? 'warn' : 'bad';
+
+  cardsEl.innerHTML = `
+    <div class="card ${pctClass}">
+      <div class="card-label">Overall %</div>
+      <div class="card-val">${pct.toFixed(1)}%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Marks</div>
+      <div class="card-val">${totalObtained}/${totalMax}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Subjects</div>
+      <div class="card-val">${rows.length}</div>
+    </div>`;
+
+  tableEl.innerHTML = `<tr><th>Subject</th><th>Marks</th><th>%</th><th>Remark</th></tr>` +
+    (rows.map(r => {
+      const p = Number(r.TotalMarks) ? (Number(r.MarksObtained) / Number(r.TotalMarks) * 100) : 0;
+      const pClass = p >= 90 ? 'ok' : p >= 75 ? 'warn' : 'bad';
+      return `<tr><td>${r.Subject}</td><td>${r.MarksObtained}/${r.TotalMarks}</td><td><span class="grade-pill ${pClass}">${p.toFixed(0)}%</span></td><td>${r.Remark || ''}</td></tr>`;
+    }).join('') || `<tr><td class="empty-st" colspan="4">No subjects for this assessment.</td></tr>`);
+
+  box.style.display = 'block';
+  const chart = new Chart(document.getElementById('ca-chart'), {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.Subject),
+      datasets: [{
+        data: rows.map(r => Number(r.TotalMarks) ? (Number(r.MarksObtained) / Number(r.TotalMarks) * 100) : 0),
+        backgroundColor: '#4f8ef7',
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,.05)' } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
+  charts.push(chart);
 }
 
 const RATING_CLASS = { Always: 'ok', Often: 'warn', Sometimes: 'warn', Rarely: 'bad', Never: 'bad' };
