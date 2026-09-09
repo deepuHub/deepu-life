@@ -153,7 +153,7 @@
   <div class="gate" id="gate">
     <div class="gate-icon">🔒</div>
     <h1>Private report card record</h1>
-    <p>This page reads directly from a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page.</p>
+    <p>This page reads directly from private Google Sheets — one per grade. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page.</p>
     <button class="btn-signin" id="signin-btn">
       <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
       Sign in with Google
@@ -219,15 +219,24 @@
 /* ══════════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════════ */
-const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
-const SPREADSHEET_ID = '1yDv_PhuoqJXF5EhMDSdNAtY7c61_p76OJmfADrbq3SQ';
+const CLIENT_ID = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+// One private Google Sheet PER GRADE — "Udhbhav — Report Cards - Grade N
+// (Private)". Add a row here each time a new grade's sheet is created;
+// nothing else in this file needs to change.
+const GRADE_SHEETS = {
+  '1': '1yDv_PhuoqJXF5EhMDSdNAtY7c61_p76OJmfADrbq3SQ',
+  '2': '1U5uTyUEfqeo9BmEBn857h53uaN2Xqa2yKMOMiyHM0KE',
+};
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
-const DB = { meta: [], grades: [], skills: [], ca: [] };
+const gradeCache = {};   // { [grade]: { meta, grades, skills, ca } } — fetched once per grade, then reused
+let DB = { meta: [], grades: [], skills: [], ca: [] };
 let tokenClient, accessToken = null;
 let charts = [];
+let selectedGrade = null;
 let selectedTermID = null;
 let selectedCAID = null;
+let gradeLoading = false;
 
 function initAuth() {
   tokenClient = google.accounts.oauth2.initTokenClient({
@@ -246,11 +255,13 @@ function showGateError(msg) { document.getElementById('gate-error').textContent 
 
 async function onSignedIn() {
   try {
-    await loadData();
+    const grades = Object.keys(GRADE_SHEETS).sort((a, b) => Number(a) - Number(b));
+    selectedGrade = grades[grades.length - 1]; // default to the most recent grade
+    await loadGrade(selectedGrade);
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    const all = allTermsSorted();
-    selectedTermID = all.length ? all[all.length - 1].TermID : null;
+    const terms = allTermsSorted();
+    selectedTermID = terms.length ? terms[terms.length - 1].TermID : null;
     const cas = allCAsSorted();
     selectedCAID = cas.length ? cas[cas.length - 1] : null;
     render();
@@ -269,27 +280,34 @@ function rowsToObjects(rows) {
   });
 }
 
-async function loadData() {
-  // Core tabs — these must exist, so one request, and a failure here is fatal.
+// Fetches one grade's sheet (Report Meta / Subject Grades / Behavior Skills +
+// the optional CA Results tab) and caches it — each grade is only ever
+// fetched once per page load, even if the user flips chips back and forth.
+async function loadGrade(grade) {
+  if (gradeCache[grade]) { DB = gradeCache[grade]; return; }
+  const spreadsheetId = GRADE_SHEETS[grade];
   const sheetNames = ['Report Meta','Subject Grades','Behavior Skills'];
   const qs = sheetNames.map(n => `ranges=${encodeURIComponent(n)}`).join('&');
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${qs}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet?${qs}`;
   const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  if (res.status === 403) throw new Error('This Google account does not have access to the Kid sheet.');
-  if (!res.ok) throw new Error(`Could not load sheet (HTTP ${res.status})`);
+  if (res.status === 403) throw new Error(`This Google account does not have access to the Grade ${grade} sheet.`);
+  if (!res.ok) throw new Error(`Could not load the Grade ${grade} sheet (HTTP ${res.status})`);
   const data = await res.json();
-  const [meta, grades, skills] = data.valueRanges.map(vr => rowsToObjects(vr.values));
-  DB.meta = meta; DB.grades = grades; DB.skills = skills;
+  const [meta, subjectGrades, skills] = data.valueRanges.map(vr => rowsToObjects(vr.values));
 
   // "CA Results" is a separate, optional tab — fetched on its own so that if
-  // it hasn't been added to the sheet yet, the rest of the page still works.
+  // it hasn't been added to this grade's sheet yet, the rest still works.
+  let ca = [];
   try {
-    const caUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent('CA Results')}`;
+    const caUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent('CA Results')}`;
     const caRes = await fetch(caUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
-    DB.ca = caRes.ok ? rowsToObjects((await caRes.json()).values) : [];
+    ca = caRes.ok ? rowsToObjects((await caRes.json()).values) : [];
   } catch (e) {
-    DB.ca = [];
+    ca = [];
   }
+
+  gradeCache[grade] = { meta, grades: subjectGrades, skills, ca };
+  DB = gradeCache[grade];
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -301,9 +319,10 @@ function allTermsSorted() {
   return [...DB.meta].sort((a, b) => Number(a.Grade) - Number(b.Grade) || Number(a.Term) - Number(b.Term));
 }
 function uniqueGrades() {
-  const grades = [];
-  allTermsSorted().forEach(m => { if (!grades.includes(m.Grade)) grades.push(m.Grade); });
-  return grades;
+  // Grades are now one-sheet-per-grade, so the chip list is just the
+  // configured grades — not derived from whichever grade happens to be
+  // loaded into DB right now.
+  return Object.keys(GRADE_SHEETS).sort((a, b) => Number(a) - Number(b));
 }
 function termsForGrade(grade) {
   return allTermsSorted().filter(m => m.Grade === grade);
@@ -311,10 +330,30 @@ function termsForGrade(grade) {
 function selectedMeta() {
   return DB.meta.find(m => m.TermID === selectedTermID) || null;
 }
-function selectGrade(grade) {
-  const terms = termsForGrade(grade);
-  if (!terms.length) return;
-  selectedTermID = terms[terms.length - 1].TermID;
+async function selectGrade(grade) {
+  if (!GRADE_SHEETS[grade] || grade === selectedGrade) return;
+  selectedGrade = grade;
+  if (!gradeCache[grade]) {
+    gradeLoading = true;
+    render();
+    try {
+      await loadGrade(grade);
+    } catch (e) {
+      gradeLoading = false;
+      const banner = document.getElementById('render-error');
+      banner.style.display = 'block';
+      banner.innerHTML = `<strong>Could not load Grade ${grade}:</strong> ${e.message}`;
+      render();
+      return;
+    }
+    gradeLoading = false;
+  } else {
+    DB = gradeCache[grade];
+  }
+  const terms = allTermsSorted();
+  selectedTermID = terms.length ? terms[terms.length - 1].TermID : null;
+  const cas = allCAsSorted();
+  selectedCAID = cas.length ? cas[cas.length - 1] : null;
   render();
 }
 function selectTerm(termID) {
@@ -348,7 +387,15 @@ function selectCA(caid) {
 function render() {
   charts.forEach(c => c.destroy());
   charts = [];
-  const sections = [renderChips, renderHead, renderAttendance, renderGrades, renderCA, renderSkills, renderComment];
+  try { renderChips(); } catch (e) { console.error('renderChips failed:', e); }
+
+  if (gradeLoading) {
+    document.getElementById('page-title').textContent = `Loading Grade ${selectedGrade}…`;
+    document.getElementById('page-meta').innerHTML = '';
+    return;
+  }
+
+  const sections = [renderHead, renderAttendance, renderGrades, renderCA, renderSkills, renderComment];
   const errors = [];
   sections.forEach(fn => {
     try { fn(); }
@@ -368,13 +415,14 @@ function renderChips() {
   const grades = uniqueGrades();
   const gradeEl = document.getElementById('grade-chips');
   gradeEl.innerHTML = grades.map(g => {
-    const sample = termsForGrade(g)[0];
-    const active = current && current.Grade === g ? 'active' : '';
-    return `<button class="chip ${active}" onclick="selectGrade('${g}')">Grade ${g}${sample.Division || ''}</button>`;
-  }).join('') || `<p class="empty-st">No terms yet.</p>`;
+    const active = g === selectedGrade ? 'active' : '';
+    // Division suffix only known once that grade's sheet is actually loaded.
+    const divisionSuffix = (g === selectedGrade && current) ? (current.Division || '') : '';
+    return `<button class="chip ${active}" onclick="selectGrade('${g}')">Grade ${g}${divisionSuffix}</button>`;
+  }).join('') || `<p class="empty-st">No grades configured.</p>`;
 
   const termEl = document.getElementById('term-chips');
-  if (!current) { termEl.innerHTML = ''; return; }
+  if (!current || gradeLoading) { termEl.innerHTML = ''; return; }
   const terms = termsForGrade(current.Grade);
   termEl.innerHTML = terms.map(t => {
     const active = t.TermID === selectedTermID ? 'active' : '';

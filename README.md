@@ -41,7 +41,15 @@ top of `exam.html`'s `<script>` for the one-time publish/deploy steps.
 
 **Private pages** — each has its own private Google Sheet (Restricted sharing) with no public web app. The page itself uses Google Identity Services (OAuth) to get an access token for the signed-in user, then reads the Sheet directly via the Sheets API. Each private Sheet also has its own Apps Script for auto-computed fields (e.g. Health's trend flags) — those scripts are bound to the Sheet itself and are not part of this repo, since they're personal.
 
-**Kid's CA Results** — the Kid Sheet has a 4th tab, `CA Results` (alongside `Report Meta`, `Subject Grades`, `Behavior Skills`), columns `CAID | CAName | Grade | Subject | MarksObtained | TotalMarks | Remark | Date`. `CAID` (e.g. `G2-CA1`) groups one assessment's subject rows together, same pattern as `TermID`. This tab is optional — fetched separately from the other three so the page still renders if it hasn't been added yet.
+**Kid page — one Sheet per grade.** Rather than one growing multi-grade Sheet, each grade gets its own Sheet named "Udhbhav — Report Cards - Grade N (Private)". `kid-private.html` keeps a `GRADE_SHEETS` map (`{ '1': spreadsheetId, '2': spreadsheetId, ... }`); clicking a grade chip lazy-loads that grade's Sheet (cached after the first fetch) rather than fetching everything up front. Add a new grade later by adding one line to `GRADE_SHEETS` — no other code changes.
+
+Each grade's Sheet has 4 tabs:
+- `Report Meta` — `TermID | Grade | Division | Term | SchoolYear | House | AttendancePct | Present | Absent | Promoted | PreparedDate | AdvisorComment`
+- `Subject Grades` — `TermID | Subject | TermGrade | EffortGrade`
+- `Behavior Skills` — `TermID | Category | Skill | Rating`
+- `CA Results` (optional — Continuous Assessments, fetched separately so the page still renders if this tab hasn't been added yet) — `CAID | CAName | Grade | Subject | MarksObtained | TotalMarks | Remark | Date`
+
+`TermID` (e.g. `G2-T1`) and `CAID` (e.g. `G2-CA1`) are the join keys within a grade's tabs — same pattern as before, just scoped to one grade's Sheet instead of shared across all grades.
 
 No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, reload the page, it appears.
 
