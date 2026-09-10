@@ -43,13 +43,14 @@ top of `exam.html`'s `<script>` for the one-time publish/deploy steps.
 
 **Kid page — one Sheet per grade.** Rather than one growing multi-grade Sheet, each grade gets its own Sheet named "Udhbhav — Report Cards - Grade N (Private)". `kid-private.html` keeps a `GRADE_SHEETS` map (`{ '1': spreadsheetId, '2': spreadsheetId, ... }`); clicking a grade chip lazy-loads that grade's Sheet (cached after the first fetch) rather than fetching everything up front. Add a new grade later by adding one line to `GRADE_SHEETS` — no other code changes.
 
-Each grade's Sheet has 4 tabs:
+Each grade's Sheet has 5 tabs:
 - `Report Meta` — `TermID | Grade | Division | Term | SchoolYear | House | AttendancePct | Present | Absent | Promoted | PreparedDate | AdvisorComment`
 - `Subject Grades` — `TermID | Subject | TermGrade | EffortGrade`
 - `Behavior Skills` — `TermID | Category | Skill | Rating`
 - `CA Results` (optional — Continuous Assessments, fetched separately so the page still renders if this tab hasn't been added yet) — `CAID | CAName | Grade | Subject | MarksObtained | TotalMarks | Remark | Date`
+- `CA Breakdown` (optional, same reason — question-level detail behind each CA Results row) — `CAID | Subject | Q# | What it covered | Marks Obtained | Max Marks`
 
-`TermID` (e.g. `G2-T1`) and `CAID` (e.g. `G2-CA1`) are the join keys within a grade's tabs — same pattern as before, just scoped to one grade's Sheet instead of shared across all grades.
+`TermID` (e.g. `G2-T1`) and `CAID` (e.g. `G2-CA1`) are the join keys within a grade's tabs — same pattern as before, just scoped to one grade's Sheet instead of shared across all grades. One `CA Breakdown` tab holds every CA's questions (filtered by `CAID`), same as `CA Results` — not a separate tab per CA.
 
 No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, reload the page, it appears.
 

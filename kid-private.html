@@ -97,6 +97,7 @@
   .comment-body{font-size:0.82rem;color:var(--text);line-height:1.65}
 
   .empty-st{color:var(--muted);font-size:0.85rem;padding:1rem 0}
+  .row-dropped td{background:rgba(240,84,92,.08)}
 </style>
 </head>
 <body>
@@ -197,6 +198,10 @@
         <div class="chart-box-title">Marks by subject (%)</div>
         <div class="chart-wrap"><canvas id="ca-chart"></canvas></div>
       </div>
+      <div style="margin-top:1.5rem">
+        <div class="chart-box-title" id="ca-breakdown-title" style="margin-bottom:0.6rem"></div>
+        <div style="overflow-x:auto"><table class="data-table" id="ca-breakdown-table"></table></div>
+      </div>
     </section>
 
     <section id="sec-skills">
@@ -229,8 +234,8 @@ const GRADE_SHEETS = {
 };
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
-const gradeCache = {};   // { [grade]: { meta, grades, skills, ca } } — fetched once per grade, then reused
-let DB = { meta: [], grades: [], skills: [], ca: [] };
+const gradeCache = {};   // { [grade]: { meta, grades, skills, ca, breakdown } } — fetched once per grade, then reused
+let DB = { meta: [], grades: [], skills: [], ca: [], breakdown: [] };
 let tokenClient, accessToken = null;
 let charts = [];
 let selectedGrade = null;
@@ -295,18 +300,23 @@ async function loadGrade(grade) {
   const data = await res.json();
   const [meta, subjectGrades, skills] = data.valueRanges.map(vr => rowsToObjects(vr.values));
 
-  // "CA Results" is a separate, optional tab — fetched on its own so that if
-  // it hasn't been added to this grade's sheet yet, the rest still works.
-  let ca = [];
-  try {
-    const caUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent('CA Results')}`;
-    const caRes = await fetch(caUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
-    ca = caRes.ok ? rowsToObjects((await caRes.json()).values) : [];
-  } catch (e) {
-    ca = [];
-  }
+  // "CA Results" and "CA Breakdown" are separate, optional tabs — fetched on
+  // their own so the rest still works if they haven't been added yet.
+  // Both are one tab shared across every CA (CAID column tells them apart),
+  // same pattern as TermID.
+  const fetchOptionalTab = async (name) => {
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(name)}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+      return res.ok ? rowsToObjects((await res.json()).values) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  const ca = await fetchOptionalTab('CA Results');
+  const breakdown = await fetchOptionalTab('CA Breakdown');
 
-  gradeCache[grade] = { meta, grades: subjectGrades, skills, ca };
+  gradeCache[grade] = { meta, grades: subjectGrades, skills, ca, breakdown };
   DB = gradeCache[grade];
 }
 
@@ -512,6 +522,8 @@ function renderCA() {
     cardsEl.innerHTML = `<p class="empty-st">No CA results yet — add a "CA Results" tab to the Sheet.</p>`;
     tableEl.innerHTML = '';
     box.style.display = 'none';
+    document.getElementById('ca-breakdown-title').textContent = '';
+    document.getElementById('ca-breakdown-table').innerHTML = '';
     return;
   }
   if (!selectedCAID || !ids.includes(selectedCAID)) selectedCAID = ids[ids.length - 1];
@@ -570,6 +582,28 @@ function renderCA() {
     },
   });
   charts.push(chart);
+
+  renderCABreakdown(selectedCAID);
+}
+
+function renderCABreakdown(caid) {
+  const titleEl = document.getElementById('ca-breakdown-title');
+  const tableEl = document.getElementById('ca-breakdown-table');
+  const rows = DB.breakdown.filter(r => r.CAID === caid);
+  const m = caMeta(caid);
+  titleEl.textContent = `Question-wise Breakdown — ${m ? m.CAName : caid}`;
+
+  if (!rows.length) {
+    tableEl.innerHTML = `<tr><td class="empty-st">No question-wise breakdown for this assessment yet — add a "CA Breakdown" tab to the Sheet.</td></tr>`;
+    return;
+  }
+  tableEl.innerHTML = `<tr><th>Subject</th><th>Q#</th><th>What it covered</th><th>Marks</th></tr>` +
+    rows.map(r => {
+      const obtained = Number(r['Marks Obtained'] || 0);
+      const maxm = Number(r['Max Marks'] || 0);
+      const dropped = maxm > 0 && obtained < maxm;
+      return `<tr class="${dropped ? 'row-dropped' : ''}"><td>${r.Subject}</td><td>${r['Q#'] || ''}</td><td>${r['What it covered'] || ''}</td><td>${obtained}/${maxm}</td></tr>`;
+    }).join('');
 }
 
 const RATING_CLASS = { Always: 'ok', Often: 'warn', Sometimes: 'warn', Rarely: 'bad', Never: 'bad' };
