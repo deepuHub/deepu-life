@@ -859,6 +859,51 @@
     .exam-row-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
     .exam-row-subject { font-weight: 700; font-size: 0.86rem; color: var(--text); }
     .exam-row-topic { font-size: 0.74rem; color: var(--muted); }
+
+    /* HOMEWORK & NOTICES ALERT BANNER */
+    .hw-alert-banner {
+      margin: 10px 20px 0;
+      background: linear-gradient(135deg, #1e88e5, #26c6da);
+      color: #fff;
+      border-radius: 14px;
+      padding: 11px 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 6px 20px var(--shadow);
+    }
+    .hw-alert-banner.show { display: flex; }
+    .hw-alert-icon { font-size: 1.3rem; flex: 0 0 auto; }
+    .hw-alert-count { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 800; margin: 0 2px; }
+
+    /* HOMEWORK & NOTICES ROWS */
+    .hw-row { display: flex; align-items: flex-start; gap: 10px; background: var(--card-bg); border-radius: 12px; padding: 10px 14px; box-shadow: 0 2px 10px var(--shadow); }
+    .hw-row.overdue { border-left: 4px solid #e53935; }
+    .hw-row.due-soon { border-left: 4px solid #fb8c00; }
+    .hw-row.upcoming { border-left: 4px solid #43a047; }
+    .hw-row.no-date { border-left: 4px solid #8e24aa; }
+    .hw-row-badge { font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; margin-top: 1px; }
+    .hw-row-badge.type-homework { background: #1e88e5; }
+    .hw-row-badge.type-test { background: #fb8c00; }
+    .hw-row-badge.type-notice { background: #8e24aa; }
+    .hw-row-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+    .hw-row-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .hw-row-subject { font-weight: 700; font-size: 0.86rem; color: var(--text); }
+    .hw-row-title { font-size: 0.82rem; color: var(--text); }
+    .hw-row-detail { font-size: 0.74rem; color: var(--muted); }
+    .hw-row-date { font-size: 0.68rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .hw-status-pill { font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+    .hw-status-pill.overdue { background: #ffebee; color: #c62828; }
+    .hw-status-pill.due-soon { background: #fff3e0; color: #e65100; }
+    .hw-status-pill.upcoming { background: #e8f5e9; color: #2e7d32; }
+    .hw-status-pill.no-date { background: #f3e5f5; color: #6a1b9a; }
+    [data-theme="dark"] .hw-status-pill.overdue { background: rgba(229,57,53,0.25); color: #ff8a80; }
+    [data-theme="dark"] .hw-status-pill.due-soon { background: rgba(251,140,0,0.22); color: #ffcc80; }
+    [data-theme="dark"] .hw-status-pill.upcoming { background: rgba(67,160,71,0.22); color: #a5d6a7; }
+    [data-theme="dark"] .hw-status-pill.no-date { background: rgba(142,36,170,0.25); color: #ce93d8; }
+
     .jain-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
     .toggle { position: relative; width: 44px; height: 24px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
@@ -1059,6 +1104,11 @@
   <span id="examAlertText"></span>
 </div>
 
+<div class="hw-alert-banner" id="hwAlertBanner">
+  <span class="hw-alert-icon">📋</span>
+  <span id="hwAlertText"></span>
+</div>
+
 <div style="padding: 0 20px;">
   <div class="jain-toggle-wrap">
     <span class="jain-label">🌿 Jain Menu</span>
@@ -1074,6 +1124,15 @@
 <div class="day-selector" id="daySelector"></div>
 
 <div class="timeline-wrap" id="timelineWrap"></div>
+
+<div class="calendar-section">
+  <div class="calendar-header">
+    <h2>📋 Homework & Notices</h2>
+    <span style="font-size:0.65rem;color:var(--muted);" id="hwUpdatedLabel"></span>
+  </div>
+  <div class="cal-legend">🔴 = Overdue &nbsp;·&nbsp; 🟠 = Due soon &nbsp;·&nbsp; 🟢 = Upcoming &nbsp;·&nbsp; 🟣 = Notice / no fixed date</div>
+  <div id="homeworkNoticesList"></div>
+</div>
 
 <div class="calendar-section">
   <div class="calendar-header">
@@ -2017,6 +2076,97 @@ function renderExamAlert() {
 
 renderExamSchedule();
 renderExamAlert();
+
+// ── HOMEWORK & NOTICES (from ManageBac — updated manually) ──────────────────
+const HOMEWORK_UPDATED = '2026-09-12';
+const HOMEWORK_NOTICES = [
+  { date: '2026-09-15', type: 'homework', subject: 'Math',    title: 'Workbook pages 60-61 & 63', detail: 'Q1, Q2, Q3 and Q8' },
+  { date: '2026-09-15', type: 'homework', subject: 'Marathi', title: 'Glossary words — pg 26 & 31 (इ / ई मात्रा)', detail: 'Write on revision pg 103 in the textbook; return the textbook to school' },
+  { date: '2026-09-11', type: 'homework', subject: 'Science', title: 'Workbook — Life Cycle & Food Chain', detail: 'Pages 50, 51, 53… — due date has passed, check it’s submitted' },
+  { dateLabel: 'Last week of Sep', type: 'test',    subject: 'Math',    title: 'Surprise test — Tables 2 to 10', detail: 'Keep practising multiplication tables 2–10' },
+  { dateLabel: '28 Sep – 6 Oct',   type: 'notice',  subject: 'School',  title: 'Continuous Assessment 2 (CA2)', detail: 'No early dispersal on assessment days; arrive on time' },
+];
+
+function hwDateLabel(dateStr) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function hwStatusOf(item) {
+  if (!item.date) return 'no-date';
+  const diff = daysBetween(getTodayStr(), item.date);
+  if (diff < 0) return 'overdue';
+  if (diff <= 3) return 'due-soon';
+  return 'upcoming';
+}
+
+const HW_TYPE_LABEL = { homework: 'HW', test: 'Test', notice: 'Notice' };
+const HW_STATUS_LABEL = { overdue: 'Overdue', 'due-soon': 'Due soon', upcoming: 'Upcoming', 'no-date': 'No fixed date' };
+
+function renderHomeworkNotices() {
+  const wrap = document.getElementById('homeworkNoticesList');
+  const updatedLabel = document.getElementById('hwUpdatedLabel');
+  if (!wrap) return;
+  if (updatedLabel) updatedLabel.textContent = `Updated ${hwDateLabel(HOMEWORK_UPDATED)}`;
+
+  const sorted = [...HOMEWORK_NOTICES].sort((a, b) => {
+    if (a.date && b.date) return a.date.localeCompare(b.date);
+    if (a.date) return -1;
+    if (b.date) return 1;
+    return 0;
+  });
+
+  let html = '<div class="cal-card-grid">';
+  sorted.forEach(item => {
+    const status = hwStatusOf(item);
+    const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
+    html += `<div class="hw-row ${status}">
+      <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
+      <div class="hw-row-info">
+        <div class="hw-row-top">
+          <span class="hw-row-subject">${item.subject}</span>
+          <span class="hw-status-pill ${status}">${HW_STATUS_LABEL[status]}</span>
+        </div>
+        <span class="hw-row-title">${item.title}</span>
+        <span class="hw-row-detail">${item.detail}</span>
+        <span class="hw-row-date">📅 ${dateText}</span>
+      </div>
+    </div>`;
+  });
+  html += '</div><div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks — updated here by hand, not live-synced.</div>';
+  wrap.innerHTML = html;
+}
+
+function renderHomeworkAlert() {
+  const banner = document.getElementById('hwAlertBanner');
+  const textEl = document.getElementById('hwAlertText');
+  if (!banner || !textEl) return;
+
+  const todayStr = getTodayStr();
+  const dated = HOMEWORK_NOTICES.filter(i => i.date);
+  const overdue = dated.filter(i => i.date < todayStr);
+  const dueToday = dated.filter(i => i.date === todayStr);
+  const dueSoon = dated.filter(i => i.date > todayStr && daysBetween(todayStr, i.date) <= 3);
+
+  if (dueToday.length) {
+    textEl.innerHTML = `Due today: <strong>${dueToday.map(i => i.subject).join(', ')}</strong> homework 📋`;
+    banner.classList.add('show');
+  } else if (overdue.length) {
+    textEl.innerHTML = `<span class="hw-alert-count">${overdue.length}</span> homework item${overdue.length === 1 ? '' : 's'} past due — check if submitted`;
+    banner.classList.add('show');
+  } else if (dueSoon.length) {
+    const next = dueSoon.sort((a, b) => a.date.localeCompare(b.date))[0];
+    const days = daysBetween(todayStr, next.date);
+    textEl.innerHTML = days === 0
+      ? `${next.subject} homework due today!`
+      : `<span class="hw-alert-count">${days}</span> day${days === 1 ? '' : 's'} left for ${next.subject} homework`;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+renderHomeworkNotices();
+renderHomeworkAlert();
 </script>
 
 </body>
