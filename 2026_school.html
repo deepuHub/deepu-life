@@ -884,6 +884,8 @@
     .hw-row.due-soon { border-left: 4px solid #fb8c00; }
     .hw-row.upcoming { border-left: 4px solid #43a047; }
     .hw-row.no-date { border-left: 4px solid #8e24aa; }
+    .hw-row.done { border-left: 4px solid #43a047; opacity: 0.6; }
+    .hw-row.done .hw-row-title { text-decoration: line-through; }
     .hw-row-badge { font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; margin-top: 1px; }
     .hw-row-badge.type-homework { background: #1e88e5; }
     .hw-row-badge.type-test { background: #fb8c00; }
@@ -893,16 +895,28 @@
     .hw-row-subject { font-weight: 700; font-size: 0.86rem; color: var(--text); }
     .hw-row-title { font-size: 0.82rem; color: var(--text); }
     .hw-row-detail { font-size: 0.74rem; color: var(--muted); }
+    .hw-row-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
     .hw-row-date { font-size: 0.68rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .hw-row-action { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-solid); color: var(--text); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .hw-row-action:hover { border-color: var(--accent); }
+    .hw-row.done .hw-row-action { border-color: transparent; background: transparent; color: var(--muted); }
     .hw-status-pill { font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
     .hw-status-pill.overdue { background: #ffebee; color: #c62828; }
     .hw-status-pill.due-soon { background: #fff3e0; color: #e65100; }
     .hw-status-pill.upcoming { background: #e8f5e9; color: #2e7d32; }
     .hw-status-pill.no-date { background: #f3e5f5; color: #6a1b9a; }
+    .hw-status-pill.done { background: #e8f5e9; color: #2e7d32; }
     [data-theme="dark"] .hw-status-pill.overdue { background: rgba(229,57,53,0.25); color: #ff8a80; }
     [data-theme="dark"] .hw-status-pill.due-soon { background: rgba(251,140,0,0.22); color: #ffcc80; }
     [data-theme="dark"] .hw-status-pill.upcoming { background: rgba(67,160,71,0.22); color: #a5d6a7; }
     [data-theme="dark"] .hw-status-pill.no-date { background: rgba(142,36,170,0.25); color: #ce93d8; }
+    [data-theme="dark"] .hw-status-pill.done { background: rgba(67,160,71,0.22); color: #a5d6a7; }
+
+    /* PAGE TABS */
+    .page-tabs { display: flex; gap: 8px; padding: 10px 20px 0; }
+    .page-tab { flex: 1; text-align: center; font-size: 0.8rem; font-weight: 700; padding: 9px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card-bg); color: var(--muted); cursor: pointer; transition: all 0.18s; box-shadow: 0 1px 4px var(--shadow); }
+    .page-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 2px var(--stripe-white) inset; }
+    .tab-panel[hidden] { display: none; }
 
     .jain-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
     .toggle { position: relative; width: 44px; height: 24px; }
@@ -1100,57 +1114,66 @@
 
 <div class="cap-stripe-banner"></div>
 
-<div class="exam-alert-banner" id="examAlertBanner">
+<div class="exam-alert-banner" id="examAlertBanner" onclick="switchPageTab('timetable')" style="cursor:pointer;">
   <span class="exam-alert-icon">📝</span>
   <span id="examAlertText"></span>
 </div>
 
-<div class="hw-alert-banner" id="hwAlertBanner">
+<div class="hw-alert-banner" id="hwAlertBanner" onclick="switchPageTab('tasks')" style="cursor:pointer;">
   <span class="hw-alert-icon">📋</span>
   <span id="hwAlertText"></span>
 </div>
 
-<div style="padding: 0 20px;">
-  <div class="jain-toggle-wrap">
-    <span class="jain-label">🌿 Jain Menu</span>
-    <label class="toggle">
-      <input type="checkbox" id="jainToggle" onchange="toggleJain()"/>
-      <span class="toggle-slider"></span>
-    </label>
+<div class="page-tabs" id="pageTabs">
+  <button class="page-tab active" type="button" data-tab="timetable" onclick="switchPageTab('timetable')">🍽️ Timetable</button>
+  <button class="page-tab" type="button" data-tab="tasks" onclick="switchPageTab('tasks')">📋 Tasks & Notices</button>
+</div>
+
+<div class="tab-panel" id="tabTimetable">
+  <div style="padding: 0 20px;">
+    <div class="jain-toggle-wrap">
+      <span class="jain-label">🌿 Jain Menu</span>
+      <label class="toggle">
+        <input type="checkbox" id="jainToggle" onchange="toggleJain()"/>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="month-tabs" id="monthTabs"></div>
+  <div class="week-tabs" id="weekTabs"></div>
+  <div class="day-selector" id="daySelector"></div>
+
+  <div class="timeline-wrap" id="timelineWrap"></div>
+
+  <div class="calendar-section">
+    <div class="calendar-header">
+      <h2>📅 Holidays & School Events</h2>
+      <button class="cal-toggle-btn" id="calToggleBtn" type="button">View Full Year</button>
+    </div>
+    <div class="cal-legend">🎉 = Holiday (no school) &nbsp;·&nbsp; 📌 = School event (school is open)</div>
+    <div id="calendarHighlights"></div>
+    <div class="calendar-full" id="calendarFull" style="display:none;"></div>
+  </div>
+
+  <div class="calendar-section">
+    <div class="calendar-header">
+      <h2>📝 Formal CA1 Exam Schedule <span style="font-size:0.65em;font-weight:400;color:var(--muted);">(completed)</span></h2>
+    </div>
+    <div class="cal-legend">🟧 = Weekend &nbsp;·&nbsp; 📝 = Exam day &nbsp;·&nbsp; — = No exam scheduled</div>
+    <div id="examScheduleList"></div>
   </div>
 </div>
 
-<div class="month-tabs" id="monthTabs"></div>
-<div class="week-tabs" id="weekTabs"></div>
-<div class="day-selector" id="daySelector"></div>
-
-<div class="timeline-wrap" id="timelineWrap"></div>
-
-<div class="calendar-section">
-  <div class="calendar-header">
-    <h2>📋 Homework & Notices</h2>
-    <span style="font-size:0.65rem;color:var(--muted);" id="hwUpdatedLabel"></span>
+<div class="tab-panel" id="tabTasks" hidden>
+  <div class="calendar-section">
+    <div class="calendar-header">
+      <h2>📋 Homework & Notices</h2>
+      <span style="font-size:0.65rem;color:var(--muted);" id="hwUpdatedLabel"></span>
+    </div>
+    <div class="cal-legend">🔴 = Overdue &nbsp;·&nbsp; 🟠 = Due soon &nbsp;·&nbsp; 🟢 = Upcoming &nbsp;·&nbsp; ✅ = Done &nbsp;·&nbsp; 🟣 = Notice / no fixed date</div>
+    <div id="homeworkNoticesList"></div>
   </div>
-  <div class="cal-legend">🔴 = Overdue &nbsp;·&nbsp; 🟠 = Due soon &nbsp;·&nbsp; 🟢 = Upcoming &nbsp;·&nbsp; 🟣 = Notice / no fixed date</div>
-  <div id="homeworkNoticesList"></div>
-</div>
-
-<div class="calendar-section">
-  <div class="calendar-header">
-    <h2>📅 Holidays & School Events</h2>
-    <button class="cal-toggle-btn" id="calToggleBtn" type="button">View Full Year</button>
-  </div>
-  <div class="cal-legend">🎉 = Holiday (no school) &nbsp;·&nbsp; 📌 = School event (school is open)</div>
-  <div id="calendarHighlights"></div>
-  <div class="calendar-full" id="calendarFull" style="display:none;"></div>
-</div>
-
-<div class="calendar-section">
-  <div class="calendar-header">
-    <h2>📝 Formal CA1 Exam Schedule <span style="font-size:0.65em;font-weight:400;color:var(--muted);">(completed)</span></h2>
-  </div>
-  <div class="cal-legend">🟧 = Weekend &nbsp;·&nbsp; 📝 = Exam day &nbsp;·&nbsp; — = No exam scheduled</div>
-  <div id="examScheduleList"></div>
 </div>
 
 <div class="footer">Made with ❤️ for kids and parents — by a kid's father</div>
@@ -1430,6 +1453,15 @@ function renderDaySelector() {
 function toggleJain() {
   jainMode = document.getElementById('jainToggle').checked;
   renderTimeline();
+}
+
+// ── PAGE TABS (Timetable vs Tasks & Notices) ─────────────────────────────────
+function switchPageTab(name) {
+  document.getElementById('tabTimetable').hidden = name !== 'timetable';
+  document.getElementById('tabTasks').hidden = name !== 'tasks';
+  document.querySelectorAll('.page-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === name);
+  });
 }
 
 // ── RENDER TIMELINE ───────────────────────────────────────────────────────────
@@ -2078,21 +2110,96 @@ function renderExamAlert() {
 renderExamSchedule();
 renderExamAlert();
 
-// ── HOMEWORK & NOTICES (from ManageBac — updated manually) ──────────────────
-const HOMEWORK_UPDATED = '2026-09-12';
-const HOMEWORK_NOTICES = [
-  { date: '2026-09-15', type: 'homework', subject: 'Math',    title: 'Workbook pages 60-61 & 63', detail: 'Q1, Q2, Q3 and Q8' },
-  { date: '2026-09-15', type: 'homework', subject: 'Marathi', title: 'Glossary words — pg 26 & 31 (इ / ई मात्रा)', detail: 'Write on revision pg 103 in the textbook; return the textbook to school' },
-  { date: '2026-09-11', type: 'homework', subject: 'Science', title: 'Workbook — Life Cycle & Food Chain', detail: 'Pages 50, 51, 53… — due date has passed, check it’s submitted' },
-  { dateLabel: 'Last week of Sep', type: 'test',    subject: 'Math',    title: 'Surprise test — Tables 2 to 10', detail: 'Keep practising multiplication tables 2–10' },
-  { dateLabel: '28 Sep – 6 Oct',   type: 'notice',  subject: 'School',  title: 'Continuous Assessment 2 (CA2)', detail: 'No early dispersal on assessment days; arrive on time' },
-];
+// ── HOMEWORK & NOTICES (from ManageBac, synced via a published Google Sheet) ─
+// ONE-TIME SETUP: export tasks from ManageBac to Excel (or copy them in by hand),
+// upload/paste into the Google Sheet below, share it "Anyone with the link ▸
+// Viewer", then keep it updated — the page re-fetches it fresh on every load.
+// Header row (exact names): date, date_label, type, subject, title, detail, status
+//   - date: YYYY-MM-DD for anything with a fixed due date (sorts first, drives
+//     the "due today / overdue" alert banner)
+//   - date_label: free text used only when date is left blank, e.g. "Last week of Sep"
+//   - type: homework | test | notice
+//   - status: leave blank while pending, or "done" once it's submitted/completed —
+//     done items get a green check, sort to the bottom, and stop counting toward
+//     the overdue/due-soon alert banner
+//
+// Tapping "✅ Done" / "↩️ Undo" on a row writes the `status` cell straight back
+// to the sheet via HomeworkAppScript.gs (see that file for the one-time
+// deploy steps) — paste the resulting /exec URL into HOMEWORK_GS_URL below.
+// Leave it blank to keep the buttons working locally only (no write-back).
+const HOMEWORK_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1WRm9BBGGFUrw2_ZU8fbarnruAlvxNIMtc7-jubwY9gM/export?format=csv&gid=0';
+const HOMEWORK_GS_URL = 'https://script.google.com/macros/s/AKfycbx8NZxvFomB8_0hQa4RF8essSL6GThrKjChuaa6L52rexFh8Qe2-GLgfz-HBWBSD8Xp/exec';
+
+let HOMEWORK_NOTICES = [];
+let homeworkSyncedAt = null;
+let homeworkSyncFailed = false;
+
+function parseHomeworkCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        fields.push(cur.trim()); cur = '';
+      } else cur += ch;
+    }
+    fields.push(cur.trim());
+    rows.push(fields);
+  }
+  return rows;
+}
+
+async function loadHomeworkNotices() {
+  try {
+    const res = await fetch(HOMEWORK_SHEET_CSV, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const rows = parseHomeworkCSV(text);
+    if (!rows.length) throw new Error('No data rows');
+
+    const header = rows[0].map(h => h.toLowerCase().trim());
+    const idx = {
+      date:      header.indexOf('date'),
+      dateLabel: header.indexOf('date_label'),
+      type:      header.indexOf('type'),
+      subject:   header.indexOf('subject'),
+      title:     header.indexOf('title'),
+      detail:    header.indexOf('detail'),
+      status:    header.indexOf('status'),
+    };
+
+    HOMEWORK_NOTICES = rows.slice(1)
+      .map((r, i) => ({
+        date:      idx.date      > -1 && r[idx.date]      ? r[idx.date].trim()      : '',
+        dateLabel: idx.dateLabel > -1 && r[idx.dateLabel] ? r[idx.dateLabel].trim() : '',
+        type:      (idx.type > -1 && r[idx.type] ? r[idx.type].trim() : 'notice'),
+        subject:   idx.subject > -1 ? r[idx.subject] || '' : '',
+        title:     idx.title   > -1 ? r[idx.title]   || '' : '',
+        detail:    idx.detail  > -1 ? r[idx.detail]  || '' : '',
+        status:    idx.status  > -1 && r[idx.status] ? r[idx.status].trim().toLowerCase() : 'pending',
+        sheetRow:  i + 2, // header is row 1 — matches the CSV export's row order 1:1
+      }))
+      .filter(item => item.title);
+    homeworkSyncedAt = new Date();
+  } catch (err) {
+    console.error('Homework sync failed:', err);
+    homeworkSyncFailed = true;
+  }
+}
 
 function hwDateLabel(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 function hwStatusOf(item) {
+  if (item.status === 'done') return 'done';
   if (!item.date) return 'no-date';
   const diff = daysBetween(getTodayStr(), item.date);
   if (diff < 0) return 'overdue';
@@ -2101,15 +2208,30 @@ function hwStatusOf(item) {
 }
 
 const HW_TYPE_LABEL = { homework: 'HW', test: 'Test', notice: 'Notice' };
-const HW_STATUS_LABEL = { overdue: 'Overdue', 'due-soon': 'Due soon', upcoming: 'Upcoming', 'no-date': 'No fixed date' };
+const HW_STATUS_LABEL = { overdue: 'Overdue', 'due-soon': 'Due soon', upcoming: 'Upcoming', 'no-date': 'No fixed date', done: '✅ Done' };
 
 function renderHomeworkNotices() {
   const wrap = document.getElementById('homeworkNoticesList');
   const updatedLabel = document.getElementById('hwUpdatedLabel');
   if (!wrap) return;
-  if (updatedLabel) updatedLabel.textContent = `Updated ${hwDateLabel(HOMEWORK_UPDATED)}`;
+  if (updatedLabel) {
+    updatedLabel.textContent = homeworkSyncedAt
+      ? `Synced ${homeworkSyncedAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${homeworkSyncedAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}`
+      : (homeworkSyncFailed ? 'Sync failed' : '');
+  }
+
+  if (homeworkSyncFailed && !HOMEWORK_NOTICES.length) {
+    wrap.innerHTML = '<div class="cal-empty">Couldn’t load homework/notices from the sheet — try refreshing.</div>';
+    return;
+  }
+  if (!HOMEWORK_NOTICES.length) {
+    wrap.innerHTML = '<div class="cal-empty">No homework or notices right now 🎉</div>';
+    return;
+  }
 
   const sorted = [...HOMEWORK_NOTICES].sort((a, b) => {
+    const aDone = a.status === 'done', bDone = b.status === 'done';
+    if (aDone !== bDone) return aDone ? 1 : -1;
     if (a.date && b.date) return a.date.localeCompare(b.date);
     if (a.date) return -1;
     if (b.date) return 1;
@@ -2120,6 +2242,7 @@ function renderHomeworkNotices() {
   sorted.forEach(item => {
     const status = hwStatusOf(item);
     const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
+    const isDone = item.status === 'done';
     html += `<div class="hw-row ${status}">
       <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
       <div class="hw-row-info">
@@ -2129,12 +2252,44 @@ function renderHomeworkNotices() {
         </div>
         <span class="hw-row-title">${item.title}</span>
         <span class="hw-row-detail">${item.detail}</span>
-        <span class="hw-row-date">📅 ${dateText}</span>
+        <div class="hw-row-bottom">
+          <span class="hw-row-date">📅 ${dateText}</span>
+          <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${isDone ? '↩️ Undo' : '✅ Done'}</button>
+        </div>
       </div>
     </div>`;
   });
-  html += '</div><div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks — updated here by hand, not live-synced.</div>';
+  html += '</div><div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks, synced live from a Google Sheet.</div>';
   wrap.innerHTML = html;
+}
+
+// ── WRITE-BACK: tapping ✅ Done / ↩️ Undo writes the `status` cell straight
+// back to the sheet via HomeworkAppScript.gs, so it sticks for everyone —
+// not just this browser. Updates the UI immediately either way. ──────────
+async function markHomeworkStatus(row, newStatus) {
+  const item = HOMEWORK_NOTICES.find(i => i.sheetRow === row);
+  if (!item) return;
+  const prevStatus = item.status;
+  item.status = newStatus || 'pending';
+  renderHomeworkNotices();
+  renderHomeworkAlert();
+
+  if (!HOMEWORK_GS_URL) return; // no backend deployed yet — local-only toggle
+
+  try {
+    const res = await fetch(HOMEWORK_GS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight on Apps Script
+      body: JSON.stringify({ row, status: newStatus }),
+    });
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(data.message || 'Unknown error');
+  } catch (err) {
+    console.error('Failed to sync homework status:', err);
+    item.status = prevStatus;
+    renderHomeworkNotices();
+    renderHomeworkAlert();
+  }
 }
 
 function renderHomeworkAlert() {
@@ -2143,7 +2298,7 @@ function renderHomeworkAlert() {
   if (!banner || !textEl) return;
 
   const todayStr = getTodayStr();
-  const dated = HOMEWORK_NOTICES.filter(i => i.date);
+  const dated = HOMEWORK_NOTICES.filter(i => i.date && i.status !== 'done');
   const overdue = dated.filter(i => i.date < todayStr);
   const dueToday = dated.filter(i => i.date === todayStr);
   const dueSoon = dated.filter(i => i.date > todayStr && daysBetween(todayStr, i.date) <= 3);
@@ -2166,8 +2321,10 @@ function renderHomeworkAlert() {
   }
 }
 
-renderHomeworkNotices();
-renderHomeworkAlert();
+loadHomeworkNotices().then(() => {
+  renderHomeworkNotices();
+  renderHomeworkAlert();
+});
 </script>
 
 </body>
