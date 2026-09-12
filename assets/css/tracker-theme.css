@@ -68,6 +68,7 @@ body::before{
 }
 
 /* ═══ NAV — identical shell on every tracker page ═══ */
+deepu-nav{display:contents}
 nav{
   position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
   display:flex;justify-content:space-between;align-items:center;

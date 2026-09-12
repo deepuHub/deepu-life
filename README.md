@@ -60,6 +60,7 @@ No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, 
 
 - **Cinematic timeline** — full-screen slide view, draggable scrubber, keyboard nav, touch swipe (shared across Tracker and Half Marathon)
 - **Light / dark mode** — toggle in the nav, persisted, applied before first paint
+- **Single source of truth nav** — `<deepu-nav active="page">` web component (`assets/js/nav.js`) renders the pill row and hamburger drawer from one link list; adding a new page means adding one entry, not editing every HTML file
 - **Mobile nav** — pill row on desktop collapses into a hamburger drawer below 860px, grouped into Public / 🔒 Private
 - **Chip navigation** — Kid and BEd Results pages navigate by Grade/Term or Semester via pill chips instead of one long page
 - Zero npm, zero build step — pure HTML/CSS/JS
@@ -86,7 +87,7 @@ deepu-life/
 │   │   └── timeline.css      ← shared cinematic timeline styles
 │   └── js/
 │       ├── theme.js          ← light/dark toggle
-│       ├── nav.js            ← mobile hamburger drawer
+│       ├── nav.js            ← <deepu-nav> web component: single source of truth for the nav (pill row + hamburger drawer)
 │       └── timeline.js       ← shared cinematic timeline engine
 ├── AppScript.gs               ← paste into the public tracker's Apps Script
 ├── ExamAppScript.gs            ← paste into the private Exam Results Sheet's Apps Script
