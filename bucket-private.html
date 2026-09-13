@@ -123,6 +123,7 @@
 
   footer{margin-top:3.5rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;
          letter-spacing:.12em;color:var(--muted)}
+  .sync-note{display:block;margin-top:.5rem;color:#f0545c}
 </style>
 </head>
 <body>
@@ -154,7 +155,7 @@
 
   <main class="charts" id="charts"></main>
 
-  <footer>click a star, or the line of text · progress stays in this browser</footer>
+  <footer>click a star, or the line of text · saved to the sheet<span class="sync-note" id="sync-note"></span></footer>
 </div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -173,18 +174,19 @@
 
    DATA — a private Google Sheet, tab "List", tab-separated columns:
 
-     section_id   section_name   section_sub   item   href
+     section_id   section_name   section_sub   item   href   status
 
    - section_id  stable slug (competence, travel, family, work, …). It seeds the
-                 constellation layout AND keys the saved progress, so NEVER
-                 rename one: the shape and the checkmarks both reset if you do.
+                 constellation layout, so NEVER rename one — the sky's shape
+                 changes if you do.
    - section_name / section_sub  card heading + subtitle. Repeat them on every
                  row of the section; the first row of each section wins.
    - item        the label, rendered verbatim. No transformation.
    - href        optional — renders a LINK pill next to the row.
-   Section order = first appearance in the sheet. Item order within a section is
-   part of its identity ("<section_id>:<index>"), so APPEND, don't insert —
-   inserting mid-section shifts every later item's saved state.
+   - status      "done" lights the star, blank leaves it dark. Clicking a star
+                 writes this cell, so progress is the Sheet's, not the browser's.
+   Section order = first appearance in the sheet. Rows may be reordered freely:
+   a star is tied to its sheet ROW, not its position in a section.
 
    ONE-TIME SETUP:
      1. New Google Sheet, name the first tab "List", keep sharing Restricted.
@@ -194,21 +196,22 @@
      3. Put the spreadsheet id (the /d/<id>/ part of its URL) in SPREADSHEET_ID.
    Edit the list in the Sheet from then on; reload the page and it appears.
 
-   STATE — localStorage['deepu-bucket'] = { "section_id:index": 1, … }.
-   Per-browser by design, same posture as todo.html. The Sheet is read-only here.
+   STATE — the `status` column, read on load and written on every click via the
+   Sheets API as the signed-in user. No Apps Script, no public write URL, no
+   localStorage: the same stars are lit on every device you sign in from.
 
    Each sky is an SVG on a 640×H viewBox, so it scales to any width.
 ═══════════════════════════════════════════════════════════════════ */
 const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
 const SPREADSHEET_ID = '16Z3HUgyER1sAT9H8RUcyUXdeeIGvbToqHdkRntzzNtk';
 const SHEET_TAB      = 'List';
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
-const KEY = 'deepu-bucket', W = 640, NS = 'http://www.w3.org/2000/svg';
-let done = {};
-try { done = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { done = {}; }
+const W = 640, NS = 'http://www.w3.org/2000/svg';
 
 let tokenClient, accessToken = null, DATA = null;
+let statusCol = '';                 // sheet column letter of `status`
+const ITEMS = new Map();            // "section_id:index" → item
 
 function showGateError(msg) { document.getElementById('gate-error').textContent = msg; }
 
@@ -235,6 +238,7 @@ async function onSignedIn(){
   try {
     DATA = { cats: rowsToCats(await loadRows()) };
     if (!DATA.cats.length) throw new Error('The List tab has no rows yet.');
+    DATA.cats.forEach(c => c.items.forEach((it, i) => ITEMS.set(c.id + ':' + i, it)));
     document.getElementById('gate').style.display = 'none';
     document.getElementById('stats').classList.add('show');
     document.getElementById('s-total').textContent = DATA.cats.reduce((n, c) => n + c.items.length, 0);
@@ -255,17 +259,21 @@ async function loadRows(){
   return data.values || [];
 }
 
-/* Flat sheet rows → one group per section_id, in first-appearance order. */
+/* Flat sheet rows → one group per section_id, in first-appearance order.
+   Each item remembers its sheet row, which is what a click writes back to. */
 function rowsToCats(rows){
   if (!rows.length) return [];
   const header = rows[0].map(h => String(h || '').toLowerCase().trim());
   const iId = header.indexOf('section_id'), iItem = header.indexOf('item');
   if (iId < 0 || iItem < 0) throw new Error('The List tab needs section_id and item columns.');
+  const iStatus = header.indexOf('status');
+  if (iStatus < 0) throw new Error('The List tab needs a status column — add "status" as the last header.');
   const iName = header.indexOf('section_name'), iSub = header.indexOf('section_sub'), iHref = header.indexOf('href');
   const cell = (r, i) => (i > -1 && r[i] != null ? String(r[i]).trim() : '');
+  statusCol = String.fromCharCode(65 + iStatus);
 
   const cats = [], byId = new Map();
-  rows.slice(1).forEach(r => {
+  rows.slice(1).forEach((r, i) => {
     const id = cell(r, iId), t = cell(r, iItem);
     if (!id || !t) return;
     let c = byId.get(id);
@@ -274,7 +282,8 @@ function rowsToCats(rows){
       byId.set(id, c);
       cats.push(c);
     }
-    const it = { t }, href = cell(r, iHref);
+    const it = { t, row: i + 2, done: cell(r, iStatus).toLowerCase() === 'done' };
+    const href = cell(r, iHref);
     if (href) it.href = href;
     c.items.push(it);
   });
@@ -397,11 +406,36 @@ function build(data){
   });
 }
 
-function toggle(k){
-  if (done[k]) delete done[k]; else done[k] = 1;
-  try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+/* Optimistic: light the star now, write the cell after. A failed write puts
+   the star back, so what you see always matches what the sheet holds. */
+async function toggle(k){
+  const it = ITEMS.get(k);
+  if (!it) return;
+  it.done = !it.done;
   refresh();
+  try {
+    await writeCells(`${statusCol}${it.row}`, [[it.done ? 'done' : '']]);
+    note('');
+  } catch (e) {
+    it.done = !it.done;
+    refresh();
+    note('Could not save to the sheet — ' + e.message);
+  }
 }
+
+async function writeCells(range, values){
+  const target = `${SHEET_TAB}!${range}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(target)}?valueInputOption=RAW`;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values }),
+  });
+  if (res.status === 401) throw new Error('sign-in expired, reload the page');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+}
+
+function note(msg){ document.getElementById('sync-note').textContent = msg; }
 
 function refresh(){
   if (!DATA) return;
@@ -409,13 +443,13 @@ function refresh(){
 
   DATA.cats.forEach(c => {
     const card = document.querySelector('.con[data-cat="' + c.id + '"]');
-    const flags = c.items.map((it, i) => !!done[c.id + ':' + i]);
+    const flags = c.items.map(it => it.done);
     const k = flags.filter(Boolean).length;
     lit += k;
     if (k === c.items.length) clear++;
 
-    card.querySelectorAll('.star').forEach(s => s.classList.toggle('lit', !!done[s.dataset.star]));
-    card.querySelectorAll('.obj[data-k]').forEach(o => o.classList.toggle('done', !!done[o.dataset.k]));
+    card.querySelectorAll('.star').forEach(s => s.classList.toggle('lit', ITEMS.get(s.dataset.star).done));
+    card.querySelectorAll('.obj[data-k]').forEach(o => o.classList.toggle('done', ITEMS.get(o.dataset.k).done));
     card.querySelectorAll('.cline').forEach(l => l.classList.toggle('on', flags[l.dataset.a] && flags[l.dataset.b]));
     card.classList.toggle('clear', k === c.items.length);
     card.querySelector('.con-count').textContent = k + '/' + c.items.length;
@@ -425,10 +459,25 @@ function refresh(){
   document.getElementById('s-con').textContent = clear;
 }
 
-document.getElementById('reset').addEventListener('click', () => {
-  done = {};
-  try { localStorage.setItem(KEY, '{}'); } catch (e) {}
+/* GO DARK now clears the sheet, i.e. every device — hence the confirm. */
+document.getElementById('reset').addEventListener('click', async () => {
+  if (!DATA) return;
+  const items = [...ITEMS.values()];
+  if (!items.some(it => it.done)) return;
+  if (!confirm('Put out every lit star? This clears the status column in the sheet, on every device.')) return;
+
+  const was = items.map(it => it.done);
+  items.forEach(it => it.done = false);
   refresh();
+  const last = Math.max(...items.map(it => it.row));
+  try {
+    await writeCells(`${statusCol}2:${statusCol}${last}`, Array.from({ length: last - 1 }, () => ['']));
+    note('');
+  } catch (e) {
+    items.forEach((it, i) => it.done = was[i]);
+    refresh();
+    note('Could not clear the sheet — ' + e.message);
+  }
 });
 
 initAuth();

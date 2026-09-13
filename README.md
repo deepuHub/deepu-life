@@ -54,12 +54,17 @@ Each grade's Sheet has 5 tabs:
 `TermID` (e.g. `G2-T1`) and `CAID` (e.g. `G2-CA1`) are the join keys within a grade's tabs — same pattern as before, just scoped to one grade's Sheet instead of shared across all grades. One `CA Breakdown` tab holds every CA's questions (filtered by `CAID`), same as `CA Results` — not a separate tab per CA.
 
 **Bucket List — one flat tab.** `bucket-private.html` reads a single tab, `List`, whose columns are
-`section_id | section_name | section_sub | item | href`. Every row is one star; rows sharing a
-`section_id` become one constellation, in the order the sections first appear. `section_id` seeds both
-the constellation's shape and its saved progress, so renaming one resets that sky — and item order is
-part of each star's identity, so append rather than insert. `data/bucket-list.tsv` is the seed to paste
+`section_id | section_name | section_sub | item | href | status`. Every row is one star; rows sharing a
+`section_id` become one constellation, in the order the sections first appear. `section_id` seeds the
+constellation's shape, so renaming one redraws that sky. `data/bucket-list.tsv` is the seed to paste
 into the Sheet (gitignored along with the rest of `data/*.tsv` — the page reads the Sheet, never the
-file). Ticking a star is per-browser `localStorage`; the Sheet is read-only here.
+file).
+
+Clicking a star writes `done` into that row's `status` cell through the Sheets API, as the signed-in
+user — no Apps Script and no public write URL, unlike the School page's write-back, because this page
+already holds an OAuth token. Progress therefore lives in the Sheet and follows you across devices; a
+star is tied to its sheet row, so rows can be reordered freely. `GO DARK` clears the whole column and
+asks first.
 
 No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, reload the page, it appears.
 
