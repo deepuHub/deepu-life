@@ -2310,10 +2310,10 @@ async function markHomeworkStatus(row, newStatus) {
   const item = HOMEWORK_NOTICES.find(i => i.sheetRow === row);
   if (!item) return;
 
-  // Celebrate only when finishing (not un-doing) something that wasn't
-  // already overdue — "done before the deadline" is the whole point.
-  // Notices are just marked read/unread, not achievements — no confetti.
-  if (newStatus === 'done' && item.type !== 'notice' && hwStatusOf(item) !== 'overdue') {
+  // Celebrate every time something is finished (not un-done), overdue or
+  // not — every "Done" hit deserves confetti. Notices are just marked
+  // read/unread, not achievements, so they stay confetti-free.
+  if (newStatus === 'done' && item.type !== 'notice') {
     fireHomeworkCelebration();
   }
 
