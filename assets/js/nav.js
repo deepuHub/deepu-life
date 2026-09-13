@@ -1,10 +1,11 @@
 /* ══════════════════════════════════════════════════════════════════
    deepu-life — <deepu-nav> web component
-   Single source of truth for the site nav: the pill row, the mobile
-   hamburger drawer, and the Public/Private grouping. Every page just
-   drops in <deepu-nav active="key"></deepu-nav> — add a new page here
-   once and it shows up everywhere, instead of hand-editing every
-   HTML file's copy-pasted nav block.
+   Single source of truth for the site nav: the pill row (mobile-only
+   now), the persistent left sidebar (desktop), the mobile hamburger
+   drawer, and the Public/Private grouping. Every page just drops in
+   <deepu-nav active="key"></deepu-nav> — add a new page here once and
+   it shows up everywhere, instead of hand-editing every HTML file's
+   copy-pasted nav block.
 ═══════════════════════════════════════════════════════════════════ */
 (() => {
   const LINKS = [
@@ -70,7 +71,13 @@
     ${groupHTML('public', 'Public', active)}
     ${groupHTML('private', '🔒 Private', active)}
   </div>
-</div>`.trim();
+</div>
+<aside class="nav-sidebar" aria-label="Sections">
+  <div class="nav-sidebar-inner">
+    ${groupHTML('public', 'Public', active)}
+    ${groupHTML('private', '🔒 Private', active)}
+  </div>
+</aside>`.trim();
 
       this._wireDrawer();
     }
