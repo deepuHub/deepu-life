@@ -2128,17 +2128,27 @@ renderExamAlert();
 //   - status: leave blank while pending, or "done" once it's submitted/completed —
 //     done items get a green check, sort to the bottom, and stop counting toward
 //     the overdue/due-soon alert banner
+//   - synced_at: NOT per-row — put one value in the first data row only (e.g.
+//     cell H2), everything else in this column stays blank. This is the
+//     timestamp of the last real "Update homework" pass (when notifications
+//     were actually pulled from ManageBac), NOT when a visitor's browser
+//     happened to load the page. Update it by hand (ISO-ish, e.g.
+//     2026-09-13T09:09:12+05:30) each time you sync — the page reads it to
+//     show "Synced ..." and flags itself "Stale" once it's over 8h old.
 //
-// Tapping "✅ Done" / "↩️ Undo" on a row writes the `status` cell straight back
-// to the sheet via HomeworkAppScript.gs (see that file for the one-time
-// deploy steps) — paste the resulting /exec URL into HOMEWORK_GS_URL below.
-// Leave it blank to keep the buttons working locally only (no write-back).
+// Tapping "✅ Done" / "↩️ Undo" (or "👁️ Read" / "↩️ Unread" for notices) on a
+// row writes the `status` cell straight back to the sheet via
+// HomeworkAppScript.gs (see that file for the one-time deploy steps) — paste
+// the resulting /exec URL into HOMEWORK_GS_URL below. Leave it blank to keep
+// the buttons working locally only (no write-back).
 const HOMEWORK_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1WRm9BBGGFUrw2_ZU8fbarnruAlvxNIMtc7-jubwY9gM/export?format=csv&gid=0';
 const HOMEWORK_GS_URL = 'https://script.google.com/macros/s/AKfycbx8NZxvFomB8_0hQa4RF8essSL6GThrKjChuaa6L52rexFh8Qe2-GLgfz-HBWBSD8Xp/exec';
 
 let HOMEWORK_NOTICES = [];
 let homeworkSyncedAt = null;
+let homeworkSyncStale = false;
 let homeworkSyncFailed = false;
+const HOMEWORK_STALE_HOURS = 8;
 
 function parseHomeworkCSV(text) {
   const rows = [];
@@ -2179,6 +2189,7 @@ async function loadHomeworkNotices() {
       title:     header.indexOf('title'),
       detail:    header.indexOf('detail'),
       status:    header.indexOf('status'),
+      syncedAt:  header.indexOf('synced_at'),
     };
 
     HOMEWORK_NOTICES = rows.slice(1)
@@ -2193,7 +2204,17 @@ async function loadHomeworkNotices() {
         sheetRow:  i + 2, // header is row 1 — matches the CSV export's row order 1:1
       }))
       .filter(item => item.title);
-    homeworkSyncedAt = new Date();
+
+    // synced_at lives in exactly one data row (whichever one it was typed
+    // into) — scan for the first non-blank value rather than assuming row 2.
+    const syncedAtRaw = idx.syncedAt > -1
+      ? (rows.slice(1).map(r => r[idx.syncedAt]).find(v => v && v.trim()) || '')
+      : '';
+    const parsedSyncedAt = syncedAtRaw ? new Date(syncedAtRaw.trim()) : null;
+    homeworkSyncedAt = (parsedSyncedAt && !isNaN(parsedSyncedAt)) ? parsedSyncedAt : null;
+    homeworkSyncStale = homeworkSyncedAt
+      ? (Date.now() - homeworkSyncedAt.getTime()) / 3600000 > HOMEWORK_STALE_HOURS
+      : false;
   } catch (err) {
     console.error('Homework sync failed:', err);
     homeworkSyncFailed = true;
@@ -2221,9 +2242,16 @@ function renderHomeworkNotices() {
   const updatedLabel = document.getElementById('hwUpdatedLabel');
   if (!wrap) return;
   if (updatedLabel) {
-    updatedLabel.textContent = homeworkSyncedAt
-      ? `Synced ${homeworkSyncedAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${homeworkSyncedAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}`
-      : (homeworkSyncFailed ? 'Sync failed' : '');
+    if (homeworkSyncedAt) {
+      const stamp = `${homeworkSyncedAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${homeworkSyncedAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}`;
+      updatedLabel.textContent = homeworkSyncStale ? `⚠️ Stale — last synced ${stamp}` : `Synced ${stamp}`;
+      updatedLabel.style.color = homeworkSyncStale ? '#e65100' : 'var(--muted)';
+      updatedLabel.style.fontWeight = homeworkSyncStale ? '700' : '400';
+    } else {
+      updatedLabel.textContent = homeworkSyncFailed ? 'Sync failed' : '';
+      updatedLabel.style.color = 'var(--muted)';
+      updatedLabel.style.fontWeight = '400';
+    }
   }
 
   if (homeworkSyncFailed && !HOMEWORK_NOTICES.length) {
@@ -2249,18 +2277,24 @@ function renderHomeworkNotices() {
     const status = hwStatusOf(item);
     const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
     const isDone = item.status === 'done';
+    // Pure FYI items (type "notice") aren't "done" in any real sense — they're
+    // read or unread. Everything else (homework/test/event) is an action.
+    const isReadType = item.type === 'notice';
+    const doneStatusLabel = isReadType ? '👁️ Read' : HW_STATUS_LABEL.done;
+    const actionLabel = isDone ? (isReadType ? '↩️ Unread' : '↩️ Undo') : (isReadType ? '👁️ Read' : '✅ Done');
+    const statusPillLabel = status === 'done' ? doneStatusLabel : HW_STATUS_LABEL[status];
     html += `<div class="hw-row ${status}">
       <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
       <div class="hw-row-info">
         <div class="hw-row-top">
           <span class="hw-row-subject">${item.subject}</span>
-          <span class="hw-status-pill ${status}">${HW_STATUS_LABEL[status]}</span>
+          <span class="hw-status-pill ${status}">${statusPillLabel}</span>
         </div>
         <span class="hw-row-title">${item.title}</span>
         <span class="hw-row-detail">${item.detail}</span>
         <div class="hw-row-bottom">
           <span class="hw-row-date">📅 ${dateText}</span>
-          <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${isDone ? '↩️ Undo' : '✅ Done'}</button>
+          <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${actionLabel}</button>
         </div>
       </div>
     </div>`;
@@ -2278,7 +2312,8 @@ async function markHomeworkStatus(row, newStatus) {
 
   // Celebrate only when finishing (not un-doing) something that wasn't
   // already overdue — "done before the deadline" is the whole point.
-  if (newStatus === 'done' && hwStatusOf(item) !== 'overdue') {
+  // Notices are just marked read/unread, not achievements — no confetti.
+  if (newStatus === 'done' && item.type !== 'notice' && hwStatusOf(item) !== 'overdue') {
     fireHomeworkCelebration();
   }
 
