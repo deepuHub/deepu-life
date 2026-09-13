@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bucket List — deepu-life</title>
+<meta name="description" content="The Heinlein competence list, as a star chart.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✶%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600&family=Fraunces:wght@900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<script src="assets/js/theme.js"></script>
+<style>
+  /* ── Deep-space skin: overrides the tracker palette for this page only.
+        --cycle (#a78bfa) is already the repo's violet, so the nav inherits it. ── */
+  :root{
+    --bg:#05060d;--surface:rgba(9,10,20,.6);--border:#191a2e;
+    --text:#e9e4ff;--muted:#9a95bd;--muted2:#6f6a96;
+    --run:#a78bfa;--run-dim:#1e1535;
+
+    --star:#eaf7ff;--star-dim:#3a4260;
+    --line-on:#a78bfa;--line-off:#5a6180;
+    --lit:#cfe8f7;--unlit:#8f8ab0;--cyan:#7fe3ff;
+    --card-on-bg:radial-gradient(120% 90% at 50% 0%, rgba(120,80,220,.18), rgba(8,9,20,.75));
+    --card-on-border:rgba(167,139,250,.7);
+  }
+  /* Day chart — the same map on paper when the nav's theme toggle is flipped. */
+  :root[data-theme="light"]{
+    --bg:#f5ead8;--surface:#fffaf1;--border:#e6d8c0;
+    --text:#201e1d;--muted:#5c554c;--muted2:#82796a;
+    --run:#c67139;--run-dim:#f6e3d3;
+
+    --star:#c67139;--star-dim:#cdbca0;
+    --line-on:#7a8a5e;--line-off:#cdbca0;
+    --lit:#201e1d;--unlit:#5c554c;--cyan:#8a4d24;
+    --card-on-bg:#fbeee0;--card-on-border:#c67139;
+  }
+  body::before{opacity:.02}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(1px 1px at 12% 14%, rgba(255,255,255,.5) 50%, transparent),
+      radial-gradient(1px 1px at 68% 6%, rgba(255,255,255,.32) 50%, transparent),
+      radial-gradient(1.5px 1.5px at 84% 38%, rgba(255,255,255,.38) 50%, transparent),
+      radial-gradient(1px 1px at 31% 62%, rgba(255,255,255,.28) 50%, transparent),
+      radial-gradient(1px 1px at 54% 86%, rgba(255,255,255,.32) 50%, transparent),
+      radial-gradient(900px 520px at 80% -6%, rgba(120,80,220,.20), transparent),
+      radial-gradient(760px 420px at 4% 104%, rgba(30,120,180,.16), transparent);
+    background-attachment:fixed;
+  }
+  :root[data-theme="light"] body{background-image:none}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:calc(var(--nav-h) + 3.5rem) var(--pad) 5rem}
+
+  /* ── hero ── */
+  .hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.15rem;margin-bottom:3rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.1rem,6.5vw,3.4rem);line-height:1.02;letter-spacing:-.02em;max-width:20ch}
+  .epigraph{font-size:clamp(.9rem,2.4vw,1rem);line-height:1.75;color:var(--muted);max-width:72ch;text-wrap:pretty}
+  .attrib{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--muted)}
+  .stats{display:none;flex-wrap:wrap;justify-content:center;align-items:center;gap:1.1rem 1.75rem;margin-top:.6rem;
+         font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.12em;color:var(--muted)}
+  .stats.show{display:flex}
+  .stats b{color:var(--cyan);font-weight:500}
+  .reset{font:inherit;letter-spacing:.12em;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;
+         min-height:44px;-webkit-tap-highlight-color:transparent}
+  .reset:hover{color:var(--run)}
+  .reset:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+
+  /* ── sign-in gate — the private Sheet is the access control, not this page ── */
+  .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:36vh}
+  .gate-icon{font-size:2.2rem}
+  .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem;color:var(--text)}
+  .gate p{font-size:.88rem;font-weight:300;line-height:1.7;color:var(--muted);max-width:46ch}
+  .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+              background:var(--run-dim);color:var(--run);border:1px solid var(--run);font-family:'JetBrains Mono',monospace;
+              font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s;
+              -webkit-tap-highlight-color:transparent}
+  .btn-signin:hover{background:var(--run);color:var(--bg)}
+  .btn-signin:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  .gate-error{color:#f0545c;font-size:.8rem;max-width:52ch}
+
+  /* ── constellations ── */
+  .charts{display:flex;flex-direction:column;gap:1rem}
+  .con{border:1px solid var(--border);border-radius:16px;background:var(--surface);
+       padding:1.4rem 1.4rem 1.2rem;transition:border-color .35s,background .35s}
+  .con.clear{border-color:var(--card-on-border);background:var(--card-on-bg)}
+
+  .con-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:.35rem .75rem}
+  .con-name{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.1rem,3.2vw,1.45rem);letter-spacing:-.01em;color:var(--text)}
+  .con.clear .con-name{color:var(--run)}
+  .con-sub{font-size:.8rem;color:var(--muted)}
+  .con-count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;color:var(--muted)}
+
+  .sky{display:block;width:100%;max-width:640px;height:auto;margin:1rem auto .6rem;overflow:visible}
+  .cline{stroke:var(--line-off);stroke-width:1;opacity:.5;transition:stroke .45s,opacity .45s,stroke-width .45s}
+  .cline.on{stroke:var(--line-on);opacity:1;stroke-width:1.4}
+  .star{fill:var(--star-dim);cursor:pointer;transition:fill .35s}
+  .star.lit{fill:var(--star);filter:url(#glow)}
+  .hit{fill:transparent;cursor:pointer;outline:none}
+  .hit:focus-visible + .star,.hit:hover + .star{fill:var(--star)}
+  .hit:focus-visible + .star{stroke:var(--run);stroke-width:1.5}
+  @keyframes flare{0%{transform:scale(.3);opacity:.25}55%{transform:scale(2.1);opacity:1}100%{transform:scale(1);opacity:1}}
+  .star.lit{transform-box:fill-box;transform-origin:center;animation:flare .55s ease}
+
+  .objs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 1.25rem;margin-top:.6rem}
+  .obj-row{display:flex;align-items:center;gap:.45rem}
+  .obj{flex:1;min-width:0;display:flex;align-items:center;gap:.6rem;padding:.3rem .45rem;margin:0 -.45rem;border-radius:8px;
+       background:none;border:0;text-align:left;font:inherit;cursor:pointer;min-height:44px;
+       -webkit-tap-highlight-color:transparent}
+  .obj:hover{background:rgba(167,139,250,.09)}
+  :root[data-theme="light"] .obj:hover{background:rgba(198,113,57,.07)}
+  .obj:focus-visible{outline:2px solid var(--run);outline-offset:-2px}
+  .dot{width:6px;height:6px;flex-shrink:0;border-radius:50%;background:var(--star-dim);transition:all .3s}
+  .obj.done .dot{background:var(--star);box-shadow:0 0 5px 1px rgba(127,227,255,.7)}
+  .obj > span{flex:1;min-width:0;font-size:.88rem;line-height:1.4;font-weight:300;color:var(--unlit);transition:color .25s}
+  .obj.done > span{color:var(--lit);text-decoration:line-through;text-decoration-color:var(--run)}
+  .obj-row a{flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;color:var(--muted);
+         text-decoration:none;border:1px solid var(--border);border-radius:999px;padding:.2rem .5rem}
+  .obj-row a:hover{color:var(--run);border-color:var(--run)}
+  .obj-row a:focus-visible{outline:2px solid var(--run);outline-offset:2px}
+
+  footer{margin-top:3.5rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;
+         letter-spacing:.12em;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<deepu-nav active="bucket"></deepu-nav>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>Light every star you earn.</h1>
+    <p class="epigraph">"A human being should be able to change a diaper, plan an invasion, butcher a hog, conn a ship, design a building, write a sonnet, balance accounts, build a wall, set a bone, comfort the dying, take orders, give orders, cooperate, act alone, solve equations, analyze a new problem, pitch manure, program a computer, cook a tasty meal, fight efficiently, die gallantly. Specialization is for insects."</p>
+    <div class="attrib">— Robert A. Heinlein, Time Enough for Love</div>
+    <div class="stats" id="stats">
+      <span>STARS LIT <b id="s-lit">0</b> / <span id="s-total">0</span></span>
+      <span>CONSTELLATIONS <b id="s-con">0</b> / <span id="s-cons">0</span></span>
+      <button class="reset" id="reset" type="button">GO DARK</button>
+    </div>
+  </header>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private sky</h2>
+    <p>The list itself lives in a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <main class="charts" id="charts"></main>
+
+  <footer>click a star, or the line of text · progress stays in this browser</footer>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="glow" x="-300%" y="-300%" width="700%" height="700%">
+    <feGaussianBlur stdDeviation="2.4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs></svg>
+
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   bucket-private.html — the bucket list as a star chart.
+   One constellation per section, one star per item.
+
+   DATA — a private Google Sheet, tab "List", tab-separated columns:
+
+     section_id   section_name   section_sub   item   href
+
+   - section_id  stable slug (competence, travel, family, work, …). It seeds the
+                 constellation layout AND keys the saved progress, so NEVER
+                 rename one: the shape and the checkmarks both reset if you do.
+   - section_name / section_sub  card heading + subtitle. Repeat them on every
+                 row of the section; the first row of each section wins.
+   - item        the label, rendered verbatim. No transformation.
+   - href        optional — renders a LINK pill next to the row.
+   Section order = first appearance in the sheet. Item order within a section is
+   part of its identity ("<section_id>:<index>"), so APPEND, don't insert —
+   inserting mid-section shifts every later item's saved state.
+
+   ONE-TIME SETUP:
+     1. New Google Sheet, name the first tab "List", keep sharing Restricted.
+     2. Paste data/bucket-list.tsv into A1 (Paste special ▸ values only, or
+        File ▸ Import ▸ tab-separated). That file is the seed, gitignored —
+        the page reads the Sheet, never the file.
+     3. Put the spreadsheet id (the /d/<id>/ part of its URL) in SPREADSHEET_ID.
+   Edit the list in the Sheet from then on; reload the page and it appears.
+
+   STATE — localStorage['deepu-bucket'] = { "section_id:index": 1, … }.
+   Per-browser by design, same posture as todo.html. The Sheet is read-only here.
+
+   Each sky is an SVG on a 640×H viewBox, so it scales to any width.
+═══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '16Z3HUgyER1sAT9H8RUcyUXdeeIGvbToqHdkRntzzNtk';
+const SHEET_TAB      = 'List';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+const KEY = 'deepu-bucket', W = 640, NS = 'http://www.w3.org/2000/svg';
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { done = {}; }
+
+let tokenClient, accessToken = null, DATA = null;
+
+function showGateError(msg) { document.getElementById('gate-error').textContent = msg; }
+
+function initAuth(){
+  if (!SPREADSHEET_ID){
+    document.getElementById('signin-btn').style.display = 'none';
+    showGateError('No Sheet wired up yet — see the setup steps in this page’s source.');
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: resp => {
+      if (resp.error){ showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  document.getElementById('signin-btn')
+    .addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+async function onSignedIn(){
+  try {
+    DATA = { cats: rowsToCats(await loadRows()) };
+    if (!DATA.cats.length) throw new Error('The List tab has no rows yet.');
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('stats').classList.add('show');
+    document.getElementById('s-total').textContent = DATA.cats.reduce((n, c) => n + c.items.length, 0);
+    document.getElementById('s-cons').textContent = DATA.cats.length;
+    build(DATA);
+    refresh();
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+async function loadRows(){
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(SHEET_TAB)}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Bucket List sheet.');
+  if (!res.ok) throw new Error(`Could not load the sheet (HTTP ${res.status}).`);
+  const data = await res.json();
+  return data.values || [];
+}
+
+/* Flat sheet rows → one group per section_id, in first-appearance order. */
+function rowsToCats(rows){
+  if (!rows.length) return [];
+  const header = rows[0].map(h => String(h || '').toLowerCase().trim());
+  const iId = header.indexOf('section_id'), iItem = header.indexOf('item');
+  if (iId < 0 || iItem < 0) throw new Error('The List tab needs section_id and item columns.');
+  const iName = header.indexOf('section_name'), iSub = header.indexOf('section_sub'), iHref = header.indexOf('href');
+  const cell = (r, i) => (i > -1 && r[i] != null ? String(r[i]).trim() : '');
+
+  const cats = [], byId = new Map();
+  rows.slice(1).forEach(r => {
+    const id = cell(r, iId), t = cell(r, iItem);
+    if (!id || !t) return;
+    let c = byId.get(id);
+    if (!c){
+      c = { id, name: cell(r, iName) || id, sub: cell(r, iSub), items: [] };
+      byId.set(id, c);
+      cats.push(c);
+    }
+    const it = { t }, href = cell(r, iHref);
+    if (href) it.href = href;
+    c.items.push(it);
+  });
+  return cats;
+}
+
+/* Deterministic layout — a given section always gets the same sky. */
+function rng(seed){
+  let a = 0;
+  for (let i = 0; i < seed.length; i++) a = (a * 31 + seed.charCodeAt(i)) | 0;
+  a = (a ^ 0x9e3779b9) >>> 0;
+  return () => { a += 0x6d2b79f5; let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+/* Best-candidate sampling: each star is the farthest of 14 tries from the
+   stars already placed, so the sky fills evenly instead of clumping. */
+function layout(id, n, h){
+  const r = rng(id), pts = [];
+  for (let i = 0; i < n; i++){
+    let best = null, bestD = -1;
+    for (let c = 0; c < 14; c++){
+      const p = { x: 34 + r() * (W - 68), y: 26 + r() * (h - 52) };
+      let d = Infinity;
+      pts.forEach(q => { d = Math.min(d, (q.x - p.x) ** 2 + (q.y - p.y) ** 2); });
+      if (d > bestD){ bestD = d; best = p; }
+    }
+    pts.push(best);
+  }
+  /* Walk the stars as a nearest-neighbour chain from the leftmost one, so the
+     lines trace a path instead of criss-crossing in data order. */
+  const left = pts.reduce((a, p, i) => (p.x < pts[a].x ? i : a), 0);
+  const order = [left], seen = new Set(order);
+  while (order.length < n){
+    const from = pts[order[order.length - 1]];
+    let next = -1, nd = Infinity;
+    pts.forEach((p, i) => {
+      if (seen.has(i)) return;
+      const d = (p.x - from.x) ** 2 + (p.y - from.y) ** 2;
+      if (d < nd){ nd = d; next = i; }
+    });
+    order.push(next); seen.add(next);
+  }
+  return { pts, order };
+}
+const el = (tag, attrs) => { const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+
+function build(data){
+  const host = document.getElementById('charts');
+  const frag = document.createDocumentFragment();
+
+  data.cats.forEach(c => {
+    const n = c.items.length;
+    const h = n > 14 ? 300 : n > 8 ? 230 : 170;
+    const sky = layout(c.id, n, h), pts = sky.pts, order = sky.order;
+
+    const card = document.createElement('section');
+    card.className = 'con';
+    card.dataset.cat = c.id;
+
+    card.insertAdjacentHTML('beforeend',
+      '<div class="con-head"><span class="con-name"></span><span class="con-sub"></span>' +
+      '<span class="con-count"></span></div>');
+    card.querySelector('.con-name').textContent = c.name;
+    card.querySelector('.con-sub').textContent = c.sub || '';
+
+    const svg = el('svg', { class: 'sky', viewBox: '0 0 ' + W + ' ' + h, role: 'img',
+                            'aria-label': c.name + ' constellation' });
+    for (let i = 0; i < n - 1; i++){
+      const a = order[i], b = order[i + 1];
+      svg.appendChild(el('line', { class: 'cline', 'data-a': a, 'data-b': b,
+        x1: pts[a].x, y1: pts[a].y, x2: pts[b].x, y2: pts[b].y }));
+    }
+    c.items.forEach((it, i) => {
+      const k = c.id + ':' + i;
+      svg.appendChild(el('circle', { class: 'hit', 'data-k': k, cx: pts[i].x, cy: pts[i].y, r: 22,
+        tabindex: 0, role: 'button', 'aria-label': it.t }));
+      svg.appendChild(el('circle', { class: 'star', 'data-star': k, cx: pts[i].x, cy: pts[i].y, r: 4.5 }));
+      const tip = el('title', {}); tip.textContent = it.t;
+      svg.lastChild.appendChild(tip);
+    });
+    card.appendChild(svg);
+
+    const objs = document.createElement('div');
+    objs.className = 'objs';
+    c.items.forEach((it, i) => {
+      const row = document.createElement('div');
+      row.className = 'obj-row';
+
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'obj';
+      b.dataset.k = c.id + ':' + i;
+      b.innerHTML = '<i class="dot"></i><span></span>';
+      b.querySelector('span').textContent = it.t;
+      row.appendChild(b);
+      if (it.href){
+        const a = document.createElement('a');
+        a.href = it.href; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = 'LINK';
+        row.appendChild(a);
+      }
+      objs.appendChild(row);
+    });
+    card.appendChild(objs);
+    frag.appendChild(card);
+  });
+
+  host.appendChild(frag);
+
+  host.addEventListener('click', e => {
+    const hit = e.target.closest('[data-k]');
+    if (hit && !e.target.closest('a')) toggle(hit.dataset.k);
+  });
+  host.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const hit = e.target.closest && e.target.closest('.hit');
+    if (hit){ e.preventDefault(); toggle(hit.dataset.k); }
+  });
+}
+
+function toggle(k){
+  if (done[k]) delete done[k]; else done[k] = 1;
+  try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+  refresh();
+}
+
+function refresh(){
+  if (!DATA) return;
+  let lit = 0, clear = 0;
+
+  DATA.cats.forEach(c => {
+    const card = document.querySelector('.con[data-cat="' + c.id + '"]');
+    const flags = c.items.map((it, i) => !!done[c.id + ':' + i]);
+    const k = flags.filter(Boolean).length;
+    lit += k;
+    if (k === c.items.length) clear++;
+
+    card.querySelectorAll('.star').forEach(s => s.classList.toggle('lit', !!done[s.dataset.star]));
+    card.querySelectorAll('.obj[data-k]').forEach(o => o.classList.toggle('done', !!done[o.dataset.k]));
+    card.querySelectorAll('.cline').forEach(l => l.classList.toggle('on', flags[l.dataset.a] && flags[l.dataset.b]));
+    card.classList.toggle('clear', k === c.items.length);
+    card.querySelector('.con-count').textContent = k + '/' + c.items.length;
+  });
+
+  document.getElementById('s-lit').textContent = lit;
+  document.getElementById('s-con').textContent = clear;
+}
+
+document.getElementById('reset').addEventListener('click', () => {
+  done = {};
+  try { localStorage.setItem(KEY, '{}'); } catch (e) {}
+  refresh();
+});
+
+initAuth();
+</script>
+</body>
+</html>

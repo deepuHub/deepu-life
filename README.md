@@ -20,6 +20,7 @@
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
 | 🔥 Embers & Tides (`embers-tides-private.html`) | Coded intake index; every counterparty is a code | Private — Google Sign-In |
+| ✶ Bucket List (`bucket-private.html`) | Life list as star charts — one constellation per section, one star per item | Private — Google Sign-In |
 
 Private pages render nothing until Google authenticates the one account with access to that page's Sheet — enforced by Google, not by the page.
 
@@ -52,6 +53,14 @@ Each grade's Sheet has 5 tabs:
 
 `TermID` (e.g. `G2-T1`) and `CAID` (e.g. `G2-CA1`) are the join keys within a grade's tabs — same pattern as before, just scoped to one grade's Sheet instead of shared across all grades. One `CA Breakdown` tab holds every CA's questions (filtered by `CAID`), same as `CA Results` — not a separate tab per CA.
 
+**Bucket List — one flat tab.** `bucket-private.html` reads a single tab, `List`, whose columns are
+`section_id | section_name | section_sub | item | href`. Every row is one star; rows sharing a
+`section_id` become one constellation, in the order the sections first appear. `section_id` seeds both
+the constellation's shape and its saved progress, so renaming one resets that sky — and item order is
+part of each star's identity, so append rather than insert. `data/bucket-list.tsv` is the seed to paste
+into the Sheet (gitignored along with the rest of `data/*.tsv` — the page reads the Sheet, never the
+file). Ticking a star is per-browser `localStorage`; the Sheet is read-only here.
+
 No forms, no localStorage sync, no third-party backend. Add a row in the Sheet, reload the page, it appears.
 
 ---
@@ -81,6 +90,7 @@ deepu-life/
 ├── kid-private.html          ← private report-card dashboard (Google Sign-In)
 ├── results-private.html      ← private BEd results dashboard (Google Sign-In)
 ├── embers-tides-private.html ← coded intake index (private Sheet; seed built by scripts/)
+├── bucket-private.html       ← bucket list as constellations (private Sheet; seed in data/bucket-list.tsv)
 ├── assets/
 │   ├── css/
 │   │   ├── tracker-theme.css ← shared design tokens, nav, light/dark palette
