@@ -890,6 +890,7 @@
     .hw-row-badge.type-homework { background: #1e88e5; }
     .hw-row-badge.type-test { background: #fb8c00; }
     .hw-row-badge.type-notice { background: #8e24aa; }
+    .hw-row-badge.type-event { background: #d81b60; }
     .hw-row-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
     .hw-row-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     .hw-row-subject { font-weight: 700; font-size: 0.86rem; color: var(--text); }
@@ -900,6 +901,9 @@
     .hw-row-action { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-solid); color: var(--text); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .hw-row-action:hover { border-color: var(--accent); }
     .hw-row.done .hw-row-action { border-color: transparent; background: transparent; color: var(--muted); }
+
+    /* HOMEWORK CELEBRATION CONFETTI */
+    .hw-celebrate-piece { position: fixed; top: 0; left: 0; z-index: 999; pointer-events: none; will-change: transform, opacity; line-height: 1; }
     .hw-status-pill { font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
     .hw-status-pill.overdue { background: #ffebee; color: #c62828; }
     .hw-status-pill.due-soon { background: #fff3e0; color: #e65100; }
@@ -2118,7 +2122,9 @@ renderExamAlert();
 //   - date: YYYY-MM-DD for anything with a fixed due date (sorts first, drives
 //     the "due today / overdue" alert banner)
 //   - date_label: free text used only when date is left blank, e.g. "Last week of Sep"
-//   - type: homework | test | notice
+//   - type: homework | test | notice | event (event = needs Udhbhav to actively
+//     do/bring/wear/prepare something — a celebration, costume day, performance —
+//     as opposed to notice, which is passive FYI: recaps, digests, file uploads)
 //   - status: leave blank while pending, or "done" once it's submitted/completed —
 //     done items get a green check, sort to the bottom, and stop counting toward
 //     the overdue/due-soon alert banner
@@ -2207,7 +2213,7 @@ function hwStatusOf(item) {
   return 'upcoming';
 }
 
-const HW_TYPE_LABEL = { homework: 'HW', test: 'Test', notice: 'Notice' };
+const HW_TYPE_LABEL = { homework: 'HW', test: 'Test', notice: 'Notice', event: '🎉 Action' };
 const HW_STATUS_LABEL = { overdue: 'Overdue', 'due-soon': 'Due soon', upcoming: 'Upcoming', 'no-date': 'No fixed date', done: '✅ Done' };
 
 function renderHomeworkNotices() {
@@ -2269,6 +2275,13 @@ function renderHomeworkNotices() {
 async function markHomeworkStatus(row, newStatus) {
   const item = HOMEWORK_NOTICES.find(i => i.sheetRow === row);
   if (!item) return;
+
+  // Celebrate only when finishing (not un-doing) something that wasn't
+  // already overdue — "done before the deadline" is the whole point.
+  if (newStatus === 'done' && hwStatusOf(item) !== 'overdue') {
+    fireHomeworkCelebration();
+  }
+
   const prevStatus = item.status;
   item.status = newStatus || 'pending';
   renderHomeworkNotices();
@@ -2289,6 +2302,53 @@ async function markHomeworkStatus(row, newStatus) {
     item.status = prevStatus;
     renderHomeworkNotices();
     renderHomeworkAlert();
+  }
+}
+
+// ── CELEBRATION 🎉 — a full-page confetti rain, a different flavor every
+// time ✅ Done lands before the deadline: smiley (his favorite, weighted
+// to show up most), flower, candy, chocolate. Never repeats the same
+// flavor twice in a row. Lightweight DOM particles animated via the Web
+// Animations API — same approach as the Exams page's fireConfetti(),
+// just emoji instead of colored rectangles, and raining across the whole
+// viewport instead of one spot. No canvas or external library needed. ───
+const CELEBRATION_EMOJI = {
+  smiley:    ['😄', '😊', '🥳', '😁', '🤩', '😆', '🤗', '⭐'],
+  flower:    ['🌸', '🌼', '🌻', '🌷', '💐', '🌹'],
+  candy:     ['🍬', '🍭', '🍡', '🧁', '🍩'],
+  chocolate: ['🍫', '🍪'],
+};
+const CELEBRATION_POOL = ['smiley', 'smiley', 'flower', 'candy', 'chocolate']; // smiley weighted 2x
+let lastCelebrationType = null;
+
+function fireHomeworkCelebration() {
+  const choices = CELEBRATION_POOL.filter(t => t !== lastCelebrationType);
+  const type = choices[Math.floor(Math.random() * choices.length)];
+  lastCelebrationType = type;
+  fireEmojiRain(CELEBRATION_EMOJI[type]);
+}
+
+function fireEmojiRain(emojis) {
+  const count = 44;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'hw-celebrate-piece';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.top = '-40px';
+    el.style.fontSize = (18 + Math.random() * 18) + 'px';
+    document.body.appendChild(el);
+
+    const drift = Math.random() * 200 - 100;
+    const rot = Math.random() * 520 - 260;
+    const duration = 1900 + Math.random() * 1500;
+    const delay = Math.random() * 450;
+
+    el.animate([
+      { transform: 'translate(0, 0) rotate(0deg)', opacity: 0 },
+      { transform: `translate(${drift * 0.3}px, 45vh) rotate(${rot * 0.5}deg)`, opacity: 1, offset: 0.18 },
+      { transform: `translate(${drift}px, 108vh) rotate(${rot}deg)`, opacity: 0.9 },
+    ], { duration, delay, easing: 'cubic-bezier(.25,.46,.45,.94)', fill: 'backwards' }).onfinish = () => el.remove();
   }
 }
 
