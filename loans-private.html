@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loans — deepu-life</title>
+<meta name="description" content="The car and the house, and what each one still costs.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏦%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600&family=Fraunces:wght@900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<script src="assets/js/theme.js"></script>
+<style>
+  /* ── Molten-ledger skin: bank paper held over a flame. Amber is what is
+        still owed, green is what has been retired. Overrides the tracker
+        palette for this page only; --run drives the nav accent. ── */
+  :root{
+    --bg:#0c0a08;--surface:rgba(24,19,14,.7);--surface2:#181310;--border:#33271c;
+    --text:#f4ece1;--muted:#a4907a;--muted2:#6f6152;
+    --run:#f5a524;--run-dim:#2e1d05;
+
+    --owed:#f5a524;--retired:#4ade80;--hot:#f87171;--cool:#7dd3fc;
+    --rule:rgba(245,165,36,.05);
+  }
+  /* Daylight — the same ledger on the desk instead of over the flame. */
+  :root[data-theme="light"]{
+    --bg:#faf5ee;--surface:#ffffff;--surface2:#f2e9dc;--border:#e0d1bc;
+    --text:#1c1509;--muted:#6b5a45;--muted2:#95826b;
+    --run:#b45309;--run-dim:#fbecd6;
+
+    --owed:#b45309;--retired:#15803d;--hot:#b91c1c;--cool:#0369a1;
+    --rule:rgba(180,83,9,.05);
+  }
+  body::before{opacity:.02}
+  body{
+    background:var(--bg);
+    /* ledger rule, 30px, with heat pooling in the top corner */
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      radial-gradient(820px 520px at 92% -12%, rgba(245,165,36,.14), transparent),
+      radial-gradient(700px 440px at -8% 108%, rgba(248,113,113,.07), transparent);
+    background-size:100% 30px, auto, auto;
+    background-attachment:fixed;
+  }
+
+  /* several blocks below set display:flex, which otherwise wins over the
+     hidden attribute and leaks the gated content before sign-in */
+  [hidden]{display:none !important}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:calc(var(--nav-h) + 2.6rem) var(--pad) 5rem}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+
+  /* ── hero ── */
+  .hero{text-align:center;margin-bottom:2.6rem}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--muted2);margin-bottom:.9rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.2rem,8vw,3.6rem);line-height:1;
+           letter-spacing:-.03em;color:var(--owed);font-variant-numeric:tabular-nums}
+  .hero .cap{margin-top:.6rem;font-size:.9rem;font-weight:300;color:var(--muted);max-width:54ch;
+             margin-inline:auto;line-height:1.7}
+  .hero .cap b{color:var(--text);font-weight:500}
+
+  .rings{display:flex;align-items:center;justify-content:center;gap:1.1rem 1.8rem;flex-wrap:wrap;margin-top:1.8rem}
+  .ring{position:relative;width:104px;height:104px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring-bg{stroke:var(--border);fill:none;stroke-width:7}
+  .ring-fg{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)}
+  .ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.12rem}
+  .ring-num b{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--text)}
+  .ring-num i{font-family:'JetBrains Mono',monospace;font-style:normal;font-size:.5rem;letter-spacing:.13em;
+              color:var(--muted);text-align:center;line-height:1.4;max-width:8rem}
+
+  /* ── sign-in gate — the private Sheet is the access control, not this page ── */
+  .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:34vh}
+  .gate-icon{font-size:2.2rem}
+  .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem}
+  .gate p{font-size:.88rem;font-weight:300;line-height:1.7;color:var(--muted);max-width:46ch}
+  .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+              background:var(--run-dim);color:var(--run);border:1px solid var(--run);font-family:'JetBrains Mono',monospace;
+              font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s;
+              -webkit-tap-highlight-color:transparent}
+  .btn-signin:hover{background:var(--run);color:var(--bg)}
+  .btn-signin:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  .gate-error{color:var(--hot);font-size:.8rem;max-width:52ch}
+
+  /* ── cards ── */
+  main{display:flex;flex-direction:column;gap:1.15rem}
+  .card{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:1.4rem}
+  .card > h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.15rem;letter-spacing:-.01em;
+             display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+  .card > h2 .tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;font-weight:400;
+                  color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:.2rem .55rem}
+  .card > h2 .right{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.14em;
+                    font-weight:400;color:var(--muted)}
+  .card > p.lead{margin-top:.4rem;font-size:.83rem;font-weight:300;color:var(--muted);line-height:1.7;max-width:70ch}
+  .card > p.lead b{color:var(--text);font-weight:500}
+
+  /* a line that should stop you */
+  .flag{display:flex;gap:.6rem;align-items:flex-start;margin-top:1rem;padding:.7rem .9rem;border-radius:11px;
+        border:1px solid var(--hot);background:rgba(248,113,113,.07);font-size:.82rem;font-weight:300;
+        line-height:1.6;color:var(--text)}
+  .flag b{font-weight:500;color:var(--hot)}
+  .flag.warn{border-color:var(--owed);background:rgba(245,165,36,.07)}
+  .flag.warn b{color:var(--owed)}
+
+  /* ── figure grid ── */
+  .figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:1.2rem}
+  .fig{border:1px solid var(--border);border-radius:11px;background:var(--surface2);padding:.75rem .85rem}
+  .fig i{display:block;font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.54rem;
+         letter-spacing:.14em;color:var(--muted2);margin-bottom:.35rem}
+  .fig b{font-family:'JetBrains Mono',monospace;font-size:.98rem;font-weight:500;color:var(--text);
+         font-variant-numeric:tabular-nums}
+  .fig.owed b{color:var(--owed)}
+  .fig.retired b{color:var(--retired)}
+  .fig.hot b{color:var(--hot)}
+  .fig s{display:block;text-decoration:none;font-size:.62rem;font-weight:300;color:var(--muted);margin-top:.2rem}
+
+  /* ── burn-down chart ── */
+  .chart{display:block;width:100%;height:auto;margin:1.3rem 0 .4rem;overflow:visible}
+  .chart .grid{stroke:var(--border);stroke-width:1}
+  .chart .axis{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;fill:var(--muted2)}
+  .chart .paid-area{fill:var(--retired);opacity:.1}
+  .chart .left-area{fill:var(--owed);opacity:.12}
+  .chart .curve{fill:none;stroke:var(--owed);stroke-width:2;stroke-linejoin:round}
+  .chart .curve.done{stroke:var(--retired)}
+  .chart .now{stroke:var(--text);stroke-width:1;stroke-dasharray:3 3;opacity:.55}
+  .chart .dot{fill:var(--text)}
+
+  /* ── split bar (principal vs interest, paid vs left) ── */
+  .split{display:flex;height:16px;border-radius:999px;overflow:hidden;margin-top:1.2rem;border:1px solid var(--border)}
+  .split span{display:block;height:100%}
+  .legend{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;margin-top:.6rem;
+          font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.11em;color:var(--muted)}
+  .legend em{font-style:normal;display:inline-flex;align-items:center;gap:.4rem}
+  .legend em::before{content:'';width:8px;height:8px;border-radius:2px;background:currentColor}
+  .legend b{color:var(--text);font-weight:500}
+
+  /* ── ladders (disbursals, milestones, instalments, money in) ── */
+  .ladder{margin-top:1.2rem;display:flex;flex-direction:column}
+  .rung{display:flex;align-items:center;gap:.7rem;padding:.55rem 0;border-top:1px solid var(--border);
+        font-size:.83rem;font-weight:300}
+  .rung:first-child{border-top:0}
+  .rung .seq{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--muted2);
+             width:2.1rem;flex-shrink:0}
+  .rung .what{flex:1;min-width:0;color:var(--text);overflow-wrap:anywhere}
+  .rung .what s{display:block;text-decoration:none;font-size:.66rem;color:var(--muted);margin-top:.15rem;
+                font-family:'JetBrains Mono',monospace;letter-spacing:.06em;overflow-wrap:anywhere}
+  .rung .when{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:var(--muted);
+              flex-shrink:0;width:5.3rem;text-align:right}
+  .rung .amt{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text);flex-shrink:0;
+             text-align:right;width:6.6rem;font-variant-numeric:tabular-nums}
+  .rung.is-pending .amt,.rung.is-pending .what{color:var(--muted)}
+  /* past due reads as past due at every width — the OVERDUE column is the
+     first thing the narrow layout drops */
+  .rung.is-late .what s{color:var(--hot)}
+  .rung .pct{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.1em;color:var(--muted2);
+             border:1px solid var(--border);border-radius:999px;padding:.12rem .4rem;flex-shrink:0}
+
+  /* a status badge, not a control — this page reads the Sheet, never writes it */
+  .pill{display:inline-flex;align-items:center;justify-content:center;
+        font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.11em;border-radius:999px;
+        padding:.24rem .55rem;border:1px solid var(--border);background:var(--surface2);color:var(--muted);
+        flex-shrink:0;min-height:26px}
+  .pill.done{border-color:var(--retired);color:var(--retired);background:transparent}
+  .pill.hot{border-color:var(--owed);color:var(--owed);background:transparent}
+
+  /* ── bar of progress against the builder's total ── */
+  .meter{height:10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);
+         overflow:hidden;margin-top:1.1rem}
+  .meter span{display:block;height:100%;background:var(--retired)}
+
+  .more{margin-top:.9rem;background:none;border:0;padding:.45rem 0;min-height:44px;cursor:pointer;
+        font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;color:var(--muted);
+        -webkit-tap-highlight-color:transparent}
+  .more:hover{color:var(--run)}
+  .more:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+
+  footer{margin-top:3.2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.62rem;
+         letter-spacing:.12em;color:var(--muted)}
+  footer .stale{color:var(--hot)}
+
+  @media(max-width:640px){
+    /* the balance column is the first thing to go, then everything narrows:
+       the sub-line is the detail worth keeping, so give it the room */
+    .rung{gap:.5rem}
+    .rung .when{display:none}
+    .rung .seq{width:1.5rem}
+    .rung .amt{width:4.9rem;font-size:.74rem}
+    .rung .what s{font-size:.6rem;letter-spacing:0}
+    .pill{padding:.24rem .45rem;font-size:.52rem;letter-spacing:.08em}
+  }
+</style>
+</head>
+<body>
+
+<deepu-nav active="loans"></deepu-nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker" id="asof">TWO LOANS</div>
+    <h1 id="owed">—</h1>
+    <p class="cap" id="cap"></p>
+    <div class="rings" id="rings" hidden></div>
+  </header>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private ledger</h2>
+    <p>The schedules live in a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in will be rejected by Google, not by this page. This page only reads: it asks for a read-only token, so nothing here can move a figure even by accident.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <main id="main" hidden></main>
+
+  <footer id="foot"></footer>
+</div>
+
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   loans-private.html — the car and the house, and what each one still
+   costs.
+
+   Lenders, amounts and the name of whoever contributes live in the
+   private Sheet, never in this file — it is served from a public repo.
+
+   WHY THIS EXISTS, given the bank already sends a statement: a statement shows
+   one loan on one day. The question worth answering is the one no bank
+   asks — what do both of them together take out of a month, how much of
+   that is interest rather than progress, and what is still queued behind
+   them from the builder. That only exists when the three schedules sit
+   on one page.
+
+   DATA — a private Google Sheet, one tab per kind of thing. Each tab is
+   read header-first, so its columns can be reordered without touching
+   this file, and every tab is optional except Loans:
+
+     Meta          key | value
+                   synced_at, source, property_value, property_base,
+                   property_gst.
+     Loans         loan | name | lender | sanctioned | emi | rate_pct |
+                   tenure | first_due | balance | status
+                   One row per loan. `loan` is the slug (car, house) the
+                   schedule tabs below belong to.
+     Car           instl | due | amount | principal | interest | balance |
+     House         status | paid_on
+                   One row per instalment. `status` is the cell meant to
+                   be edited: completed or pending.
+                   `principal`, `interest` and `balance` may be left blank
+                   and are derived (see fillGaps): a row only needs the
+                   instalment number, its date, what was charged, and the
+                   status.
+                   Car is a fixed amortisation table — the bank issued all
+                   84 rows up front. House is not: it is a home loan still
+                   drawing down, so the instalment is pre-EMI interest on
+                   whatever has been released, and it steps up with every
+                   further tranche. Its rows therefore run only as far as
+                   months that have actually happened; the page appends
+                   the next one rather than projecting a figure it cannot
+                   know.
+     Disbursals    no | date | amount | status | note
+                   The bank releasing money to the builder.
+     Milestones    no | stage | pct | principal | gst | total | status |
+                   date | note
+                   The builder's construction-linked payment plan.
+     MoneyIn       no | type | name | date | amount | status | note
+                   type=own for money paid to the builder ourselves,
+                   type=contribution for money in from family.
+
+   WHY TABS AND NOT ONE FLAT SHEET: the monthly job is two cells — did
+   the car EMI go out, did the house one. On a single mixed tab that
+   means hunting the right row among milestones and transfers. A tab per
+   schedule puts this month's row next to last month's and nothing else,
+   and lets each tab carry only the columns it actually uses.
+
+   A tab this page does not know about is simply not read, so one can be
+   added to the Sheet before the page knows what to do with it.
+
+   ONE-TIME SETUP:
+     1. Upload data/loans.xlsx to Drive and open it with Google Sheets
+        (File ▸ Save as Google Sheets). It already carries all seven tabs,
+        correctly named, with the dates stored as text so they survive —
+        a date left for Sheets to parse comes back in the sheet's own
+        locale and stops parsing, the same trap as the Ideas page. Set
+        the new Sheet's sharing to Restricted.
+        The same seed is in data/loans/*.tsv, one file per tab, if you
+        would rather build the tabs by hand. Both are gitignored — the
+        page reads the Sheet, never the files.
+     2. Put the spreadsheet id (the /d/<id>/ part of the URL) in
+        SPREADSHEET_ID below.
+
+   WHAT THIS PAGE WRITES: nothing. It reads the Sheet and renders it, and
+   the token it asks for is `spreadsheets.readonly`, so the guarantee is
+   Google's rather than this file's — a bug here, or anything served in
+   its place, still cannot move a figure. These are loan schedules and a
+   property ledger; being wrong about them costs more than the
+   convenience of editing in place is worth. Status is set in the Sheet.
+
+   SYNCING — say "Update loans" to Claude, which re-reads the workbook in
+   Drive and refreshes the rows, then stamps `synced_at`. A sync must
+   never clobber a `status` set here by hand — same rule as the School
+   page's homework sync.
+═══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '';                 // ← paste the Sheet id here (step 2)
+const SCOPES  = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+const STALE_D = 45;                        // an EMI is monthly — 45 days without one has drifted
+
+/* Every tab this page reads, and how its columns map onto the one row
+   shape the rendering below works in. `cols` is sheet header → internal
+   field; anything a tab does not carry stays blank. A row remembers the
+   tab it came from, because that is where its status cell gets written. */
+const TABS = [
+  { tab: 'Loans',      kind: 'loan',
+    cols: { loan:'loan', label:'name', note:'lender', amount:'sanctioned', emi:'emi',
+            interest:'rate_pct', seq:'tenure', date:'first_due', balance:'balance', status:'status' } },
+  { tab: 'Car',        kind: 'emi', loan: 'car',   cols: EMI_COLS() },
+  { tab: 'House',      kind: 'emi', loan: 'house', cols: EMI_COLS() },
+  { tab: 'Disbursals', kind: 'disbursal', loan: 'house',
+    cols: { seq:'no', date:'date', amount:'amount', status:'status', note:'note' } },
+  { tab: 'Milestones', kind: 'milestone', loan: 'house',
+    cols: { seq:'no', label:'stage', pct:'pct', principal:'principal', gst:'gst',
+            amount:'total', status:'status', date:'date', note:'note' } },
+  /* one tab, two kinds — the `type` column decides which */
+  { tab: 'MoneyIn',    kind: r => (r.type === 'contribution' ? 'contribution' : 'payment'), loan: 'house',
+    cols: { seq:'no', type:'type', label:'name', date:'date', amount:'amount',
+            status:'status', note:'note' } },
+];
+function EMI_COLS(){
+  return { seq:'instl', date:'due', amount:'amount', principal:'principal',
+           interest:'interest', balance:'balance', status:'status', note:'paid_on' };
+}
+
+let tokenClient, accessToken = null;
+let ROWS = [], META = {};
+const $ = id => document.getElementById(id);
+const byKind = (k, loan) => ROWS.filter(r => r.kind === k && (!loan || r.loan === loan));
+const isDone = s => s === 'completed' || s === 'disbursed' || s === 'received' || s === 'done';
+
+/* ── money ─────────────────────────────────────────────────────────
+   Indian grouping throughout, because every figure here came from an
+   Indian bank and 13,73,767 is the number on the statement. */
+const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+function inrShort(n){
+  const a = Math.abs(n);
+  if (a >= 1e7) return '₹' + (n / 1e7).toFixed(2).replace(/\.00$/, '') + 'Cr';
+  if (a >= 1e5) return '₹' + (n / 1e5).toFixed(2).replace(/\.00$/, '') + 'L';
+  return inr(n);
+}
+const day = iso => {
+  const d = new Date(iso);
+  return isNaN(d) ? (iso || '') : d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: '2-digit' });
+};
+const monthsSince = iso => {
+  const d = new Date(iso);
+  return isNaN(d) ? null : (Date.now() - d) / 864e5 / 30.44;
+};
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ── auth ──────────────────────────────────────────────────────────
+   Same shape as the other private pages: Google Identity Services hands
+   the signed-in user a token, the page talks to the Sheets API as them.
+   Access is the Sheet's sharing, enforced by Google, not by this file. */
+function showGateError(msg){ $('gate-error').textContent = msg; }
+
+function initAuth(){
+  if (!SPREADSHEET_ID){
+    $('signin-btn').style.display = 'none';
+    showGateError('No Sheet wired up yet — see the setup steps in this page’s source.');
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: resp => {
+      if (resp.error){ showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  $('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+async function onSignedIn(){
+  try {
+    parse(await loadRows());
+    if (!byKind('loan').length) throw new Error('The Loans tab has no loan rows yet.');
+    $('gate').style.display = 'none';
+    $('main').hidden = false;
+    render();
+  } catch (e){
+    showGateError(e.message);
+  }
+}
+
+/* One batchGet rather than a request per tab: seven ranges, one round
+   trip, and the reply comes back in the order asked for. A tab that does
+   not exist yet comes back empty instead of failing the whole read. */
+async function loadRows(){
+  const ranges = TABS.map(t => `ranges=${encodeURIComponent(t.tab)}`).join('&')
+               + '&ranges=' + encodeURIComponent('Meta');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${ranges}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Loans sheet.');
+  if (res.status === 400) throw new Error('The Sheet is missing the tabs this page reads — see the setup steps in its source.');
+  if (!res.ok) throw new Error(`Could not load the sheet (HTTP ${res.status}).`);
+  const out = (await res.json()).valueRanges || [];
+  return out.map(v => v.values || []);
+}
+
+/* Header-driven, so columns can be reordered in a tab without touching
+   this file. Every row remembers its tab, its sheet row and where its
+   status cell sits — that trio is what a toggle writes back to. */
+function parse(sheets){
+  ROWS = [];
+  META = {};
+
+  const meta = sheets[TABS.length] || [];
+  const mh = header(meta);
+  if (mh){
+    const ik = mh.indexOf('key'), iv = mh.indexOf('value');
+    meta.slice(1).forEach(r => {
+      const k = cell(r, ik);
+      if (k) META[k] = cell(r, iv);
+    });
+  }
+
+  TABS.forEach((spec, i) => {
+    const rows = sheets[i] || [];
+    const h = header(rows);
+    if (!h) return;                         // tab absent or empty — skip it
+    const at = {};
+    for (const field in spec.cols) at[field] = h.indexOf(spec.cols[field]);
+
+    rows.slice(1).forEach((r, n) => {
+      const o = { tab: spec.tab, row: n + 2, loan: spec.loan || '' };
+      for (const field in at) o[field] = cell(r, at[field]);
+      o.kind = typeof spec.kind === 'function' ? spec.kind(o) : spec.kind;
+      if (spec.tab === 'Loans' && !o.loan) return;
+      /* a blank padding row — no amount and nothing to show for it */
+      if (!o.seq && !o.label && !o.amount) return;
+      o.status = String(o.status || '').toLowerCase();
+      NUMERIC.forEach(k => { o[k + 'N'] = toNum(o[k]); });
+      ROWS.push(o);
+    });
+  });
+
+  if (!ROWS.length) throw new Error('None of the tabs this page reads have any rows yet.');
+}
+const NUMERIC = ['seq','amount','emi','principal','interest','gst','balance','pct'];
+const header = rows => (rows && rows.length ? rows[0].map(h => String(h || '').toLowerCase().trim()) : null);
+const cell = (r, i) => (i > -1 && r && r[i] != null ? String(r[i]).trim() : '');
+function toNum(s){
+  const v = parseFloat(String(s == null ? '' : s).replace(/,/g, ''));
+  return isNaN(v) ? null : v;
+}
+/* ── what the numbers actually say ────────────────────────────────
+   Everything below is derived from the rows. Nothing is hard-coded, so
+   marking one more instalment paid moves every figure on the page. */
+function digest(slug){
+  const L = byKind('loan').find(l => l.loan === slug);
+  if (!L) return null;
+  const emis = byKind('emi', slug).sort((a, b) => (a.seqN || 0) - (b.seqN || 0));
+  fillGaps(emis, L, byKind('disbursal', slug).filter(r => isDone(r.status)));
+  const paid = emis.filter(e => isDone(e.status));
+  const last = paid[paid.length - 1] || null;
+  const d = {
+    loan: L, emis, paid, last,
+    name: L.label || slug,
+    sanctioned: L.amountN || 0,
+    emiAmt: L.emiN || 0,
+    rate: L.interestN,
+    tenure: L.seqN || emis.length,
+    /* the balance the bank carries after the last instalment we have
+       marked paid — not a projection, the figure in that row */
+    outstanding: last && last.balanceN != null ? last.balanceN : (L.balanceN || 0),
+    interestPaid: paid.reduce((s, e) => s + (e.interestN || 0), 0),
+    interestLife: emis.reduce((s, e) => s + (e.interestN || 0), 0),
+    principalPaid: paid.reduce((s, e) => s + (e.principalN || 0), 0),
+    next: emis.find(e => !isDone(e.status)) || null,
+    end: emis.length ? emis[emis.length - 1].date : '',
+  };
+  d.interestLeft = d.interestLife - d.interestPaid;
+  d.pctRetired = d.sanctioned ? Math.max(0, Math.min(1, (d.sanctioned - d.outstanding) / d.sanctioned)) : 0;
+  d.monthsLeft = emis.length - paid.length;
+  return d;
+}
+
+/* A blank principal / interest / balance is not missing data — it is the part
+   of a row nobody should have to work out by hand. A pre-EMI instalment
+   retires no principal, so its interest is the whole payment and the balance
+   has not moved; a normal instalment's balance is the last one less what it
+   just paid off. Only what the bank actually charged has to be typed.
+
+   While a loan is still drawing down, the balance on any given month is what
+   had been released by then — which the Disbursals tab already knows. Add the
+   tranche there when it lands and every instalment after it corrects itself.
+
+   Fills the numeric mirrors only; the raw cells stay untouched, and nothing
+   here is ever written back to the Sheet. */
+function fillGaps(emis, loan, disb){
+  let carried = null;
+  emis.forEach(e => {
+    if (e.principalN == null) e.principalN = 0;
+    if (e.interestN == null) e.interestN = Math.max(0, (e.amountN || 0) - e.principalN);
+    if (e.balanceN == null){
+      e.balanceN = disb.length
+        ? drawnBy(disb, e.date)
+        : (carried != null ? carried : (loan.amountN || 0)) - e.principalN;
+    }
+    carried = e.balanceN;
+  });
+}
+const drawnBy = (disb, date) => disb
+  .filter(r => !r.date || !date || r.date <= date)
+  .reduce((s, r) => s + (r.amountN || 0), 0);
+
+function builderDigest(){
+  const ms = byKind('milestone').sort((a, b) => (a.seqN || 0) - (b.seqN || 0));
+  const total = parseFloat(META.property_value) || ms.reduce((s, m) => s + (m.amountN || 0), 0);
+  const cleared = ms.filter(m => isDone(m.status)).reduce((s, m) => s + (m.amountN || 0), 0);
+  return { ms, total, cleared, left: total - cleared, pct: total ? cleared / total : 0 };
+}
+
+/* ── render ────────────────────────────────────────────────────────*/
+function render(){
+  const car = digest('car'), house = digest('house'), b = builderDigest();
+  const loans = [car, house].filter(Boolean);
+
+  const owed = loans.reduce((s, d) => s + d.outstanding, 0);
+  const monthly = loans.reduce((s, d) => s + d.emiAmt, 0);
+
+  $('asof').textContent = loans.length + ' LOANS · ' +
+    new Date().toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+  $('owed').textContent = inr(owed);
+  $('cap').innerHTML = `owed to the banks right now, costing <b>${esc(inr(monthly))} a month</b>` +
+    (b.left > 0 ? ` — with <b>${esc(inr(b.left))}</b> still queued behind it from the builder.` : '.');
+
+  $('rings').hidden = false;
+  $('rings').innerHTML = [
+    ring(car ? car.pctRetired : 0, 'var(--retired)', pct(car ? car.pctRetired : 0), 'CAR PRINCIPAL RETIRED'),
+    ring(house ? house.pctRetired : 0, 'var(--owed)', pct(house ? house.pctRetired : 0), 'HOUSE PRINCIPAL RETIRED'),
+    ring(b.pct, 'var(--cool)', pct(b.pct), 'PAID TO THE BUILDER'),
+  ].join('');
+
+  const main = $('main');
+  main.innerHTML = '';
+  main.appendChild(thisMonthCard(loans));
+  if (car)   main.appendChild(carCard(car));
+  if (house) main.appendChild(houseCard(house));
+  main.appendChild(builderCard(b));
+  main.appendChild(moneyInCard(b));
+  footBlock(house);
+}
+
+/* ── the monthly job, in one place ─────────────────────────────────
+   The whole routine is: did each EMI go out this month. That is two
+   pills, and hunting them down a schedule is the part worth removing —
+   so the next unpaid instalment of every loan comes to the top. */
+function thisMonthCard(loans){
+  const now = new Date();
+  const rows = loans.map(d => ({ d, e: d.next })).filter(x => x.e);
+  const overdue = rows.filter(x => dueBy(x.e.date) < now).length;
+  const el = card(`
+    <h2>This month <span class="right">${rows.length ? esc(inr(rows.reduce((s, x) => s + (x.e.amountN || x.d.emiAmt), 0))) + ' TO GO OUT' : 'NOTHING PENDING'}</span></h2>
+    <p class="lead">${rows.length
+      ? `The next instalment on each loan, and whether it has slipped.`
+      : `Every instalment on both loans is marked paid.`}
+      ${overdue ? `<b>${overdue} ${overdue === 1 ? 'is' : 'are'} past due.</b>` : ''}</p>
+    <div class="ladder">` + rows.map(x => {
+      const late = dueBy(x.e.date) < now;
+      return `<div class="rung is-pending${late ? ' is-late' : ''}">
+        <span class="seq">${esc(x.e.seq)}</span>
+        <span class="what">${esc(x.d.name)}<s>${esc(late ? 'was due ' : 'due ')}${esc(day(x.e.date))}</s></span>
+        <span class="when">${late ? 'OVERDUE' : ''}</span>
+        <span class="amt">${esc(inr(x.e.amountN || x.d.emiAmt))}</span>
+        <span class="pill hot">${late ? 'OVERDUE' : 'DUE'}</span>
+      </div>`;
+    }).join('') + `</div>`);
+  return el;
+}
+/* end of the due day, so an instalment due today is not already late */
+function dueBy(iso){
+  const d = new Date(iso);
+  if (isNaN(d)) return new Date(8640000000000000);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
+const pct = f => Math.round(f * 100) + '%';
+function ring(frac, color, big, label){
+  const r = 42, c = 2 * Math.PI * r;
+  return `<div class="ring">
+    <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
+      <circle class="ring-bg" cx="52" cy="52" r="${r}"/>
+      <circle class="ring-fg" cx="52" cy="52" r="${r}" stroke="${color}"
+              stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - Math.max(0, Math.min(1, frac)))}"/>
+    </svg>
+    <div class="ring-num"><b>${esc(big)}</b><i>${esc(label)}</i></div>
+  </div>`;
+}
+function figs(list){
+  return `<div class="figs">` + list.map(f =>
+    `<div class="fig${f.tone ? ' ' + f.tone : ''}"><i>${esc(f.k)}</i><b>${esc(f.v)}</b>` +
+    (f.s ? `<s>${esc(f.s)}</s>` : '') + `</div>`).join('') + `</div>`;
+}
+function card(html){
+  const el = document.createElement('section');
+  el.className = 'card';
+  el.innerHTML = html;
+  return el;
+}
+
+/* ── the car ───────────────────────────────────────────────────────*/
+function carCard(d){
+  const el = card(`
+    <h2>${esc(d.name)} <span class="tag">${esc(d.loan.note || 'vehicle loan')}</span>
+      <span class="right">${d.paid.length} / ${d.emis.length} PAID</span></h2>
+    <p class="lead">${esc(inr(d.sanctioned))} over ${d.tenure} months at ${d.rate != null ? d.rate + '%' : '—'},
+      ${esc(inr(d.emiAmt))} a month. <b>${esc(inr(d.outstanding))}</b> left${d.last ? `, after instalment ${esc(d.last.seq)}` : ''}.</p>
+    ${burndown(d)}
+    ${figs([
+      { k: 'OUTSTANDING',    v: inr(d.outstanding), tone: 'owed', s: pct(1 - d.pctRetired) + ' of the loan' },
+      { k: 'INTEREST PAID',  v: inr(d.interestPaid), tone: 'hot', s: 'gone, not owed' },
+      { k: 'INTEREST LEFT',  v: inr(d.interestLeft), s: 'if it runs full term' },
+      { k: 'MONTHS LEFT',    v: String(d.monthsLeft), s: d.end ? 'clear on ' + day(d.end) : '' },
+      { k: 'NEXT DUE',       v: d.next ? day(d.next.date) : '—', s: d.next ? inr(d.next.amountN || d.emiAmt) : 'nothing pending' },
+    ])}
+    ${splitBar(d)}
+    <div class="ladder" id="car-ladder"></div>
+    <button class="more" type="button" data-more="car">SHOW THE WHOLE SCHEDULE</button>`);
+  renderEmis(el.querySelector('#car-ladder'), d, false);
+  el.querySelector('[data-more]').addEventListener('click', e => {
+    const open = e.target.dataset.open === '1';
+    e.target.dataset.open = open ? '0' : '1';
+    e.target.textContent = open ? 'SHOW THE WHOLE SCHEDULE' : 'SHOW ONLY WHAT IS NEAR';
+    renderEmis(el.querySelector('#car-ladder'), d, !open);
+  });
+  return el;
+}
+
+/* The near view is the three most recent instalments and the next six —
+   the window you actually act on. The rest is one click away. */
+function renderEmis(host, d, all){
+  const i = d.paid.length;
+  const rows = all ? d.emis : d.emis.slice(Math.max(0, i - 3), i + 6);
+  host.innerHTML = rows.map(e => {
+    const done = isDone(e.status);
+    return `<div class="rung${done ? '' : ' is-pending'}">
+      <span class="seq">${esc(e.seq)}</span>
+      <span class="what">${esc(day(e.date))}${e.principalN != null && e.interestN != null
+        ? `<s>${esc(inr(e.principalN))} principal · ${esc(inr(e.interestN))} interest</s>` : ''}</span>
+      <span class="when">${e.balanceN != null ? esc(inrShort(e.balanceN)) + ' left' : ''}</span>
+      <span class="amt">${esc(inr(e.amountN || 0))}</span>
+      <span class="pill${done ? ' done' : ' hot'}">${done ? 'PAID' : 'DUE'}</span>
+    </div>`;
+  }).join('');
+}
+
+/* Where the money in an instalment actually goes, across the whole loan. */
+function splitBar(d){
+  const total = d.sanctioned + d.interestLife;
+  if (!total) return '';
+  const seg = [
+    { w: d.principalPaid, c: 'var(--retired)', k: 'PRINCIPAL RETIRED', v: inr(d.principalPaid) },
+    { w: d.interestPaid,  c: 'var(--hot)',     k: 'INTEREST PAID',     v: inr(d.interestPaid) },
+    { w: d.outstanding,   c: 'var(--owed)',    k: 'PRINCIPAL LEFT',    v: inr(d.outstanding) },
+    { w: d.interestLeft,  c: 'var(--muted2)',  k: 'INTEREST LEFT',     v: inr(d.interestLeft) },
+  ];
+  return `<div class="split" role="img" aria-label="where the money goes">` +
+    seg.map(s => `<span style="width:${(s.w / total) * 100}%;background:${s.c}"></span>`).join('') +
+    `</div><div class="legend">` +
+    seg.map(s => `<em style="color:${s.c}">${esc(s.k)} <b>${esc(s.v)}</b></em>`).join('') +
+    `</div>`;
+}
+
+/* Outstanding principal across the life of the loan: solid green up to the
+   last instalment marked paid, amber for everything still to come. */
+function burndown(d){
+  const pts = d.emis.filter(e => e.balanceN != null);
+  if (pts.length < 2) return '';
+  const W = 640, H = 170, P = 26;
+  const max = Math.max(d.sanctioned, ...pts.map(p => p.balanceN));
+  const x = i => P + (i / (pts.length - 1)) * (W - P * 2);
+  const y = v => H - P - (v / max) * (H - P * 2);
+  const cut = Math.max(0, Math.min(pts.length - 1, d.paid.length - 1));
+  const path = list => list.map((p, i) => (i ? 'L' : 'M') + x(p.i).toFixed(1) + ' ' + y(p.balanceN).toFixed(1)).join(' ');
+  const idx = pts.map((p, i) => ({ ...p, i }));
+  const done = idx.slice(0, cut + 1), left = idx.slice(cut);
+  const base = H - P;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="Outstanding principal falling from ${inr(max)} to zero over ${pts.length} instalments">
+    <line class="grid" x1="${P}" y1="${base}" x2="${W - P}" y2="${base}"/>
+    <path class="paid-area" d="${path(done)} L${x(done[done.length - 1].i).toFixed(1)} ${base} L${x(0)} ${base} Z"/>
+    <path class="left-area" d="${path(left)} L${x(left[left.length - 1].i).toFixed(1)} ${base} L${x(cut).toFixed(1)} ${base} Z"/>
+    <path class="curve done" d="${path(done)}"/>
+    <path class="curve" d="${path(left)}" stroke-dasharray="4 3"/>
+    <line class="now" x1="${x(cut).toFixed(1)}" y1="${P - 10}" x2="${x(cut).toFixed(1)}" y2="${base}"/>
+    <circle class="dot" cx="${x(cut).toFixed(1)}" cy="${y(pts[cut].balanceN).toFixed(1)}" r="3.5"/>
+    <text class="axis" x="${P}" y="${P - 12}">${esc(inrShort(max))}</text>
+    <text class="axis" x="${W - P}" y="${base + 14}" text-anchor="end">${esc(day(pts[pts.length - 1].date))}</text>
+    <text class="axis" x="${P}" y="${base + 14}">${esc(day(pts[0].date))}</text>
+  </svg>`;
+}
+
+/* ── the house, at the bank ────────────────────────────────────────*/
+function houseCard(d){
+  const disb = byKind('disbursal', 'house').filter(r => isDone(r.status))
+    .sort((a, b) => (a.seqN || 0) - (b.seqN || 0));
+  const drawn = disb.reduce((s, r) => s + (r.amountN || 0), 0) || d.sanctioned;
+  const interestOnly = d.principalPaid === 0 && d.paid.length > 0;
+  const drift = d.last ? monthsSince(d.last.date) : null;
+  const ramp = drawdown(d, drawn);
+
+  const el = card(`
+    <h2>${esc(d.name)} <span class="tag">${esc(d.loan.note || 'home loan')}</span>
+      <span class="right">${d.paid.length} / ${d.emis.length} INSTALMENTS MARKED</span></h2>
+    <p class="lead">${esc(inr(drawn))} drawn across ${disb.length} tranche${disb.length === 1 ? '' : 's'}
+      at ${d.rate != null ? d.rate + '%' : '—'}, ${esc(inr(d.emiAmt))} a month.
+      ${interestOnly
+        ? `Every rupee of it so far has been <b>interest</b> — the principal has not moved.`
+        : `<b>${esc(inr(d.outstanding))}</b> outstanding.`}</p>
+    ${interestOnly ? `<div class="flag"><span>🔥</span><span><b>Pre-EMI.</b>
+      ${esc(inr(d.interestPaid))} paid in, ${esc(inr(0))} off the principal. Until the full EMI starts,
+      the balance stays at ${esc(inr(drawn))} however many instalments go out — and each further
+      disbursal raises the monthly interest again.</span></div>` : ''}
+    ${ramp ? `<div class="flag warn"><span>📈</span><span><b>Still drawing down.</b>
+      ${esc(inr(ramp.left))} of the price sits behind ${ramp.stages} stage${ramp.stages === 1 ? '' : 's'}
+      the bank funds, and it has funded those in full so far
+      (${esc(pct(ramp.coverage))} of the ones already cleared). As they are hit, the monthly interest
+      climbs from ${esc(inr(d.emiAmt))} toward <b>${esc(inr(ramp.monthly))}</b> — about
+      ${esc(inr(ramp.perStage))} more a month for each ${esc(ramp.stagePct)} stage. Charges the bank does
+      not fund are left out.</span></div>` : ''}
+    ${drift != null && drift > STALE_D / 30.44 ? `<div class="flag"><span>⚠️</span><span>
+      <b>The tracker has drifted.</b> The last instalment marked paid was ${esc(day(d.last.date))},
+      about ${Math.round(drift)} months ago. The loan did not pause — these rows did.</span></div>` : ''}
+    ${figs([
+      { k: 'DRAWN',            v: inr(drawn), tone: 'owed', s: 'released to the builder' },
+      { k: 'PRINCIPAL RETIRED',v: inr(d.principalPaid), tone: d.principalPaid ? 'retired' : 'hot', s: interestOnly ? 'not started' : '' },
+      { k: 'INTEREST PAID',    v: inr(d.interestPaid), tone: 'hot', s: d.paid.length + ' instalments' },
+      { k: 'MONTHLY NOW',      v: inr(d.emiAmt), s: 'until the next disbursal' },
+      ramp ? { k: 'MONTHLY AT FULL DRAW', v: inr(ramp.monthly), tone: 'hot', s: '×' + (ramp.monthly / d.emiAmt).toFixed(1) + ' of today' }
+           : { k: 'TENURE', v: d.tenure + ' mo', s: d.loan.date ? 'from ' + day(d.loan.date) : '' },
+    ])}
+    <div class="ladder" id="house-disb"></div>
+    <div class="ladder" id="house-emis"></div>
+    <p class="lead" style="margin-top:.9rem">The amount changes every time the bank releases another
+      tranche, so months are recorded as they happen rather than projected. Add them in the Sheet's
+      House tab — instalment number, date, what was charged, status. The split and the balance are
+      worked out here.</p>`);
+
+  el.querySelector('#house-disb').innerHTML = disb.map(r => `<div class="rung">
+      <span class="seq">D${esc(r.seq)}</span>
+      <span class="what">Disbursal ${esc(r.seq)}<s>bank → builder</s></span>
+      <span class="when">${esc(day(r.date))}</span>
+      <span class="amt">${esc(inr(r.amountN || 0))}</span>
+      <span class="pill done">OUT</span>
+    </div>`).join('');
+  renderEmis(el.querySelector('#house-emis'), d, true);
+  return el;
+}
+
+/* What is left to draw, and what it does to the monthly bill. Which stages
+   the bank funds is not assumed — it is the ones carrying a `pct`, i.e. a
+   share of the agreement value, and the history says the bank covered those
+   in full while the no-pct rows (booking, registration, charges) came out of
+   our own pocket. */
+function drawdown(d, drawn){
+  if (d.rate == null) return null;
+  const staged = byKind('milestone').filter(m => m.pctN);
+  const cleared = staged.filter(m => isDone(m.status)).reduce((s, m) => s + (m.amountN || 0), 0);
+  const left = staged.filter(m => !isDone(m.status));
+  if (!cleared || !left.length) return null;
+  const coverage = drawn / cleared;
+  const ahead = left.reduce((s, m) => s + (m.amountN || 0), 0) * coverage;
+  const monthly = (drawn + ahead) * (d.rate / 100) / 12;
+  const common = left.map(m => m.pctN).sort((a, b) => a - b)[Math.floor(left.length / 2)];
+  return {
+    left: ahead, stages: left.length, coverage, monthly,
+    perStage: (left.find(m => m.pctN === common).amountN || 0) * coverage * (d.rate / 100) / 12,
+    stagePct: common + '%',
+  };
+}
+
+/* ── the house, at the builder ─────────────────────────────────────*/
+function builderCard(b){
+  const nextUp = b.ms.filter(m => !isDone(m.status));
+  const biggest = nextUp.length ? Math.max(...nextUp.map(m => m.amountN || 0)) : 0;
+  const el = card(`
+    <h2>The builder's ladder <span class="tag">construction-linked</span>
+      <span class="right">${esc(inrShort(b.cleared))} / ${esc(inrShort(b.total))}</span></h2>
+    <p class="lead">The flat is priced at <b>${esc(inr(b.total))}</b> all in.
+      ${esc(inr(b.cleared))} of that has been handed over; <b>${esc(inr(b.left))}</b> has not,
+      and it falls due stage by stage as the building goes up — not on a date anyone here chooses.</p>
+    <div class="meter"><span style="width:${(b.pct * 100).toFixed(1)}%"></span></div>
+    ${figs([
+      { k: 'CLEARED',       v: inr(b.cleared), tone: 'retired', s: pct(b.pct) + ' of the price' },
+      { k: 'STILL DUE',     v: inr(b.left), tone: 'owed', s: nextUp.length + ' stages left' },
+      { k: 'BIGGEST AHEAD', v: inr(biggest), tone: 'hot', s: 'per construction stage' },
+      { k: 'BASE / GST',    v: inrShort(parseFloat(META.property_base) || 0) + ' + ' + inrShort(parseFloat(META.property_gst) || 0), s: 'of the total' },
+    ])}
+    <div class="ladder" id="ms-ladder"></div>`);
+  el.querySelector('#ms-ladder').innerHTML = b.ms.map(m => {
+    const done = isDone(m.status);
+    return `<div class="rung${done ? '' : ' is-pending'}">
+      <span class="seq">${esc(m.seq)}</span>
+      <span class="what">${esc(m.label)}${m.note ? `<s>${esc(m.note)}</s>`
+        : (m.gstN ? `<s>${esc(inr(m.principalN || 0))} + ${esc(inr(m.gstN))} GST</s>` : '')}</span>
+      ${m.pct ? `<span class="pct">${esc(m.pct)}%</span>` : ''}
+      <span class="when">${esc(m.date ? day(m.date) : '')}</span>
+      <span class="amt">${esc(inr(m.amountN || 0))}</span>
+      <span class="pill${done ? ' done' : ' hot'}">${done ? 'CLEARED' : 'DUE'}</span>
+    </div>`;
+  }).join('');
+  return el;
+}
+
+/* ── where the cleared money came from ─────────────────────────────*/
+function moneyInCard(b){
+  const pays = byKind('payment').sort((a, b2) => (a.date || '').localeCompare(b2.date || ''));
+  const cons = byKind('contribution').sort((a, b2) => (a.date || '').localeCompare(b2.date || ''));
+  const own = pays.reduce((s, r) => s + (r.amountN || 0), 0);
+  const given = cons.reduce((s, r) => s + (r.amountN || 0), 0);
+  const el = card(`
+    <h2>Money in <span class="right">${esc(inrShort(own + given))} RAISED</span></h2>
+    <p class="lead">What went to the builder outside the loan, and what came in from family
+      to carry it. <b>${esc(inr(own))}</b> of ours, <b>${esc(inr(given))}</b> contributed.</p>
+    ${figs([
+      { k: 'OUR OWN',        v: inr(own), s: pays.length + ' payments' },
+      { k: 'CONTRIBUTED',    v: inr(given), tone: 'retired', s: cons.length + ' transfers' },
+      { k: 'BANK DISBURSED', v: inr(byKind('disbursal').filter(r => isDone(r.status)).reduce((s, r) => s + (r.amountN || 0), 0)), tone: 'owed', s: 'borrowed, not raised' },
+    ])}
+    <div class="ladder">` +
+    pays.map(r => `<div class="rung">
+      <span class="seq">P${esc(r.seq)}</span>
+      <span class="what">${esc(r.label || 'Payment')}<s>paid to the builder</s></span>
+      <span class="when">${esc(day(r.date))}</span>
+      <span class="amt">${esc(inr(r.amountN || 0))}</span>
+    </div>`).join('') +
+    cons.map(r => `<div class="rung">
+      <span class="seq">C${esc(r.seq)}</span>
+      <span class="what">${esc(r.label || 'Contribution')}${r.note ? `<s>${esc(r.note)}</s>` : ''}</span>
+      <span class="when">${esc(day(r.date))}</span>
+      <span class="amt">${esc(inr(r.amountN || 0))}</span>
+    </div>`).join('') +
+    `</div>`);
+  return el;
+}
+
+/* ── footer ───────────────────────────────────────────────────────*/
+function footBlock(house){
+  const parts = [];
+  if (META.synced_at){
+    const d = new Date(META.synced_at);
+    if (!isNaN(d)){
+      const days = (Date.now() - d) / 864e5;
+      const when = d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+      parts.push(days > STALE_D ? `<span class="stale">⚠️ STALE · SYNCED ${when}</span>` : `SYNCED ${when}`);
+    }
+  } else {
+    parts.push('<span class="stale">NEVER SYNCED</span>');
+  }
+  if (META.source) parts.push('FROM ' + String(META.source).toUpperCase());
+  parts.push('READ-ONLY · EDIT IN THE SHEET · SAY “UPDATE LOANS” TO REFRESH');
+  $('foot').innerHTML = parts.join(' · ');
+}
+
+initAuth();
+</script>
+</body>
+</html>

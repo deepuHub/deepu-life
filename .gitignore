@@ -7,6 +7,8 @@ apple_health_export/
 # served from its own repo, so nothing sensitive is allowed in here at all.
 data/et.json
 data/*.tsv
+data/loans/
+data/*.xlsx
 
 # Holds payee names, venue names and statement paths. Never commit.
 scripts/*.local.json

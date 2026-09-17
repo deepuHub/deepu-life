@@ -23,6 +23,7 @@
 | ✶ Bucket List (`bucket-private.html`) | Life list as star charts — one constellation per section, one star per item | Private — Google Sign-In |
 | 🎙️ Carnatic (`carnatic-private.html`) | Carnatic vocal journey at Artium — badge medallions, lesson ladder, riyaaz log | Private — Google Sign-In |
 | 💡 Ideas (`ideas-private.html`) | Ideas and projects — date each one turned up, status, AI verdict on whether to chase it, impact × effort matrix | Private — Google Sign-In |
+| 🏦 Loans (`loans-private.html`) | The car and the house — burn-down of each schedule, the builder's construction-linked ladder, and who paid for what | Private — Google Sign-In |
 
 Private pages render nothing until Google authenticates the one account with access to that page's Sheet — enforced by Google, not by the page.
 
@@ -123,6 +124,62 @@ re-score is asked for by name — which is what makes a verdict overridden by ha
 review must never touch `status` either; that is the family's call, the same rule as the School page's
 homework sync.
 
+**Loans — a tab per schedule.** `loans-private.html` reads seven tabs, each with only the columns it
+actually uses. Unlike Bucket List, Carnatic and Ideas — which are flat single tabs — the loans data is
+genuinely heterogeneous, and the monthly job is two cells: did the car EMI go out, did the house one. A tab
+per schedule puts this month's row next to last month's and nothing else:
+
+- `Meta` — `key | value`: `synced_at`, `source`, `property_value`, `property_base`, `property_gst`
+- `Loans` — `loan | name | lender | sanctioned | emi | rate_pct | tenure | first_due | balance | status`, one row per loan; `loan` is the slug (`car`, `house`) the schedule tabs below belong to
+- `Car` / `House` — `instl | due | amount | principal | interest | balance | status | paid_on`, one row per instalment. `principal`, `interest` and `balance` may be left blank and are derived, so a row only needs the instalment number, its date, what was charged and the status. Car is a fixed amortisation table — the bank issued all 84 rows up front. House is not: it is still drawing down, so its instalment is pre-EMI interest on whatever has been released and steps up with every further tranche, and its rows run only as far as months that have actually happened
+- `Disbursals` — `no | date | amount | status | note`, the bank releasing money to the builder
+- `Milestones` — `no | stage | pct | principal | gst | total | status | date | note`, the builder's construction-linked payment plan
+- `MoneyIn` — `no | type | name | date | amount | status | note`; `type` is `own` (paid to the builder ourselves) or `contribution` (money in from family)
+
+Each tab is read header-first, so its columns can be reordered without touching the page, and all seven come
+back in one `values:batchGet`. A tab the page does not know about is simply not read, so one can be added to
+the Sheet first. Every parsed row remembers the tab it came from, its sheet row and where its `status` cell
+sits — that trio is what a toggle writes back to.
+
+`data/loans.xlsx` is the seed: upload it to Drive and open it with Google Sheets and all seven tabs arrive
+correctly named, with dates stored as text so they survive the conversion (a date left for Sheets to parse
+comes back in the sheet's own locale and stops parsing — the same trap as Ideas). The same content is in
+`data/loans/*.tsv`, one file per tab, for building them by hand. Both are gitignored — the page reads the
+Sheet, never the files.
+
+Everything on the page is derived from those rows — nothing is hard-coded. **This month** sits at the top
+and is the whole monthly ritual: the next unpaid instalment on each loan, with a MARK PAID pill that writes
+straight to that loan's tab, and anything past its due date called out as overdue. Below it the hero adds up
+what both banks are owed today and what the month costs; each loan gets a burn-down of its outstanding
+principal, solid up to the last instalment marked paid and dashed for what is still to come, plus a bar
+splitting the whole loan into principal retired, interest paid, principal left and interest still to come. A
+loan whose instalments have retired no principal is called what it is — pre-EMI, interest only — and a
+schedule whose last recorded instalment is more than 45 days old says so, because a tracker drifting is not
+the loan pausing.
+
+**The house loan is still drawing down**, and that is the thing the page is built to show. The bank funds
+the milestones that carry a `pct` — a share of the agreement value — and has covered those in full so far;
+the no-pct rows (booking, registration, and the charges at the end) came out of our own pocket. That rule is
+read off the data rather than assumed, so the page can say what the remaining stages do to the monthly bill:
+each 10% stage adds about ₹9,944 a month, and at full drawdown the interest alone is roughly ₹94,468 against
+₹29,835 today. Until the principal starts amortising, none of it touches the balance.
+
+**Nothing anyone can be expected to know has to be typed.** A blank `principal` is 0, a blank `interest` is
+the rest of the instalment, and a blank `balance` is the previous one less what was just paid off — or,
+while a loan is still drawing down, whatever the `Disbursals` tab says had been released by that date. So
+the first three house instalments correctly show ₹17,07,837, ₹17,96,786 and ₹35,87,000 without anyone
+working it out, and adding a tranche to `Disbursals` when it lands corrects every instalment after it.
+
+**The page writes nothing.** It reads the Sheet and renders it, asking for a `spreadsheets.readonly` token
+— so the guarantee is Google's rather than the page's: a bug here, or anything served in its place, still
+cannot move a figure. Unlike Bucket List, Carnatic and Ideas, which write their own status cells, these are
+loan schedules and a property ledger, and being wrong about them costs more than editing in place is worth.
+Status is set in the Sheet.
+
+**Syncing** — say *"Update loans"*. The source is a workbook in Drive (`Loans.xlsx`), one tab per schedule;
+Claude re-reads it, refreshes the rows and stamps the `synced_at` meta row, which is what the footer shows.
+A sync must never clobber a `status` set by hand on the page, same rule as the School page's homework sync.
+
 ---
 
 ## Features
@@ -153,6 +210,7 @@ deepu-life/
 ├── bucket-private.html       ← bucket list as constellations (private Sheet; seed in data/bucket-list.tsv)
 ├── carnatic-private.html     ← Carnatic journey at Artium (private Sheet; seed in data/carnatic.tsv)
 ├── ideas-private.html        ← ideas & projects with AI verdicts (private Sheet; seed in data/ideas.tsv)
+├── loans-private.html        ← car & house loans, builder ladder (private Sheet; seed in data/loans.xlsx + data/loans/)
 ├── assets/
 │   ├── css/
 │   │   ├── tracker-theme.css ← shared design tokens, nav, light/dark palette
