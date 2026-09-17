@@ -745,11 +745,19 @@ async function writeCells(range, values){
 }
 
 /* Appends land after the last row, so every other row keeps its index and
-   the status selects above stay pointed at the right cells. */
+   the status selects above stay pointed at the right cells.
+
+   RAW, not USER_ENTERED: a captured idea's date_added is written as the
+   literal text "2026-09-17". Let Sheets parse it and the cell becomes a
+   date, which reads back in the sheet's own locale ("17/09/2026" on an
+   Indian sheet) — which new Date() then refuses, so the card loses its
+   age and its idle flag. RAW makes what the page writes and what it reads
+   back the same string. Same reason the seed should be imported without
+   conversion. */
 async function appendRow(values){
   const target = `${SHEET_TAB}!A:${colLetter(Math.max(HEADER.length, values.length) - 1)}`;
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(target)}`
-            + `:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+            + `:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
