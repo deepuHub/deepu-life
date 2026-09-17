@@ -102,14 +102,26 @@ idea on the page's impact × effort matrix; rows missing either are simply left 
 header-driven, so columns can be reordered in the Sheet without touching the page.
 `data/ideas.tsv` is the seed to paste in (gitignored with the rest of `data/*.tsv`).
 
-The page **writes** two things: an idea's `status` cell, changed from the pill on its card, and a row
-appended by the capture box at the top — which lands as a `spark` dated today with no verdict. Both go
-through the Sheets API as the signed-in user, same as the Bucket List and Carnatic.
+**Every card is editable in place.** The status pill writes its own cell on change; the pencil next to
+it turns the card into a form covering every other column except `id` and `reviewed` — title, pitch,
+the date it came up, verdict, confidence, impact, effort, rationale, next step, tags and link. Saving
+diffs the form against the row and sends only the cells that actually changed, as a single
+`values:batchUpdate`, so a one-word fix is one cell rather than fifteen. Escape cancels, Cmd/Ctrl+Enter
+saves, and only one card is open at a time. The capture box at the top appends a row instead, landing
+as a `spark` dated today with no verdict. All of it goes through the Sheets API as the signed-in user,
+same as the Bucket List and Carnatic.
+
+Writes are RAW, not USER_ENTERED, so a date stays the literal text `2026-09-17`. Left to parse it,
+Sheets makes it a date cell and hands it back in the sheet's own locale — `17/09/2026` on an Indian
+sheet — which `new Date()` refuses, and the card loses its age and its idle flag. Import the seed with
+*Convert text to numbers, dates, and formulas* set to **No** for the same reason.
 
 **Getting a verdict** — say *"Review ideas"*. Claude reads the rows with no verdict, weighs each against
 what the rest of this site already does, and writes back `verdict`, `confidence`, `rationale`,
-`next_step`, `impact`, `effort` and `reviewed`. A review must never touch `status` — that is the
-family's call, the same rule as the School page's homework sync.
+`next_step`, `impact`, `effort` and `reviewed`. Rows that already have a verdict are left alone unless a
+re-score is asked for by name — which is what makes a verdict overridden by hand on the page stick. A
+review must never touch `status` either; that is the family's call, the same rule as the School page's
+homework sync.
 
 ---
 

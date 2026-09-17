@@ -190,6 +190,39 @@
 
   .i-pitch{margin-top:.5rem;font-size:.86rem;font-weight:300;line-height:1.65;color:var(--muted)}
 
+  /* ── editing in place ── */
+  .i-edit{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:1px solid var(--border);
+          background:var(--surface);color:var(--muted);cursor:pointer;display:grid;place-items:center;
+          font-size:.68rem;padding:0;-webkit-tap-highlight-color:transparent;transition:all .2s}
+  .i-edit:hover{color:var(--run);border-color:var(--run)}
+  .i-edit:focus-visible{outline:2px solid var(--run);outline-offset:2px}
+  .idea.editing{background:var(--surface);border-left-color:var(--run)}
+
+  .ef{display:flex;flex-direction:column;gap:.7rem}
+  .ef-row{display:flex;gap:.6rem;flex-wrap:wrap}
+  .ef-f{display:flex;flex-direction:column;gap:.28rem;flex:1 1 140px;min-width:0}
+  .ef-f.wide{flex:1 1 100%}
+  .ef-f.narrow{flex:0 1 110px}
+  .ef-f label{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.14em;color:var(--muted2)}
+  .ef-f input,.ef-f select,.ef-f textarea{width:100%;min-height:38px;padding:.45rem .6rem;border-radius:9px;
+          border:1px solid var(--border);background:var(--surface2);color:var(--text);
+          font-family:'Epilogue',sans-serif;font-size:.84rem;font-weight:300}
+  .ef-f textarea{min-height:92px;resize:vertical;line-height:1.6}
+  .ef-f select{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em}
+  .ef-f input:focus,.ef-f select:focus,.ef-f textarea:focus{outline:2px solid var(--run);outline-offset:-1px}
+  .ef-acts{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.1rem}
+  .ef-acts button{min-height:38px;padding:.45rem 1.05rem;border-radius:999px;cursor:pointer;
+          font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+          -webkit-tap-highlight-color:transparent}
+  .ef-save{border:1px solid var(--run);background:var(--run-dim);color:var(--run)}
+  .ef-save:hover{background:var(--run);color:var(--bg)}
+  .ef-save:disabled{opacity:.5;cursor:default}
+  .ef-cancel{border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .ef-cancel:hover{color:var(--text);border-color:var(--muted2)}
+  .ef-note{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.1em;color:var(--muted2);
+           margin-left:auto;text-align:right}
+  .ef-err{color:#f0545c;font-size:.76rem;font-weight:300}
+
   /* the verdict colour lives on the row, so the badge border and the
      confidence bar's currentColor both land on it */
   .i-verdict{margin-top:.75rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
@@ -382,12 +415,19 @@
    already does, and writes verdict / confidence / rationale / next_step
    / reviewed back. impact and effort get filled the same way.
 
-   A review must never overwrite `status` — that is the family's call and
-   the only column this page writes. Same rule as the School page's
-   homework sync and the Carnatic assignment toggles.
+   A review only fills rows whose `verdict` is blank, unless it is asked
+   for a re-score by name. That is what protects a verdict overridden by
+   hand on this page — no extra column needed to mark it.
 
-   WHAT THIS PAGE WRITES: an idea's `status` cell, and appended rows from
-   the capture box. Nothing else.
+   A review must never overwrite `status` — that is the family's call.
+   Same rule as the School page's homework sync and the Carnatic
+   assignment toggles.
+
+   WHAT THIS PAGE WRITES: every column except `id` and `reviewed`. The
+   status pill writes its own cell; the pencil opens the rest of the card
+   as a form, and saving sends only the cells that actually changed, in
+   one batch. `id` is the row's handle and `reviewed` belongs to a review
+   pass, so neither is offered for editing.
 ═══════════════════════════════════════════════════════════════════ */
 const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
 const SPREADSHEET_ID = '1O8wiXJ1dvamI9C47MigPl6FYZ31m73HGlvcgrQnU5W8';
@@ -406,6 +446,26 @@ let ROWS = [];                             // every parsed row, in sheet order
 let HEADER = [];
 let statusCol = 'G';
 let filter = 'all', sortBy = 'priority';
+let editing = null;                        // sheet row currently open for editing
+
+/* What a card can change, and which Sheet column each one lands in.
+   `id`, `status` and `reviewed` are deliberately absent: the id is the
+   row's handle, the status has its own pill, and `reviewed` is stamped by
+   a review pass, not by hand. */
+const EDITABLE = [
+  { k:'title',   col:'title',      label:'TITLE',      type:'text', wide:true },
+  { k:'kind',    col:'kind',       label:'KIND',       type:'kind', narrow:true },
+  { k:'added',   col:'date_added', label:'CAME UP',    type:'date', narrow:true },
+  { k:'pitch',   col:'pitch',      label:'PITCH',      type:'area', wide:true },
+  { k:'verdict', col:'verdict',    label:'VERDICT',    type:'verdict', narrow:true },
+  { k:'conf',    col:'confidence', label:'% SURE',     type:'num', min:0, max:100, narrow:true },
+  { k:'impact',  col:'impact',     label:'IMPACT 1-5', type:'num', min:1, max:5, narrow:true },
+  { k:'effort',  col:'effort',     label:'EFFORT 1-5', type:'num', min:1, max:5, narrow:true },
+  { k:'why',     col:'rationale',  label:'WHY',        type:'area', wide:true },
+  { k:'next',    col:'next_step',  label:'NEXT STEP',  type:'area', wide:true },
+  { k:'tags',    col:'tags',       label:'TAGS',       type:'text' },
+  { k:'link',    col:'link',       label:'LINK',       type:'text' },
+];
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s)
@@ -482,6 +542,14 @@ function colLetter(i){
   let s = '';
   for (i = i + 1; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + (i - 1) % 26) + s;
   return s;
+}
+
+/* Column letter for a header name, so writes follow the Sheet's own order
+   rather than assuming the seed's. */
+function colOf(name){
+  const i = HEADER.indexOf(name);
+  if (i < 0) throw new Error(`the Sheet has no "${name}" column`);
+  return colLetter(i);
 }
 
 /* ── helpers ──────────────────────────────────────────────────────── */
@@ -598,6 +666,7 @@ function listBlock(){
 }
 
 function card(r){
+  if (r.row === editing) return editCard(r);
   const v = VERDICTS[r.verdict];
   const conf = isNaN(r.conf) ? null : Math.max(0, Math.min(100, r.conf));
   const age = daysSince(r.added);
@@ -621,6 +690,8 @@ function card(r){
     <div class="i-head">
       ${r.id ? `<span class="i-id">${esc(r.id)}</span>` : ''}
       <h3 class="i-title">${esc(r.title)}<span class="i-kind">${esc(r.kind).toUpperCase()}</span></h3>
+      <button type="button" class="i-edit" data-edit="${r.row}"
+              aria-label="Edit ${esc(r.title)}" title="Edit">✎</button>
       <select class="i-status s-${esc(r.status)}" data-row="${r.row}" aria-label="Status of ${esc(r.title)}">
         ${STATUSES.map(s => `<option value="${s}"${s === r.status ? ' selected' : ''}>${s.toUpperCase()}</option>`).join('')}
         ${STATUSES.includes(r.status) ? '' : `<option value="${esc(r.status)}" selected>${esc(r.status).toUpperCase()}</option>`}
@@ -632,6 +703,122 @@ function card(r){
     ${r.next && !isSettled(r) ? `<p class="i-next"><span>→</span>${esc(r.next)}</p>` : ''}
     <div class="i-foot">${foot}</div>
   </article>`;
+}
+
+/* ── editing ──────────────────────────────────────────────────────── */
+/* Values live on the row as parsed types (numbers for impact/effort/conf,
+   NaN when blank), so both directions go through here rather than being
+   read straight off the object. */
+const fieldValue = (r, f) =>
+  (f.type === 'num') ? (isNaN(r[f.k]) ? '' : String(r[f.k])) : String(r[f.k] ?? '');
+
+function fieldHTML(r, f){
+  const v = fieldValue(r, f);
+  const cls = `ef-f${f.wide ? ' wide' : ''}${f.narrow ? ' narrow' : ''}`;
+  const id = `ef-${f.k}-${r.row}`;
+  let input;
+  if (f.type === 'area'){
+    input = `<textarea id="${id}" data-k="${f.k}">${esc(v)}</textarea>`;
+  } else if (f.type === 'kind'){
+    input = `<select id="${id}" data-k="${f.k}">${['idea','project']
+      .map(o => `<option value="${o}"${o === v ? ' selected' : ''}>${o.toUpperCase()}</option>`).join('')}</select>`;
+  } else if (f.type === 'verdict'){
+    input = `<select id="${id}" data-k="${f.k}"><option value=""${v ? '' : ' selected'}>— NONE —</option>${
+      Object.keys(VERDICTS).map(o =>
+        `<option value="${o}"${o === v ? ' selected' : ''}>${VERDICTS[o]}</option>`).join('')}</select>`;
+  } else if (f.type === 'num'){
+    input = `<input id="${id}" data-k="${f.k}" type="number" inputmode="numeric" min="${f.min}" max="${f.max}" value="${esc(v)}">`;
+  } else if (f.type === 'date'){
+    input = `<input id="${id}" data-k="${f.k}" type="date" value="${esc(v)}">`;
+  } else {
+    input = `<input id="${id}" data-k="${f.k}" type="text" value="${esc(v)}">`;
+  }
+  return `<div class="${cls}"><label for="${id}">${f.label}</label>${input}</div>`;
+}
+
+function editCard(r){
+  // grouped so the row reads the way the card does: what it is, then the
+  // verdict and its numbers, then the prose
+  const groups = [['title','kind','added'], ['pitch'], ['verdict','conf','impact','effort'],
+                  ['why'], ['next'], ['tags','link']];
+  const rows = groups.map(g =>
+    `<div class="ef-row">${g.map(k => fieldHTML(r, EDITABLE.find(f => f.k === k))).join('')}</div>`).join('');
+
+  return `<article class="idea ${vClass(r)} s-${esc(r.status)} editing" id="idea-${r.row}">
+    <div class="ef">
+      ${rows}
+      <div class="ef-acts">
+        <button type="button" class="ef-save" data-save="${r.row}">SAVE</button>
+        <button type="button" class="ef-cancel" data-cancel="${r.row}">CANCEL</button>
+        <span class="ef-note">${esc(r.id)} · SHEET ROW ${r.row}<br>STATUS AND ID STAY OUTSIDE THIS FORM</span>
+      </div>
+      <p class="ef-err" id="ef-err-${r.row}"></p>
+    </div>
+  </article>`;
+}
+
+function startEdit(row){
+  if (editing !== null && editing !== row) return cancelEdit(editing, () => startEdit(row));
+  editing = row;
+  const r = ROWS.find(x => x.row === row);
+  const el = $('idea-' + row);
+  if (!r || !el) return;
+  el.outerHTML = editCard(r);
+  const first = $(`ef-title-${row}`);
+  if (first) first.focus();
+}
+
+function cancelEdit(row, then){
+  const r = ROWS.find(x => x.row === row);
+  editing = null;
+  const el = $('idea-' + row);
+  if (r && el) el.outerHTML = card(r);
+  if (then) then();
+}
+
+/* Only what actually changed is written, so a save on a card where one
+   word moved is one cell, not fifteen. */
+function collectEdits(row){
+  const r = ROWS.find(x => x.row === row);
+  const out = [];
+  EDITABLE.forEach(f => {
+    const el = $(`ef-${f.k}-${row}`);
+    if (!el) return;
+    let next = String(el.value).trim();
+    if (f.type === 'num' && next !== ''){
+      const n = Math.round(+next);
+      if (isNaN(n)) return;
+      next = String(Math.max(f.min, Math.min(f.max, n)));
+    }
+    if (f.type === 'kind' || f.type === 'verdict') next = next.toLowerCase();
+    if (next !== fieldValue(r, f)) out.push({ f, next });
+  });
+  return out;
+}
+
+async function saveEdit(row){
+  const r = ROWS.find(x => x.row === row);
+  if (!r) return;
+  const changes = collectEdits(row);
+  if (!changes.length){ cancelEdit(row); return; }
+
+  const btn = document.querySelector(`[data-save="${row}"]`);
+  const err = $('ef-err-' + row);
+  if (btn){ btn.disabled = true; btn.textContent = 'SAVING…'; }
+  if (err) err.textContent = '';
+
+  try {
+    await batchWrite(changes.map(c => ({ range: `${colOf(c.f.col)}${row}`, value: c.next })));
+    changes.forEach(({ f, next }) => {
+      r[f.k] = (f.type === 'num') ? (next === '' ? NaN : +next) : next;
+    });
+    editing = null;
+    render();
+    note('');
+  } catch (e){
+    if (btn){ btn.disabled = false; btn.textContent = 'SAVE'; }
+    if (err) err.textContent = 'Could not save — ' + e.message;
+  }
 }
 
 /* ── interaction ──────────────────────────────────────────────────── */
@@ -647,6 +834,17 @@ function wire(){
   $('ideas').addEventListener('change', e => {
     const sel = e.target.closest('select[data-row]');
     if (sel) setStatus(+sel.dataset.row, sel.value);
+  });
+  $('ideas').addEventListener('click', e => {
+    const ed = e.target.closest('[data-edit]');   if (ed) return startEdit(+ed.dataset.edit);
+    const sv = e.target.closest('[data-save]');   if (sv) return saveEdit(+sv.dataset.save);
+    const cx = e.target.closest('[data-cancel]'); if (cx) return cancelEdit(+cx.dataset.cancel);
+  });
+  // Escape backs out of an edit; Cmd/Ctrl+Enter saves it
+  $('ideas').addEventListener('keydown', e => {
+    if (editing === null) return;
+    if (e.key === 'Escape'){ e.stopPropagation(); cancelEdit(editing); }
+    else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveEdit(editing);
   });
   $('mx-plot').addEventListener('click', e => {
     const dot = e.target.closest('.dot');
@@ -739,6 +937,23 @@ async function writeCells(range, values){
     method: 'PUT',
     headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ values }),
+  });
+  if (res.status === 401) throw new Error('sign-in expired, reload the page');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+}
+
+/* Every changed cell of one card goes up in a single request — a card with
+   five edits is one round trip, not five, and the Sheet sees one revision.
+   RAW for the same reason as the append below. */
+async function batchWrite(cells){
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchUpdate`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      valueInputOption: 'RAW',
+      data: cells.map(c => ({ range: `${SHEET_TAB}!${c.range}`, values: [[c.value]] })),
+    }),
   });
   if (res.status === 401) throw new Error('sign-in expired, reload the page');
   if (!res.ok) throw new Error('HTTP ' + res.status);
