@@ -21,6 +21,8 @@
     { key: 'results',  href: 'results-private.html',        icon: '🎓', label: 'BEd Results',   group: 'private' },
     { key: 'apple',    href: 'apple-health-private.html',   icon: '🍎', label: 'Apple Health',  group: 'private' },
     { key: 'bucket',   href: 'bucket-private.html',         icon: '✶', label: 'Bucket List',   group: 'private' },
+    { key: 'carnatic', href: 'carnatic-private.html',       icon: '🎙️', label: 'Carnatic',      group: 'private' },
+    { key: 'ideas',    href: 'ideas-private.html',          icon: '💡', label: 'Ideas',         group: 'private' },
   ];
 
   // index.html swaps its own "Tracker" pill for these in-page tabs.

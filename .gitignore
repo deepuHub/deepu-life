@@ -10,3 +10,7 @@ data/*.tsv
 
 # Holds payee names, venue names and statement paths. Never commit.
 scripts/*.local.json
+
+# Raw idea notes — personal names and half-formed plans. The seed built from
+# these (data/ideas.tsv) is gitignored above, and the page reads the Sheet.
+Ideas/

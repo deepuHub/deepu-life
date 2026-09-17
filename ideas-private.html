@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ideas — deepu-life</title>
+<meta name="description" content="Ideas and projects, with the date each one turned up and a verdict on whether to chase it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💡%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600&family=Fraunces:wght@900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<script src="assets/js/theme.js"></script>
+<style>
+  /* ── Blueprint skin: drafting ink and cyan rule. Overrides the tracker
+        palette for this page only; --run drives the nav accent. ── */
+  :root{
+    --bg:#080d16;--surface:rgba(16,26,42,.66);--surface2:#101a2a;--border:#1e3149;
+    --text:#e6f0fb;--muted:#8fa6c2;--muted2:#5e7694;
+    --run:#38bdf8;--run-dim:#072839;
+
+    --go:#4ade80;--maybe:#fbbf24;--park:#8fa6c2;--drop:#f87171;--spark:#f5a524;
+    --grid:rgba(56,189,248,.055);
+  }
+  /* Daylight — the same drawing on drafting paper. */
+  :root[data-theme="light"]{
+    --bg:#f2f6fb;--surface:#ffffff;--surface2:#e9f0f8;--border:#cddced;
+    --text:#0c1a2b;--muted:#4c657f;--muted2:#7b90a8;
+    --run:#0369a1;--run-dim:#ddeeff;
+
+    --go:#15803d;--maybe:#b45309;--park:#4c657f;--drop:#b91c1c;--spark:#b45309;
+    --grid:rgba(3,105,161,.07);
+  }
+  body::before{opacity:.02}
+  body{
+    background:var(--bg);
+    /* graph paper, 28px rule, with a cyan wash in the corners */
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      radial-gradient(760px 460px at 88% -10%, rgba(56,189,248,.13), transparent),
+      radial-gradient(640px 400px at -6% 104%, rgba(74,222,128,.08), transparent);
+    background-size:28px 28px, 28px 28px, auto, auto;
+    background-attachment:fixed;
+  }
+
+  /* several blocks below set display:flex, which otherwise wins over the
+     hidden attribute and leaks the gated content before sign-in */
+  [hidden]{display:none !important}
+
+  .wrap{max-width:1040px;margin:0 auto;padding:calc(var(--nav-h) + 2.6rem) var(--pad) 5rem}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.12em}
+
+  /* ── hero ── */
+  .hero{text-align:center;margin-bottom:2.4rem}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--muted2);margin-bottom:.85rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.9rem,5.6vw,2.9rem);line-height:1.05;letter-spacing:-.02em}
+  .hero .sub{margin-top:.7rem;font-size:.92rem;font-weight:300;color:var(--muted);max-width:52ch;margin-inline:auto;line-height:1.7}
+
+  .ring-row{display:flex;align-items:center;justify-content:center;gap:1.4rem;flex-wrap:wrap;margin-top:1.6rem}
+  .ring{position:relative;width:98px;height:98px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring-bg{stroke:var(--border);fill:none;stroke-width:7}
+  .ring-fg{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)}
+  .ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem}
+  .ring-num b{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--text)}
+  .ring-num i{font-family:'JetBrains Mono',monospace;font-style:normal;font-size:.52rem;letter-spacing:.14em;color:var(--muted)}
+
+  .facts{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:30rem}
+  .fact{border:1px solid var(--border);border-radius:999px;padding:.4rem .85rem;background:var(--surface);
+        font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;color:var(--muted)}
+  .fact b{color:var(--text);font-weight:500}
+  .fact.warn b{color:var(--spark)}
+
+  /* ── sign-in gate — the private Sheet is the access control, not this page ── */
+  .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:34vh}
+  .gate-icon{font-size:2.2rem}
+  .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem}
+  .gate p{font-size:.88rem;font-weight:300;line-height:1.7;color:var(--muted);max-width:46ch}
+  .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+              background:var(--run-dim);color:var(--run);border:1px solid var(--run);font-family:'JetBrains Mono',monospace;
+              font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s;
+              -webkit-tap-highlight-color:transparent}
+  .btn-signin:hover{background:var(--run);color:var(--bg)}
+  .btn-signin:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  .gate-error{color:#f0545c;font-size:.8rem;max-width:52ch}
+
+  /* ── cards ── */
+  main{display:flex;flex-direction:column;gap:1.1rem}
+  .card{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:1.3rem}
+  .card > h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.12rem;letter-spacing:-.01em;
+             display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+  .card > h2 .tally{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.14em;
+                    font-weight:400;color:var(--muted)}
+  .card > p.lead{margin-top:.35rem;font-size:.82rem;font-weight:300;color:var(--muted);line-height:1.65}
+
+  /* ── capture ── */
+  .capture{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+  .capture input,.capture select{min-height:42px;padding:.5rem .8rem;border-radius:10px;
+                 border:1px solid var(--border);background:var(--surface2);color:var(--text);
+                 font-family:'Epilogue',sans-serif;font-size:.85rem;font-weight:300}
+  .capture input{flex:1 1 200px;min-width:0}
+  .capture select{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.1em}
+  .capture input:focus,.capture select:focus{outline:2px solid var(--run);outline-offset:-1px}
+  .capture button{min-height:42px;padding:.5rem 1.1rem;border-radius:999px;border:1px solid var(--run);
+                  background:var(--run-dim);color:var(--run);cursor:pointer;
+                  font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.12em;
+                  -webkit-tap-highlight-color:transparent}
+  .capture button:hover{background:var(--run);color:var(--bg)}
+  .capture button:disabled{opacity:.5;cursor:default}
+
+  /* ── filters ── */
+  .filters{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.95rem}
+  .chip{border:1px solid var(--border);border-radius:999px;background:var(--surface2);color:var(--muted);
+        padding:.38rem .8rem;min-height:34px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+        font-size:.6rem;letter-spacing:.12em;-webkit-tap-highlight-color:transparent;transition:all .2s}
+  .chip:hover{color:var(--text);border-color:var(--muted2)}
+  .chip.on{background:var(--run-dim);border-color:var(--run);color:var(--run)}
+  .chip b{font-weight:500;opacity:.7;margin-left:.35rem}
+  .chip:focus-visible{outline:2px solid var(--run);outline-offset:2px}
+  .sorter{margin-left:auto;display:flex;align-items:center;gap:.45rem}
+  .sorter label{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.14em;color:var(--muted2)}
+  .sorter select{min-height:34px;padding:.3rem .55rem;border-radius:999px;border:1px solid var(--border);
+                 background:var(--surface2);color:var(--muted);font-family:'JetBrains Mono',monospace;
+                 font-size:.6rem;letter-spacing:.1em}
+
+  /* ── impact × effort matrix ── */
+  .matrix{margin-top:1.1rem;display:grid;grid-template-columns:18px 1fr;grid-template-rows:1fr 18px;gap:.4rem}
+  .mx-y{grid-area:1/1;writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;
+        font-family:'JetBrains Mono',monospace;font-size:.54rem;letter-spacing:.18em;color:var(--muted2)}
+  .mx-x{grid-area:2/2;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.54rem;
+        letter-spacing:.18em;color:var(--muted2)}
+  .mx-plot{grid-area:1/2;position:relative;aspect-ratio:1.7;min-height:200px;border:1px solid var(--border);
+           border-radius:12px;background:
+             linear-gradient(var(--grid) 1px,transparent 1px),
+             linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+             var(--surface2);
+           background-size:20% 20%,20% 20%,auto;overflow:hidden}
+  .mx-plot::before,.mx-plot::after{content:'';position:absolute;background:var(--border)}
+  .mx-plot::before{left:50%;top:0;bottom:0;width:1px}
+  .mx-plot::after{top:50%;left:0;right:0;height:1px}
+  .quad{position:absolute;font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.14em;
+        color:var(--muted2);opacity:.75;pointer-events:none}
+  .quad.tl{top:.5rem;left:.6rem}.quad.tr{top:.5rem;right:.6rem}
+  .quad.bl{bottom:.5rem;left:.6rem}.quad.br{bottom:.5rem;right:.6rem}
+  .dot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;
+       display:grid;place-items:center;cursor:pointer;border:1px solid currentColor;
+       background:var(--surface);font-family:'JetBrains Mono',monospace;font-size:.5rem;font-weight:700;
+       transition:transform .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
+  .dot:hover,.dot:focus-visible{transform:scale(1.28);box-shadow:0 0 0 4px color-mix(in srgb,currentColor 22%,transparent);outline:none;z-index:3}
+  .dot.v-pursue{color:var(--go)}.dot.v-maybe{color:var(--maybe)}
+  .dot.v-park{color:var(--park)}.dot.v-drop{color:var(--drop)}
+  .dot.v-none{color:var(--muted2);border-style:dashed}
+  .dot.settled{opacity:.42}
+
+  /* ── idea cards ── */
+  .ideas{margin-top:1.1rem;display:flex;flex-direction:column;gap:.7rem}
+  .idea{border:1px solid var(--border);border-left:3px solid var(--muted2);border-radius:12px;
+        background:var(--surface2);padding:.9rem 1rem;scroll-margin-top:calc(var(--nav-h) + 1rem)}
+  .idea.v-pursue{border-left-color:var(--go)}
+  .idea.v-maybe{border-left-color:var(--maybe)}
+  .idea.v-park{border-left-color:var(--park)}
+  .idea.v-drop{border-left-color:var(--drop)}
+  .idea.v-none{border-left-style:dashed}
+  .idea.settled{opacity:.62}
+  .idea.settled:hover{opacity:1}
+  .idea.flash{animation:flash 1.4s ease-out}
+  @keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--run)}100%{box-shadow:0 0 0 0 transparent}}
+
+  .i-head{display:flex;align-items:flex-start;gap:.7rem;flex-wrap:wrap}
+  .i-id{flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:.54rem;letter-spacing:.1em;
+        color:var(--muted2);border:1px solid var(--border);border-radius:5px;padding:.22rem .38rem;margin-top:.12rem}
+  .i-title{flex:1;min-width:160px;font-size:1rem;font-weight:500;line-height:1.35;color:var(--text)}
+  .idea.settled .i-title{font-weight:400}
+  .idea.s-dropped .i-title{text-decoration:line-through;text-decoration-color:var(--drop)}
+  .i-kind{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.14em;color:var(--muted2);
+          margin-left:.5rem;vertical-align:.12em}
+  .i-status{flex-shrink:0;min-height:30px;padding:.2rem 1.5rem .2rem .6rem;border-radius:999px;
+            border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;
+            font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.12em;
+            appearance:none;-webkit-appearance:none;
+            background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+            background-position:calc(100% - 14px) 52%,calc(100% - 10px) 52%;
+            background-size:4px 4px,4px 4px;background-repeat:no-repeat}
+  .i-status:focus-visible{outline:2px solid var(--run);outline-offset:2px}
+  .i-status.s-building{color:var(--run);border-color:var(--run)}
+  .i-status.s-shipped{color:var(--go);border-color:var(--go)}
+  .i-status.s-spark{color:var(--spark);border-color:var(--spark)}
+
+  .i-pitch{margin-top:.5rem;font-size:.86rem;font-weight:300;line-height:1.65;color:var(--muted)}
+
+  /* the verdict colour lives on the row, so the badge border and the
+     confidence bar's currentColor both land on it */
+  .i-verdict{margin-top:.75rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+  .i-verdict.v-pursue{color:var(--go)}
+  .i-verdict.v-maybe{color:var(--maybe)}
+  .i-verdict.v-park{color:var(--park)}
+  .i-verdict.v-drop{color:var(--drop)}
+  .i-verdict.v-none{color:var(--muted2)}
+  .v-badge{display:inline-flex;align-items:center;gap:.4rem;border:1px solid currentColor;border-radius:999px;
+           padding:.24rem .65rem;font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.14em}
+  .v-pursue .v-badge,.v-badge.v-pursue{color:var(--go)}
+  .v-maybe .v-badge,.v-badge.v-maybe{color:var(--maybe)}
+  .v-park .v-badge,.v-badge.v-park{color:var(--park)}
+  .v-drop .v-badge,.v-badge.v-drop{color:var(--drop)}
+  .v-badge.v-none{color:var(--muted2);border-style:dashed}
+  .conf{flex:1;min-width:70px;max-width:180px;height:3px;border-radius:2px;background:var(--border);overflow:hidden}
+  .conf i{display:block;height:100%;border-radius:2px;background:currentColor;
+          transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .conf-n{font-family:'JetBrains Mono',monospace;font-size:.54rem;letter-spacing:.1em;color:var(--muted2)}
+
+  .i-why{margin-top:.55rem;padding-left:.75rem;border-left:2px solid var(--border);
+         font-size:.79rem;font-weight:300;line-height:1.7;color:var(--muted)}
+  .i-next{margin-top:.55rem;font-size:.8rem;font-weight:400;color:var(--text)}
+  .i-next span{color:var(--run);margin-right:.35rem}
+  .i-foot{margin-top:.7rem;display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;
+          font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.11em;color:var(--muted2)}
+  .i-foot a{color:var(--run);text-decoration:none;border-bottom:1px solid transparent}
+  .i-foot a:hover{border-bottom-color:var(--run)}
+  .i-foot .age.old{color:var(--spark)}
+  .tag{border:1px solid var(--border);border-radius:999px;padding:.12rem .45rem}
+
+  .empty{margin-top:1rem;font-size:.84rem;font-weight:300;color:var(--muted);text-align:center;padding:1.5rem 0}
+
+  footer{margin-top:3rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.6rem;
+         letter-spacing:.12em;color:var(--muted);line-height:2}
+  .sync-note{display:block;margin-top:.5rem;color:#f0545c}
+  .stale{color:var(--spark)}
+
+  @media(max-width:620px){
+    .sorter{margin-left:0;width:100%}
+    .mx-plot{aspect-ratio:1.25}
+    .i-status{order:3}
+  }
+</style>
+</head>
+<body>
+
+<deepu-nav active="ideas"></deepu-nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">SPARK · VERDICT · BUILD · SHIP</div>
+    <h1>Ideas &amp; Projects</h1>
+    <p class="sub">Every idea gets a date, a status, and a straight answer on whether it is worth chasing — so the good ones get built and the rest stop taking up room.</p>
+    <div class="ring-row" id="h-ring" hidden>
+      <div class="ring">
+        <svg width="98" height="98" viewBox="0 0 98 98" aria-hidden="true">
+          <circle class="ring-bg" cx="49" cy="49" r="42"></circle>
+          <circle class="ring-fg" id="ring-rev" cx="49" cy="49" r="42" stroke="var(--run)" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+        </svg>
+        <div class="ring-num"><b id="rev-pct">0%</b><i>REVIEWED</i></div>
+      </div>
+      <div class="ring">
+        <svg width="98" height="98" viewBox="0 0 98 98" aria-hidden="true">
+          <circle class="ring-bg" cx="49" cy="49" r="42"></circle>
+          <circle class="ring-fg" id="ring-ship" cx="49" cy="49" r="42" stroke="var(--go)" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+        </svg>
+        <div class="ring-num"><b id="ship-pct">0%</b><i>SHIPPED</i></div>
+      </div>
+      <div class="facts" id="facts"></div>
+    </div>
+  </header>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private notebook</h2>
+    <p>The ideas live in a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in is rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <main id="main" hidden>
+    <section class="card">
+      <h2>✍️ Catch it now</h2>
+      <p class="lead">One line is enough. It lands as a spark dated today, with no verdict — ask Claude for one later.</p>
+      <form class="capture" id="capture">
+        <input id="cap-title" type="text" placeholder="The idea, in a few words" maxlength="120" required>
+        <input id="cap-pitch" type="text" placeholder="One line on what it actually is" maxlength="240">
+        <select id="cap-kind" aria-label="Idea or project">
+          <option value="idea">IDEA</option>
+          <option value="project">PROJECT</option>
+        </select>
+        <button type="submit" id="cap-btn">ADD SPARK</button>
+      </form>
+    </section>
+
+    <section class="card" id="c-matrix" hidden>
+      <h2>📐 Worth it? <span class="tally" id="mx-tally"></span></h2>
+      <p class="lead">Impact against effort, coloured by the verdict. Top-left is where the weekend should go. Tap a dot to jump to it.</p>
+      <div class="matrix">
+        <span class="mx-y">IMPACT →</span>
+        <span class="mx-x">EFFORT →</span>
+        <div class="mx-plot" id="mx-plot">
+          <span class="quad tl">QUICK WINS</span>
+          <span class="quad tr">BIG BETS</span>
+          <span class="quad bl">SMALL STUFF</span>
+          <span class="quad br">MONEY PITS</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>💡 The list <span class="tally" id="list-tally"></span></h2>
+      <div class="filters" id="filters">
+        <button class="chip on" type="button" data-f="all">ALL<b id="n-all"></b></button>
+        <button class="chip" type="button" data-f="open">OPEN<b id="n-open"></b></button>
+        <button class="chip" type="button" data-f="unreviewed">NO VERDICT<b id="n-unreviewed"></b></button>
+        <button class="chip" type="button" data-f="pursue">PURSUE<b id="n-pursue"></b></button>
+        <button class="chip" type="button" data-f="building">BUILDING<b id="n-building"></b></button>
+        <button class="chip" type="button" data-f="shipped">SHIPPED<b id="n-shipped"></b></button>
+        <button class="chip" type="button" data-f="cold">PARK / DROP<b id="n-cold"></b></button>
+        <span class="sorter">
+          <label for="sort">SORT</label>
+          <select id="sort">
+            <option value="priority">WHAT'S NEXT</option>
+            <option value="newest">NEWEST</option>
+            <option value="oldest">OLDEST</option>
+            <option value="impact">IMPACT</option>
+          </select>
+        </span>
+      </div>
+      <div class="ideas" id="ideas"></div>
+    </section>
+  </main>
+
+  <footer id="foot"></footer>
+</div>
+
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   ideas-private.html — the ideas and projects notebook.
+
+   WHY THIS EXISTS: ideas turned up in notes apps, chat threads and the
+   backs of envelopes, and the good ones got lost among the ones that
+   only sounded good at midnight. One Sheet, one date per idea, one
+   verdict — and the page sorts them so the next thing to build is at
+   the top rather than whichever one shouted loudest.
+
+   DATA — a private Google Sheet, tab "Ideas", tab-separated columns:
+
+     id  kind  title  pitch  tags  date_added  status  impact  effort
+     verdict  confidence  rationale  next_step  link  reviewed
+
+     id          IDEA-01… — stable handle, shown on the card and dot.
+     kind        idea | project. A project is something already underway.
+     title       the idea in a few words.
+     pitch       one line on what it actually is.
+     tags        comma separated, free-form.
+     date_added  YYYY-MM-DD — the day it turned up. Never edited after.
+     status      spark | exploring | building | shipped | parked | dropped.
+                 The one field this page WRITES.
+     impact      1–5, how much it changes if it works.
+     effort      1–5, how much it costs to find out.
+     verdict     pursue | maybe | park | drop — Claude's call. Blank until
+                 reviewed, which the page shows as AWAITING VERDICT.
+     confidence  0–100, how sure that call is.
+     rationale   why that verdict, in a sentence or two. The useful bit.
+     next_step   the one concrete move that unblocks it.
+     link        page or URL, if it has one.
+     reviewed    YYYY-MM-DD the verdict was last given.
+
+   Parsing is header-driven, so columns can be reordered in the Sheet
+   without touching this file, and unknown columns are ignored.
+
+   ONE-TIME SETUP:
+     1. New Google Sheet, name the first tab "Ideas", sharing Restricted.
+     2. Paste data/ideas.tsv into A1 (File ▸ Import ▸ tab-separated, or
+        Paste special ▸ values only). That file is the seed and is
+        gitignored — the page reads the Sheet, never the file.
+     3. Put the spreadsheet id (the /d/<id>/ part of the URL) in
+        SPREADSHEET_ID below.
+
+   GETTING A VERDICT — say "Review ideas" to Claude. It reads the rows
+   with no verdict, thinks about each against what the rest of this site
+   already does, and writes verdict / confidence / rationale / next_step
+   / reviewed back. impact and effort get filled the same way.
+
+   A review must never overwrite `status` — that is the family's call and
+   the only column this page writes. Same rule as the School page's
+   homework sync and the Carnatic assignment toggles.
+
+   WHAT THIS PAGE WRITES: an idea's `status` cell, and appended rows from
+   the capture box. Nothing else.
+═══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '';                 // ← paste the Sheet id here (step 3)
+const SHEET_TAB      = 'Ideas';
+const SCOPES  = 'https://www.googleapis.com/auth/spreadsheets';
+const STALE_D = 45;                        // a spark idle this long gets flagged
+
+const STATUSES = ['spark','exploring','building','shipped','parked','dropped'];
+const SETTLED  = ['shipped','parked','dropped'];       // decided, so they sit back
+const VERDICTS = { pursue:'PURSUE', maybe:'MAYBE', park:'PARK', drop:'DROP' };
+const V_RANK   = { pursue:0, maybe:1, '':2, park:3, drop:4 };
+const S_RANK   = { building:0, exploring:1, spark:2, parked:3, shipped:4, dropped:5 };
+
+let tokenClient, accessToken = null;
+let ROWS = [];                             // every parsed row, in sheet order
+let HEADER = [];
+let statusCol = 'G';
+let filter = 'all', sortBy = 'priority';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const note = m => { const n = $('sync-note'); if (n) n.textContent = m; };
+function showGateError(msg){ $('gate-error').textContent = msg; }
+
+/* ── auth ─────────────────────────────────────────────────────────── */
+function initAuth(){
+  if (!SPREADSHEET_ID){
+    $('signin-btn').style.display = 'none';
+    showGateError('No Sheet wired up yet — see the setup steps in this page’s source.');
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: resp => {
+      if (resp.error){ showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  $('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+async function onSignedIn(){
+  try {
+    ROWS = parse(await loadRows());
+    $('gate').style.display = 'none';
+    $('main').hidden = false;
+    wire();
+    render();
+  } catch (e){
+    showGateError(e.message);
+  }
+}
+
+async function loadRows(){
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(SHEET_TAB)}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Ideas sheet.');
+  if (res.status === 400) throw new Error(`No tab named "${SHEET_TAB}" in that spreadsheet.`);
+  if (!res.ok) throw new Error(`Could not load the sheet (HTTP ${res.status}).`);
+  return (await res.json()).values || [];
+}
+
+/* Header-driven so columns can be reordered in the Sheet without breaking
+   the page; each row remembers its sheet row for write-back. */
+function parse(rows){
+  if (!rows.length) throw new Error('The Ideas tab is empty — paste the seed in first.');
+  HEADER = rows[0].map(h => String(h || '').toLowerCase().trim());
+  ['title','status'].forEach(c => {
+    if (HEADER.indexOf(c) < 0) throw new Error(`The Ideas tab needs a "${c}" column.`);
+  });
+  statusCol = colLetter(HEADER.indexOf('status'));
+  const at = (r, name) => { const i = HEADER.indexOf(name);
+    return i > -1 && r[i] != null ? String(r[i]).trim() : ''; };
+
+  return rows.slice(1).map((r, i) => ({
+    id: at(r,'id'), kind: at(r,'kind').toLowerCase() || 'idea',
+    title: at(r,'title'), pitch: at(r,'pitch'), tags: at(r,'tags'),
+    added: at(r,'date_added'), status: at(r,'status').toLowerCase(),
+    impact: parseInt(at(r,'impact'), 10), effort: parseInt(at(r,'effort'), 10),
+    verdict: at(r,'verdict').toLowerCase(), conf: parseInt(at(r,'confidence'), 10),
+    why: at(r,'rationale'), next: at(r,'next_step'), link: at(r,'link'),
+    reviewed: at(r,'reviewed'), row: i + 2,
+  })).filter(r => r.title);
+}
+
+/* 0→A … 25→Z, 26→AA. The seed is 15 columns, but a Sheet that has grown
+   past Z should still write to the right cell. */
+function colLetter(i){
+  let s = '';
+  for (i = i + 1; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + (i - 1) % 26) + s;
+  return s;
+}
+
+/* ── helpers ──────────────────────────────────────────────────────── */
+const vClass = r => 'v-' + (VERDICTS[r.verdict] ? r.verdict : 'none');
+const isSettled = r => SETTLED.includes(r.status);
+const daysSince = iso => { const d = new Date(iso); return isNaN(d) ? null : Math.floor((Date.now() - d) / 864e5); };
+
+function fmtDate(iso){
+  const d = new Date(iso);
+  if (isNaN(d)) return esc(iso);
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+}
+
+function matches(r){
+  switch (filter){
+    case 'open':       return !isSettled(r);
+    case 'unreviewed': return !VERDICTS[r.verdict];
+    case 'pursue':     return r.verdict === 'pursue';
+    case 'building':   return r.status === 'building';
+    case 'shipped':    return r.status === 'shipped';
+    // shelved either way round: told to drop it, or actually dropped
+    case 'cold':       return r.status === 'parked' || r.status === 'dropped'
+                           || r.verdict === 'park' || r.verdict === 'drop';
+    default:           return true;
+  }
+}
+
+function sorted(list){
+  const byDate = (a, b) => String(b.added).localeCompare(String(a.added));
+  const copy = list.slice();
+  if (sortBy === 'newest') return copy.sort(byDate);
+  if (sortBy === 'oldest') return copy.sort((a, b) => String(a.added).localeCompare(String(b.added)));
+  if (sortBy === 'impact') return copy.sort((a, b) => (b.impact || 0) - (a.impact || 0) || byDate(a, b));
+  // "what's next": the verdict leads, then how far along it is, then impact.
+  return copy.sort((a, b) =>
+      (V_RANK[a.verdict] ?? 2) - (V_RANK[b.verdict] ?? 2)
+   || (S_RANK[a.status] ?? 9) - (S_RANK[b.status] ?? 9)
+   || (b.impact || 0) - (a.impact || 0)
+   || byDate(a, b));
+}
+
+/* ── render ───────────────────────────────────────────────────────── */
+function render(){ heroBlock(); countsBlock(); matrixBlock(); listBlock(); footBlock(); }
+
+function ring(el, pctEl, pct){
+  $(pctEl).textContent = Math.round(pct) + '%';
+  // 2πr for r=42 ≈ 264 — the dasharray set in the markup.
+  requestAnimationFrame(() => { $(el).style.strokeDashoffset = String(264 * (1 - pct / 100)); });
+}
+
+function heroBlock(){
+  const n = ROWS.length;
+  if (!n) return;
+  $('h-ring').hidden = false;
+  const reviewed = ROWS.filter(r => VERDICTS[r.verdict]).length;
+  const shipped  = ROWS.filter(r => r.status === 'shipped').length;
+  ring('ring-rev', 'rev-pct', (reviewed / n) * 100);
+  ring('ring-ship','ship-pct',(shipped  / n) * 100);
+
+  const open = ROWS.filter(r => !isSettled(r)).length;
+  const waiting = n - reviewed;
+  const stale = ROWS.filter(r => r.status === 'spark' && (daysSince(r.added) ?? 0) > STALE_D).length;
+  const facts = [
+    ['IDEAS', String(n), false],
+    ['OPEN', String(open), false],
+    ['BUILDING', String(ROWS.filter(r => r.status === 'building').length), false],
+  ];
+  if (waiting) facts.push(['AWAITING VERDICT', String(waiting), true]);
+  if (stale)   facts.push([`IDLE ${STALE_D}D+`, String(stale), true]);
+  $('facts').innerHTML = facts.map(([k, v, warn]) =>
+    `<span class="fact${warn ? ' warn' : ''}">${esc(k)} <b>${esc(v)}</b></span>`).join('');
+}
+
+function countsBlock(){
+  const was = filter;
+  const count = f => { filter = f; const c = ROWS.filter(matches).length; filter = was; return c; };
+  ['all','open','unreviewed','pursue','building','shipped','cold'].forEach(f => {
+    const el = $('n-' + f);
+    if (el) el.textContent = count(f);
+  });
+}
+
+function matrixBlock(){
+  const plotted = ROWS.filter(r => r.impact >= 1 && r.effort >= 1);
+  if (!plotted.length) return;
+  $('c-matrix').hidden = false;
+  $('mx-tally').textContent = `${plotted.length} / ${ROWS.length} SIZED`;
+
+  const plot = $('mx-plot');
+  plot.querySelectorAll('.dot').forEach(d => d.remove());
+  // 1–5 mapped into 12%–88%, which leaves room for the nudge below without
+  // a dot at either extreme hanging off the clipped edge of the plot.
+  const pos = v => 12 + ((Math.min(5, Math.max(1, v)) - 1) / 4) * 76;
+
+  plot.insertAdjacentHTML('beforeend', plotted.map((r, i) => {
+    // deterministic nudge on a 4×3 cycle, so several ideas landing on the
+    // same square fan out instead of hiding behind each other
+    const jx = ((i % 4) - 1.5) * 2.6, jy = ((i % 3) - 1) * 2.6;
+    const label = r.id || r.title.slice(0, 3).toUpperCase();
+    return `<button type="button" class="dot ${vClass(r)}${isSettled(r) ? ' settled' : ''}"
+       style="left:${(pos(r.effort) + jx).toFixed(1)}%;bottom:${(pos(r.impact) + jy).toFixed(1)}%"
+       data-row="${r.row}"
+       title="${esc(r.title)} — impact ${r.impact}, effort ${r.effort}${r.verdict ? ', ' + esc(r.verdict) : ''}"
+       aria-label="${esc(r.title)}, impact ${r.impact} of 5, effort ${r.effort} of 5">${esc(label.replace(/^IDEA-/, ''))}</button>`;
+  }).join(''));
+}
+
+function listBlock(){
+  const shown = sorted(ROWS.filter(matches));
+  $('list-tally').textContent = `${shown.length} SHOWN · ${ROWS.length} TOTAL`;
+
+  $('ideas').innerHTML = shown.length ? shown.map(card).join('')
+    : `<p class="empty">Nothing under this filter.</p>`;
+}
+
+function card(r){
+  const v = VERDICTS[r.verdict];
+  const conf = isNaN(r.conf) ? null : Math.max(0, Math.min(100, r.conf));
+  const age = daysSince(r.added);
+  const idle = r.status === 'spark' && age !== null && age > STALE_D;
+
+  const verdictRow = `<div class="i-verdict ${vClass(r)}">
+      <span class="v-badge ${vClass(r)}">${v ? '⟶ ' + v : '⋯ AWAITING VERDICT'}</span>
+      ${conf !== null && v ? `<span class="conf"><i style="width:${conf}%"></i></span>
+        <span class="conf-n">${conf}% SURE</span>` : ''}
+      ${r.impact >= 1 && r.effort >= 1
+        ? `<span class="conf-n">IMPACT ${r.impact}/5 · EFFORT ${r.effort}/5</span>` : ''}
+    </div>`;
+
+  const foot = [
+    r.added ? `<span class="age${idle ? ' old' : ''}">${esc(fmtDate(r.added))}${age !== null ? ` · ${isSettled(r) ? '' : (idle ? 'IDLE ' : '')}${age}D` : ''}</span>` : '',
+    ...(r.tags ? r.tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${esc(t)}</span>`) : []),
+    r.link ? `<a href="${esc(r.link)}"${/^https?:/i.test(r.link) ? ' target="_blank" rel="noopener"' : ''}>OPEN ↗</a>` : '',
+  ].filter(Boolean).join('');
+
+  return `<article class="idea ${vClass(r)} s-${esc(r.status)}${isSettled(r) ? ' settled' : ''}" id="idea-${r.row}">
+    <div class="i-head">
+      ${r.id ? `<span class="i-id">${esc(r.id)}</span>` : ''}
+      <h3 class="i-title">${esc(r.title)}<span class="i-kind">${esc(r.kind).toUpperCase()}</span></h3>
+      <select class="i-status s-${esc(r.status)}" data-row="${r.row}" aria-label="Status of ${esc(r.title)}">
+        ${STATUSES.map(s => `<option value="${s}"${s === r.status ? ' selected' : ''}>${s.toUpperCase()}</option>`).join('')}
+        ${STATUSES.includes(r.status) ? '' : `<option value="${esc(r.status)}" selected>${esc(r.status).toUpperCase()}</option>`}
+      </select>
+    </div>
+    ${r.pitch ? `<p class="i-pitch">${esc(r.pitch)}</p>` : ''}
+    ${verdictRow}
+    ${r.why ? `<p class="i-why">${esc(r.why)}</p>` : ''}
+    ${r.next && !isSettled(r) ? `<p class="i-next"><span>→</span>${esc(r.next)}</p>` : ''}
+    <div class="i-foot">${foot}</div>
+  </article>`;
+}
+
+/* ── interaction ──────────────────────────────────────────────────── */
+function wire(){
+  $('filters').addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    filter = chip.dataset.f;
+    $('filters').querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === chip));
+    listBlock();
+  });
+  $('sort').addEventListener('change', e => { sortBy = e.target.value; listBlock(); });
+  $('ideas').addEventListener('change', e => {
+    const sel = e.target.closest('select[data-row]');
+    if (sel) setStatus(+sel.dataset.row, sel.value);
+  });
+  $('mx-plot').addEventListener('click', e => {
+    const dot = e.target.closest('.dot');
+    if (!dot) return;
+    // the card may be filtered out of view — widen to ALL before jumping
+    const card = $('idea-' + dot.dataset.row);
+    if (!card){
+      filter = 'all';
+      $('filters').querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.f === 'all'));
+      listBlock();
+    }
+    const target = $('idea-' + dot.dataset.row);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.remove('flash');
+    void target.offsetWidth;
+    target.classList.add('flash');
+  });
+  $('capture').addEventListener('submit', addIdea);
+}
+
+/* Optimistic, same contract as the Bucket List: flip it now, write the
+   cell after, put it back if the sheet refuses. */
+async function setStatus(row, status){
+  const r = ROWS.find(x => x.row === row);
+  if (!r || r.status === status) return;
+  const was = r.status;
+  r.status = status;
+  heroBlock(); countsBlock(); matrixBlock(); listBlock();
+  try {
+    await writeCells(`${statusCol}${row}`, [[status]]);
+    note('');
+  } catch (e){
+    r.status = was;
+    heroBlock(); countsBlock(); matrixBlock(); listBlock();
+    note('Could not save to the sheet — ' + e.message);
+  }
+}
+
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/* IDEA-07 → IDEA-08. Falls back to the row count if the ids are free-form,
+   and never reuses a number that is already in the sheet. */
+function nextId(){
+  let max = 0, prefix = 'IDEA';
+  ROWS.forEach(r => {
+    const m = /^([A-Za-z]+)-(\d+)$/.exec(r.id || '');
+    if (m){ prefix = m[1]; max = Math.max(max, +m[2]); }
+  });
+  return `${prefix}-${String(max + 1).padStart(2, '0')}`;
+}
+
+async function addIdea(e){
+  e.preventDefault();
+  const title = $('cap-title').value.trim();
+  if (!title) return;
+  const pitch = $('cap-pitch').value.trim();
+  const kind  = $('cap-kind').value;
+
+  const btn = $('cap-btn');
+  btn.disabled = true; btn.textContent = 'SAVING…';
+  const r = { id: nextId(), kind, title, pitch, tags: '', added: ymd(new Date()),
+              status: 'spark', impact: NaN, effort: NaN, verdict: '', conf: NaN,
+              why: '', next: '', link: '', reviewed: '' };
+  // Built from the live header, so a reordered or extended sheet still
+  // gets each value in the right column.
+  const cell = {
+    id: r.id, kind: r.kind, title: r.title, pitch: r.pitch, tags: '',
+    date_added: r.added, status: r.status, impact: '', effort: '',
+    verdict: '', confidence: '', rationale: '', next_step: '', link: '', reviewed: '',
+  };
+  try {
+    r.row = await appendRow(HEADER.map(h => cell[h] ?? ''));
+    ROWS.push(r);
+    $('cap-title').value = ''; $('cap-pitch').value = '';
+    render();
+    note('');
+  } catch (err){
+    note('Could not save the idea — ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'ADD SPARK';
+  }
+}
+
+/* ── sheet writes ─────────────────────────────────────────────────── */
+async function writeCells(range, values){
+  const target = `${SHEET_TAB}!${range}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(target)}?valueInputOption=RAW`;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values }),
+  });
+  if (res.status === 401) throw new Error('sign-in expired, reload the page');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+}
+
+/* Appends land after the last row, so every other row keeps its index and
+   the status selects above stay pointed at the right cells. */
+async function appendRow(values){
+  const target = `${SHEET_TAB}!A:${colLetter(Math.max(HEADER.length, values.length) - 1)}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(target)}`
+            + `:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [values] }),
+  });
+  if (res.status === 401) throw new Error('sign-in expired, reload the page');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const updated = (await res.json()).updates?.updatedRange || '';
+  const m = updated.match(/!A(\d+)/);
+  return m ? +m[1] : ROWS.length + 2;
+}
+
+/* ── footer ───────────────────────────────────────────────────────── */
+function footBlock(){
+  const waiting = ROWS.filter(r => !VERDICTS[r.verdict]).length;
+  const last = ROWS.map(r => r.reviewed).filter(Boolean).sort().pop();
+  const parts = [];
+  parts.push(waiting
+    ? `<span class="stale">⚠️ ${waiting} AWAITING A VERDICT</span>`
+    : 'EVERY IDEA HAS A VERDICT');
+  if (last) parts.push(`LAST REVIEW ${fmtDate(last)}`);
+  parts.push('SAY “REVIEW IDEAS” TO GET CLAUDE’S CALL ON THE REST');
+  $('foot').innerHTML = parts.join(' · ') + '<span class="sync-note" id="sync-note"></span>';
+}
+
+initAuth();
+</script>
+</body>
+</html>
