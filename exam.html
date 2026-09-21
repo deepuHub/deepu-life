@@ -112,6 +112,14 @@
     display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0}
   .opt-btn.selected .opt-letter{background:var(--accent);color:#0a0f0d;border-color:var(--accent)}
 
+  /* OMR-style bubble answers — Olympiad tests only. Row stays neutral, the
+     letter itself is the hollow/filled "bubble" — mirrors marking a real
+     OMR answer sheet more closely than a fully-highlighted card. */
+  .opt-list.omr-style .opt-btn{background:transparent;border-color:var(--border)}
+  .opt-list.omr-style .opt-btn.selected{background:var(--surface2);border-color:var(--border);color:var(--text);font-weight:500}
+  .opt-list.omr-style .opt-letter{width:30px;height:30px;border:2px solid var(--muted);background:transparent;font-size:0.8rem}
+  .opt-list.omr-style .opt-btn.selected .opt-letter{background:var(--accent);border-color:var(--accent);color:#0a0f0d;box-shadow:0 0 0 3px var(--accent-dim)}
+
   .symbol-row{display:flex;gap:0.8rem}
   .symbol-btn{flex:1;padding:1.4rem;border-radius:12px;border:1px solid var(--border);background:var(--surface2);
     font-size:2rem;font-weight:700;cursor:pointer;color:var(--text);transition:all .12s;min-height:80px}
@@ -229,15 +237,18 @@
 
   <!-- ═══ PICKER ═══ -->
   <div id="picker-view">
-    <div class="picker-block">
-      <div class="picker-label">Subject</div>
-      <div class="chip-row" id="subject-chips">
+    <div class="picker-block" id="subject-picker">
+      <div class="picker-label">Subject — School</div>
+      <div class="chip-row">
         <button class="big-chip active" data-subject="maths">🔢 Mathematics</button>
         <button class="big-chip" data-subject="dlc">💻 DL&amp;C <small>Digital Learning &amp; Computers</small></button>
         <button class="big-chip" data-subject="english">🔤 English <small>Dictation Words</small></button>
         <button class="big-chip" data-subject="social">🌍 Social Studies <small>The Wider World</small></button>
-        <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO Olympiad</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
+      </div>
+      <div class="picker-label" style="margin-top:1.1rem">Subject — Olympiad</div>
+      <div class="chip-row">
+        <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO</small></button>
       </div>
     </div>
 
@@ -428,6 +439,9 @@ let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
 const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", gk: "GK (IGKO)" };
+// Olympiad-tagged subjects get the OMR-bubble answer style instead of the
+// regular full-width card — add future ones (imo/iso/ieo/icso) here.
+const OLYMPIAD_SUBJECTS = new Set(["gk"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
@@ -504,9 +518,9 @@ async function loadQuestions(testName) {
 }
 
 // ── PICKER ──────────────────────────────────────────────────────────
-document.querySelectorAll('#subject-chips .big-chip[data-subject]').forEach(btn => {
+document.querySelectorAll('#subject-picker .big-chip[data-subject]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#subject-chips .big-chip').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#subject-picker .big-chip').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     CURRENT_SUBJECT = btn.dataset.subject;
   });
@@ -581,7 +595,7 @@ function renderQuestion() {
 
   if (q.type === 'MCQ' || q.type === 'True/False') {
     const wrap = document.createElement('div');
-    wrap.className = 'opt-list';
+    wrap.className = 'opt-list' + (OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT) ? ' omr-style' : '');
     q.options.forEach((opt, i) => {
       const letter = String.fromCharCode(65 + i);
       const b = document.createElement('button');
