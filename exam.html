@@ -769,10 +769,15 @@ function submitExam() {
     let correctDisplay = q.correct;
     let isCorrect;
     if (q.type === 'MCQ' || q.type === 'True/False') {
-      const idx = { A: 0, B: 1, C: 2, D: 3 }[q.correct];
-      correctDisplay = q.options[idx];
-      isCorrect = given === q.correct;
-      given = given ? q.options[{ A: 0, B: 1, C: 2, D: 3 }[given]] : '(no answer)';
+      // "Correct Answer" is usually a letter (A/B/C/D), but some sheets
+      // (e.g. GK/IGKO) store the full option text instead — support both.
+      const LETTER_IDX = { A: 0, B: 1, C: 2, D: 3 };
+      let correctIdx = LETTER_IDX[q.correct];
+      if (correctIdx === undefined) correctIdx = q.options.findIndex(o => normalize(o) === normalize(q.correct));
+      const correctLetter = correctIdx >= 0 ? String.fromCharCode(65 + correctIdx) : q.correct;
+      correctDisplay = correctIdx >= 0 ? q.options[correctIdx] : q.correct;
+      isCorrect = given === correctLetter;
+      given = given ? q.options[LETTER_IDX[given]] : '(no answer)';
     } else {
       isCorrect = normalize(given) === normalize(q.correct);
       given = given || '(no answer)';
