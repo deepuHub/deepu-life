@@ -121,6 +121,13 @@
   .opt-list.omr-style .opt-letter{width:30px;height:30px;border:2px solid var(--muted);background:transparent;font-size:0.8rem}
   .opt-list.omr-style .opt-btn.selected .opt-letter{background:var(--accent);border-color:var(--accent);color:#0a0f0d;box-shadow:0 0 0 3px var(--accent-dim)}
 
+  /* Olympiad question card is read-only — marking happens on the OMR
+     sheet only, so strip the button affordances (cursor, hover, disabled
+     dimming) but keep the "selected" look at full strength. */
+  .opt-list.read-only .opt-btn{cursor:default}
+  .opt-list.read-only .opt-btn:hover{border-color:var(--border)}
+  .opt-list.read-only .opt-btn[disabled]{opacity:1;cursor:default}
+
   .symbol-row{display:flex;gap:0.8rem}
   .symbol-btn{flex:1;padding:1.4rem;border-radius:12px;border:1px solid var(--border);background:var(--surface2);
     font-size:2rem;font-weight:700;cursor:pointer;color:var(--text);transition:all .12s;min-height:80px}
@@ -687,14 +694,19 @@ function renderQuestion() {
   const saved = CURRENT_ANSWERS[CURRENT_INDEX];
 
   if (q.type === 'MCQ' || q.type === 'True/False') {
+    const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
     const wrap = document.createElement('div');
-    wrap.className = 'opt-list' + (OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT) ? ' omr-style' : '');
+    wrap.className = 'opt-list' + (isOlympiad ? ' omr-style read-only' : '');
     q.options.forEach((opt, i) => {
       const letter = String.fromCharCode(65 + i);
       const b = document.createElement('button');
       b.className = 'opt-btn' + (saved === letter ? ' selected' : '');
       b.innerHTML = `<span class="opt-letter">${letter}</span><span>${opt}</span>`;
-      b.addEventListener('click', () => { CURRENT_ANSWERS[CURRENT_INDEX] = letter; renderQuestion(); });
+      // Olympiad tests: the question card is read-only — answers are only
+      // marked on the OMR sheet, same as filling a real bubble sheet
+      // instead of circling the printed question paper.
+      if (isOlympiad) b.disabled = true;
+      else b.addEventListener('click', () => { CURRENT_ANSWERS[CURRENT_INDEX] = letter; renderQuestion(); });
       wrap.appendChild(b);
     });
     area.appendChild(wrap);
