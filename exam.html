@@ -16,7 +16,8 @@
     --card: var(--surface2);
     --hgreen:#2dd4a0; --hamber:#f0a532; --hred:#f0545c; --hblue:#4f8ef7;
   }
-  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem;max-width:760px;margin:0 auto}
+  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem;max-width:760px;margin:0 auto;transition:max-width .2s}
+  .page.exam-wide{max-width:1140px}
 
   /* ═══ HERO THEMES — each test wears a different superhero mode,
      same trick as 2026_school.html: swap CSS custom properties off a
@@ -142,6 +143,39 @@
     color:var(--muted);font-size:0.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .qdot.answered{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
   .qdot.current{border-color:var(--text);color:var(--text)}
+
+  /* ── OMR answer-sheet sidebar — Olympiad tests only ──
+     Mimics the actual SOF/MTG "MARK YOUR ANSWERS" bubble sheet: a paper
+     card with alternating shaded rows and A/B/C/D circles per question,
+     split into 25-row column blocks the way the real sheet is. Colors are
+     hardcoded (not theme vars) on purpose — it's meant to read as a
+     physical scanned sheet, not part of the app chrome. */
+  .exam-layout{display:flex;gap:1.5rem;align-items:flex-start}
+  .exam-main{flex:1;min-width:0}
+  .omr-panel{display:none;flex-shrink:0;width:340px;background:#fbf4f7;border:1px solid #d9b6c9;
+    border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.3);padding:0.85rem 0.8rem;
+    position:sticky;top:calc(var(--nav-h) + 1rem);max-height:calc(100vh - var(--nav-h) - 2rem);
+    overflow-y:auto;font-family:'Epilogue',sans-serif}
+  .exam-layout.has-omr .omr-panel{display:block}
+  .exam-layout.has-omr .qgrid{display:none}
+  .omr-head{background:#8c2d54;color:#fff;text-align:center;font-weight:700;font-size:0.72rem;
+    letter-spacing:0.06em;text-transform:uppercase;padding:0.55rem;border-radius:6px;margin-bottom:0.7rem}
+  .omr-cols{display:flex;gap:0.5rem;flex-wrap:wrap}
+  .omr-col{flex:1;min-width:150px}
+  .omr-row{display:flex;align-items:center;gap:0.35rem;padding:0.22rem 0.3rem;border-radius:4px}
+  .omr-row:nth-child(odd){background:rgba(140,45,84,.08)}
+  .omr-row.current{outline:2px solid #8c2d54;outline-offset:-2px}
+  .omr-qnum{width:18px;font-size:0.7rem;font-weight:700;color:#6b2140;flex-shrink:0;cursor:pointer;text-align:right}
+  .omr-bubbles{display:flex;gap:0.28rem}
+  .omr-bubble{width:17px;height:17px;border-radius:50%;border:1.4px solid #8c2d54;background:#fff;
+    color:#8c2d54;font-size:0.52rem;font-weight:700;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+  .omr-bubble.filled{background:#8c2d54;color:#fff;box-shadow:0 0 0 2px rgba(140,45,84,.25)}
+
+  @media (max-width:900px){
+    .exam-layout{flex-direction:column}
+    .omr-panel{width:100%;position:static;max-height:none}
+  }
 
   /* ── Results ── */
   #results-view{display:none;text-align:center}
@@ -280,19 +314,28 @@
       <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
     </div>
 
-    <div class="q-card">
-      <span class="q-topic" id="q-topic">Place Value</span>
-      <div class="q-text" id="q-text">Loading…</div>
-      <div id="q-input-area"></div>
-    </div>
+    <div class="exam-layout" id="exam-layout">
+      <div class="exam-main">
+        <div class="q-card">
+          <span class="q-topic" id="q-topic">Place Value</span>
+          <div class="q-text" id="q-text">Loading…</div>
+          <div id="q-input-area"></div>
+        </div>
 
-    <div class="exam-nav">
-      <button class="nav-btn" id="prev-btn">← Back</button>
-      <button class="nav-btn primary" id="next-btn">Next →</button>
-      <button class="nav-btn submit" id="submit-btn" style="display:none">✓ Submit test</button>
-    </div>
+        <div class="exam-nav">
+          <button class="nav-btn" id="prev-btn">← Back</button>
+          <button class="nav-btn primary" id="next-btn">Next →</button>
+          <button class="nav-btn submit" id="submit-btn" style="display:none">✓ Submit test</button>
+        </div>
 
-    <div class="qgrid" id="qgrid"></div>
+        <div class="qgrid" id="qgrid"></div>
+      </div>
+
+      <aside class="omr-panel" id="omr-panel">
+        <div class="omr-head">Mark your answers</div>
+        <div class="omr-cols" id="omr-cols"></div>
+      </aside>
+    </div>
   </div>
 
   <!-- ═══ RESULTS ═══ -->
@@ -560,7 +603,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
     document.getElementById('picker-view').style.display = 'none';
     document.getElementById('exam-view').style.display = 'block';
+    document.getElementById('page-root').classList.toggle('exam-wide', OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT));
     buildQGrid();
+    buildOMRPanel();
     renderQuestion();
   } catch (err) {
     alert('Could not load questions. ' + err.message);
@@ -578,6 +623,54 @@ function buildQGrid() {
     dot.textContent = i + 1;
     dot.addEventListener('click', () => { CURRENT_INDEX = i; renderQuestion(); });
     grid.appendChild(dot);
+  });
+}
+
+// ── OMR SIDEBAR — Olympiad tests only. Rebuilt whenever a fresh test
+// starts (question count/order changes); synced (not rebuilt) on every
+// answer/navigation so it doesn't lose scroll position mid-test. ──
+function buildOMRPanel() {
+  const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
+  document.getElementById('exam-layout').classList.toggle('has-omr', isOlympiad);
+  const colsWrap = document.getElementById('omr-cols');
+  colsWrap.innerHTML = '';
+  if (!isOlympiad) return;
+
+  const CHUNK = 25; // matches the real SOF sheet's column split
+  for (let start = 0; start < CURRENT_QUESTIONS.length; start += CHUNK) {
+    const col = document.createElement('div');
+    col.className = 'omr-col';
+    CURRENT_QUESTIONS.slice(start, start + CHUNK).forEach((q, j) => {
+      const i = start + j;
+      const letters = ['A', 'B', 'C', 'D'].slice(0, Math.max(q.options.length, 2));
+      const row = document.createElement('div');
+      row.className = 'omr-row';
+      row.dataset.index = i;
+      row.innerHTML = `<span class="omr-qnum">${i + 1}</span><span class="omr-bubbles">${
+        letters.map(L => `<span class="omr-bubble" data-letter="${L}">${L}</span>`).join('')
+      }</span>`;
+      row.querySelector('.omr-qnum').addEventListener('click', () => { CURRENT_INDEX = i; renderQuestion(); });
+      row.querySelectorAll('.omr-bubble').forEach(b => {
+        b.addEventListener('click', () => {
+          CURRENT_ANSWERS[i] = b.dataset.letter;
+          CURRENT_INDEX = i;
+          renderQuestion();
+        });
+      });
+      col.appendChild(row);
+    });
+    colsWrap.appendChild(col);
+  }
+  syncOMRPanel();
+}
+
+function syncOMRPanel() {
+  if (!OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT)) return;
+  document.querySelectorAll('.omr-row').forEach(row => {
+    const i = Number(row.dataset.index);
+    row.classList.toggle('current', i === CURRENT_INDEX);
+    const ans = CURRENT_ANSWERS[i];
+    row.querySelectorAll('.omr-bubble').forEach(b => b.classList.toggle('filled', !!ans && b.dataset.letter === ans));
   });
 }
 
@@ -636,6 +729,7 @@ function renderQuestion() {
     d.classList.toggle('answered', CURRENT_ANSWERS[i] !== undefined && CURRENT_ANSWERS[i] !== '');
     d.classList.toggle('current', i === CURRENT_INDEX);
   });
+  syncOMRPanel();
 }
 
 document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
@@ -946,7 +1040,7 @@ document.getElementById('retake-btn').addEventListener('click', () => {
   CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
   document.getElementById('results-view').style.display = 'none';
   document.getElementById('exam-view').style.display = 'block';
-  buildQGrid(); renderQuestion();
+  buildQGrid(); buildOMRPanel(); renderQuestion();
 });
 document.getElementById('home-btn').addEventListener('click', () => {
   document.getElementById('results-view').style.display = 'none';
