@@ -898,6 +898,9 @@
     .hw-row-detail { font-size: 0.74rem; color: var(--muted); }
     .hw-row-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
     .hw-row-date { font-size: 0.68rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .hw-done-toggle { display: block; width: 100%; margin-top: 10px; padding: 9px 14px; border-radius: 12px; border: 1.5px dashed var(--line); background: transparent; color: var(--muted); font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .hw-done-toggle:hover { border-color: var(--accent); color: var(--text); }
+    .hw-done-grid { margin-top: 10px; opacity: 0.75; }
     .hw-row-dates { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
     .hw-row-added { font-size: 0.64rem; font-weight: 700; color: var(--muted); white-space: nowrap; opacity: 0.85; }
     .hw-row-added.fresh { color: #2e7d32; opacity: 1; }
@@ -2204,6 +2207,10 @@ const HOMEWORK_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1WRm9BBGGFUrw
 const HOMEWORK_GS_URL = 'https://script.google.com/macros/s/AKfycbx8NZxvFomB8_0hQa4RF8essSL6GThrKjChuaa6L52rexFh8Qe2-GLgfz-HBWBSD8Xp/exec';
 
 let HOMEWORK_NOTICES = [];
+// Finished homework and read notices pile up fast. Keep them folded away
+// behind a "Show completed" button so the list only ever opens on what
+// still needs doing; the toggle survives re-renders within a visit.
+let hwShowDone = false;
 let homeworkSyncedAt = null;
 let homeworkSyncStale = false;
 let homeworkSyncFailed = false;
@@ -2342,42 +2349,61 @@ function renderHomeworkNotices() {
     return 0;
   });
 
-  let html = '<div class="cal-card-grid">';
-  sorted.forEach(item => {
-    const status = hwStatusOf(item);
-    const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
-    // "Added" = the day it showed up on ManageBac. Anything from today or
-    // yesterday gets the NEW treatment so fresh arrivals are obvious.
-    const addedText = item.postedAt ? hwDateLabel(item.postedAt) : '';
-    const isFresh = item.postedAt ? daysBetween(item.postedAt, getTodayStr()) <= 1 : false;
-    const isDone = item.status === 'done';
-    // Pure FYI items (type "notice") aren't "done" in any real sense — they're
-    // read or unread. Everything else (homework/test/event) is an action.
-    const isReadType = item.type === 'notice';
-    const doneStatusLabel = isReadType ? '👁️ Read' : HW_STATUS_LABEL.done;
-    const actionLabel = isDone ? (isReadType ? '↩️ Unread' : '↩️ Undo') : (isReadType ? '👁️ Read' : '✅ Done');
-    const statusPillLabel = status === 'done' ? doneStatusLabel : HW_STATUS_LABEL[status];
-    html += `<div class="hw-row ${status}">
-      <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
-      <div class="hw-row-info">
-        <div class="hw-row-top">
-          <span class="hw-row-subject">${item.subject}</span>
-          <span class="hw-status-pill ${status}">${statusPillLabel}</span>
-        </div>
-        <span class="hw-row-title">${item.title}</span>
-        <span class="hw-row-detail">${item.detail}</span>
-        <div class="hw-row-bottom">
-          <div class="hw-row-dates">
-            <span class="hw-row-date">📅 ${item.date ? 'Due ' + dateText : dateText}</span>
-            ${addedText ? `<span class="hw-row-added${isFresh ? ' fresh' : ''}">${isFresh ? '🆕' : '📥'} Added ${addedText}</span>` : ''}
-          </div>
-          <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${actionLabel}</button>
-        </div>
-      </div>
-    </div>`;
-  });
-  html += '</div><div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks, synced live from a Google Sheet.</div>';
+  const pending = sorted.filter(i => i.status !== 'done');
+  const completed = sorted.filter(i => i.status === 'done');
+
+  let html = pending.length
+    ? '<div class="cal-card-grid">' + pending.map(hwRowHtml).join('') + '</div>'
+    : '<div class="cal-empty">All caught up — nothing pending 🎉</div>';
+
+  if (completed.length) {
+    html += `<button type="button" class="hw-done-toggle" onclick="toggleHomeworkDone()">${hwShowDone ? '▲ Hide' : '▼ Show'} ${completed.length} completed</button>`;
+    if (hwShowDone) {
+      html += '<div class="cal-card-grid hw-done-grid">' + completed.map(hwRowHtml).join('') + '</div>';
+    }
+  }
+
+  html += '<div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks, synced live from a Google Sheet.</div>';
   wrap.innerHTML = html;
+}
+
+function toggleHomeworkDone() {
+  hwShowDone = !hwShowDone;
+  renderHomeworkNotices();
+}
+
+function hwRowHtml(item) {
+  const status = hwStatusOf(item);
+  const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
+  // "Added" = the day it showed up on ManageBac. Anything from today or
+  // yesterday gets the NEW treatment so fresh arrivals are obvious.
+  const addedText = item.postedAt ? hwDateLabel(item.postedAt) : '';
+  const isFresh = item.postedAt ? daysBetween(item.postedAt, getTodayStr()) <= 1 : false;
+  const isDone = item.status === 'done';
+  // Pure FYI items (type "notice") aren't "done" in any real sense — they're
+  // read or unread. Everything else (homework/test/event) is an action.
+  const isReadType = item.type === 'notice';
+  const doneStatusLabel = isReadType ? '👁️ Read' : HW_STATUS_LABEL.done;
+  const actionLabel = isDone ? (isReadType ? '↩️ Unread' : '↩️ Undo') : (isReadType ? '👁️ Read' : '✅ Done');
+  const statusPillLabel = status === 'done' ? doneStatusLabel : HW_STATUS_LABEL[status];
+  return `<div class="hw-row ${status}">
+    <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
+    <div class="hw-row-info">
+      <div class="hw-row-top">
+        <span class="hw-row-subject">${item.subject}</span>
+        <span class="hw-status-pill ${status}">${statusPillLabel}</span>
+      </div>
+      <span class="hw-row-title">${item.title}</span>
+      <span class="hw-row-detail">${item.detail}</span>
+      <div class="hw-row-bottom">
+        <div class="hw-row-dates">
+          <span class="hw-row-date">📅 ${item.date ? 'Due ' + dateText : dateText}</span>
+          ${addedText ? `<span class="hw-row-added${isFresh ? ' fresh' : ''}">${isFresh ? '🆕' : '📥'} Added ${addedText}</span>` : ''}
+        </div>
+        <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${actionLabel}</button>
+      </div>
+    </div>
+  </div>`;
 }
 
 // ── WRITE-BACK: tapping ✅ Done / ↩️ Undo writes the `status` cell straight
