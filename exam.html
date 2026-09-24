@@ -99,6 +99,11 @@
   .q-topic{display:inline-block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;
     padding:0.25rem 0.65rem;border-radius:999px;background:var(--surface2);color:var(--muted);margin-bottom:0.9rem}
   .q-text{font-family:'Fraunces',serif;font-weight:700;font-size:1.2rem;line-height:1.45;margin-bottom:1.3rem}
+  /* Optional picture for a question (sheet's "Image" column). Drawn as
+     printed paper, so it keeps a white card in dark mode too. */
+  .q-img{display:block;max-width:100%;max-height:340px;margin:-0.4rem auto 1.3rem;background:#fff;
+    border:1px solid var(--border);border-radius:12px;padding:0.5rem}
+  .q-img[hidden]{display:none}
 
   .opt-list{display:flex;flex-direction:column;gap:0.6rem}
   .opt-btn{
@@ -287,6 +292,10 @@
         <button class="big-chip" data-subject="social">🌍 Social Studies <small>The Wider World</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
       </div>
+      <div class="picker-label" style="margin-top:1.1rem">Subject — SA1 (First Term Summative)</div>
+      <div class="chip-row">
+        <button class="big-chip" data-subject="sa1maths">🔢 Maths <small>Units 3 &amp; 9</small></button>
+      </div>
       <div class="picker-label" style="margin-top:1.1rem">Subject — Olympiad</div>
       <div class="chip-row">
         <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO</small></button>
@@ -326,6 +335,7 @@
         <div class="q-card">
           <span class="q-topic" id="q-topic">Place Value</span>
           <div class="q-text" id="q-text">Loading…</div>
+          <img class="q-img" id="q-img" alt="" hidden>
           <div id="q-input-area"></div>
         </div>
 
@@ -416,6 +426,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1280612197&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=552736091&single=true&output=csv",
   },
+  sa1maths: {
+    // TODO — publish "SA1 Maths Test A - Regular" and "SA1 Maths Test B -
+    // Harder" tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   gk: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=0&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=152720249&single=true&output=csv",
@@ -450,6 +466,11 @@ const TOPIC_EMOJI = {
   "Maths Fun": "➗",
   "Life Skills": "🧭",
   "Current Affairs and Developments": "📰",
+  "Addition": "➕",
+  "Subtraction": "➖",
+  "Money": "💵",
+  "Regrouping Tens": "🔟",
+  "Complements": "🧩",
 };
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
@@ -488,7 +509,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", gk: "GK (IGKO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", sa1maths: "SA1 Maths", gk: "GK (IGKO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk"]);
@@ -544,6 +565,7 @@ function rowsToQuestions(rows) {
     d: header.indexOf('option d'),
     correct: header.indexOf('correct answer'),
     points: header.indexOf('points'),
+    image: header.indexOf('image'),
   };
   return rows.slice(1)
     .filter(r => r[idx.question] && r[idx.question].trim())
@@ -555,6 +577,8 @@ function rowsToQuestions(rows) {
       options: [r[idx.a], r[idx.b], r[idx.c], r[idx.d]].filter(o => o && o.trim()),
       correct: (r[idx.correct] || '').trim(),
       points: Number(r[idx.points]) || 5,
+      // Optional — a repo-relative path like assets/exam/sa1-maths/coins.svg
+      image: idx.image >= 0 ? (r[idx.image] || '').trim() : '',
     }));
 }
 
@@ -688,6 +712,9 @@ function renderQuestion() {
   document.getElementById('progress-fill').style.width = `${((CURRENT_INDEX + 1) / total) * 100}%`;
   document.getElementById('q-topic').textContent = `${TOPIC_EMOJI[q.topic] || '📘'} ${q.topic}`;
   document.getElementById('q-text').textContent = q.question;
+  const img = document.getElementById('q-img');
+  img.hidden = !q.image;
+  if (q.image) img.src = q.image; else img.removeAttribute('src');
 
   const area = document.getElementById('q-input-area');
   area.innerHTML = '';
@@ -722,7 +749,7 @@ function renderQuestion() {
     });
     area.appendChild(wrap);
   } else {
-    const isNumeric = /^-?\d+$/.test(q.correct);
+    const isNumeric = /^-?\d+$/.test(q.correct);  // "a|b" alternatives stay text
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'text-answer';
@@ -779,7 +806,11 @@ function submitExam() {
       isCorrect = given === correctLetter;
       given = given ? q.options[LETTER_IDX[given]] : '(no answer)';
     } else {
-      isCorrect = normalize(given) === normalize(q.correct);
+      // Short answers may list accepted alternatives with "|" (e.g.
+      // "$0.65|65c|65") — the first one is what's shown as correct.
+      const accepted = q.correct.split('|');
+      isCorrect = accepted.some(a => normalize(given) === normalize(a));
+      correctDisplay = accepted[0];
       given = given || '(no answer)';
     }
 
