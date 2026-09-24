@@ -898,6 +898,10 @@
     .hw-row-detail { font-size: 0.74rem; color: var(--muted); }
     .hw-row-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
     .hw-row-date { font-size: 0.68rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .hw-row-dates { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+    .hw-row-added { font-size: 0.64rem; font-weight: 700; color: var(--muted); white-space: nowrap; opacity: 0.85; }
+    .hw-row-added.fresh { color: #2e7d32; opacity: 1; }
+    [data-theme="dark"] .hw-row-added.fresh { color: #a5d6a7; }
     .hw-row-action { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-solid); color: var(--text); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .hw-row-action:hover { border-color: var(--accent); }
     .hw-row.done .hw-row-action { border-color: transparent; background: transparent; color: var(--muted); }
@@ -2168,13 +2172,18 @@ renderExamAlert();
 // ONE-TIME SETUP: export tasks from ManageBac to Excel (or copy them in by hand),
 // upload/paste into the Google Sheet below, share it "Anyone with the link ▸
 // Viewer", then keep it updated — the page re-fetches it fresh on every load.
-// Header row (exact names): date, date_label, type, subject, title, detail, status
+// Header row (exact names): date, date_label, type, subject, title, detail, status,
+//   synced_at, posted_at
 //   - date: YYYY-MM-DD for anything with a fixed due date (sorts first, drives
 //     the "due today / overdue" alert banner)
 //   - date_label: free text used only when date is left blank, e.g. "Last week of Sep"
 //   - type: homework | test | notice | event (event = needs Udhbhav to actively
 //     do/bring/wear/prepare something — a celebration, costume day, performance —
 //     as opposed to notice, which is passive FYI: recaps, digests, file uploads)
+//   - posted_at: YYYY-MM-DD - the day the notification/task actually appeared
+//     on ManageBac. The list is sorted by this, newest first, so the top of
+//     the list is always whatever turned up most recently. Rows without it
+//     fall back to their due date.
 //   - status: leave blank while pending, or "done" once it's submitted/completed —
 //     done items get a green check, sort to the bottom, and stop counting toward
 //     the overdue/due-soon alert banner
@@ -2240,6 +2249,7 @@ async function loadHomeworkNotices() {
       detail:    header.indexOf('detail'),
       status:    header.indexOf('status'),
       syncedAt:  header.indexOf('synced_at'),
+      postedAt:  header.indexOf('posted_at'),
     };
 
     HOMEWORK_NOTICES = rows.slice(1)
@@ -2251,6 +2261,7 @@ async function loadHomeworkNotices() {
         title:     idx.title   > -1 ? r[idx.title]   || '' : '',
         detail:    idx.detail  > -1 ? r[idx.detail]  || '' : '',
         status:    idx.status  > -1 && r[idx.status] ? r[idx.status].trim().toLowerCase() : 'pending',
+        postedAt:  idx.postedAt > -1 && r[idx.postedAt] ? r[idx.postedAt].trim() : '',
         sheetRow:  i + 2, // header is row 1 — matches the CSV export's row order 1:1
       }))
       .filter(item => item.title);
@@ -2313,9 +2324,18 @@ function renderHomeworkNotices() {
     return;
   }
 
+  // Newest arrivals first: whatever ManageBac posted most recently sits at the
+  // top, so "what's new since I last looked" is the first thing you read.
+  // Finished/read rows still sink to the bottom. Rows with no posted_at fall
+  // back to their due date so they never jump above genuinely new items.
   const sorted = [...HOMEWORK_NOTICES].sort((a, b) => {
     const aDone = a.status === 'done', bDone = b.status === 'done';
     if (aDone !== bDone) return aDone ? 1 : -1;
+    const aPosted = a.postedAt || a.date || '';
+    const bPosted = b.postedAt || b.date || '';
+    if (aPosted && bPosted && aPosted !== bPosted) return bPosted.localeCompare(aPosted);
+    if (aPosted && !bPosted) return -1;
+    if (bPosted && !aPosted) return 1;
     if (a.date && b.date) return a.date.localeCompare(b.date);
     if (a.date) return -1;
     if (b.date) return 1;
@@ -2326,6 +2346,10 @@ function renderHomeworkNotices() {
   sorted.forEach(item => {
     const status = hwStatusOf(item);
     const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
+    // "Added" = the day it showed up on ManageBac. Anything from today or
+    // yesterday gets the NEW treatment so fresh arrivals are obvious.
+    const addedText = item.postedAt ? hwDateLabel(item.postedAt) : '';
+    const isFresh = item.postedAt ? daysBetween(item.postedAt, getTodayStr()) <= 1 : false;
     const isDone = item.status === 'done';
     // Pure FYI items (type "notice") aren't "done" in any real sense — they're
     // read or unread. Everything else (homework/test/event) is an action.
@@ -2343,7 +2367,10 @@ function renderHomeworkNotices() {
         <span class="hw-row-title">${item.title}</span>
         <span class="hw-row-detail">${item.detail}</span>
         <div class="hw-row-bottom">
-          <span class="hw-row-date">📅 ${dateText}</span>
+          <div class="hw-row-dates">
+            <span class="hw-row-date">📅 ${item.date ? 'Due ' + dateText : dateText}</span>
+            ${addedText ? `<span class="hw-row-added${isFresh ? ' fresh' : ''}">${isFresh ? '🆕' : '📥'} Added ${addedText}</span>` : ''}
+          </div>
           <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${actionLabel}</button>
         </div>
       </div>
