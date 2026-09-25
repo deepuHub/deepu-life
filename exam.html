@@ -316,7 +316,11 @@
         <div class="empty-hist">Tests coming before the First Term Summative (19 Oct – 3 Nov).</div>
       </div>
       <div class="chip-row" data-exam-subjects="olympiad" hidden>
-        <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO</small></button>
+        <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO · 22 Sep</small></button>
+        <button class="big-chip" data-subject="ieo">🔤 English <small>IEO · 30 Sep</small></button>
+        <button class="big-chip" disabled>🔬 Science <small>ISO · soon</small></button>
+        <button class="big-chip" disabled>🔢 Maths <small>IMO · soon</small></button>
+        <button class="big-chip" disabled>💻 Computers <small>ICSO · soon</small></button>
       </div>
     </div>
 
@@ -448,6 +452,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1916905751&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=85477057&single=true&output=csv",
   },
+  ieo: {
+    // TODO — publish "IEO_TestA_Regular" and "IEO_TestB_Harder" tabs to web
+    // as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   gk: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=0&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=152720249&single=true&output=csv",
@@ -487,6 +497,10 @@ const TOPIC_EMOJI = {
   "Money": "💵",
   "Regrouping Tens": "🔟",
   "Complements": "🧩",
+  "Word and Structure Knowledge": "🔤",
+  "Reading": "📖",
+  "Spoken and Written Expression": "💬",
+  "Achievers Section": "🏆",
 };
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
@@ -526,10 +540,10 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", gk: "GK (IGKO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
-const OLYMPIAD_SUBJECTS = new Set(["gk"]);
+const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
