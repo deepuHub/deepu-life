@@ -102,6 +102,26 @@
 /* Quotes button on slide */
 .quotes-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:1px solid var(--read-dim);border-radius:999px;background:var(--read-dim);color:var(--read);font-size:0.75rem;font-weight:500;font-family:'Epilogue',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.03em}
 .quotes-btn:hover{background:var(--read);color:#0a0f0d}
+/* Full notes inside the quotes popup (notes/<slug>.md) */
+.qmodal.has-notes{max-width:860px}
+.q-search{margin:0 1.5rem 0.5rem;padding:0.5rem 0.8rem;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font:inherit;font-size:0.82rem}
+.q-search:focus{outline:none;border-color:var(--read)}
+.note-md{font-size:0.88rem;line-height:1.7;color:var(--text);border-top:1px solid var(--border);padding-top:1rem;margin-top:0.25rem}
+.note-md h1{font-family:'Fraunces',serif;font-size:1.3rem;line-height:1.25;margin:0 0 0.5rem;color:var(--read)}
+.note-md h2{font-family:'Fraunces',serif;font-size:1.05rem;margin:1.5rem 0 0.5rem;color:var(--read)}
+.note-md h3{font-size:0.92rem;margin:1rem 0 0.4rem}
+.note-md p{margin:0.5rem 0}
+.note-md ul,.note-md ol{margin:0.4rem 0 0.4rem 1.2rem;padding:0}
+.note-md li{margin:0.2rem 0}
+.note-md li.task{list-style:none;margin-left:-1.2rem}
+.note-md blockquote{margin:0.6rem 0;padding:0.6rem 0.9rem;border-left:3px solid var(--read);background:var(--bg);border-radius:0 3px 3px 0}
+.note-md table{border-collapse:collapse;width:100%;margin:0.6rem 0;font-size:0.8rem;display:block;overflow-x:auto}
+.note-md th,.note-md td{border:1px solid var(--border);padding:0.4rem 0.6rem;text-align:left;vertical-align:top}
+.note-md th{background:var(--surface2);color:var(--muted);font-weight:500}
+.note-md a{color:var(--read)}
+.note-md code{background:var(--bg);padding:0 0.3rem;border-radius:3px;font-size:0.85em}
+.note-md mark,.q-text mark{background:var(--read);color:#0a0f0d;border-radius:2px}
+.note-loading{color:var(--muted);font-size:0.8rem}
 
 
 
@@ -394,6 +414,7 @@ async function gsGet() {
   }
   setSyncBadge('loading');
   showLoader();
+  await notesReady;
   try {
     const res  = await fetch(GS_URL + '?action=getAll', { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -451,6 +472,22 @@ const fmtS = d => { if(!d) return '—'; const p=String(d).split('-'); return `$
 const fmtF = d => { if(!d) return '—'; const p=String(d).split('-'); return `${MO[+p[1]-1]} ${+p[2]}, ${p[0]}`; };
 const daysFrom = d => Math.floor((Date.now()-new Date(String(d)+'T00:00:00').getTime())/86400000);
 const chips = arr => arr.map(c => `<div class="summary-chip"><span class="chip-lbl">${c.l}</span><span class="chip-val ${c.cls||''}">${c.v}</span></div>`).join('');
+/* Notes: long-form notes live in notes/*.md, listed in notes/index.json.
+   Each entry is merged into the Read list (matched by title, else added),
+   and its quotes popup also shows the full notes. */
+let NOTES = [];
+const notesReady = fetch('notes/index.json', { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : []).then(j => { NOTES = Array.isArray(j) ? j : []; }).catch(() => {});
+const normTitle = t => String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+function booksWithNotes() {
+  const list = DB.books.map(b => ({ ...b }));
+  NOTES.forEach(n => {
+    const m = list.find(b => normTitle(b.title) === normTitle(n.title));
+    if (m) { m.notes = n.slug; if (!m.quotes) m.quotes = n.quotes || ''; }
+    else list.push({ id:'n-'+n.slug, title:n.title, author:n.author, cat:n.cat, status:n.status||'done', added:n.added, quotes:n.quotes||'', notes:n.slug });
+  });
+  return list;
+}
 const parseQuotes = q => !q||typeof q!=='string' ? [] : q.split('|').map(s=>s.trim()).filter(Boolean).map(s=>({content:s}));
 
 /* ══════════════════════════════════════════════════════════
@@ -527,7 +564,7 @@ const readCfg = {
   makeSlide: b => {
     const badge = b.status==='done' ? `<span class="badge b-done">Done ✓</span>` : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>` : `<span class="badge b-plan">Planned</span>`;
     const qs    = parseQuotes(b.quotes);
-    const qBtn  = qs.length ? `<button class="quotes-btn" onclick="openQuotes('${b.id}')">📖 ${qs.length} Quote${qs.length!==1?'s':''}</button>` : '';
+    const qBtn  = (qs.length || b.notes) ? `<button class="quotes-btn" onclick="openQuotes('${b.id}')">📖 ${qs.length} Quote${qs.length!==1?'s':''}</button>` : '';
     return `<div class="tl-slide-inner">
       <div class="tl-date">Added ${fmtF(b.added)}</div>
       <div class="tl-headline" style="color:var(--read)">${b.title}</div>
@@ -542,7 +579,7 @@ const readCfg = {
 };
 
 function renderBooks() {
-  const books = [...DB.books].sort((a,b) => String(a.added) < String(b.added) ? -1 : 1);
+  const books = booksWithNotes().sort((a,b) => String(a.added) < String(b.added) ? -1 : 1);
   const tbody = document.getElementById('read-tbody');
   const cards = document.getElementById('read-cards');
   const empty = document.getElementById('read-empty');
@@ -551,12 +588,12 @@ function renderBooks() {
   books.forEach(b => {
     const badge = b.status==='done' ? `<span class="badge b-done">Done ✓</span>` : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>` : `<span class="badge b-plan">Planned</span>`;
     const qs   = parseQuotes(b.quotes);
-    const qbtn = qs.length ? `<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0;white-space:nowrap">📖 ${qs.length}q</button>` : '';
+    const qbtn = (qs.length || b.notes) ? `<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0;white-space:nowrap">📖 ${qs.length}q</button>` : '';
     const tr = document.createElement('tr');
     tr.innerHTML = `<td><strong>${b.title}</strong></td><td class="ht" style="color:var(--muted)">${b.author||'—'}</td><td class="ht"><span class="badge b-read">${b.cat||'—'}</span></td><td>${badge}</td><td class="ht">${qbtn}</td><td class="ht" style="color:var(--muted);font-size:.82rem">${fmtF(b.added)}</td>`;
     tbody.appendChild(tr);
     const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${b.title}</span></div><div class="ecard-meta">${badge}${b.cat?`<span class="badge b-read">${b.cat}</span>`:''}${b.author?`<span style="font-size:.78rem;color:var(--muted)">${b.author}</span>`:''}${qs.length?`<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0">📖 ${qs.length}q</button>`:''}</div>`;
+    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${b.title}</span></div><div class="ecard-meta">${badge}${b.cat?`<span class="badge b-read">${b.cat}</span>`:''}${b.author?`<span style="font-size:.78rem;color:var(--muted)">${b.author}</span>`:''}${(qs.length||b.notes)?`<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0">📖 ${qs.length}q</button>`:''}</div>`;
     cards.appendChild(c);
   });
   tlBuild('read', books, readCfg);
@@ -647,7 +684,7 @@ function renderPlants() {
    HERO
 ══════════════════════════════════════════════════════════ */
 function updateHero() {
-  const { runs, books, plants } = DB;
+  const { runs, plants } = DB; const books = booksWithNotes();
   const mi = runs.reduce((s,r) => s+parseFloat(r.dist||0), 0);
   document.getElementById('h-miles').innerHTML = `${mi.toFixed(1)} <small style="font-size:.4em">mi</small>`;
   document.getElementById('h-runs').textContent = `${runs.length} race${runs.length!==1?'s':''} logged`;
@@ -672,15 +709,15 @@ function updateHero() {
    QUOTES MODAL
 ══════════════════════════════════════════════════════════ */
 function openQuotes(bookId) {
-  const b = DB.books.find(b => String(b.id) === String(bookId));
+  const b = booksWithNotes().find(b => String(b.id) === String(bookId));
   if (!b) return;
   const qs = parseQuotes(b.quotes);
-  if (!qs.length) { showBanner('No quotes for this book yet — add them in Sheets under the Quotes column, separated by |', 'info'); return; }
+  if (!qs.length && !b.notes) { showBanner('No quotes for this book yet — add them in Sheets under the Quotes column, separated by |', 'info'); return; }
   document.getElementById('qmodal')?.remove();
   const modal = document.createElement('div');
   modal.className = 'qmodal-overlay'; modal.id = 'qmodal';
   modal.innerHTML = `
-    <div class="qmodal" role="dialog" aria-modal="true">
+    <div class="qmodal${b.notes ? ' has-notes' : ''}" role="dialog" aria-modal="true">
       <div class="qmodal-head">
         <div>
           <div class="qmodal-title">${escHtml(b.title)}</div>
@@ -688,12 +725,96 @@ function openQuotes(bookId) {
         </div>
         <button class="qmodal-close" onclick="closeQuotes()">×</button>
       </div>
-      <div class="q-count">${qs.length} quote${qs.length!==1?'s':''}</div>
-      <div class="qmodal-body">${qs.map(q=>`<div class="q-item"><div class="q-text">${escHtml(q.content)}</div></div>`).join('')}</div>
+      ${b.notes ? `<input class="q-search" id="q-search" type="search" placeholder="Search these notes…" oninput="searchNotes(this.value)">` : ''}
+      <div class="q-count">${qs.length} quote${qs.length!==1?'s':''}${b.notes ? ' · full notes below' : ''}</div>
+      <div class="qmodal-body" id="qmodal-body">${qs.map(q=>`<div class="q-item"><div class="q-text">${escHtml(q.content)}</div></div>`).join('')}
+        ${b.notes ? `<div class="note-md" id="note-md"><span class="note-loading">Loading notes…</span></div>` : ''}
+      </div>
     </div>`;
   document.body.appendChild(modal);
   modal.addEventListener('click', e => { if (e.target===modal) closeQuotes(); });
   document.addEventListener('keydown', onModalKey);
+  if (b.notes) {
+    fetch(`notes/${encodeURIComponent(b.notes)}.md`, { cache: 'no-store' })
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(md => { const el = document.getElementById('note-md'); if (el) el.innerHTML = mdToHtml(md); })
+      .catch(() => { const el = document.getElementById('note-md'); if (el) el.innerHTML = '<span class="note-loading">Could not load notes.</span>'; });
+  }
+}
+
+/* Highlight matches in the open popup and jump to the first one */
+function searchNotes(q) {
+  const body = document.getElementById('qmodal-body'); if (!body) return;
+  body.querySelectorAll('mark').forEach(m => m.replaceWith(document.createTextNode(m.textContent)));
+  body.normalize();
+  q = q.trim(); if (q.length < 2) return;
+  const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+  const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  let first = null;
+  nodes.forEach(n => {
+    if (!re.test(n.nodeValue)) return; re.lastIndex = 0;
+    const frag = document.createDocumentFragment(); let last = 0;
+    n.nodeValue.replace(re, (m, i) => {
+      frag.appendChild(document.createTextNode(n.nodeValue.slice(last, i)));
+      const mk = document.createElement('mark'); mk.textContent = m; frag.appendChild(mk); first = first || mk;
+      last = i + m.length;
+    });
+    frag.appendChild(document.createTextNode(n.nodeValue.slice(last)));
+    n.replaceWith(frag);
+  });
+  first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+/* Small markdown renderer for notes: headings, lists, task lists,
+   tables, blockquotes, bold/italic/code/links. No external library. */
+function mdInline(t) {
+  return escHtml(t)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>')
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function mdToHtml(md) {
+  const lines = md.replace(/\r/g, '').split('\n');
+  let html = '', i = 0;
+  const listRe = /^(\s*)([-*]|\d+\.)\s+(.*)$/;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+    let m;
+    if ((m = line.match(/^(#{1,3})\s+(.*)$/))) { html += `<h${m[1].length}>${mdInline(m[2])}</h${m[1].length}>`; i++; continue; }
+    if (line.startsWith('>')) {
+      const buf = []; while (i < lines.length && lines[i].startsWith('>')) buf.push(lines[i++].replace(/^>\s?/, ''));
+      html += `<blockquote>${buf.map(mdInline).join('<br>')}</blockquote>`; continue;
+    }
+    if (line.trim().startsWith('|')) {
+      const rows = []; while (i < lines.length && lines[i].trim().startsWith('|')) rows.push(lines[i++].trim());
+      const cells = r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+      const body = rows.filter((r, k) => !(k === 1 && /^\|?\s*:?-+/.test(r)));
+      html += '<table><thead><tr>' + cells(body[0]).map(c => `<th>${mdInline(c)}</th>`).join('') + '</tr></thead><tbody>' +
+        body.slice(1).map(r => '<tr>' + cells(r).map(c => `<td>${mdInline(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+      continue;
+    }
+    if (listRe.test(line)) {
+      // nested lists by indentation
+      const stack = [];
+      while (i < lines.length && listRe.test(lines[i])) {
+        const [, ind, mark, text] = lines[i].match(listRe);
+        const depth = Math.floor(ind.length / 2), tag = /\d/.test(mark) ? 'ol' : 'ul';
+        while (stack.length > depth + 1) html += `</li></${stack.pop()}>`;
+        if (stack.length === depth + 1) html += '</li>'; else { html += `<${tag}>`; stack.push(tag); }
+        const task = text.match(/^\[( |x)\]\s+(.*)$/i);
+        html += task ? `<li class="task"><input type="checkbox" disabled ${task[1] !== ' ' ? 'checked' : ''}> ${mdInline(task[2])}` : `<li>${mdInline(text)}`;
+        i++;
+      }
+      while (stack.length) html += `</li></${stack.pop()}>`;
+      continue;
+    }
+    const buf = []; while (i < lines.length && lines[i].trim() && !/^(#|>|\||\s*([-*]|\d+\.)\s)/.test(lines[i])) buf.push(lines[i++]);
+    html += `<p>${buf.map(mdInline).join('<br>')}</p>`;
+  }
+  return html;
 }
 function closeQuotes() { document.getElementById('qmodal')?.remove(); document.removeEventListener('keydown', onModalKey); }
 function onModalKey(e) { if (e.key==='Escape') closeQuotes(); }
