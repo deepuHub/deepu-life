@@ -135,6 +135,27 @@
   .opt-list.read-only .opt-btn[disabled]{opacity:1;cursor:default}
 
   .symbol-row{display:flex;gap:0.8rem}
+  /* Drag-and-drop questions (Order / Match). Pointer events, so a finger on
+     the iPad works the same as a mouse; a tap-then-tap fallback also works. */
+  .dd-hint{font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem}
+  .order-list{display:flex;flex-direction:column;gap:0.5rem}
+  .dd-card{display:flex;align-items:center;gap:0.7rem;padding:0.8rem 1rem;border-radius:12px;
+    border:1.5px solid var(--border);background:var(--surface);font-weight:600;font-size:0.95rem;
+    cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;transition:border-color .12s,box-shadow .12s}
+  .dd-card .dd-num{flex:0 0 auto;width:1.7rem;height:1.7rem;border-radius:50%;display:inline-flex;align-items:center;
+    justify-content:center;background:var(--accent-dim);color:var(--accent);font-size:0.8rem}
+  .dd-card .dd-grip{margin-left:auto;color:var(--muted);font-size:1.1rem}
+  .dd-card.picked{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+  .dd-card.dragging{position:relative;z-index:20;box-shadow:0 10px 24px rgba(0,0,0,0.25);cursor:grabbing}
+  .dd-pool{display:flex;flex-wrap:wrap;gap:0.5rem;min-height:3.2rem;padding:0.6rem;border-radius:12px;
+    border:1.5px dashed var(--border);margin-bottom:0.8rem}
+  .dd-pool .dd-card,.dd-bucket .dd-card{padding:0.55rem 0.8rem;font-size:0.85rem}
+  .dd-buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.6rem}
+  .dd-bucket{border-radius:12px;border:2px solid var(--border);padding:0.5rem;min-height:5.5rem;display:flex;
+    flex-direction:column;gap:0.4rem;background:var(--bg)}
+  .dd-bucket.hot{border-color:var(--accent);background:var(--accent-dim)}
+  .dd-bucket-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+    padding:0.25rem 0.5rem;border-radius:8px;color:#fff;align-self:flex-start}
   .symbol-btn{flex:1;padding:1.4rem;border-radius:12px;border:1px solid var(--border);background:var(--surface2);
     font-size:2rem;font-weight:700;cursor:pointer;color:var(--text);transition:all .12s;min-height:80px}
   .symbol-btn.selected{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
@@ -306,7 +327,7 @@
       </div>
       <div class="chip-row" data-exam-subjects="ca2">
         <button class="big-chip" data-subject="ca2maths">🔢 Maths <small>Units 3 &amp; 9</small></button>
-        <button class="big-chip" disabled>💻 DL&amp;C <small>soon</small></button>
+        <button class="big-chip" data-subject="ca2dlc">💻 DL&amp;C <small>Be a designer</small></button>
         <button class="big-chip" disabled>📖 Marathi <small>soon</small></button>
         <button class="big-chip" disabled>🔤 English <small>soon</small></button>
         <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
@@ -452,6 +473,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1916905751&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=85477057&single=true&output=csv",
   },
+  ca2dlc: {
+    // TODO — publish "CA2_DLC_TestA_Regular" and "CA2_DLC_TestB_Harder" tabs
+    // to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ieo: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=413510104&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=2007406486&single=true&output=csv",
@@ -499,6 +526,9 @@ const TOPIC_EMOJI = {
   "Reading": "📖",
   "Spoken and Written Expression": "💬",
   "Achievers Section": "🏆",
+  "Efficient Algorithms": "⚡",
+  "Repetition in Tasks": "🔁",
+  "Multiple Algorithms": "🧩",
 };
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
@@ -538,7 +568,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", gk: "GK (IGKO)", ieo: "English (IEO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
@@ -690,7 +720,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
 });
 
 // ── EXAM RENDER ─────────────────────────────────────────────────────
+let ATTEMPT = 0;
 function buildQGrid() {
+  ATTEMPT++;
   const grid = document.getElementById('qgrid');
   grid.innerHTML = '';
   CURRENT_QUESTIONS.forEach((q, i) => {
@@ -765,7 +797,9 @@ function renderQuestion() {
   area.innerHTML = '';
   const saved = CURRENT_ANSWERS[CURRENT_INDEX];
 
-  if (q.type === 'MCQ' || q.type === 'True/False') {
+  if (q.type === 'Order') renderOrder(q, area);
+  else if (q.type === 'Match') renderMatch(q, area);
+  else if (q.type === 'MCQ' || q.type === 'True/False') {
     const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
     const wrap = document.createElement('div');
     wrap.className = 'opt-list' + (isOlympiad ? ' omr-style read-only' : '');
@@ -816,6 +850,124 @@ function renderQuestion() {
   syncOMRPanel();
 }
 
+// ── DRAG & DROP (Order / Match) ─────────────────────────────────────
+// Order: the sheet lists the options A–D in the CORRECT order (Correct
+// Answer "ABCD"); cards start shuffled and the answer is the letters in the
+// order the child leaves them. Match: each option is "item=Group"; chips are
+// dropped into group buckets and the answer is a JSON map of item → group.
+const SCRATCH_COLORS = { Events: '#e6a700', Motion: '#4c97ff', Looks: '#9966ff', Sound: '#cf63cf', Control: '#ffab19' };
+
+function shuffledFor(q, n) {
+  if (q._att !== ATTEMPT) {
+    let idx;
+    do { idx = shuffleArray([...Array(n).keys()]); } while (n > 1 && idx.every((v, k) => v === k));
+    q._att = ATTEMPT; q._shuffle = idx;
+  }
+  return q._shuffle;
+}
+
+// Pointer-based drag: moves the element with the finger/mouse, and on
+// release reports what it was dropped on. A plain tap calls onTap instead.
+function makeDraggable(el, { onDrop, onTap, onHover }) {
+  el.addEventListener('pointerdown', e => {
+    if (e.button !== undefined && e.button !== 0) return;
+    const sx = e.clientX, sy = e.clientY;
+    let dragging = false;
+    el.setPointerCapture(e.pointerId);
+    const under = (x, y) => { el.style.visibility = 'hidden'; const t = document.elementFromPoint(x, y); el.style.visibility = ''; return t; };
+    const move = ev => {
+      const dx = ev.clientX - sx, dy = ev.clientY - sy;
+      if (!dragging && Math.hypot(dx, dy) > 6) { dragging = true; el.classList.add('dragging'); }
+      if (dragging) { el.style.transform = `translate(${dx}px,${dy}px)`; onHover && onHover(under(ev.clientX, ev.clientY)); }
+    };
+    const up = ev => {
+      el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
+      el.classList.remove('dragging'); el.style.transform = '';
+      onHover && onHover(null);
+      if (dragging) onDrop(under(ev.clientX, ev.clientY)); else onTap();
+    };
+    el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  });
+}
+
+let DD_PICKED = null;  // tap-then-tap fallback: the card picked by the first tap
+
+function renderOrder(q, area) {
+  const i = CURRENT_INDEX;
+  const letters = q.options.map((_, k) => String.fromCharCode(65 + k));
+  let order = CURRENT_ANSWERS[i] ? CURRENT_ANSWERS[i].split('') : shuffledFor(q, letters.length).map(k => letters[k]);
+  const save = () => { CURRENT_ANSWERS[i] = order.join(''); DD_PICKED = null; renderQuestion(); };
+  area.innerHTML = '<div class="dd-hint">✋ Drag the cards into the right order (or tap one card, then tap where it should go).</div>';
+  const list = document.createElement('div'); list.className = 'order-list';
+  order.forEach((L, pos) => {
+    const card = document.createElement('div');
+    card.className = 'dd-card' + (DD_PICKED === L ? ' picked' : '');
+    card.dataset.letter = L;
+    card.innerHTML = `<span class="dd-num">${pos + 1}</span><span>${q.options[L.charCodeAt(0) - 65]}</span><span class="dd-grip">⠿</span>`;
+    const moveTo = target => {
+      const t = target && target.closest('.dd-card');
+      if (!t || t === card) return;
+      order.splice(order.indexOf(L), 1);
+      order.splice([...list.children].indexOf(t), 0, L);
+      save();
+    };
+    makeDraggable(card, {
+      onDrop: moveTo,
+      onTap: () => {
+        if (DD_PICKED && DD_PICKED !== L) { const t = list.querySelector(`[data-letter="${DD_PICKED}"]`); const from = DD_PICKED; DD_PICKED = null; order.splice(order.indexOf(from), 1); order.splice([...list.children].indexOf(card), 0, from); save(); }
+        else { DD_PICKED = DD_PICKED === L ? null : L; renderQuestion(); }
+      },
+    });
+    list.appendChild(card);
+  });
+  area.appendChild(list);
+}
+
+function parseMatch(q) {
+  const items = q.options.map(o => { const k = o.lastIndexOf('='); return { text: o.slice(0, k).trim(), group: o.slice(k + 1).trim() }; });
+  const groups = [...new Set(items.map(it => it.group))];
+  return { items, groups };
+}
+
+function renderMatch(q, area) {
+  const i = CURRENT_INDEX;
+  const { items, groups } = parseMatch(q);
+  let placed = {};
+  try { placed = JSON.parse(CURRENT_ANSWERS[i] || '{}'); } catch (e) {}
+  const save = () => { CURRENT_ANSWERS[i] = Object.keys(placed).length ? JSON.stringify(placed) : ''; DD_PICKED = null; renderQuestion(); };
+  const assign = (k, target) => {
+    const b = target && target.closest('[data-group]');
+    if (!b) return false;
+    if (b.dataset.group === '') delete placed[k]; else placed[k] = b.dataset.group;
+    save(); return true;
+  };
+  area.innerHTML = '<div class="dd-hint">✋ Drag each card into the right box (or tap a card, then tap a box).</div>';
+  const pool = document.createElement('div'); pool.className = 'dd-pool'; pool.dataset.group = '';
+  const buckets = document.createElement('div'); buckets.className = 'dd-buckets';
+  const bucketEls = {};
+  groups.forEach(g => {
+    const b = document.createElement('div'); b.className = 'dd-bucket'; b.dataset.group = g;
+    b.innerHTML = `<span class="dd-bucket-title" style="background:${SCRATCH_COLORS[g] || 'var(--accent)'}">${g}</span>`;
+    b.addEventListener('click', e => { if (DD_PICKED !== null && !e.target.closest('.dd-card')) assign(DD_PICKED, b); });
+    bucketEls[g] = b; buckets.appendChild(b);
+  });
+  pool.addEventListener('click', e => { if (DD_PICKED !== null && !e.target.closest('.dd-card')) assign(DD_PICKED, pool); });
+  const hover = t => { Object.values(bucketEls).forEach(b => b.classList.toggle('hot', !!t && t.closest('.dd-bucket') === b)); };
+  shuffledFor(q, items.length).forEach(k => {
+    const chip = document.createElement('div');
+    chip.className = 'dd-card' + (DD_PICKED === String(k) ? ' picked' : '');
+    chip.textContent = items[k].text;
+    makeDraggable(chip, {
+      onHover: hover,
+      onDrop: t => assign(String(k), t),
+      onTap: () => { DD_PICKED = DD_PICKED === String(k) ? null : String(k); renderQuestion(); },
+    });
+    (placed[k] && bucketEls[placed[k]] ? bucketEls[placed[k]] : pool).appendChild(chip);
+  });
+  if (!pool.children.length) pool.innerHTML = '<span class="dd-hint" style="margin:0">All placed ✔ — drag a card back here to change it.</span>';
+  area.appendChild(pool); area.appendChild(buckets);
+}
+
 document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
 document.getElementById('next-btn').addEventListener('click', () => { if (CURRENT_INDEX < CURRENT_QUESTIONS.length - 1) { CURRENT_INDEX++; renderQuestion(); } });
 document.getElementById('submit-btn').addEventListener('click', submitExam);
@@ -840,7 +992,20 @@ function submitExam() {
     let given = CURRENT_ANSWERS[i] || '';
     let correctDisplay = q.correct;
     let isCorrect;
-    if (q.type === 'MCQ' || q.type === 'True/False') {
+    if (q.type === 'Order') {
+      const txt = seq => seq.split('').map(L => q.options[L.charCodeAt(0) - 65]).join(' → ');
+      const want = q.options.map((_, k) => String.fromCharCode(65 + k)).join('');
+      isCorrect = given === want;
+      correctDisplay = txt(want);
+      given = given ? txt(given) : '(not moved)';
+    } else if (q.type === 'Match') {
+      const { items } = parseMatch(q);
+      let placed = {};
+      try { placed = JSON.parse(given || '{}'); } catch (e) {}
+      isCorrect = items.every((it, k) => placed[k] === it.group);
+      correctDisplay = items.map(it => `${it.text} → ${it.group}`).join(' · ');
+      given = Object.keys(placed).length ? items.map((it, k) => `${it.text} → ${placed[k] || '?'}`).join(' · ') : '(no answer)';
+    } else if (q.type === 'MCQ' || q.type === 'True/False') {
       // "Correct Answer" is usually a letter (A/B/C/D), but some sheets
       // (e.g. GK/IGKO) store the full option text instead — support both.
       const LETTER_IDX = { A: 0, B: 1, C: 2, D: 3 };
