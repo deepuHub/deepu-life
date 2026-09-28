@@ -1551,6 +1551,21 @@ function confettiPiecesHTML(n) {
 // that hasn't finished yet. A row with no subject renders as "No exam scheduled".
 const EXAM_SETS = [
   {
+    name: 'SA1',
+    title: 'First Term Summative Assessment (SA1)',
+    note: 'Circular 2026/27/PY/CIR016 (28 Sep 2026). Revision sessions follow each paper.',
+    rows: [
+      { date: '2026-10-26', day: 'Monday',    time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'English', topic: "Unit 1 — Story writing with Roald Dahl: stories with a familiar setting, articles, speech marks, write a story with beginning, middle, end · Unit 2 — Let's Have a Party: compound words, instructional text · Unit 3 — Poems from around the world: suffix -ing, -ed, onomatopoeia · Unit 9 — Laughing Allowed: homonyms, alliteration, verb tense, noun phrase, limericks, calligram" },
+      { date: '2026-10-27', day: 'Tuesday',   time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'DL&C', topic: 'Unit 1 — Making programs clear: follow, understand, edit and correct algorithms, resetting objects · Unit 2 — Hardware and software work together: a working system, hardware and software roles, manual and automatic input devices, identifying problems · Unit 3 — Be a data expert: discrete data · Unit 5 — Networks are everywhere: computing devices, networks around us, services on a network, advantages and disadvantages of networks' },
+      { date: '2026-10-28', day: 'Wednesday', time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Hindi', topic: 'Matra — अ to ऐ: word formation, identifying the matra, making different words, picture identification, fill in the blanks' },
+      { date: '2026-10-29', day: 'Thursday',  time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Science', topic: 'Unit 1 — Plants are living things: 1.1 Alive or not alive, 1.2 Plant parts, 1.3 Plants and light, 1.4 Plants need water and the right temperature · Unit 4 — Staying Alive: 4.1 Human organs, 4.2 Animal groups and life cycles, 4.3 Food chains, 4.4 Fossils · Unit 5 — Forces and Magnets: 5.1 Forces and forcemeters, 5.2 Gravity, 5.3 Friction, 5.4 Amazing magnets, 5.5 Magnetic materials' },
+      { date: '2026-10-30', day: 'Friday',    time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Marathi', topic: 'Lessons 6–10 — उ, ऊ, ऋ, ए, ऐ ची मात्रा: write the words in English and in Marathi, name the pictures, complete the words, rearrange letters into words, match the columns' },
+      { date: '2026-10-31', day: 'Saturday',  weekend: true },
+      { date: '2026-11-01', day: 'Sunday',    weekend: true },
+      { date: '2026-11-02', day: 'Monday',    time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Mathematics', topic: 'Unit 1 — Numbers to 1000: 1.1–1.3 · Unit 3 — Addition, subtraction and money: 3.1–3.3 · Unit 5 — Multiplication and division: 5.1 Exploring, 5.2 Connecting 2×, 4×, 8×, 5.3 Connecting 3×, 6×, 9× · Unit 9 — More addition and subtraction: 9.1–9.3 · Unit 11 — More multiplication and division: 11.1–11.3 · Unit 17 — Pattern and symmetry: 17.1–17.2' },
+    ],
+  },
+  {
     name: 'CA2',
     title: 'Formal CA2 Exam Schedule',
     rows: [
@@ -1628,7 +1643,7 @@ function renderTimeline() {
     html += `<div class="exam-row examday" style="margin-bottom:14px;">
       <span class="exam-row-badge">📝 ${exam.set.name}</span>
       <div class="exam-row-info">
-        <span class="exam-row-subject">${exam.row.subject} exam today</span>
+        <span class="exam-row-subject">${exam.row.subject} exam today${exam.row.time ? ` <span class="exam-row-topic">· ${exam.row.time}</span>` : ''}</span>
         <span class="exam-row-topic">${exam.row.topic}</span>
       </div>
     </div>`;
@@ -2148,7 +2163,7 @@ function renderExamSchedule() {
           <span class="exam-row-badge">📝 Exam</span>
           <span class="exam-row-date">${dateLabel}</span>
           <div class="exam-row-info">
-            <span class="exam-row-subject">${row.subject}</span>
+            <span class="exam-row-subject">${row.subject}${row.time ? ` <span class="exam-row-topic">· ${row.time}</span>` : ''}</span>
             <span class="exam-row-topic">${row.topic}</span>
           </div>
         </div>`;
@@ -2156,7 +2171,9 @@ function renderExamSchedule() {
         html += `<div class="exam-row blank"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">No exam scheduled</span></div>`;
       }
     });
-    html += '</div></div>';
+    html += '</div>';
+    if (set.note) html += `<div class="cal-empty" style="margin-top:8px;">${set.note}</div>`;
+    html += '</div>';
     if (set === EXAM_SETS[0]) html += olympiadScheduleHTML(todayStr);
   });
   wrap.innerHTML = html;
