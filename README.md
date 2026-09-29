@@ -15,7 +15,7 @@
 | 💬 Quotes (`quotes.html`) | Saved quotes, reads from a Sheet | Public |
 | 🏫 School (`2026_school.html`) | School timings, food timetable, exam countdown | Public |
 | 🏅 Half Marathon (`half-marathon.html`) | Training plan with live race-day countdown | Public |
-| 🧮 Exams (`exam.html`) | Touch-friendly practice tests, Regular/Hulk-mode Harder, reads from a Sheet, auto-scores | Public |
+| 🧮 Exams (`exam.html`) | Touch-friendly practice tests, Regular / Harder (Iron Man or Hulk mode, switchable on the picker), reads from a Sheet, auto-scores | Public |
 | 🎒 Kid (`kid-private.html`) | Report cards by grade/term + Continuous Assessment (CA) results, chip navigation | Private — Google Sign-In |
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |

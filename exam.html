@@ -27,6 +27,8 @@
   :root[data-theme="light"] [data-hero="cap"]{ --accent:#1b2a68; --accent-dim:#e7ecff; }
   [data-hero="hulk"]{ --accent:#4ade52; --accent-dim:rgba(74,222,82,.16); --hero-glow:#b34dff; }
   :root[data-theme="light"] [data-hero="hulk"]{ --accent:#2e7d32; --accent-dim:#e3ffd6; }
+  [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
+  :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
 
   .hero-badge{
     width:64px;height:64px;border-radius:50%;margin-bottom:0.9rem;display:flex;align-items:center;
@@ -41,6 +43,20 @@
     background:radial-gradient(circle,#7cff3f 0%,#2e7d32 75%);
     animation:hero-smash 1.5s cubic-bezier(.36,.07,.19,.97) infinite;
   }
+  /* Iron Man: helmet hovering on repulsor thrust (arc-reactor blue glow below) */
+  [data-hero="ironman"] .hero-badge{
+    background:radial-gradient(circle at 50% 40%,#1d3b63 0%,#0a1428 78%);
+    box-shadow:0 0 22px 5px var(--hero-glow),0 0 0 3px #f5c542,0 4px 14px rgba(0,0,0,.25);
+    animation:hero-hover 2.4s ease-in-out infinite;
+  }
+  [data-hero="ironman"] .hero-badge svg{width:46px;height:46px;display:block}
+  [data-hero="ironman"] .hero-badge::after{
+    content:'';position:absolute;left:50%;bottom:-16px;width:26px;height:9px;margin-left:-13px;border-radius:50%;
+    background:radial-gradient(ellipse,#bff9ff 0%,#3ff0ff 45%,transparent 75%);filter:blur(1.5px);
+    animation:hero-thrust .5s ease-in-out infinite alternate;
+  }
+  @keyframes hero-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes hero-thrust{from{opacity:.55;transform:scaleX(.8)}to{opacity:1;transform:scaleX(1.15)}}
   @keyframes hero-spin{to{transform:rotate(360deg)}}
   @keyframes hero-smash{
     0%,55%,100%{transform:scale(1) rotate(0)}
@@ -236,6 +252,17 @@
   }
   .firework-particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:600}
 
+  /* Iron Man fly-by after a finished test */
+  .flyby{position:fixed;left:0;top:0;z-index:650;pointer-events:none;will-change:transform}
+  .flyby svg{width:84px;height:84px;display:block;filter:drop-shadow(0 0 14px #ff2d3d)}
+  .flyby-trail{position:absolute;right:56px;top:34px;width:260px;height:14px;border-radius:14px;
+    transform-origin:100% 50%;background:linear-gradient(270deg,#fff 0%,#3ff0ff 25%,rgba(63,240,255,0) 100%);
+    filter:blur(1.5px) drop-shadow(0 0 8px #3ff0ff)}
+  .theme-switch{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;font-size:0.78rem;color:var(--muted)}
+  .theme-switch button{border:1.5px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;
+    padding:0.4rem 0.85rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Epilogue',sans-serif;min-height:38px}
+  .theme-switch button.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+
   .hero-speech-bubble{
     position:fixed;top:34%;left:50%;transform:translate(-50%,-50%) scale(0.3);
     background:#fff;color:#0a0f0d;padding:1.1rem 1.5rem;border-radius:22px;
@@ -354,7 +381,13 @@
       <div class="picker-label">Test</div>
       <div class="chip-row" id="test-chips">
         <button class="big-chip active" data-test="Test A - Regular" data-hero="cap">🛡️ Regular <small>Captain America mode</small></button>
-        <button class="big-chip" data-test="Test B - Harder" data-hero="hulk">👊 Harder <small>Hulk SMASH mode</small></button>
+        <button class="big-chip" id="harder-chip" data-test="Test B - Harder" data-hero="ironman">🦾 Harder <small>Iron Man flight mode</small></button>
+      </div>
+      <!-- Which superhero the Harder test wears. Remembered on this device. -->
+      <div class="theme-switch" id="harder-theme-switch">
+        <span>Harder mode:</span>
+        <button type="button" data-harder="ironman">🦾 Iron Man</button>
+        <button type="button" data-harder="hulk">👊 Hulk</button>
       </div>
     </div>
 
@@ -549,6 +582,15 @@ const TOPIC_EMOJI = {
   "Make New Words": "✨",
 };
 
+// Iron Man helmet — red shell, gold faceplate, glowing eyes.
+const IRONMAN_HELMET_SVG = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M32 3C19 3 9 12 9 27v14c0 9 7 17 23 20 16-3 23-11 23-20V27C55 12 45 3 32 3z" fill="#c8102e" stroke="#6d0a1a" stroke-width="1.5"/>
+  <path d="M32 3v15" stroke="#f5c542" stroke-width="3" stroke-linecap="round"/>
+  <path d="M17 20h30l-2 24c-1 6-7 11-13 12-6-1-12-6-13-12z" fill="#f5c542" stroke="#b8860b" stroke-width="1.5"/>
+  <path d="M20 27l9 2.5-.5 4.5-8-2z M44 27l-9 2.5.5 4.5 8-2z" fill="#eaffff" stroke="#7fefff" stroke-width="1"/>
+  <path d="M22 40l6 4M42 40l-6 4M28 49h8M29 52h6" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+</svg>`;
+
 // Each test wears a hero identity — badge, tag line, headline and confetti
 // colors all switch together. Add more entries here as more tests show up.
 const HERO_THEME = {
@@ -566,7 +608,7 @@ const HERO_THEME = {
     voicePitch: 1.0, voiceRate: 0.9,
   },
   hulk: {
-    badge: "👊", tag: "Hulk SMASH Mode",
+    badge: "👊", chip: "👊 Harder", chipSub: "Hulk SMASH mode", tag: "Hulk SMASH Mode",
     title: "SMASH this test!",
     sub: "The harder test — trickier numbers, bigger brain muscles. Hulk believes in you.",
     confetti: ["#4ade52", "#b34dff", "#0f1c0d"],
@@ -575,7 +617,54 @@ const HERO_THEME = {
     bubbleText: "YOU SMASHED IT!! 💪",
     voicePitch: 0.45, voiceRate: 0.75,
   },
+  // Iron Man — the Harder test can wear this instead of Hulk (see
+  // HARDER_HERO below). `finish` gives a line about FLYING for every score
+  // band; it is shown on the results screen, spoken, and put in the bubble.
+  ironman: {
+    badge: "🦾", badgeHTML: IRONMAN_HELMET_SVG,
+    chip: "🦾 Harder", chipSub: "Iron Man flight mode",
+    tag: "Iron Man Flight Mode",
+    title: "Suit up and FLY this test!",
+    sub: "The harder test — trickier questions, higher altitude. Repulsors charged, Jarvis is ready. Let's fly.",
+    confetti: ["#c8102e", "#f5c542", "#3ff0ff"],
+    cheer: "Iron Man says: you FLEW this exam! 🚀",
+    voiceLine: "Jarvis, log it. Perfect flight. You flew that exam like a champion!",
+    bubbleText: "YOU FLEW THIS EXAM! 🚀",
+    voicePitch: 0.85, voiceRate: 1.0,
+    finish: [
+      { min: 100, text: "PERFECT FLIGHT! You didn't just take that test — you FLEW it! 🚀",
+        say: "Jarvis, log it. Perfect flight. You flew that exam like a champion!", bubble: "PERFECT FLIGHT! YOU FLEW IT! 🚀" },
+      { min: 90, text: "You flew this exam! Repulsors at full power! 🚀",
+        say: "Nice flying! You flew right through that exam!", bubble: "YOU FLEW THIS EXAM! 🚀" },
+      { min: 70, text: "Good flight! A little more thrust and you'll fly even higher. 🦾",
+        say: "Good flight, pilot. A little more thrust and next time we fly even higher!", bubble: "GOOD FLIGHT — FLY HIGHER NEXT TIME! 🦾" },
+      { min: 0, text: "Even Iron Man crashes before he learns to fly. Check the misses, then take off again! 🔧",
+        say: "Every pilot crashes before they learn to fly. Fix the flaws, and take off again!", bubble: "TAKE OFF AGAIN! 🔧" },
+    ],
+  },
 };
+
+// Which hero the "Harder" test wears — switchable from the picker (the
+// toggle under the Test chips) and remembered on this device. Hulk's theme
+// is all still here; flip the toggle to bring him back.
+const HARDER_KEY = 'deepu-exam-harder-hero';
+let HARDER_HERO = 'ironman';
+try { const v = localStorage.getItem(HARDER_KEY); if (v && HERO_THEME[v] && v !== 'cap') HARDER_HERO = v; } catch (e) {}
+function applyHarderHero() {
+  const h = HERO_THEME[HARDER_HERO];
+  const chip = document.getElementById('harder-chip');
+  chip.dataset.hero = HARDER_HERO;
+  chip.innerHTML = `${h.chip || '👊 Harder'} <small>${h.chipSub || h.tag}</small>`;
+  document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => b.classList.toggle('active', b.dataset.harder === HARDER_HERO));
+  if (CURRENT_TEST === 'Test B - Harder') { CURRENT_HERO = HARDER_HERO; updateHeroUI(); }
+}
+document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => {
+  b.addEventListener('click', () => {
+    HARDER_HERO = b.dataset.harder;
+    try { localStorage.setItem(HARDER_KEY, HARDER_HERO); } catch (e) {}
+    applyHarderHero();
+  });
+});
 
 let CURRENT_QUESTIONS = [];
 let CURRENT_EXAM = "ca2";
@@ -599,7 +688,8 @@ function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_S
 function updateHeroUI() {
   const h = HERO_THEME[CURRENT_HERO];
   document.getElementById('page-root').setAttribute('data-hero', CURRENT_HERO);
-  document.getElementById('hero-badge').textContent = h.badge;
+  const badgeEl = document.getElementById('hero-badge');
+  if (h.badgeHTML) badgeEl.innerHTML = h.badgeHTML; else badgeEl.textContent = h.badge;
   document.getElementById('hero-tag').textContent = h.tag;
   const titleEl = document.getElementById('hero-title');
   const subEl = document.getElementById('hero-sub');
@@ -694,6 +784,7 @@ document.querySelectorAll('#subject-picker .big-chip[data-subject]').forEach(btn
   btn.addEventListener('click', () => selectSubject(btn));
 });
 selectExam(CURRENT_EXAM);
+applyHarderHero();
 
 document.querySelectorAll('#test-chips .big-chip').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1061,9 +1152,14 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
   const pct = Math.round((scored / maxScore) * 100);
   document.getElementById('score-big').textContent = `${scored}/${maxScore}`;
   const emojiEl = document.getElementById('score-emoji');
-  emojiEl.textContent = pct === 100 ? '🏆' : pct >= 90 ? '🎉' : pct >= 70 ? '👍' : '💪';
+  // Heroes with a `finish` table (Iron Man) get a line — about flying — for
+  // EVERY score band, spoken and shown; others keep the classic behaviour.
+  const fin = (HERO_THEME[CURRENT_HERO].finish || []).find(f => pct >= f.min) || null;
+  emojiEl.textContent = fin ? (pct === 100 ? '🏆' : pct >= 90 ? '🚀' : pct >= 70 ? '🦾' : '🔧')
+    : pct === 100 ? '🏆' : pct >= 90 ? '🎉' : pct >= 70 ? '👍' : '💪';
   emojiEl.classList.toggle('perfect', pct === 100);
-  const heroLine = pct === 100 ? `PERFECT SCORE! ${HERO_THEME[CURRENT_HERO].cheer}`
+  const heroLine = fin ? fin.text
+    : pct === 100 ? `PERFECT SCORE! ${HERO_THEME[CURRENT_HERO].cheer}`
     : pct >= 90 ? HERO_THEME[CURRENT_HERO].cheer
     : pct >= 70 ? 'Solid effort!' : 'Keep practicing — you\'ll get there!';
   document.getElementById('score-sub').textContent =
@@ -1088,8 +1184,46 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
     list.appendChild(item);
   });
 
-  if (pct === 100) { fireConfetti(); firePerfectScoreShow(); }
+  // Speech has to start synchronously inside the tap that submitted (iOS).
+  if (fin) { fireFlyby(pct >= 90 ? 2 : 1); fireHeroVoiceLine(fin.say, fin.bubble); }
+  if (pct === 100) { fireConfetti(); firePerfectScoreShow(!!fin); }
   else if (pct >= 90) { fireConfetti(); }
+}
+
+// ── Iron Man fly-by: the helmet streaks across the screen on a cyan
+//    repulsor trail, with a whoosh. `passes` = how many times he flies by. ──
+function playWhoosh() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx(), now = ctx.currentTime, len = 0.9;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / d.length);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2.2;
+    bp.frequency.setValueAtTime(300, now); bp.frequency.exponentialRampToValueAtTime(3200, now + len);
+    const g = ctx.createGain(); g.gain.value = 0.5;
+    src.connect(bp).connect(g).connect(ctx.destination); src.start(now);
+    setTimeout(() => ctx.close(), 1300);
+  } catch (e) { /* no Web Audio — the visuals still fly */ }
+}
+
+function fireFlyby(passes) {
+  playWhoosh();
+  const W = window.innerWidth, H = window.innerHeight;
+  for (let n = 0; n < passes; n++) {
+    const el = document.createElement('div');
+    el.className = 'flyby';
+    el.innerHTML = `<div class="flyby-trail"></div>${IRONMAN_HELMET_SVG}`;
+    const y0 = H * (n ? 0.85 : 0.72), y1 = H * (n ? 0.3 : 0.08);
+    const x0 = -300, x1 = W + 120;
+    el.querySelector('.flyby-trail').style.transform = `rotate(${Math.atan2(y1 - y0, x1 - x0) * 180 / Math.PI}deg)`;
+    document.body.appendChild(el);
+    el.animate(
+      [{ transform: `translate(${x0}px, ${y0}px)` }, { transform: `translate(${x1}px, ${y1}px)` }],
+      { duration: 1500, delay: n * 700, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'both' }
+    ).onfinish = () => el.remove();
+  }
 }
 
 function fireConfetti() {
@@ -1153,12 +1287,12 @@ function playImpactBoom() {
 //    setTimeout callback, since it's no longer "inside" the user gesture.
 //    The bubble is pure visual, so it's fine to stagger via animate()'s
 //    own delay option instead of a setTimeout. ──
-function fireHeroVoiceLine() {
+function fireHeroVoiceLine(say, bubbleText) {
   const h = HERO_THEME[CURRENT_HERO];
 
   const bubble = document.createElement('div');
   bubble.className = 'hero-speech-bubble';
-  bubble.textContent = h.bubbleText;
+  bubble.textContent = bubbleText || h.bubbleText;
   document.body.appendChild(bubble);
   bubble.animate(
     [
@@ -1172,7 +1306,7 @@ function fireHeroVoiceLine() {
 
   try {
     if (!('speechSynthesis' in window)) return;
-    const utter = new SpeechSynthesisUtterance(h.voiceLine);
+    const utter = new SpeechSynthesisUtterance(say || h.voiceLine);
     utter.pitch = h.voicePitch;
     utter.rate = h.voiceRate;
     utter.volume = 1;
@@ -1186,7 +1320,7 @@ function fireHeroVoiceLine() {
 }
 
 // ── PERFECT SCORE: fireworks + laser show ────────────────────────────
-function firePerfectScoreShow() {
+function firePerfectScoreShow(voiceAlreadyFired) {
   playImpactBoom();
 
   // white screen flash for impact
@@ -1201,7 +1335,7 @@ function firePerfectScoreShow() {
   // Called synchronously (not setTimeout) so speechSynthesis.speak() still
   // counts as user-gesture-triggered on iOS Safari; the bubble's own
   // animation delay handles staggering it after the PERFECT SCORE banner.
-  fireHeroVoiceLine();
+  if (!voiceAlreadyFired) fireHeroVoiceLine();
 
   // big banner text, themed to whichever hero is active
   const banner = document.createElement('div');
