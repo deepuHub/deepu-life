@@ -822,6 +822,7 @@ function shuffleArray(arr) {
 }
 
 document.getElementById('start-btn').addEventListener('click', async () => {
+  PERFECT_AUDIO.pause(); AFTER_VOICE = null;  // stop a still-playing recording
   const btn = document.getElementById('start-btn');
   btn.textContent = 'Loading…'; btn.disabled = true;
   try {
@@ -1097,7 +1098,35 @@ document.getElementById('submit-btn').addEventListener('click', submitExam);
 // ── GRADING ─────────────────────────────────────────────────────────
 function normalize(v) { return String(v || '').trim().toLowerCase().replace(/\s+/g, ' '); }
 
+// ── PERFECT-SCORE RECORDING ─────────────────────────────────────────
+// A family voice recording that plays on a 100%, right after the hero's
+// text-to-speech line. iOS only lets audio play from a tap, so the Submit tap
+// "unlocks" it (a silent play/pause) and the real play happens seconds later.
+const PERFECT_AUDIO = new Audio('assets/audio/perfect-score.m4a');
+PERFECT_AUDIO.preload = 'auto';
+let PERFECT_AUDIO_UNLOCKED = false;
+let AFTER_VOICE = null;  // set on a perfect score; run once when speech ends
+
+function unlockPerfectAudio() {
+  if (PERFECT_AUDIO_UNLOCKED) return;
+  PERFECT_AUDIO.muted = true;
+  const p = PERFECT_AUDIO.play();
+  const done = () => { PERFECT_AUDIO.pause(); PERFECT_AUDIO.currentTime = 0; PERFECT_AUDIO.muted = false; };
+  if (p && p.then) p.then(() => { PERFECT_AUDIO_UNLOCKED = true; done(); }).catch(done);
+  else done();
+}
+
+function playPerfectRecording() {
+  try { PERFECT_AUDIO.muted = false; PERFECT_AUDIO.currentTime = 0; PERFECT_AUDIO.play().catch(() => {}); } catch (e) {}
+}
+
+function runAfterVoice() {
+  const f = AFTER_VOICE; AFTER_VOICE = null;
+  if (f) f();
+}
+
 function submitExam() {
+  unlockPerfectAudio();
   const unanswered = CURRENT_QUESTIONS.filter((_, i) => !CURRENT_ANSWERS[i]).length;
   if (unanswered > 0 && !confirm(`${unanswered} question(s) still unanswered. Submit anyway?`)) return;
 
@@ -1194,6 +1223,9 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
     list.appendChild(item);
   });
 
+  // On a 100%, the family recording follows whichever voice line plays.
+  // Safety net: if the device never reports the speech ending, play anyway.
+  if (pct === 100) { AFTER_VOICE = playPerfectRecording; setTimeout(runAfterVoice, 9000); }
   // Speech has to start synchronously inside the tap that submitted (iOS).
   if (fin) { fireFlyby(pct >= 90 ? 2 : 1); fireHeroVoiceLine(fin.say, fin.bubble); }
   if (pct === 100) { fireConfetti(); firePerfectScoreShow(!!fin); }
@@ -1315,8 +1347,10 @@ function fireHeroVoiceLine(say, bubbleText) {
   ).onfinish = () => bubble.remove();
 
   try {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window)) { setTimeout(runAfterVoice, 2500); return; }
     const utter = new SpeechSynthesisUtterance(say || h.voiceLine);
+    utter.onend = () => setTimeout(runAfterVoice, 300);
+    utter.onerror = () => setTimeout(runAfterVoice, 300);
     utter.pitch = h.voicePitch;
     utter.rate = h.voiceRate;
     utter.volume = 1;
@@ -1326,7 +1360,7 @@ function fireHeroVoiceLine(say, bubbleText) {
     if (enVoice) utter.voice = enVoice;
     window.speechSynthesis.cancel(); // clear any queued speech first
     window.speechSynthesis.speak(utter);
-  } catch (e) { /* speech unsupported — bubble text still lands the joke */ }
+  } catch (e) { setTimeout(runAfterVoice, 2500); /* speech unsupported — bubble text still lands the joke */ }
 }
 
 // ── PERFECT SCORE: fireworks + laser show ────────────────────────────
@@ -1459,6 +1493,7 @@ function renderHistory() {
 
 // ── RESET / RETAKE ──────────────────────────────────────────────────
 document.getElementById('retake-btn').addEventListener('click', () => {
+  PERFECT_AUDIO.pause(); AFTER_VOICE = null;  // stop a still-playing recording
   CURRENT_QUESTIONS = shuffleArray(CURRENT_QUESTIONS);
   CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
   document.getElementById('results-view').style.display = 'none';
