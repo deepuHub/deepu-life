@@ -28,6 +28,8 @@ function doGet(e) {
       plants:  sheetToObjects(ss.getSheetByName('Plants')),
       cycling: sheetToObjects(ss.getSheetByName('Rides'), { cleanRide: true }),
       plan:    sheetToObjects(ss.getSheetByName('Plan')),
+      // tab name → gid, so each page's "Add in Sheets" button opens its own tab
+      gids:    Object.fromEntries(ss.getSheets().map(s => [s.getName(), s.getSheetId()])),
     });
   } catch (err) {
     return respond({ error: err.message });

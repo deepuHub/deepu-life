@@ -10,7 +10,8 @@
 
 | Page | What it is | Access |
 |---|---|---|
-| 🏃 Tracker (`index.html`) | Run / Read / Cycle logs, hero stats, cinematic timeline | Public |
+| 🏠 Home (`index.html`) | Static launcher: a card for every page (built from `assets/js/nav.js`), no network calls; Run / Read / Cycle / Half Marathon cards show figures saved in this browser | Public |
+| 🏃 Run · 📚 Read · 🚴 Cycle (`run.html`, `read.html`, `cycle.html`) | One page per activity: log, stats, cinematic timeline | Public |
 | ✅ To-Do (`todo.html`) | Checklists, local-only storage | Public |
 | 💬 Quotes (`quotes.html`) | Saved quotes, reads from a Sheet | Public |
 | 🏫 School (`2026_school.html`) | School timings, food timetable, exam countdown | Public |
@@ -31,7 +32,7 @@ Private pages render nothing until Google authenticates the one account with acc
 
 ## How it works
 
-**Public tracker** — one shared Google Sheet + one Apps Script web app (`AppScript.gs`), read by `index.html`, `quotes.html`, and `half-marathon.html`:
+**Public tracker** — one shared Google Sheet + one Apps Script web app (`AppScript.gs`), read by `index.html`, `run.html`, `read.html`, `cycle.html`, `quotes.html`, and `half-marathon.html` (shared fetch + helpers in `assets/js/activity.js`):
 
 ```
 Google Sheets  →  Apps Script Web App (doGet)  →  site fetches JSON
@@ -197,7 +198,8 @@ A sync must never clobber a `status` set by hand on the page, same rule as the S
 
 ```
 deepu-life/
-├── index.html              ← tracker app (Run/Read/Cycle)
+├── index.html              ← home: Run/Read/Cycle overview
+├── run.html / read.html / cycle.html ← one page per activity (Runs / Books / Rides tabs)
 ├── todo.html                ← to-do list
 ├── quotes.html               ← saved quotes, reads from a Sheet
 ├── 2026_school.html          ← school timings & food timetable (standalone theme)

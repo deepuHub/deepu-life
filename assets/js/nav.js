@@ -9,36 +9,29 @@
 ═══════════════════════════════════════════════════════════════════ */
 (() => {
   const LINKS = [
-    { key: 'index',    href: 'index.html',                 icon: '🏃', label: 'Tracker',       group: 'public' },
-    { key: 'todo',     href: 'todo.html',                   icon: '✅', label: 'To-Do',         group: 'public' },
-    { key: 'quotes',   href: 'quotes.html',                 icon: '💬', label: 'Quotes',        group: 'public' },
-    { key: 'school',   href: '2026_school.html',            icon: '🏫', label: 'School',        group: 'public' },
-    { key: 'exam',     href: 'exam.html',                   icon: '🧮', label: 'Exams',         group: 'public' },
-    { key: 'marathon', href: 'half-marathon.html',          icon: '🏅', label: 'Half Marathon', group: 'public' },
-    { key: 'embers',   href: 'embers-tides-private.html',   icon: '🔥', label: 'Embers',        group: 'public' },
-    { key: 'kid',      href: 'kid-private.html',            icon: '🎒', label: 'Kid',           group: 'private' },
-    { key: 'health',   href: 'health-private.html',         icon: '🩺', label: 'Health',        group: 'private' },
-    { key: 'results',  href: 'results-private.html',        icon: '🎓', label: 'BEd Results',   group: 'private' },
-    { key: 'apple',    href: 'apple-health-private.html',   icon: '🍎', label: 'Apple Health',  group: 'private' },
-    { key: 'bucket',   href: 'bucket-private.html',         icon: '✶', label: 'Bucket List',   group: 'private' },
-    { key: 'carnatic', href: 'carnatic-private.html',       icon: '🎙️', label: 'Carnatic',      group: 'private' },
-    { key: 'ideas',    href: 'ideas-private.html',          icon: '💡', label: 'Ideas',         group: 'private' },
-    { key: 'loans',    href: 'loans-private.html',          icon: '🏦', label: 'Loans',         group: 'private' },
+    { key: 'index',    href: 'index.html',                 icon: '🏠', label: 'Home',          group: 'public' },
+    { key: 'run',      href: 'run.html',                    icon: '🏃', label: 'Run',           group: 'public',  desc: 'Race log, pace and timeline' },
+    { key: 'read',     href: 'read.html',                   icon: '📚', label: 'Read',          group: 'public',  desc: 'Book list and saved quotes' },
+    { key: 'cycle',    href: 'cycle.html',                  icon: '🚴', label: 'Cycle',         group: 'public',  desc: 'Ride log and training rides' },
+    { key: 'todo',     href: 'todo.html',                   icon: '✅', label: 'To-Do',         group: 'public',  desc: 'Checklists, saved on this device' },
+    { key: 'quotes',   href: 'quotes.html',                 icon: '💬', label: 'Quotes',        group: 'public',  desc: 'Quotes worth keeping' },
+    { key: 'school',   href: '2026_school.html',            icon: '🏫', label: 'School',        group: 'public',  desc: 'Timings, menu, homework and notices' },
+    { key: 'exam',     href: 'exam.html',                   icon: '🧮', label: 'Exams',         group: 'public',  desc: 'Practice tests, auto-scored' },
+    { key: 'marathon', href: 'half-marathon.html',          icon: '🏅', label: 'Half Marathon', group: 'public',  desc: 'Training plan and race countdown' },
+    { key: 'embers',   href: 'embers-tides-private.html',   icon: '🔥', label: 'Embers',        group: 'public',  desc: 'Coded intake index' },
+    { key: 'kid',      href: 'kid-private.html',            icon: '🎒', label: 'Kid',           group: 'private', desc: 'Report cards and CA results' },
+    { key: 'health',   href: 'health-private.html',         icon: '🩺', label: 'Health',        group: 'private', desc: 'Vitals, labs and trend flags' },
+    { key: 'results',  href: 'results-private.html',        icon: '🎓', label: 'BEd Results',   group: 'private', desc: 'Semester results, subject by subject' },
+    { key: 'apple',    href: 'apple-health-private.html',   icon: '🍎', label: 'Apple Health',  group: 'private', desc: 'Activity, sleep and heart trends' },
+    { key: 'bucket',   href: 'bucket-private.html',         icon: '✶', label: 'Bucket List',   group: 'private', desc: 'Life list as constellations' },
+    { key: 'carnatic', href: 'carnatic-private.html',       icon: '🎙️', label: 'Carnatic',      group: 'private', desc: 'Vocal journey at Artium' },
+    { key: 'ideas',    href: 'ideas-private.html',          icon: '💡', label: 'Ideas',         group: 'private', desc: 'Ideas and projects, with verdicts' },
+    { key: 'loans',    href: 'loans-private.html',          icon: '🏦', label: 'Loans',         group: 'private', desc: 'Car and house loans' },
   ];
-
-  // index.html swaps its own "Tracker" pill for these in-page tabs.
-  const HOME_TABS = [
-    { tab: 'run',   icon: '🏃', label: 'Run' },
-    { tab: 'read',  icon: '📚', label: 'Read' },
-    { tab: 'cycle', icon: '🚴', label: 'Cycle' },
-  ];
+  // index.html builds its launcher cards from this same list.
+  window.DEEPU_LINKS = LINKS;
 
   function pillHTML(link, active) {
-    if (link.key === 'index' && active === 'index') {
-      return HOME_TABS.map((t, i) =>
-        `<button class="nav-pill${i === 0 ? ' active' : ''}" data-tab="${t.tab}" onclick="showTab('${t.tab}')">${t.icon} ${t.label}</button>`
-      ).join('');
-    }
     const isActive = link.key === active;
     return `<a href="${link.href}" class="nav-pill${isActive ? ' active' : ''}"${isActive ? ' aria-current="page"' : ''}>${link.icon} ${link.label}</a>`;
   }
