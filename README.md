@@ -10,7 +10,7 @@
 
 | Page | What it is | Access |
 |---|---|---|
-| 🏠 Home (`index.html`) | Static launcher: a card for every page (built from `assets/js/nav.js`), no network calls; Run / Read / Cycle / Half Marathon cards show figures saved in this browser | Public |
+| 🏠 Home (`index.html`) | Static launcher: a card for every page (built from `assets/js/nav.js`); Run / Read / Cycle / Half Marathon cards show figures saved in this browser; a visitor tile counts visits by country | Public |
 | 🏃 Run · 📚 Read · 🚴 Cycle (`run.html`, `read.html`, `cycle.html`) | One page per activity: log, stats, cinematic timeline | Public |
 | ✅ To-Do (`todo.html`) | Checklists, local-only storage | Public |
 | 💬 Quotes (`quotes.html`) | Saved quotes, reads from a Sheet | Public |
@@ -37,6 +37,11 @@ Private pages render nothing until Google authenticates the one account with acc
 ```
 Google Sheets  →  Apps Script Web App (doGet)  →  site fetches JSON
 ```
+
+**Visitor counter** — the one thing the site writes. Home asks the same web app to count a visit
+(`?action=hit`), at most once per browser per day. The visitor's browser looks up its own two-letter
+country code from [country.is](https://country.is); only that code is sent, and the `Visits` tab keeps
+just `country | count | last_seen` — no IP addresses.
 
 **Exams** — questions live in a Google Sheet (one tab per test), published to web as CSV and fetched
 directly by `exam.html` (same CSV pattern as `quotes.html`). Grading happens client-side. Each submitted

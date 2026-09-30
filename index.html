@@ -36,6 +36,17 @@
 
 .saved-note{margin-top:2.2rem;font-size:0.72rem;color:var(--muted)}
 
+.visit-tile{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 2rem;padding:1.15rem 1.3rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.visit-big{display:flex;align-items:baseline;gap:0.55rem}
+.visit-wave{font-size:1.6rem;align-self:center}
+.visit-big b{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,5vw,2.6rem);line-height:1;color:var(--grow);letter-spacing:-0.03em}
+.visit-big span{font-size:0.8rem;color:var(--muted)}
+.visit-flags{display:flex;flex-wrap:wrap;gap:0.4rem;flex:1;min-width:0}
+.visit-chip{display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.7rem;border-radius:999px;border:1px solid var(--border);font-size:0.76rem;white-space:nowrap}
+.visit-chip em{font-style:normal;color:var(--muted)}
+.visit-status{width:100%;font-size:0.68rem;color:var(--muted)}
+
 @media(max-width:480px){
   .cards{grid-template-columns:repeat(2,1fr);gap:0.5rem}
   .card{min-height:112px;padding:0.9rem}
@@ -50,22 +61,25 @@
 <main class="home">
   <h1 class="home-title">deepu<em>-life.</em></h1>
   <p class="home-sub">Everything in one place — pick where to go.</p>
+  <section class="group" aria-label="Visitors">
+    <div class="group-label">Visitors</div>
+    <div class="visit-tile" id="visitors" aria-live="polite"></div>
+  </section>
   <div id="groups"></div>
   <p class="saved-note" id="saved-note"></p>
 </main>
 
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/nav.js"></script>
+<script src="assets/js/activity.js"></script>
 <script>
-/* Static launcher: no network calls. The figures on Run / Read / Cycle /
-   Half Marathon come from the copy those pages save in this browser's
-   localStorage (assets/js/activity.js), so they appear once any of those
-   pages has been opened on this device. */
+/* Static launcher: everything renders straight away. The figures on
+   Run / Read / Cycle / Half Marathon come from the copy those pages save
+   in this browser's localStorage (assets/js/activity.js), so they appear
+   once any of those pages has been opened on this device. The visitor
+   tile is the only network work, and it runs after the page is drawn. */
 const ACCENT = { run:'var(--run)', read:'var(--read)', cycle:'var(--cycle)', marathon:'var(--plan)' };
-
-function savedData() {
-  try { return JSON.parse(localStorage.getItem('deepu-tracker-cache')); } catch (e) { return null; }
-}
+const savedData = readTrackerCache;
 
 function statsFor(data) {
   if (!data) return {};
@@ -109,6 +123,84 @@ if (saved && saved.at) {
   document.getElementById('saved-note').textContent =
     `Figures saved in this browser ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}, ${d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})} — open a page to refresh them.`;
 }
+
+/* ── Visitor counter ─────────────────────────────────────────────────
+   Each browser counts once per day. The visitor's own browser asks
+   country.is for its two-letter country code; only that code reaches
+   the Sheet (AppScript.gs → Visits tab), never an IP address. */
+const VISIT_CACHE_KEY = 'deepu-visits-cache';
+const VISIT_DAY_KEY   = 'deepu-visit-day';
+const todayKey = () => new Date().toLocaleDateString('en-CA');
+const regionName = (() => {
+  try { const dn = new Intl.DisplayNames(['en'], { type: 'region' }); return code => dn.of(code); }
+  catch (e) { return code => code; }
+})();
+const flagOf = code => /^[A-Z]{2}$/.test(code) && code !== 'ZZ'
+  ? String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : '🌐';
+const countryName = code => code === 'ZZ' ? 'Somewhere' : regionName(code);
+
+function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+
+function renderVisits(saved, status) {
+  const el = document.getElementById('visitors');
+  const v = saved && saved.visits;
+  const STATUS = {
+    loading: 'Updating…',
+    pending: 'Counter switches on once AppScript.gs is redeployed.',
+    error:   'Could not reach the counter just now.',
+  };
+  const note = status ? STATUS[status] : `Updated ${fmtTime(saved.at)} · each browser counts once a day`;
+  if (!v) {
+    el.innerHTML = `<div class="visit-big"><span class="visit-wave" aria-hidden="true">👋</span><b>—</b><span>visits</span></div>
+      <div class="visit-status">${note}</div>`;
+    return;
+  }
+  const top = v.countries.slice(0, 5);
+  el.innerHTML = `
+    <div class="visit-big"><span class="visit-wave" aria-hidden="true">👋</span><b>${v.total.toLocaleString('en-US')}</b>
+      <span>visit${v.total !== 1 ? 's' : ''} · ${v.countries.length} countr${v.countries.length !== 1 ? 'ies' : 'y'}</span></div>
+    <div class="visit-flags">${top.map(c =>
+      `<span class="visit-chip" title="${esc(countryName(c.country))}"><span aria-hidden="true">${flagOf(c.country)}</span>${esc(countryName(c.country))} <em>${c.count}</em></span>`).join('')}
+      ${v.countries.length > top.length ? `<span class="visit-chip"><em>+${v.countries.length - top.length} more</em></span>` : ''}</div>
+    <div class="visit-status">${note}</div>`;
+}
+
+async function lookupCountry() {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 4000);
+  try {
+    const res = await fetch('https://api.country.is/', { signal: ctrl.signal });
+    return (await res.json()).country || 'ZZ';
+  } catch (e) {
+    return 'ZZ';
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function refreshVisits() {
+  const cached = (() => { try { return JSON.parse(lsGet(VISIT_CACHE_KEY)); } catch (e) { return null; } })();
+  renderVisits(cached, 'loading');
+  const counted = lsGet(VISIT_DAY_KEY) === todayKey();
+  const url = counted
+    ? `${GS_URL}?action=visits`
+    : `${GS_URL}?action=hit&country=${encodeURIComponent(await lookupCountry())}`;
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    const data = await res.json();
+    // A deployment older than the counter ignores ?action= and returns the tracker data instead.
+    if (!data.visits) { renderVisits(cached, 'pending'); return; }
+    if (!counted) lsSet(VISIT_DAY_KEY, todayKey());
+    const fresh = { at: Date.now(), visits: data.visits };
+    lsSet(VISIT_CACHE_KEY, JSON.stringify(fresh));
+    renderVisits(fresh);
+  } catch (e) {
+    renderVisits(cached, 'error');
+  }
+}
+
+refreshVisits();
 </script>
 </body>
 </html>
