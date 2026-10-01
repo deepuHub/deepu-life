@@ -1,0 +1,64 @@
+/* ══════════════════════════════════════════════════════════════════
+   deepu-life — shared layout for the activity pages (run.html,
+   read.html, cycle.html). Pairs with assets/js/activity.js.
+═══════════════════════════════════════════════════════════════════ */
+.run-c{color:var(--run)}.read-c{color:var(--read)}.grow-c{color:var(--grow)}.cycle-c{color:var(--cycle)}
+
+.page{padding-top:var(--nav-h);animation:fadeIn 0.3s ease}
+
+.sec-head{padding:clamp(1.5rem,4vw,3rem) var(--pad) 0;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+.sec-eyebrow{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.4rem}
+.sec-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,4.5rem);letter-spacing:-0.03em;line-height:1}
+.sec-actions{display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem}
+
+.summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.5rem;padding:1.25rem var(--pad)}
+.summary-chip{background:var(--surface);border:1px solid var(--border);padding:0.85rem 1rem;border-radius:3px;display:flex;flex-direction:column;gap:0.15rem}
+.chip-lbl{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+.chip-val{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.1rem,3vw,1.5rem);line-height:1.1}
+
+.list-wrap{padding:1.5rem var(--pad) 3rem}
+.list-section-label{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);padding:1.5rem 0 0.75rem;display:flex;align-items:center;gap:0.75rem}
+.list-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.twrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:3px}
+.etable{width:100%;border-collapse:collapse;min-width:420px}
+.etable th{text-align:left;font-size:0.64rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:0.7rem 1rem;border-bottom:1px solid var(--border);background:var(--surface);white-space:nowrap}
+.etable td{padding:0.85rem 1rem;border-bottom:1px solid var(--border);font-size:0.88rem;vertical-align:middle}
+.etable tbody tr:last-child td{border-bottom:none}
+.etable tr:hover td{background:var(--surface)}
+.card-list{display:none;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:3px}
+.ecard{background:var(--surface);padding:1rem;display:flex;flex-direction:column;gap:0.45rem}
+.ecard-top{display:flex;justify-content:flex-start;align-items:flex-start;gap:0.5rem}
+.ecard-title{font-weight:500;font-size:0.95rem}
+.ecard-meta{display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center}
+.ecard-note{font-size:0.78rem;color:var(--muted);line-height:1.4}
+.cell-note{color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.empty-st{text-align:center;padding:4rem 2rem;color:var(--muted)}
+.empty-st .emo{font-size:2.5rem;display:block;margin-bottom:1rem}
+
+.sheets-btn{
+  display:inline-flex;align-items:center;gap:0.45rem;padding:0.42rem 1rem;border-radius:999px;
+  font-size:0.75rem;font-weight:500;letter-spacing:0.03em;font-family:'Epilogue',sans-serif;
+  border:1px solid var(--ac-dim);background:var(--ac-dim);color:var(--ac);
+  text-decoration:none;transition:all 0.2s;white-space:nowrap;
+}
+.sheets-btn:hover{background:var(--ac);color:#0a0f0d}
+
+.sync-badge{font-size:0.63rem;color:var(--muted);letter-spacing:0.06em;display:flex;align-items:center;gap:0.35rem}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.sync-dot.ok{background:var(--success);box-shadow:0 0 6px var(--success)}
+.sync-dot.err{background:var(--danger)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media(max-width:768px){.ht{display:none!important}}
+@media(max-width:480px){
+  .summary-strip{grid-template-columns:repeat(2,1fr)}
+  .sec-actions{align-items:flex-start}
+  .twrap{display:none!important}.card-list{display:flex}
+  .tl-nav{height:130px}
+  .tl-marker{width:72px}
+  .tl-keyhint{display:none}
+  .tl-prev-teaser,.tl-next-teaser{display:none}
+}

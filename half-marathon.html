@@ -91,54 +91,7 @@
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
-  <div class="nav-right">
-    <div class="nav-pills">
-      <a href="index.html" class="nav-pill">🏃 Tracker</a>
-      <a href="todo.html" class="nav-pill">✅ To-Do</a>
-      <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="nav-pill">🥧 PiePoints</a>
-      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-      <a href="2026_school.html" class="nav-pill">🏫 School</a>
-      <a href="exam.html" class="nav-pill">🧮 Exams</a>
-      <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-      <a href="health-private.html" class="nav-pill">🩺 Health</a>
-      <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
-      <a href="half-marathon.html" class="nav-pill active" aria-current="page">🏅 Half Marathon</a>
-      <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
-    </div>
-    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
-    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
-  </div>
-</nav>
-<div class="nav-drawer-backdrop"></div>
-<div class="nav-drawer">
-  <div class="nav-drawer-inner">
-    <div class="nav-drawer-group">
-      <div class="nav-drawer-label">Public</div>
-      <div class="nav-drawer-list">
-        <a href="index.html" class="nav-pill">🏃 Tracker</a>
-        <a href="todo.html" class="nav-pill">✅ To-Do</a>
-        <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="nav-pill">🥧 PiePoints</a>
-        <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-        <a href="2026_school.html" class="nav-pill">🏫 School</a>
-        <a href="exam.html" class="nav-pill">🧮 Exams</a>
-        <a href="half-marathon.html" class="nav-pill active" aria-current="page">🏅 Half Marathon</a>
-        <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
-      </div>
-    </div>
-    <div class="nav-drawer-group">
-      <div class="nav-drawer-label">🔒 Private</div>
-      <div class="nav-drawer-list">
-        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-        <a href="health-private.html" class="nav-pill">🩺 Health</a>
-        <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-        <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
-      </div>
-    </div>
-  </div>
-</div>
+<deepu-nav active="marathon"></deepu-nav>
 
 <div class="page">
   <div class="page-head">
@@ -171,21 +124,17 @@
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/timeline.js"></script>
+<script src="assets/js/activity.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════
-   Same Sheet, same Apps Script deployment as index.html —
-   after pasting the updated AppScript.gs and redeploying,
-   this reads the new "Plan" tab.
+   Reads the "Plan" tab through the shared loader in
+   assets/js/activity.js — same Sheet and Apps Script as Run /
+   Read / Cycle, and the same saved copy, so the plan shows up
+   instantly and refreshes in the background.
 ══════════════════════════════════════════════════════════ */
-const GS_URL      = 'https://script.google.com/macros/s/AKfycbyJyCwv2hh4m5RHbVgaTOiInv8kgoyIppYlFlrqoYgOzF8hGBNEH6gyqtK7CI1ngm4eVQ/exec';
-const GS_SHEET_ID = '1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE';
-
-document.getElementById('sheets-link').href = `https://docs.google.com/spreadsheets/d/${GS_SHEET_ID}/edit`;
-
 let PLAN = [];
 let countdownTimer = null;
 
-const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 function fmtDate(d) {
   if (!d) return '';
@@ -203,45 +152,6 @@ function fmtFull(d) {
   const p = String(d).split('-');
   if (p.length !== 3) return d;
   return `${MO[+p[1]-1]} ${+p[2]}, ${p[0]}`;
-}
-
-function setSyncBadge(state, timeStr) {
-  const badge = document.getElementById('sync-badge');
-  const dot   = badge.querySelector('.sync-dot');
-  const label = badge.querySelector('.sync-label');
-  if (state === 'ok')  { dot.className='sync-dot ok';  label.textContent = `Synced ${timeStr}`; }
-  if (state === 'err') { dot.className='sync-dot err'; label.textContent = 'Sync failed — showing demo data'; }
-  if (state === 'loading') { dot.className='sync-dot'; label.textContent = 'Loading…'; }
-}
-
-async function gsGet() {
-  if (!GS_URL) { loadDemoData(); return; }
-  setSyncBadge('loading');
-  try {
-    const res  = await fetch(GS_URL + '?action=getAll', { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    PLAN = data.plan || [];
-    const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-    setSyncBadge('ok', `at ${now}`);
-    render();
-  } catch (e) {
-    setSyncBadge('err');
-    loadDemoData();
-  }
-}
-
-function loadDemoData() {
-  PLAN = [
-    {id:'1',week:'1',day:'Mon',type:'Recovery Run',target:'15:00 Recovery Run',status:'done',date:''},
-    {id:'2',week:'1',day:'Wed',type:'Speed Run',target:'5:00 WU, 8×1:00 5K Pace, 1:00 rec',status:'done',date:''},
-    {id:'3',week:'1',day:'Sat',type:'Long Run',target:'5K/3.1 Mile Run',status:'skipped',date:''},
-    {id:'4',week:'2',day:'Mon',type:'Recovery Run',target:'15:00 Recovery Run',status:'planned',date:''},
-    {id:'5',week:'2',day:'Wed',type:'Speed Run',target:'5:00 WU, 1:00 Mile, 2:00 5K, 3:00 10K, 2:00 5K, 1:00 Mile',status:'planned',date:''},
-    {id:'6',week:'2',day:'Sat',type:'Long Run',target:'6.4K/4 Mile Run',status:'planned',date:''},
-  ];
-  render();
 }
 
 function statusBadge(status) {
@@ -383,7 +293,13 @@ function render() {
     </div>`).join('');
 }
 
-gsGet();
+const sheetsLink = document.getElementById('sheets-link');
+setSheetLink(sheetsLink, 'Plan');
+loadTracker(data => {
+  PLAN = data.plan || [];
+  setSheetLink(sheetsLink, 'Plan', data.gids);
+  render();
+});
 </script>
 </body>
 </html>

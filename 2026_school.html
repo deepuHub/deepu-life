@@ -884,25 +884,55 @@
     .hw-row.due-soon { border-left: 4px solid #fb8c00; }
     .hw-row.upcoming { border-left: 4px solid #43a047; }
     .hw-row.no-date { border-left: 4px solid #8e24aa; }
+    .hw-row.done { border-left: 4px solid #43a047; opacity: 0.6; }
+    .hw-row.done .hw-row-title { text-decoration: line-through; }
     .hw-row-badge { font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; margin-top: 1px; }
     .hw-row-badge.type-homework { background: #1e88e5; }
     .hw-row-badge.type-test { background: #fb8c00; }
     .hw-row-badge.type-notice { background: #8e24aa; }
+    .theme-strip { display: inline-block; margin: 2px 0 10px; padding: 5px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; letter-spacing: 0.02em; }
+    .menu-pending { font-size: 0.8rem; color: var(--muted); padding: 6px 2px 2px; }
+    .shortday-card { display: flex; gap: 12px; align-items: flex-start; background: var(--card-bg); border: 1.5px solid var(--line); border-left: 4px solid var(--accent); border-radius: 14px; padding: 14px 16px; box-shadow: 0 2px 10px var(--shadow); }
+    .shortday-card .h-emoji { font-size: 1.6rem; line-height: 1; }
+    .shortday-card p { margin: 4px 0 0; font-size: 0.82rem; color: var(--muted); }
+    .hw-row-badge.type-event { background: #d81b60; }
     .hw-row-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
     .hw-row-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     .hw-row-subject { font-weight: 700; font-size: 0.86rem; color: var(--text); }
     .hw-row-title { font-size: 0.82rem; color: var(--text); }
     .hw-row-detail { font-size: 0.74rem; color: var(--muted); }
+    .hw-row-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
     .hw-row-date { font-size: 0.68rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .hw-done-toggle { display: block; width: 100%; margin-top: 10px; padding: 9px 14px; border-radius: 12px; border: 1.5px dashed var(--line); background: transparent; color: var(--muted); font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .hw-done-toggle:hover { border-color: var(--accent); color: var(--text); }
+    .hw-done-grid { margin-top: 10px; opacity: 0.75; }
+    .hw-row-dates { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+    .hw-row-added { font-size: 0.64rem; font-weight: 700; color: var(--muted); white-space: nowrap; opacity: 0.85; }
+    .hw-row-added.fresh { color: #2e7d32; opacity: 1; }
+    [data-theme="dark"] .hw-row-added.fresh { color: #a5d6a7; }
+    .hw-row-action { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card-solid); color: var(--text); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .hw-row-action:hover { border-color: var(--accent); }
+    .hw-row.done .hw-row-action { border-color: transparent; background: transparent; color: var(--muted); }
+
+    /* HOMEWORK CELEBRATION CONFETTI */
+    .hw-celebrate-piece { position: fixed; top: 0; left: 0; z-index: 999; pointer-events: none; will-change: transform, opacity; line-height: 1; }
     .hw-status-pill { font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
     .hw-status-pill.overdue { background: #ffebee; color: #c62828; }
     .hw-status-pill.due-soon { background: #fff3e0; color: #e65100; }
     .hw-status-pill.upcoming { background: #e8f5e9; color: #2e7d32; }
     .hw-status-pill.no-date { background: #f3e5f5; color: #6a1b9a; }
+    .hw-status-pill.done { background: #e8f5e9; color: #2e7d32; }
     [data-theme="dark"] .hw-status-pill.overdue { background: rgba(229,57,53,0.25); color: #ff8a80; }
     [data-theme="dark"] .hw-status-pill.due-soon { background: rgba(251,140,0,0.22); color: #ffcc80; }
     [data-theme="dark"] .hw-status-pill.upcoming { background: rgba(67,160,71,0.22); color: #a5d6a7; }
     [data-theme="dark"] .hw-status-pill.no-date { background: rgba(142,36,170,0.25); color: #ce93d8; }
+    [data-theme="dark"] .hw-status-pill.done { background: rgba(67,160,71,0.22); color: #a5d6a7; }
+
+    /* PAGE TABS */
+    .page-tabs { display: flex; gap: 8px; padding: 10px 20px 0; }
+    .page-tab { flex: 1; text-align: center; font-size: 0.8rem; font-weight: 700; padding: 9px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card-bg); color: var(--muted); cursor: pointer; transition: all 0.18s; box-shadow: 0 1px 4px var(--shadow); }
+    .page-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 2px var(--stripe-white) inset; }
+    .tab-panel[hidden] { display: none; }
 
     .jain-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
     .toggle { position: relative; width: 44px; height: 24px; }
@@ -1073,6 +1103,82 @@
       }
     }
 
+
+    /* ============ AFTER-SCHOOL CARDS (Football / Robotics) ============ */
+    .period-card.after-card { cursor: pointer; overflow: hidden; position: relative; user-select: none; -webkit-tap-highlight-color: transparent; }
+    .period-card.after-card:active { transform: scale(0.97); }
+    .after-card .tap-hint { font-size: 0.65rem; color: var(--muted); margin-left: 6px; opacity: 0.8; }
+    .after-football .period-icon { display: inline-block; animation: fb-bounce 1.1s cubic-bezier(.3,0,.5,1) infinite; }
+    @keyframes fb-bounce {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1.1, 0.9); }
+      15%      { transform: translateY(-2px) rotate(40deg) scale(1); }
+      50%      { transform: translateY(-12px) rotate(180deg) scale(1); }
+      85%      { transform: translateY(-2px) rotate(320deg) scale(1); }
+    }
+    .after-football::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+      background: repeating-linear-gradient(90deg, #27ae60 0 12px, #2ecc71 12px 24px);
+      animation: fb-grass 1.2s linear infinite;
+    }
+    @keyframes fb-grass { to { background-position: 24px 0; } }
+    .after-robotics .period-icon { display: inline-block; animation: robo-walk 1.6s steps(1) infinite, robo-bob 0.4s ease-in-out infinite alternate; }
+    @keyframes robo-walk {
+      0%   { filter: drop-shadow(0 0 0 #00e5ff); }
+      50%  { filter: drop-shadow(0 0 6px #00e5ff); }
+    }
+    @keyframes robo-bob { from { transform: translateY(0) rotate(-6deg); } to { transform: translateY(-3px) rotate(6deg); } }
+    .after-robotics::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -40%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,0.25), transparent);
+      animation: robo-scan 2.4s linear infinite;
+    }
+    @keyframes robo-scan { to { left: 100%; } }
+
+    /* Tap effects layer */
+    .fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+    .fx-ball { position: absolute; left: 0; top: 0; font-size: 34px; line-height: 1; will-change: transform; }
+    /* Penalty shootout (Football tap) */
+    .fx-layer.fx-game { pointer-events: auto; cursor: crosshair; touch-action: none;
+      background: repeating-linear-gradient(180deg, rgba(46,160,67,0.93) 0 60px, rgba(39,140,58,0.93) 60px 120px); }
+    .pk-goal { position: absolute; border: 6px solid #fff; border-bottom: none; border-radius: 4px 4px 0 0;
+      background-color: rgba(255,255,255,0.08);
+      background-image: linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px);
+      background-size: 14px 14px; box-shadow: 0 6px 0 rgba(0,0,0,0.12); }
+    .pk-goal.shake { animation: pk-net 0.5s ease-out; }
+    @keyframes pk-net { 20% { background-position: 0 6px; transform: scale(1.03); } 60% { background-position: 0 -3px; } }
+    .pk-line { position: absolute; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.85); }
+    .pk-spot { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+    .pk-keeper { position: absolute; font-size: 54px; line-height: 1; transition: left 0.28s ease-out, transform 0.28s ease-out; }
+    .pk-player { position: absolute; font-size: 48px; line-height: 1; transform: scaleX(-1); }
+    .pk-ball { position: absolute; left: 0; top: 0; font-size: 36px; line-height: 1; will-change: transform; }
+    .pk-hud { position: absolute; left: 0; right: 0; top: 10px; text-align: center; color: #fff;
+      font: 800 1rem 'DM Sans', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+    .pk-hud .pk-dots { font-size: 1.3rem; letter-spacing: 6px; display: block; margin-top: 2px; }
+    .pk-msg { position: absolute; left: 50%; top: 45%; transform: translate(-50%,-50%) scale(0); white-space: nowrap;
+      font: 900 2.4rem 'DM Sans', sans-serif; color: #fff; text-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 0 20px rgba(0,0,0,0.3);
+      transition: transform 0.35s cubic-bezier(.3,1.7,.6,1); pointer-events: none; z-index: 2; }
+    .pk-msg.show { transform: translate(-50%,-50%) scale(1); }
+    .pk-msg.small { white-space: pre-line; text-align: center; width: max-content; max-width: 90vw; font-size: 1.5rem; background: rgba(0,0,0,0.35); padding: 12px 20px; border-radius: 16px; }
+    .pk-close { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: none;
+      background: rgba(0,0,0,0.3); color: #fff; font-size: 18px; cursor: pointer; }
+    .fx-robot { position: absolute; font-size: 44px; line-height: 1; will-change: left; }
+    .fx-robot.stomp { animation: robo-stomp 0.3s ease-in-out infinite alternate; }
+    @keyframes robo-stomp { from { rotate: -8deg; translate: 0 0; } to { rotate: 8deg; translate: 0 -4px; } }
+    .fx-block { position: absolute; border-radius: 3px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.22), inset 0 2px 0 rgba(255,255,255,0.35);
+      transition: left 0.45s cubic-bezier(.3,1.4,.6,1), top 0.45s cubic-bezier(.3,1.4,.6,1), transform 0.45s ease; }
+    .fx-block.eye.on { animation: robo-eye 0.6s ease-in-out infinite alternate; }
+    @keyframes robo-eye { from { box-shadow: 0 0 4px #00e5ff; } to { box-shadow: 0 0 18px 6px #00e5ff; background: #e0ffff; } }
+    .fx-spark { position: absolute; font-size: 14px; animation: fx-spark 0.4s ease-out forwards; }
+    @keyframes fx-spark { from { opacity: 1; transform: scale(0.6); } to { opacity: 0; transform: scale(1.6) translateY(-8px); } }
+    .fx-built { position: absolute; left: 50%; transform: translateX(-50%) scale(0); white-space: nowrap;
+      font: 800 1.2rem 'DM Sans', sans-serif; color: #fff; background: #1e88e5; padding: 8px 16px; border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3); transition: transform 0.4s cubic-bezier(.3,1.6,.6,1); }
+    .fx-built.show { transform: translateX(-50%) scale(1); }
+    .fx-fade { transition: opacity 0.6s ease; opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .after-football .period-icon, .after-robotics .period-icon,
+      .after-football::after, .after-robotics::after { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -1088,6 +1194,7 @@
 
 <div class="header">
   <div class="header-actions">
+    <a class="theme-toggle" href="index.html" aria-label="Back to deepu-life" title="Back to deepu-life" style="text-decoration:none">🏠</a>
     <button class="theme-toggle" type="button" data-sound-toggle aria-label="Mute sound" title="Toggle sound">🔊</button>
     <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle color mode">🌙</button>
   </div>
@@ -1099,57 +1206,60 @@
 
 <div class="cap-stripe-banner"></div>
 
-<div class="exam-alert-banner" id="examAlertBanner">
+<div class="exam-alert-banner" id="examAlertBanner" onclick="switchPageTab('timetable')" style="cursor:pointer;">
   <span class="exam-alert-icon">📝</span>
   <span id="examAlertText"></span>
 </div>
 
-<div class="hw-alert-banner" id="hwAlertBanner">
+<div class="hw-alert-banner" id="hwAlertBanner" onclick="switchPageTab('tasks')" style="cursor:pointer;">
   <span class="hw-alert-icon">📋</span>
   <span id="hwAlertText"></span>
 </div>
 
-<div style="padding: 0 20px;">
-  <div class="jain-toggle-wrap">
-    <span class="jain-label">🌿 Jain Menu</span>
-    <label class="toggle">
-      <input type="checkbox" id="jainToggle" onchange="toggleJain()"/>
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
+<div class="page-tabs" id="pageTabs">
+  <button class="page-tab active" type="button" data-tab="timetable" onclick="switchPageTab('timetable')">🍽️ Timetable</button>
+  <button class="page-tab" type="button" data-tab="tasks" onclick="switchPageTab('tasks')">📋 Tasks & Notices</button>
 </div>
 
-<div class="month-tabs" id="monthTabs"></div>
-<div class="week-tabs" id="weekTabs"></div>
-<div class="day-selector" id="daySelector"></div>
-
-<div class="timeline-wrap" id="timelineWrap"></div>
-
-<div class="calendar-section">
-  <div class="calendar-header">
-    <h2>📋 Homework & Notices</h2>
-    <span style="font-size:0.65rem;color:var(--muted);" id="hwUpdatedLabel"></span>
+<div class="tab-panel" id="tabTimetable">
+  <div style="padding: 0 20px;">
+    <div class="jain-toggle-wrap">
+      <span class="jain-label">🌿 Jain Menu</span>
+      <label class="toggle">
+        <input type="checkbox" id="jainToggle" onchange="toggleJain()"/>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
   </div>
-  <div class="cal-legend">🔴 = Overdue &nbsp;·&nbsp; 🟠 = Due soon &nbsp;·&nbsp; 🟢 = Upcoming &nbsp;·&nbsp; 🟣 = Notice / no fixed date</div>
-  <div id="homeworkNoticesList"></div>
-</div>
 
-<div class="calendar-section">
-  <div class="calendar-header">
-    <h2>📅 Holidays & School Events</h2>
-    <button class="cal-toggle-btn" id="calToggleBtn" type="button">View Full Year</button>
-  </div>
-  <div class="cal-legend">🎉 = Holiday (no school) &nbsp;·&nbsp; 📌 = School event (school is open)</div>
-  <div id="calendarHighlights"></div>
-  <div class="calendar-full" id="calendarFull" style="display:none;"></div>
-</div>
+  <div class="month-tabs" id="monthTabs"></div>
+  <div class="week-tabs" id="weekTabs"></div>
+  <div class="day-selector" id="daySelector"></div>
 
-<div class="calendar-section">
-  <div class="calendar-header">
-    <h2>📝 Formal CA1 Exam Schedule <span style="font-size:0.65em;font-weight:400;color:var(--muted);">(completed)</span></h2>
+  <div class="timeline-wrap" id="timelineWrap"></div>
+
+  <div class="calendar-section">
+    <div class="calendar-header">
+      <h2>📅 Holidays & School Events</h2>
+      <button class="cal-toggle-btn" id="calToggleBtn" type="button">View Full Year</button>
+    </div>
+    <div class="cal-legend">🎉 = Holiday (no school) &nbsp;·&nbsp; 📌 = School event (school is open)</div>
+    <div id="calendarHighlights"></div>
+    <div class="calendar-full" id="calendarFull" style="display:none;"></div>
   </div>
-  <div class="cal-legend">🟧 = Weekend &nbsp;·&nbsp; 📝 = Exam day &nbsp;·&nbsp; — = No exam scheduled</div>
+
   <div id="examScheduleList"></div>
+</div>
+
+<div class="tab-panel" id="tabTasks" hidden>
+  <div class="calendar-section">
+    <div class="calendar-header">
+      <h2>📋 Homework & Notices</h2>
+      <span style="font-size:0.65rem;color:var(--muted);" id="hwUpdatedLabel"></span>
+    </div>
+    <div class="cal-legend">🔴 = Overdue &nbsp;·&nbsp; 🟠 = Due soon &nbsp;·&nbsp; 🟢 = Upcoming &nbsp;·&nbsp; ✅ = Done &nbsp;·&nbsp; 🟣 = Notice / no fixed date</div>
+    <div id="homeworkNoticesList"></div>
+  </div>
 </div>
 
 <div class="footer">Made with ❤️ for kids and parents — by a kid's father</div>
@@ -1243,8 +1353,103 @@ const TIMETABLE = {
   ],
 };
 
+// ── AFTER-SCHOOL ACTIVITIES ─────────────────────────────────────────────────
+const AFTER_SCHOOL = {
+  mon: ['15:00','16:00','Football',  '⚽'],
+  tue: ['15:00','17:00','Robotics',  '🤖'],
+  wed: ['15:00','16:00','Football',  '⚽'],
+  thu: ['15:00','16:00','Football',  '⚽'],
+  fri: ['15:00','17:00','Robotics',  '🤖'],
+};
+
 // ── MENU DATA (from July xlsx) ───────────────────────────────────────────────
 const MENU = {"2026-07-13": {"breakfast": {"regular": {"opt1": "Oats Chocolate Pancake, Maple Syrup", "opt2": "Veg Puff, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Oats Chocolate Pancake, Maple Syrup", "opt2": "Veg Puff, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Ribbon  Salad", "raita": "Bondi Raita", "dessert": "Chocolate Doughnut", "main": "Palak Paneer", "dal": "Dal Tadka", "rice": "Peas Pulao", "bread": "Tawa Paratha", "yummy": "Pasta  in Pomodoro Souce"}, "jain": {"salad": "Ribbon  Salad", "raita": "Bondi Raita", "dessert": "Chocolate Doughnut", "main": "Palak Paneer", "dal": "Dal Tadka", "rice": "Peas Pulao", "bread": "Tawa Paratha", "yummy": "Pasta  in Pomodoro Souce"}}, "eveningSnack": {"regular": "Baked Sweet Potato", "jain": "Baked Sweet Potato"}}, "2026-07-14": {"breakfast": {"regular": {"opt1": "Mysore Bonda, Coconut Chutney", "opt2": "Soya Bhurje, Plain Paratha", "fruit": "Watermelon"}, "jain": {"opt1": "Mysore Bonda, Coconut Chutney", "opt2": "Soya Bhurje, Plain Paratha", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "", "main": "Paneer Buttar Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Khow Suey"}, "jain": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "", "main": "Paneer Buttar Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Khow Suey"}}, "eveningSnack": {"regular": "Veg Burger", "jain": "Veg Burger"}}, "2026-07-15": {"breakfast": {"regular": {"opt1": "Pav, Bhaji", "opt2": "Masala Uttapam, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Pav, Bhaji", "opt2": "Masala Uttapam, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Sprout Salad", "raita": "Veg Raita", "dessert": "Fruit Custard", "main": "Dahi Wali Bhindi", "dal": "Dhaba Dal", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Dahi Wada"}, "jain": {"salad": "Sprout Salad", "raita": "Veg Raita", "dessert": "Fruit Custard", "main": "Dahi Wali Bhindi", "dal": "Dhaba Dal", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Dahi Wada"}}, "eveningSnack": {"regular": "Paneer Tikka", "jain": "Paneer Tikka"}}, "2026-07-16": {"breakfast": {"regular": {"opt1": "Mix Veg Idli, Sambar", "opt2": "Aloo Paratha, Curd", "fruit": "Papaya"}, "jain": {"opt1": "Mix Veg Idli, Sambar", "opt2": "Paneer Paratha, Curd", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Toss Salad", "raita": "Buttar Milk", "dessert": "", "main": "Navratna Korma", "dal": "Dal Fry", "rice": "Tomato Rice", "bread": "Dhaniya Roti", "yummy": "Cheese Garlic Bread"}, "jain": {"salad": "Toss Salad", "raita": "Buttar Milk", "dessert": "", "main": "Navratna Korma", "dal": "Dal Fry", "rice": "Tomato Rice", "bread": "Dhaniya Roti", "yummy": "Cheese Garlic Bread"}}, "eveningSnack": {"regular": "Bhel", "jain": "Bhel"}}, "2026-07-17": {"breakfast": {"regular": {"opt1": "Corn Cheese Sandwich, Sweet Chutney", "opt2": "Dhokla, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Corn Cheese Sandwich, Sweet Chutney", "opt2": "Dhokla, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green moong Salad", "raita": "Lemon Coriander Soup", "dessert": "Coconut Burfi", "main": "Chole Masala", "dal": "Dahi Kadhi", "rice": "Moong Dal Khichidi", "bread": "Ajwaini Paratha", "yummy": "Veg Pizza"}, "jain": {"salad": "Green moong Salad", "raita": "Lemon Coriander Soup", "dessert": "Coconut Burfi", "main": "Chole Masala", "dal": "Dahi Kadhi", "rice": "Moong Dal Khichidi", "bread": "Ajwaini Paratha", "yummy": "Veg Pizza"}}, "eveningSnack": {"regular": "Mix Fruit", "jain": "Mix Fruit"}}, "2026-07-20": {"breakfast": {"regular": {"opt1": "Medu Wada, Sambar", "opt2": "Batata Poha, Sev", "fruit": "Watermelon"}, "jain": {"opt1": "Medu  Wada, Sambar", "opt2": "Peas Poha, Sev", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Seviyan Kheer", "main": "Paneer Mutter", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Kacchi Dabeli"}, "jain": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Seviyan Kheer", "main": "Paneer Mutter", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Kacchi Dabeli"}}, "eveningSnack": {"regular": "Paneer Tikka", "jain": "Paneer Tikka"}}, "2026-07-21": {"breakfast": {"regular": {"opt1": "Methi Thepla, Tomato Chutney", "opt2": "Corn Spinach Sandwich, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Methi Thepla, Tomato Chutney", "opt2": "Corn Spinach Sandwich, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Kachumber Salad", "raita": "Carrot Raita", "dessert": "", "main": "Home Style Rajma Masala", "dal": "Veg Korma", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Veg Hakka Noodles"}, "jain": {"salad": "Kachumber Salad", "raita": "Carrot Raita", "dessert": "", "main": "Home Style Rajma Masala", "dal": "Veg Korma", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Veg Hakka Noodles"}}, "eveningSnack": {"regular": "Layonaisse Potato", "jain": "Layonaisse Potato"}}, "2026-07-22": {"breakfast": {"regular": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Hakka Vermicelli, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Hakka Vermicelli, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Black Chana Salad", "raita": "Mint Cooler", "dessert": "Jalebi", "main": "Chatpata Beans", "dal": "Dal Panchmel", "rice": "Steam Rice", "bread": "Palak Roti", "yummy": "Penne Pasta"}, "jain": {"salad": "Black Chana Salad", "raita": "Mint Cooler", "dessert": "Jalebi", "main": "Chatpata Beans", "dal": "Dal Panchmel", "rice": "Steam Rice", "bread": "Palak Roti", "yummy": "Penne Pasta"}}, "eveningSnack": {"regular": "Paneer Paratha", "jain": "Paneer Paratha"}}, "2026-07-23": {"breakfast": {"regular": {"opt1": "Kathi Roll, Sweet Chutney", "opt2": "Veg Cutlet, coconut chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Kathi Roll, Sweet Chutney", "opt2": "Veg Cutlet, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Aloo Gobhi Mater", "dal": "Saboot Masoor Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Ragada Pattice"}, "jain": {"salad": "Corn Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Aloo Gobhi Mater", "dal": "Saboot Masoor Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Ragada Pattice"}}, "eveningSnack": {"regular": "Veg Roll", "jain": "Veg Roll"}}, "2026-07-24": {"breakfast": {"regular": {"opt1": "Set Dosa, Coconut Chutney", "opt2": "Oats Kheer", "fruit": "Mix Fruit"}, "jain": {"opt1": "Set Dosa, Coconut Chutney", "opt2": "Oats Kheer", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Three Beans Salad", "raita": "Bondi Raita", "dessert": "Gulan Jamun", "main": "Noodles", "dal": "Veg-Biryani", "rice": "Capsicum Salan", "bread": "Papad", "yummy": "Papdi Chaat"}, "jain": {"salad": "Three Beans Salad", "raita": "Bondi Raita", "dessert": "Gulan Jamun", "main": "Noodles", "dal": "Veg-Biryani", "rice": "Capsicum Salan", "bread": "Papad", "yummy": "Papdi Chaat"}}, "eveningSnack": {"regular": "Thepla", "jain": "Thepla"}}, "2026-07-27": {"breakfast": {"regular": {"opt1": "Veg Tikka Sandwich, Sweet Chutney", "opt2": "Veg Tomato Omlette, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Veg Tikka Sandwich, Sweet Chutney", "opt2": "Veg Tomato Omlette, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Chaat", "raita": "Palak raita", "dessert": "Rice Kheer", "main": "Kadhai Paneer", "dal": "Drumstick Dal", "rice": "Steamed Rice", "bread": "Chapati", "yummy": "Veg Manchurian"}, "jain": {"salad": "Corn Chaat", "raita": "Palak raita", "dessert": "Rice Kheer", "main": "Kadhai Paneer", "dal": "Drumstick Dal", "rice": "Steamed Rice", "bread": "Chapati", "yummy": "Veg Manchurian"}}, "eveningSnack": {"regular": "Cheese sandwich", "jain": "Cheese sandwich"}}, "2026-07-28": {"breakfast": {"regular": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Misal, Pav", "fruit": "Mix Fruit"}, "jain": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Misal, Pav", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Curd", "dessert": "", "main": "Jeera Aloo", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Mac & Cheese Pasta"}, "jain": {"salad": "Green  Salad", "raita": "Curd", "dessert": "", "main": "Jeera Aloo", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Mac & Cheese Pasta"}}, "eveningSnack": {"regular": "Veg Wrap", "jain": "Veg Wrap"}}, "2026-07-29": {"breakfast": {"regular": {"opt1": "Aloo Bonda, Sambar", "opt2": "Veg Vermicelli Upma, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Mix Veg Bonda, Sambar", "opt2": "Veg Vermicelli Upma, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green moong Salad", "raita": "Mint Cooler", "dessert": "Balusai", "main": "Mix Veg", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Paratha", "yummy": "Samosa"}, "jain": {"salad": "Green moong Salad", "raita": "Mint Cooler", "dessert": "Balusai", "main": "Mix Veg", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Paratha", "yummy": "Samosa"}}, "eveningSnack": {"regular": "Paneer Paratha", "jain": "Paneer Paratha"}}, "2026-07-30": {"breakfast": {"regular": {"opt1": "Veg Frankie, Sweet Chutney", "opt2": "Veg Croquette, Sweet Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Veg Frankie, Sweet Chutney", "opt2": "Veg Croquette, Sweet Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Rainbow Salad", "raita": "Palak raita", "dessert": "", "main": "Kofta Curry", "dal": "Dal Palak", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Penne Pasta"}, "jain": {"salad": "Rainbow Salad", "raita": "Palak raita", "dessert": "", "main": "Kofta Curry", "dal": "Dal Palak", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Penne Pasta"}}, "eveningSnack": {"regular": "Veg Pizza", "jain": "Veg Pizza"}}, "2026-07-31": {"breakfast": {"regular": {"opt1": "Chole, Kulcha", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Chole, Kulcha", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Carrot Pomegranate Salad", "raita": "Orange Tang", "dessert": "Tuti Futi Cake Slice", "main": "Stir Fry Vegetable", "dal": "Veg Hakka Noodles", "rice": "Veg Fried Rice", "bread": "", "yummy": "Veg Manchurian"}, "jain": {"salad": "Carrot Pomegranate Salad", "raita": "Orange Tang", "dessert": "Tuti Futi Cake Slice", "main": "Stir Fry Vegetable", "dal": "Veg Hakka Noodles", "rice": "Veg Fried Rice", "bread": "", "yummy": "Veg Manchurian"}}, "eveningSnack": {"regular": "Plain Doughnut", "jain": "Plain Doughnut"}}, "2026-08-03": {"breakfast": {"regular": {"opt1": "Kanchipuram Idli, Sambar", "opt2": "Kathi Roll, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Kanchipuram Idli, Sambar", "opt2": "Kathi Roll, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Plain Chaas", "dessert": "Sabudana Kheer", "main": "Panner Lababdar", "dal": "Dal Adraki", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Chocolate Croissant"}, "jain": {"salad": "Green Salad", "raita": "Plain Chaas", "dessert": "Sabudana Kheer", "main": "Panner Lababdar", "dal": "Dal Adraki", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Chocolate Croissant"}}, "eveningSnack": {"regular": "Veggie Croquettes", "jain": "Veggie Croquettes"}}, "2026-08-04": {"breakfast": {"regular": {"opt1": "Aloo Paratha, Curd", "opt2": "Green Peas Poha, Sev", "fruit": "Papaya"}, "jain": {"opt1": "Paneer Paratha, Curd", "opt2": "Green Peas Poha, Sev", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Rainbow Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Veg Jalfrezi", "dal": "Chana Dal Tadka", "rice": "Basanti Pulao", "bread": "Tawa Paratha", "yummy": "Veg Manchurian"}, "jain": {"salad": "Rainbow Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Veg Jalfrezi", "dal": "Chana Dal Tadka", "rice": "Basanti Pulao", "bread": "Tawa Paratha", "yummy": "Veg Manchurian"}}, "eveningSnack": {"regular": "Paneer Paratha", "jain": "Paneer Paratha"}}, "2026-08-05": {"breakfast": {"regular": {"opt1": "Thepla, Dahi", "opt2": "Mix Veg Upma, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Thepla, Dahi", "opt2": "Mix Veg Upma, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Green Moong Salad", "raita": "Burhani Raita", "dessert": "Coconut Ladoo", "main": "Kofta Curry", "dal": "Dal Palak", "rice": "Steam Rice", "bread": "Ajwaini Roti", "yummy": "Dahi Puri"}, "jain": {"salad": "Green Moong Salad", "raita": "Burhani Raita", "dessert": "Coconut Ladoo", "main": "Kofta Curry", "dal": "Dal Palak", "rice": "Steam Rice", "bread": "Ajwaini Roti", "yummy": "Dahi Puri"}}, "eveningSnack": {"regular": "Wheat Jaggery Pancake", "jain": "Wheat Jaggery Pancake"}}, "2026-08-06": {"breakfast": {"regular": {"opt1": "Oats Chocolate Pancake, Maple Syrup", "opt2": "Veg Cutlet, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Oats Chocolate Pancake, Maple Syrup", "opt2": "Veg Cutlet, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Lemon Coriander Soup", "dessert": "", "main": "Soya Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Arrabiata Pasta"}, "jain": {"salad": "Corn Salad", "raita": "Lemon Coriander Soup", "dessert": "", "main": "Soya Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Arrabiata Pasta"}}, "eveningSnack": {"regular": "Cookies", "jain": "Cookies"}}, "2026-08-07": {"breakfast": {"regular": {"opt1": "Dhokla, Sweet Chutney", "opt2": "Oats Kheer", "fruit": "Mix Fruit"}, "jain": {"opt1": "Dhokla, Sweet Chutney", "opt2": "Oats Kheer", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Khimchi Salad", "raita": "Veg Manchow Soup", "dessert": "Fruit Custard", "main": "Stir Fried Veg", "dal": "Veg Burnt Garlic Noodles", "rice": "Veg Burnt Garlic Fried Rice", "bread": "Veg Manchurian", "yummy": "Chinese Bhel"}, "jain": {"salad": "Khimchi Salad", "raita": "Veg Manchow Soup", "dessert": "Fruit Custard", "main": "Stir Fried Veg", "dal": "Veg Burnt Garlic Noodles", "rice": "Veg Burnt Garlic Fried Rice", "bread": "Veg Manchurian", "yummy": "Chinese Bhel"}}, "eveningSnack": {"regular": "Paneer Pakoda", "jain": "Paneer Pakoda"}}, "2026-08-10": {"breakfast": {"regular": {"opt1": "Veg Puff, Tamarind Chutney", "opt2": "Onion Uttapam, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Veg Puff, Tamarind Chutney", "opt2": "Onion Uttapam, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Motichur Ladoo", "main": "Paneer Tikka Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Cheese Chilli Toast"}, "jain": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Motichur Ladoo", "main": "Paneer Tikka Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Cheese Chilli Toast"}}, "eveningSnack": {"regular": "Corn Cheese Ball", "jain": "Corn Cheese Ball"}}, "2026-08-11": {"breakfast": {"regular": {"opt1": "Idli, Sambar", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Idli, Sambar", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Kachumber Salad", "raita": "Buttermilk", "dessert": "", "main": "Mix Veg", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "KhowSuey"}, "jain": {"salad": "Kachumber Salad", "raita": "Buttermilk", "dessert": "", "main": "Mix Veg", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "KhowSuey"}}, "eveningSnack": {"regular": "Nachos With Salsa", "jain": "Nachos With Salsa"}}, "2026-08-12": {"breakfast": {"regular": {"opt1": "Misal, Pav", "opt2": "Palak Thepla, Curd", "fruit": "Mix Fruit"}, "jain": {"opt1": "Misal, Pav", "opt2": "Palak Thepla, Curd", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Black Chana Salad", "raita": "Burhani Raita", "dessert": "Moong Dal Paysam", "main": "Bhindi Masala", "dal": "Masoor Dal Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Soya Tikki"}, "jain": {"salad": "Black Chana Salad", "raita": "Burhani Raita", "dessert": "Moong Dal Paysam", "main": "Bhindi Masala", "dal": "Masoor Dal Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Soya Tikki"}}, "eveningSnack": {"regular": "Veg Pizza", "jain": "Veg Pizza"}}, "2026-08-13": {"breakfast": {"regular": {"opt1": "Dosa, Coconut Chutney", "opt2": "Mix Veg Rawa Upma, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Dosa, Coconut Chutney", "opt2": "Mix Veg Rawa Upma, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Cream Of Broccoli Soup", "dessert": "", "main": "Aloo Gobhi Matar", "dal": "Saboot Masoor Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Schezwan Noodles"}, "jain": {"salad": "Corn Salad", "raita": "Cream Of Broccoli Soup", "dessert": "", "main": "Aloo Gobhi Matar", "dal": "Saboot Masoor Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Schezwan Noodles"}}, "eveningSnack": {"regular": "Churma Ladu", "jain": "Churma Ladu"}}, "2026-08-14": {"breakfast": {"regular": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Veg Croquettes, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Veg Croquettes, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Ministry Salad", "raita": "Mint Cooler", "dessert": "Chocolate Slice Cake", "main": "Tomato Soup", "dal": "Arrabbiata Pasta", "rice": "Mexican Rice", "bread": "Pizza", "yummy": "Pizza"}, "jain": {"salad": "Ministry Salad", "raita": "Mint Cooler", "dessert": "Chocolate Slice Cake", "main": "Tomato Soup", "dal": "Arrabbiata Pasta", "rice": "Mexican Rice", "bread": "Pizza", "yummy": "Pizza"}}, "eveningSnack": {"regular": "Oats Kheer", "jain": "Oats Kheer"}}, "2026-08-17": {"breakfast": {"regular": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Cheese Chutney Sandwich, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Cheese Chutney Sandwich, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Chana Chaat", "raita": "Manchow Soup", "dessert": "Seviyan Kheer", "main": "Kadai Paneer", "dal": "Masoor Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Dahi Wada"}, "jain": {"salad": "Chana Chaat", "raita": "Manchow Soup", "dessert": "Seviyan Kheer", "main": "Kadai Paneer", "dal": "Masoor Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Dahi Wada"}}, "eveningSnack": {"regular": "Veg Roll", "jain": "Veg Roll"}}, "2026-08-18": {"breakfast": {"regular": {"opt1": "Onion Uttapam, Sambar", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Onion Uttapam, Sambar", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Rainbow Salad", "raita": "Masala Chaas", "dessert": "", "main": "Veg Jalfrezi", "dal": "Chana Dal Tadka", "rice": "Basanti Pulao", "bread": "Tawa Paratha", "yummy": "Corn Cheese Ball"}, "jain": {"salad": "Rainbow Salad", "raita": "Masala Chaas", "dessert": "", "main": "Veg Jalfrezi", "dal": "Chana Dal Tadka", "rice": "Basanti Pulao", "bread": "Tawa Paratha", "yummy": "Corn Cheese Ball"}}, "eveningSnack": {"regular": "Puran Poli", "jain": "Puran Poli"}}, "2026-08-19": {"breakfast": {"regular": {"opt1": "Besan Chilla, Coconut Chutney", "opt2": "Beetroot Cutlet, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Besan Chilla, Coconut Chutney", "opt2": "Beetroot Cutlet, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Mix Sprout Salad", "raita": "Lemonade", "dessert": "Gulab Jamun", "main": "Chole Masala", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Ragada Pattice"}, "jain": {"salad": "Mix Sprout Salad", "raita": "Lemonade", "dessert": "Gulab Jamun", "main": "Chole Masala", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Ragada Pattice"}}, "eveningSnack": {"regular": "Cheese Sandwich", "jain": "Cheese Sandwich"}}, "2026-08-20": {"breakfast": {"regular": {"opt1": "Medu Wada, Sambar", "opt2": "Bread Butter Jam, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Medu Wada, Sambar", "opt2": "Bread Butter Jam, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Chaat", "raita": "Palak Raita", "dessert": "", "main": "Sahi Kofta Curry", "dal": "Dal Palak", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Pasta Alfredo"}, "jain": {"salad": "Corn Chaat", "raita": "Palak Raita", "dessert": "", "main": "Sahi Kofta Curry", "dal": "Dal Palak", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Pasta Alfredo"}}, "eveningSnack": {"regular": "Cut Fruit", "jain": "Cut Fruit"}}, "2026-08-21": {"breakfast": {"regular": {"opt1": "Pav Bhaji, Pav", "opt2": "Vegetable Poha, Sev", "fruit": "Mix Fruit"}, "jain": {"opt1": "Pav Bhaji, Pav", "opt2": "Vegetable Poha, Sev", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Three Beans Salad", "raita": "Bondi Raita", "dessert": "Fruit Custard", "main": "Noodles", "dal": "Veg Biryani", "rice": "Capsicum Salan", "bread": "Papad", "yummy": "Pizza"}, "jain": {"salad": "Three Beans Salad", "raita": "Bondi Raita", "dessert": "Fruit Custard", "main": "Noodles", "dal": "Veg Biryani", "rice": "Capsicum Salan", "bread": "Papad", "yummy": "Pizza"}}, "eveningSnack": {"regular": "Veg Puff", "jain": "Veg Puff"}}, "2026-08-24": {"breakfast": {"regular": {"opt1": "Mix Veg Idli, Sambar", "opt2": "Corn Tomato Upma, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Mix Veg Idli, Sambar", "opt2": "Corn Tomato Upma, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Ministry Salad", "raita": "Tomato Soup", "dessert": "Sheera", "main": "Mix Veg", "dal": "Dal Palak", "rice": "Green Peas Pulao", "bread": "Coriander Roti", "yummy": "Mac & Cheese"}, "jain": {"salad": "Ministry Salad", "raita": "Tomato Soup", "dessert": "Sheera", "main": "Mix Veg", "dal": "Dal Palak", "rice": "Green Peas Pulao", "bread": "Coriander Roti", "yummy": "Mac & Cheese"}}, "eveningSnack": {"regular": "Paneer Paratha", "jain": "Paneer Paratha"}}, "2026-08-25": {"breakfast": {"regular": {"opt1": "Poori, Bhaji", "opt2": "Dhokla, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Poori, Bhaji", "opt2": "Dhokla, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Shrikhand", "main": "Shahi Paneer", "dal": "Veg Dal", "rice": "Basanti Pulao", "bread": "Laccha Paratha", "yummy": "Moong Dal Pakoda"}, "jain": {"salad": "Green Salad", "raita": "Mix Veg Raita", "dessert": "Shrikhand", "main": "Shahi Paneer", "dal": "Veg Dal", "rice": "Basanti Pulao", "bread": "Laccha Paratha", "yummy": "Moong Dal Pakoda"}}, "eveningSnack": {"regular": "", "jain": ""}}, "2026-08-26": {"holiday": true, "label": "Eid-E-Milad"}, "2026-08-27": {"holiday": true, "label": "School Wide Holiday"}, "2026-08-28": {"holiday": true, "label": "Raksha Bandhan"}, "2026-08-31": {"breakfast": {"regular": {"opt1": "Misal, Pav", "opt2": "Peas Poha, Sev", "fruit": "Watermelon"}, "jain": {"opt1": "Misal, Pav", "opt2": "Peas Poha, Sev", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Carrot Raita", "dessert": "Sahi Tukda", "main": "Paneer Matar", "dal": "Dal Adraki", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Gobi 65"}, "jain": {"salad": "Green Salad", "raita": "Cucumber Raita", "dessert": "Sahi Tukda", "main": "Paneer Matar", "dal": "Dal Adraki", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Gobi 65"}}, "eveningSnack": {"regular": "Corn Chat", "jain": "Corn Chat"}}, "2026-09-01": {"breakfast": {"regular": {"opt1": "Oats Pancake, Maple Syrup", "opt2": "Veg Poha", "fruit": "Watermelon"}, "jain": {"opt1": "Oats Pancake, Maple Syrup", "opt2": "Veg Poha", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Masala Chaas", "dessert": "", "main": "Matar Paneer", "dal": "Dal Palak", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Sabudana Kheer"}, "jain": {"salad": "Corn Salad", "raita": "Masala Chaas", "dessert": "", "main": "Matar Paneer", "dal": "Dal Palak", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Sabudana Kheer"}}}, "2026-09-02": {"breakfast": {"regular": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Mix Veg Paratha, Curd", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Green moong Salad", "raita": "Burhani Raita", "dessert": "", "main": "Malai Kofta Curry", "dal": "Dal Fry", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Pasta Alfredo"}, "jain": {"salad": "Green moong Salad", "raita": "Burhani Raita", "dessert": "", "main": "Malai Kofta Curry", "dal": "Dal Fry", "rice": "Corn Pulao", "bread": "Ajwaini Roti", "yummy": "Pasta Alfredo"}}}, "2026-09-03": {"breakfast": {"regular": {"opt1": "Tadka Idli, Sambar", "opt2": "Palak Thepla, Tomato Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Tadka Idli, Sambar", "opt2": "Palak Thepla, Tomato Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Beetroot Salad", "raita": "Buttermilk", "dessert": "", "main": "Aloo Cabbage Matar", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Veg Hakka Noodles"}, "jain": {"salad": "Cucumber", "raita": "Buttermilk", "dessert": "", "main": "Cabbage Matar", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Veg Hakka Noodles"}}}, "2026-09-04": {"breakfast": {"regular": {"opt1": "Misal, Wheat Pav", "opt2": "Veg Quesadilla, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Misal, Wheat Pav", "opt2": "Veg Quesadilla, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "", "raita": "", "dessert": "", "main": "No lunch served today", "dal": "", "rice": "", "bread": "", "yummy": ""}, "jain": {"salad": "", "raita": "", "dessert": "", "main": "No lunch served today", "dal": "", "rice": "", "bread": "", "yummy": ""}}}, "2026-09-07": {"breakfast": {"regular": {"opt1": "Baked Beetroot Kebab, Sweet Chutney", "opt2": "Corn Tomato Upma, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Baked Paneer Kebab, Sweet Chutney", "opt2": "Corn Tomato Upma, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Plain Chaas", "dessert": "", "main": "Paneer Tikka Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Suji Sheera"}, "jain": {"salad": "Green Salad", "raita": "Plain Chaas", "dessert": "", "main": "Paneer Tikka Masala", "dal": "Dal Tadka", "rice": "Jeera Rice", "bread": "Dhaniya Roti", "yummy": "Suji Sheera"}}}, "2026-09-08": {"breakfast": {"regular": {"opt1": "Utthapam, Coconut Chutney", "opt2": "Vegetable Poha", "fruit": "Papaya"}, "jain": {"opt1": "Utthapam, Coconut Chutney", "opt2": "Vegetable Poha", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Black Chana Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Mix Veg", "dal": "Dal Fry", "rice": "Peas Pulao", "bread": "Chapati", "yummy": "Mac & Cheese"}, "jain": {"salad": "Black Chana Salad", "raita": "Sweet Corn Soup", "dessert": "", "main": "Mix Veg", "dal": "Dal Fry", "rice": "Peas Pulao", "bread": "Chapati", "yummy": "Mac & Cheese"}}}, "2026-09-09": {"breakfast": {"regular": {"opt1": "Paratha, Chole", "opt2": "Dhokla, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Paratha, Chole", "opt2": "Dhokla, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Mix Sprout Salad", "raita": "Buttermilk", "dessert": "", "main": "Veg Jalfrezi", "dal": "Dal Panchmel", "rice": "Steam Rice", "bread": "Palak Roti", "yummy": "Khow Suey"}, "jain": {"salad": "Mix Sprout Salad", "raita": "Buttermilk", "dessert": "", "main": "Veg Jalfrezi", "dal": "Dal Panchmel", "rice": "Steam Rice", "bread": "Palak Roti", "yummy": "Khow Suey"}}}, "2026-09-10": {"breakfast": {"regular": {"opt1": "Plain Dosa, Coconut Chutney", "opt2": "Chickpea Potato Tikki, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Plain Dosa, Coconut Chutney", "opt2": "Chickpea Potato Tikki, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Vegetable Raita", "dessert": "", "main": "Bhindi Masala", "dal": "Masoor Dal Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Wheat Pizza"}, "jain": {"salad": "Corn Salad", "raita": "Vegetable Raita", "dessert": "", "main": "Bhindi Masala", "dal": "Masoor Dal Tadka", "rice": "Jeera Rice", "bread": "Chapati", "yummy": "Wheat Pizza"}}}, "2026-09-11": {"breakfast": {"regular": {"opt1": "Veg Vermicelli Upma, Coconut Chutney", "opt2": "Palak Thepla, Curd", "fruit": "Mix Fruit"}, "jain": {"opt1": "Veg Vermicelli Upma, Coconut Chutney", "opt2": "Palak Thepla, Curd", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Three Beans Salad", "raita": "Vegetable Raita", "dessert": "", "main": "Veg Biryani", "dal": "Capsicum Salan", "rice": "Roasted Papad", "bread": "Noodles", "yummy": "Moong Dal Halwa"}, "jain": {"salad": "Three Beans Salad", "raita": "Vegetable Raita", "dessert": "", "main": "Veg Biryani", "dal": "Capsicum Salan", "rice": "Roasted Papad", "bread": "Noodles", "yummy": "Moong Dal Halwa"}}}, "2026-09-14": {"holiday": true, "label": "Holiday"}, "2026-09-15": {"breakfast": {"regular": {"opt1": "Corn Cheese Sandwich, Sweet Chutney", "opt2": "Palak Idli, Coconut Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Corn Cheese Sandwich, Sweet Chutney", "opt2": "Palak Idli, Coconut Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Carrot Raita", "dessert": "", "main": "Paneer Matar", "dal": "Dal Adraki", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Arrabbiata Pasta"}, "jain": {"salad": "Green Salad", "raita": "Carrot Raita", "dessert": "", "main": "Paneer Matar", "dal": "Dal Adraki", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Arrabbiata Pasta"}}}, "2026-09-16": {"breakfast": {"regular": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Ragi Oats Pancake, Maple Syrup", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Salad", "raita": "Buttermilk", "dessert": "", "main": "Veg Kolhapuri", "dal": "Dal Palak", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Kacchi Dabeli"}, "jain": {"salad": "Corn Salad", "raita": "Buttermilk", "dessert": "", "main": "Veg Kolhapuri", "dal": "Dal Palak", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Kacchi Dabeli"}}}, "2026-09-17": {"breakfast": {"regular": {"opt1": "Pav Bhaji, Wheat Pav", "opt2": "Baked Cutlet, Sweet Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Pav Bhaji, Wheat Pav", "opt2": "Baked Cutlet, Sweet Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Rainbow Salad", "raita": "Masala Chaas", "dessert": "", "main": "Aloo Parwal Masala", "dal": "Chana Dal Tadka", "rice": "Basanti Pulao", "bread": "Tawa Paratha", "yummy": "Cheese Chilli Toast"}, "jain": {"salad": "Rainbow Salad", "raita": "Masala Chaas", "dessert": "", "main": "Aloo Parwal Masala", "dal": "Chana Dal Tadka", "rice": "Basanti Pulao", "bread": "Tawa Paratha", "yummy": "Cheese Chilli Toast"}}}, "2026-09-18": {"holiday": true, "label": "Holiday"}, "2026-09-21": {"breakfast": {"regular": {"opt1": "Onion Uttapam, Sambar", "opt2": "Aloo Poha, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Onion Uttapam, Sambar", "opt2": "Aloo Poha, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Corn Chaat", "raita": "Plain Chaas", "dessert": "", "main": "Kadai Paneer", "dal": "Veg Dal", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Burnt Garlic Noodles"}, "jain": {"salad": "Corn Chaat", "raita": "Plain Chaas", "dessert": "", "main": "Kadai Paneer", "dal": "Veg Dal", "rice": "Steam Rice", "bread": "Chapati", "yummy": "Burnt Garlic Noodles"}}}, "2026-09-22": {"breakfast": {"regular": {"opt1": "Kanchipuram Idli, Sambar", "opt2": "Grilled Mix Veg Cutlet, Sweet Chutney", "fruit": "Papaya"}, "jain": {"opt1": "Kanchipuram Idli, Sambar", "opt2": "Grilled Mix Veg Cutlet, Sweet Chutney", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Manchow Soup", "dessert": "", "main": "Turai Masala", "dal": "Dal Tadka", "rice": "Tadka Rice", "bread": "Ajwaini Chapati", "yummy": "Baked Veg"}, "jain": {"salad": "Green Salad", "raita": "Manchow Soup", "dessert": "", "main": "Turai Masala", "dal": "Dal Tadka", "rice": "Tadka Rice", "bread": "Ajwaini Chapati", "yummy": "Baked Veg"}}}, "2026-09-23": {"breakfast": {"regular": {"opt1": "Aloo Paratha, Curd", "opt2": "Vegetable Upma, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Paneer Paratha, Curd", "opt2": "Vegetable Upma, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Beetroot Salad", "raita": "Masala Chaas", "dessert": "", "main": "Aloo Gobi Matar", "dal": "Dal Panchmel", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Pasta in Pink Sauce"}, "jain": {"salad": "Cucumber", "raita": "Masala Chaas", "dessert": "", "main": "Gobi Matar", "dal": "Dal Panchmel", "rice": "Jeera Rice", "bread": "Palak Roti", "yummy": "Pasta in Pink Sauce"}}}, "2026-09-24": {"breakfast": {"regular": {"opt1": "Bombay Sandwich, Sweet Chutney", "opt2": "Dhokla, Sweet Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Bombay Sandwich, Sweet Chutney", "opt2": "Dhokla, Sweet Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Mix Sprout Salad", "raita": "Vegetable Raita", "dessert": "", "main": "Dahi Wala Bhindi", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Ragada Pattice"}, "jain": {"salad": "Mix Sprout Salad", "raita": "Vegetable Raita", "dessert": "", "main": "Dahi Wala Bhindi", "dal": "Dal Fry", "rice": "Tawa Pulao", "bread": "Chapati", "yummy": "Ragada Pattice"}}}, "2026-09-25": {"holiday": true, "label": "Holiday"}, "2026-09-28": {"breakfast": {"regular": {"opt1": "Wheat Pav, Bhaji", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Watermelon"}, "jain": {"opt1": "Wheat Pav, Bhaji", "opt2": "Veg Upma, Coconut Chutney", "fruit": "Watermelon"}}, "lunch": {"regular": {"salad": "Green Salad", "raita": "Lemon Coriander Soup", "dessert": "", "main": "Paneer Lababdar", "dal": "Dal Triveni", "rice": "Veg Pulao", "bread": "Chapati", "yummy": "Rice Kheer"}, "jain": {"salad": "Green Salad", "raita": "Lemon Coriander Soup", "dessert": "", "main": "Paneer Lababdar", "dal": "Dal Triveni", "rice": "Veg Pulao", "bread": "Chapati", "yummy": "Rice Kheer"}}}, "2026-09-29": {"breakfast": {"regular": {"opt1": "Idli, Sambar", "opt2": "Green Peas Poha", "fruit": "Papaya"}, "jain": {"opt1": "Idli, Sambar", "opt2": "Green Peas Poha", "fruit": "Papaya"}}, "lunch": {"regular": {"salad": "Green Moong Salad", "raita": "Buttermilk", "dessert": "", "main": "Home-Style Rajma", "dal": "Kadhi", "rice": "Khichdi", "bread": "Chapati", "yummy": "Schezwan Noodles"}, "jain": {"salad": "Green Moong Salad", "raita": "Buttermilk", "dessert": "", "main": "Home-Style Rajma", "dal": "Kadhi", "rice": "Khichdi", "bread": "Chapati", "yummy": "Schezwan Noodles"}}}, "2026-09-30": {"breakfast": {"regular": {"opt1": "Besan Chilla, Coconut Chutney", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Mix Fruit"}, "jain": {"opt1": "Besan Chilla, Coconut Chutney", "opt2": "Vermicelli Upma, Coconut Chutney", "fruit": "Mix Fruit"}}, "lunch": {"regular": {"salad": "Black Chana Salad", "raita": "Mix Veg Raita", "dessert": "", "main": "Veg Diwani Handi", "dal": "Peas Pulao", "rice": "Dal Makhni", "bread": "Chapati", "yummy": "Spaghetti in Pomodoro"}, "jain": {"salad": "Black Chana Salad", "raita": "Mix Veg Raita", "dessert": "", "main": "Veg Diwani Handi", "dal": "Peas Pulao", "rice": "Dal Makhni", "bread": "Chapati", "yummy": "Spaghetti in Pomodoro"}}}};
+
+// ── OCTOBER 2026 — cafeteria breakfast + lunch menus. Each lunch day is [Regular, Jain] with the rows in
+// the school sheet's order: salad · raita/soup · home-favourite veg · drink/dal
+// · rice · bread · Yummy of the Day · day-care snack. A missing Jain entry means
+// "same as Regular". Rows are copied as the sheet has them (it's the school's
+// own row placement — some Fridays have noodles/desserts in the veg/dal/rice
+// rows); only obvious typos are fixed. Real dates already in MENU win. ───────
+const OCT_THEME_META = {
+  'Gujarati':      { emoji: '🪁' },
+  'Maharashtrian': { emoji: '🚩' },
+  'South Indian':  { emoji: '🌴' },
+};
+const OCT_LUNCH = {
+  '2026-10-01': { r: ['Black Chana Salad','Burhani Raita','Bhindi Masala','Dal Panchemal','Steam Rice','Phulka','Khow Suey','Veg Roll'] },
+  // Gujarati theme lunch
+  '2026-10-05': { theme: 'Gujarati', r: ['Carrot Salad','Cucumber Raita','Kadhai Paneer','Dal Palak','Green Peas Pulao','Phulka','Seviyan Kheer','Churma Laddo'],
+                  j: ['Cucumber','Cucumber Raita','Kadhai Paneer','Dal Palak','Green Peas Pulao','Phulka','Seviyan Kheer','Churma Laddo'] },
+  '2026-10-06': { theme: 'Gujarati', r: ['Kachumber Salad','Masala Chass','Ringan Bataka Nu Shaak','Khatu Meethu Dal','Ram Khichdi','Phulka','Pasta Arriabiatta','Panner Paratha'] },
+  '2026-10-07': { theme: 'Gujarati', r: ['Corn Salad','Buttermilk','Sem Aloo Masala','Dal Palak','Jeera Rice','Phulka','Mini Burger (wheat)','Papaya'],
+                  j: ['Corn Salad','Masala Chass','Sem Masala','Dal Palak','Jeera Rice','Phulka','Mini Burger (wheat)','Papaya'] },
+  '2026-10-08': { theme: 'Gujarati', r: ['Toss Salad','Masala Chass','Navratna Korma','Dal Fry','Tadka Rice','','Baked Cheese Veg','Tomato Basil Bruschetta'],
+                  j: ['Toss Salad','Lemonade','Navratna Korma','Dal Fry','Tadka Rice','','Baked Cheese Veg','Tomato Basil Bruschetta'] },
+  '2026-10-09': { theme: 'Gujarati', r: ['Khimchi Salad','Lemon Coriander Soup','Fruit Custard','Veg Hakka Noodles','Veg Schezwan Fried Rice','Veg Manchurian','Cheese Garlic Bread','Fruit Tart'] },
+  // Maharashtrian theme lunch
+  '2026-10-12': { theme: 'Maharashtrian', r: ['Green Salad','Boondi Raita','Paneer Makhanwala','Vegetable Dal Tadka','Plain Pulao','Phulka','Moong Dal Halwa','Hara Bhara Kabab'] },
+  '2026-10-13': { theme: 'Maharashtrian', r: ['Dahi Kakdi Koshimbir','Kokam Sharbat','Veg Maratha','Varan','Masala Bhaat','Chapati','Pasta in Pomodoro Sauce','Ragi Pancake'] },
+  '2026-10-14': { theme: 'Maharashtrian', r: ['Rainbow Salad','Masala Chaas','Veg Jalfrezi','Chana Dal Tadka','Coriander Rice','Tawa Paratha','Cinnamon Doughnut','Puran Poli'] },
+  '2026-10-15': { theme: 'Maharashtrian', r: ['Green Moong Salad','Sweet Corn Soup','Aloo Gobi Mutter Dry','Dal Fry','Jeera Rice','Phulka','Schezwan Noodles','Panner Tikka'] },
+  '2026-10-16': { theme: 'Maharashtrian', r: ['Ministry Salad','Mint Cooler','Slice Cake','Baked Cheese Vegetable','Arrabbiata Pasta','Mexican Rice','Pizza','Noodles'] },
+  // No theme this week
+  '2026-10-19': { r: ['Green Salad','Mix Veg Raita','Paneer Tikka Masala','Dal Tadka','Jeera Rice','Phulka','Rice Kheer','Fruit Yogurt'] },
+  '2026-10-21': { r: ['Black Chana Salad','Butter Milk','Veg Diwani Handi','Masala Khichdi','Kadhi','Phulka','Mac & Cheese','Corn Chat'] },
+  '2026-10-22': { r: ['Rainbow Salad','Kabuli Chana Chat','Veg Korma','Chana Daal','Steamed Rice','Tawa Paratha','Garlic Bread','Fruit'] },
+  '2026-10-23': { r: ['Three Beans Salad','Boondi Raita','Veg - Biryani','Capsicum Salan','Roasted Papad','Noodles','Shrikhand','Aloo Paratha'] },
+  // South Indian theme lunch (also the SA1 paper days)
+  '2026-10-26': { theme: 'South Indian', r: ['Green Salad','Carrot Raita','Panner Matter','Dal Adraki','Steam Rice','Chapati','Carrot Muffin','Margarita Pizza'],
+                  j: ['Green Salad','Cucumber Raita','Panner Matter','Dal Adraki','Steam Rice','Chapati','Carrot Muffin','Margarita Pizza'] },
+  '2026-10-27': { theme: 'South Indian', r: ['Cucumber Coconut Salad','Mint Buttermilk','Kerala Vegetable Stew','Rasam','Lemon Rice','Akki Roti','Penne Pasta','Wheat Jaggery Pancake'] },
+  '2026-10-28': { theme: 'South Indian', r: ['Rainbow Salad','Mint Mojito','Aloo Parwal Home Style','Chana Dal Tadka','Jeera Rice','Phulka','Cheese Chilli Toast','Mini Burger'] },
+  '2026-10-29': { theme: 'South Indian', r: ['Kachumber Salad','Curd','Dahi Wali Bhindi','Dal Fry','Tawa Pulao','Chapati','Veg Momos','Veg Roll'] },
+  '2026-10-30': { theme: 'South Indian', r: ['Thai Raw Papaya Salad','Sabai Sabai','Caramel Custard','Thai Curry','Thai Basil Fried Rice','Thai Noodle','Laksa','Papaya'] },
+};
+// October BREAKFAST: [option 1, option 2, fruit/dessert] per day; the sheet puts
+// the side (curd, sambar, chutney…) on a second row, joined here with a comma
+// like the earlier months. `j` only where the Jain menu differs.
+const OCT_BREAKFAST = {
+  '2026-10-01': { r: ['Mix Veg Paratha, Curd','Dhokla, Sweet Chutney','Papaya'], j: ['Paneer Paratha, Curd','Dhokla, Sweet Chutney','Papaya'] },
+  '2026-10-05': { r: ['Misal, Pav','Onion Utthapam, Coconut Chutney','Watermelon'] },
+  '2026-10-06': { r: ['Ragi Pancake, Maple Syrup','Veg Upma, Coconut Chutney','Papaya'] },
+  '2026-10-07': { r: ['Kanchipuram Idli, Sambar','Mix Veg Poha, Lemon','Mix Fruit'] },
+  '2026-10-08': { r: ['Kathi Roll, Sweet Chutney','Vermicelli Upma, Coconut Chutney','Watermelon'] },
+  '2026-10-09': { r: ['Aloo Paratha, Curd','Jaggery Oats Kheer','Mix Fruit'], j: ['Paneer Paratha, Curd','Jaggery Oats Kheer','Mix Fruit'] },
+  '2026-10-12': { r: ['Chole, Kulcha','Batata Poha','Watermelon'], j: ['Chole, Kulcha','Green Peas Poha','Watermelon'] },
+  '2026-10-13': { r: ['Pav, Wada','Sanja, Coconut Chutney','Papaya'] },
+  '2026-10-14': { r: ['Medu Wada, Sambar','Yellow Dhokla, Sweet Chutney','Mix Fruit'] },
+  '2026-10-15': { r: ['Mix Veg Paratha, Curd','Vermicelli Upma, Coconut Chutney','Papaya'] },
+  '2026-10-16': { r: ['Adai Dosa, Coconut Chutney','Mix Veg Paneer Cutlet, Green Chutney','Mix Fruit'] },
+  '2026-10-19': { r: ['Plain Dosa, Coconut Chutney','Corn Cheese Sandwich, Sweet Chutney','Watermelon'] },
+  '2026-10-21': { r: ['Pav, Bhaji','Oats Kheer','Mix Fruit'] },
+  '2026-10-22': { r: ['Wheat Jaggery Pancake, Maple Syrup','Corn Tomato Upma, Coconut Chutney','Watermelon'] },
+  '2026-10-23': { r: ['Plain Idli, Sambar','Beetroot Cutlet, Green Chutney','Papaya'], j: ['Plain Idli, Sambar','Corn Cutlet, Green Chutney','Papaya'] },
+  '2026-10-26': { r: ['Veg Roll, Ketchup','Mix Veg Poha','Watermelon'] },
+  '2026-10-27': { r: ['Idli, Sambar','Mix Veg Upma, Coconut Chutney','Papaya'] },
+  '2026-10-28': { r: ['Thepla, Curd','Vermicelli Upma, Coconut Chutney','Mix Fruit'] },
+  '2026-10-29': { r: ['Onion Utthapam, Coconut Chutney','Khaman Dhokla, Sweet Chutney','Papaya'] },
+  '2026-10-30': { r: ['Besan Chilla, Tomato Chutney','Hummus Sandwich, Sweet Chutney','Mix Fruit'] },
+};
+const octBreakfast = ([opt1, opt2, fruit]) => ({ opt1, opt2, fruit });
+const octLunch = ([salad, raita, main, dal, rice, bread, yummy]) =>
+  ({ salad, raita, dessert: '', main, dal, rice, bread, yummy });
+Object.entries(OCT_LUNCH).forEach(([d, v]) => {
+  if (MENU[d]) return;
+  const jain = v.j || v.r;
+  MENU[d] = {
+    lunch: { regular: octLunch(v.r), jain: octLunch(jain) },
+    eveningSnack: { regular: v.r[7], jain: jain[7] },
+    snackLabel: 'Day-care snack', // the October sheet's row is "Day care snacks"
+    ...(v.theme ? { theme: v.theme } : {}),
+  };
+  const b = OCT_BREAKFAST[d];
+  if (b) MENU[d].breakfast = { regular: octBreakfast(b.r), jain: octBreakfast(b.j || b.r) };
+});
+// Dates with no lunch menu yet (Maths SA1, 2 Nov) are still school days.
+if (!MENU['2026-11-02']) MENU['2026-11-02'] = { noMenu: true };
+if (!MENU['2026-10-02']) MENU['2026-10-02'] = { holiday: true, label: 'Mahatma Gandhi Jayanti' };
+if (!MENU['2026-10-20']) MENU['2026-10-20'] = { holiday: true, label: 'Dusshera' };
 
 // ── WEEKS ────────────────────────────────────────────────────────────────────
 const MONTHS = [
@@ -1279,6 +1484,18 @@ const MONTHS = [
       { label: 'Week 5 · Sep 28–30', days: ['2026-09-28','2026-09-29','2026-09-30'] },
     ]
   },
+  {
+    key: '2026-10',
+    label: 'October',
+    weeks: [
+      { label: 'Week 1 · Oct 1–2', days: ['2026-10-01','2026-10-02'] },
+      { label: 'Week 2 · Oct 5–9', days: ['2026-10-05','2026-10-06','2026-10-07','2026-10-08','2026-10-09'] },
+      { label: 'Week 3 · Oct 12–16', days: ['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-16'] },
+      { label: 'Week 4 · Oct 19–23', days: ['2026-10-19','2026-10-20','2026-10-21','2026-10-22','2026-10-23'] },
+      // SA1 runs to Mon 2 Nov (Maths), so its last paper sits in this week.
+      { label: 'Week 5 · Oct 26 – Nov 2', days: ['2026-10-26','2026-10-27','2026-10-28','2026-10-29','2026-10-30','2026-11-02'] },
+    ]
+  },
 ];
 
 const DAY_NAMES = {
@@ -1295,6 +1512,12 @@ const DAY_NAMES = {
   '2026-09-14':'Mon','2026-09-15':'Tue','2026-09-16':'Wed','2026-09-17':'Thu','2026-09-18':'Fri',
   '2026-09-21':'Mon','2026-09-22':'Tue','2026-09-23':'Wed','2026-09-24':'Thu','2026-09-25':'Fri',
   '2026-09-28':'Mon','2026-09-29':'Tue','2026-09-30':'Wed',
+  '2026-10-01':'Thu','2026-10-02':'Fri',
+  '2026-10-05':'Mon','2026-10-06':'Tue','2026-10-07':'Wed','2026-10-08':'Thu','2026-10-09':'Fri',
+  '2026-10-12':'Mon','2026-10-13':'Tue','2026-10-14':'Wed','2026-10-15':'Thu','2026-10-16':'Fri',
+  '2026-10-19':'Mon','2026-10-20':'Tue','2026-10-21':'Wed','2026-10-22':'Thu','2026-10-23':'Fri',
+  '2026-10-26':'Mon','2026-10-27':'Tue','2026-10-28':'Wed','2026-10-29':'Thu','2026-10-30':'Fri',
+  '2026-11-02':'Mon',
 };
 const WEEKDAY_BY_DATE = DAY_NAMES;
 const TT_KEY = { 'Mon':'mon','Tue':'tue','Wed':'wed','Thu':'thu','Fri':'fri' };
@@ -1431,6 +1654,15 @@ function toggleJain() {
   renderTimeline();
 }
 
+// ── PAGE TABS (Timetable vs Tasks & Notices) ─────────────────────────────────
+function switchPageTab(name) {
+  document.getElementById('tabTimetable').hidden = name !== 'timetable';
+  document.getElementById('tabTasks').hidden = name !== 'tasks';
+  document.querySelectorAll('.page-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === name);
+  });
+}
+
 // ── RENDER TIMELINE ───────────────────────────────────────────────────────────
 let thorStrikeInterval = null;
 let heroSoundInterval = null;
@@ -1508,6 +1740,83 @@ function confettiPiecesHTML(n) {
   return html;
 }
 
+// ── EXAM SCHEDULES (newest first) ────────────────────────────────────────────
+// Each set renders as its own section; the alert banner follows the first set
+// that hasn't finished yet. A row with no subject renders as "No exam scheduled".
+const EXAM_SETS = [
+  {
+    name: 'SA1',
+    title: 'First Term Summative Assessment (SA1)',
+    note: 'Circular 2026/27/PY/CIR016 (28 Sep 2026). Revision sessions follow each paper.',
+    rows: [
+      { date: '2026-10-26', day: 'Monday',    time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'English', topic: "Unit 1 — Story writing with Roald Dahl: stories with a familiar setting, articles, speech marks, write a story with beginning, middle, end · Unit 2 — Let's Have a Party: compound words, instructional text · Unit 3 — Poems from around the world: suffix -ing, -ed, onomatopoeia · Unit 9 — Laughing Allowed: homonyms, alliteration, verb tense, noun phrase, limericks, calligram" },
+      { date: '2026-10-27', day: 'Tuesday',   time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'DL&C', topic: 'Unit 1 — Making programs clear: follow, understand, edit and correct algorithms, resetting objects · Unit 2 — Hardware and software work together: a working system, hardware and software roles, manual and automatic input devices, identifying problems · Unit 3 — Be a data expert: discrete data · Unit 5 — Networks are everywhere: computing devices, networks around us, services on a network, advantages and disadvantages of networks' },
+      { date: '2026-10-28', day: 'Wednesday', time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Hindi', topic: 'Matra — अ to ऐ: word formation, identifying the matra, making different words, picture identification, fill in the blanks' },
+      { date: '2026-10-29', day: 'Thursday',  time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Science', topic: 'Unit 1 — Plants are living things: 1.1 Alive or not alive, 1.2 Plant parts, 1.3 Plants and light, 1.4 Plants need water and the right temperature · Unit 4 — Staying Alive: 4.1 Human organs, 4.2 Animal groups and life cycles, 4.3 Food chains, 4.4 Fossils · Unit 5 — Forces and Magnets: 5.1 Forces and forcemeters, 5.2 Gravity, 5.3 Friction, 5.4 Amazing magnets, 5.5 Magnetic materials' },
+      { date: '2026-10-30', day: 'Friday',    time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Marathi', topic: 'Lessons 6–10 — उ, ऊ, ऋ, ए, ऐ ची मात्रा: write the words in English and in Marathi, name the pictures, complete the words, rearrange letters into words, match the columns' },
+      { date: '2026-10-31', day: 'Saturday',  weekend: true },
+      { date: '2026-11-01', day: 'Sunday',    weekend: true },
+      { date: '2026-11-02', day: 'Monday',    time: '8:30–9:30am · school 8:00am–12:00pm', subject: 'Mathematics', topic: 'Unit 1 — Numbers to 1000: 1.1–1.3 · Unit 3 — Addition, subtraction and money: 3.1–3.3 · Unit 5 — Multiplication and division: 5.1 Exploring, 5.2 Connecting 2×, 4×, 8×, 5.3 Connecting 3×, 6×, 9× · Unit 9 — More addition and subtraction: 9.1–9.3 · Unit 11 — More multiplication and division: 11.1–11.3 · Unit 17 — Pattern and symmetry: 17.1–17.2' },
+    ],
+  },
+  {
+    name: 'CA2',
+    title: 'Formal CA2 Exam Schedule',
+    rows: [
+      { date: '2026-09-28', day: 'Monday',    subject: 'Mathematics', topic: 'Unit 3 — Addition, Subtraction and Money: 3.1 Addition, 3.2 Subtraction, 3.3 Money · Unit 9 — More Addition and Subtraction: 9.1 Addition: regrouping tens and reordering, 9.2 Subtraction: regrouping, 9.3 Complements' },
+      { date: '2026-09-29', day: 'Tuesday',   subject: 'DL&C', topic: 'Be a Designer — Algorithms · Repetition in task · Coding using multiple algorithms' },
+      { date: '2026-09-30', day: 'Wednesday', subject: 'Marathi', topic: 'उ आणि ऊ ची मात्रा' },
+      { date: '2026-10-01', day: 'Thursday',  subject: 'English', topic: "Unit 2 — Let's Have a Party · Grammar: punctuation and speech marks, instructional text (command verbs and sequencing words), compound words, -ing and -ed words" },
+      { date: '2026-10-02', day: 'Friday',    holiday: 'Gandhi Jayanti' },
+      { date: '2026-10-03', day: 'Saturday',  weekend: true },
+      { date: '2026-10-04', day: 'Sunday',    weekend: true },
+      { date: '2026-10-05', day: 'Monday',    subject: 'Hindi', topic: 'इ, ई, उ, ऊ की मात्रा' },
+      { date: '2026-10-06', day: 'Tuesday',   subject: 'Science', topic: 'Unit 4 — Staying Alive: 4.1 Human organs, 4.2 Animal groups and different life cycles, 4.3 Food chains, 4.4 Fossils' },
+    ],
+  },
+  {
+    name: 'CA1',
+    title: 'Formal CA1 Exam Schedule',
+    rows: [
+      { date: '2026-08-14', day: 'Friday',    subject: 'Science', topic: 'Unit 1: Plants are living things' },
+      { date: '2026-08-15', day: 'Saturday',  weekend: true },
+      { date: '2026-08-16', day: 'Sunday',    weekend: true },
+      { date: '2026-08-17', day: 'Monday',    subject: 'Math', topic: 'Unit 1: Numbers 1 to 1000' },
+      { date: '2026-08-18', day: 'Tuesday',   subject: 'DL&C', topic: 'Unit 1: Making programs clear' },
+      { date: '2026-08-19', day: 'Wednesday' },
+      { date: '2026-08-20', day: 'Thursday',  subject: 'Marathi', topic: 'Unit 2 — इ, ई ची मात्रा (pg 14–23)' },
+      { date: '2026-08-21', day: 'Friday',    subject: 'English', topic: 'Unit 1 — Dictation words' },
+      { date: '2026-08-22', day: 'Saturday',  weekend: true },
+      { date: '2026-08-23', day: 'Sunday',    weekend: true },
+      { date: '2026-08-24', day: 'Monday',    subject: 'Hindi', topic: "Swar, Vyanjan (पुनरावर्तन), Amaatrik Shabd (अमात्रिक शब्द), 'आ' की मात्रा" },
+    ],
+  },
+];
+
+// ── OLYMPIADS (SOF, 2026-27) — the five Uv is registered for as a
+// Grade 2 student (IHO and ISSO are Grades 3-5 only). One paper each, so they
+// live apart from EXAM_SETS: their own schedule card, a day-view card and a
+// countdown line in the alert banner.
+const OLYMPIADS = [
+  { date: '2026-09-22', code: 'IGKO', name: 'International General Knowledge Olympiad' },
+  { date: '2026-09-30', code: 'IEO',  name: 'International English Olympiad' },
+  { date: '2026-11-19', code: 'ISO',  name: 'International Science Olympiad' },
+  { date: '2026-12-10', code: 'IMO',  name: 'International Mathematics Olympiad' },
+  { date: '2026-12-17', code: 'ICSO', name: 'International Computer Science Olympiad' },
+];
+
+function olympiadOn(dateStr) {
+  return OLYMPIADS.find(o => o.date === dateStr) || null;
+}
+
+function examOn(dateStr) {
+  for (const set of EXAM_SETS) {
+    const row = set.rows.find(r => r.date === dateStr && r.subject);
+    if (row) return { set, row };
+  }
+  return null;
+}
+
 function renderTimeline() {
   applyHeroTheme();
   const wrap = document.getElementById('timelineWrap');
@@ -1522,6 +1831,28 @@ function renderTimeline() {
   const dateLabel = dateObj.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
   let html = `<div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--accent);margin-bottom:14px;padding-left:2px;">${dateLabel}</div>`;
+
+  const exam = examOn(currentDay);
+  if (exam) {
+    html += `<div class="exam-row examday" style="margin-bottom:14px;">
+      <span class="exam-row-badge">📝 ${exam.set.name}</span>
+      <div class="exam-row-info">
+        <span class="exam-row-subject">${exam.row.subject} exam today${exam.row.time ? ` <span class="exam-row-topic">· ${exam.row.time}</span>` : ''}</span>
+        <span class="exam-row-topic">${exam.row.topic}</span>
+      </div>
+    </div>`;
+  }
+
+  const oly = olympiadOn(currentDay);
+  if (oly) {
+    html += `<div class="exam-row examday olympiad" style="margin-bottom:14px;">
+      <span class="exam-row-badge">🏅 Olympiad</span>
+      <div class="exam-row-info">
+        <span class="exam-row-subject">${oly.code} today</span>
+        <span class="exam-row-topic">${oly.name}</span>
+      </div>
+    </div>`;
+  }
 
   if (!menuData) {
     html += `<div class="holiday-card"><span class="h-emoji">📅</span><h3>No data</h3><p>Menu not available for this date.</p></div>`;
@@ -1540,9 +1871,56 @@ function renderTimeline() {
     return;
   }
 
-  const bf = menuData.breakfast[mode];
-  const ln = menuData.lunch[mode];
+  const bf = menuData.breakfast ? menuData.breakfast[mode] : null;
+  const ln = menuData.lunch ? menuData.lunch[mode] : null;
   const es = menuData.eveningSnack ? menuData.eveningSnack[mode] : '';
+  const menuPending = (what) => `<div class="menu-pending">🍽️ ${what} menu isn't published yet — check back soon</div>`;
+
+  const breakfastBody = () => bf ? `<div class="food-row">
+              <div class="food-chip">🥞 <div class="food-chip-inner"><span class="fc-label">Option 1</span>${bf.opt1}</div></div>
+              <div class="food-chip">🥙 <div class="food-chip-inner"><span class="fc-label">Option 2</span>${bf.opt2}</div></div>
+              <div class="food-chip">🍉 <div class="food-chip-inner"><span class="fc-label">Fruit</span>${bf.fruit}</div></div>
+            </div>` : menuPending('Breakfast');
+
+  // Everything inside the lunch card except its title (shared by the normal
+  // timetable and the SA1 short days, which have no lunch-break slot).
+  const lunchBody = () => {
+    if (!ln) return menuPending('Lunch');
+    const th = menuData.theme ? (OCT_THEME_META[menuData.theme] || { emoji: '🍽️' }) : null;
+    let chips = `
+        <div class="food-chip">🥗 <div class="food-chip-inner"><span class="fc-label">Salad</span>${ln.salad}</div></div>
+        <div class="food-chip">🥛 <div class="food-chip-inner"><span class="fc-label">Raita/Soup</span>${ln.raita}</div></div>
+        <div class="food-chip">🍛 <div class="food-chip-inner"><span class="fc-label">Main Veg</span>${ln.main}</div></div>
+        <div class="food-chip">🫘 <div class="food-chip-inner"><span class="fc-label">Dal</span>${ln.dal}</div></div>
+        <div class="food-chip">🍚 <div class="food-chip-inner"><span class="fc-label">Rice</span>${ln.rice}</div></div>`;
+    if (ln.bread) chips += `<div class="food-chip">🫓 <div class="food-chip-inner"><span class="fc-label">Bread</span>${ln.bread}</div></div>`;
+    if (ln.dessert) chips += `<div class="food-chip">🍮 <div class="food-chip-inner"><span class="fc-label">Dessert</span>${ln.dessert}</div></div>`;
+    return `${th ? `<div class="theme-strip">${th.emoji} ${menuData.theme} Theme Lunch</div>` : ''}
+            <div class="food-row">${chips}</div>
+            ${ln.yummy ? `<div class="yummy-strip">⭐ Yummy of the Day: ${ln.yummy}</div>` : ''}
+            ${es ? `<div class="snack-strip">🌆 ${menuData.snackLabel || 'Evening Snack'}: ${es}</div>` : ''}`;
+  };
+
+  // SA1 paper days: school runs 8:00am–12:00pm, so the regular timetable
+  // (8:15–2:45) doesn't apply — say so instead of showing it. The cafeteria
+  // still lists a lunch for these days, so that stays visible.
+  if (exam && /school 8:00am/.test(exam.row.time || '')) {
+    html += `<div class="shortday-card">
+      <span class="h-emoji">🕗</span>
+      <div><strong>Short day — school 8:00am to 12:00pm</strong>
+      <p>Paper 8:30–9:30am. A revision session follows the paper, then home time. No regular timetable or after-school activity today unless the school says otherwise.</p></div>
+    </div>`;
+    if (menuData.breakfast) html += `<div class="break-card short-break" style="margin-top:14px;">
+            <div class="break-title">☕ Breakfast menu</div>
+            ${breakfastBody()}
+          </div>`;
+    if (menuData.lunch) html += `<div class="break-card long-break" style="margin-top:14px;">
+            <div class="break-title">🍱 Lunch menu</div>
+            ${lunchBody()}
+          </div>`;
+    wrap.innerHTML = html;
+    return;
+  }
 
   html += `<div class="timeline">`;
 
@@ -1554,31 +1932,17 @@ function renderTimeline() {
           <div class="t-dot" style="background:#f39c12;box-shadow:0 0 0 2px #f39c12;"></div>
           <div class="break-card short-break">
             <div class="break-title">☕ Breakfast Break <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">${start}–${end}</span></div>
-            <div class="food-row">
-              <div class="food-chip">🥞 <div class="food-chip-inner"><span class="fc-label">Option 1</span>${bf.opt1}</div></div>
-              <div class="food-chip">🥙 <div class="food-chip-inner"><span class="fc-label">Option 2</span>${bf.opt2}</div></div>
-              <div class="food-chip">🍉 <div class="food-chip-inner"><span class="fc-label">Fruit</span>${bf.fruit}</div></div>
-            </div>
+            ${breakfastBody()}
           </div>
         </div>`;
     } else if (subject === 'LONG_BREAK') {
-      let lunchItems = `
-        <div class="food-chip">🥗 <div class="food-chip-inner"><span class="fc-label">Salad</span>${ln.salad}</div></div>
-        <div class="food-chip">🥛 <div class="food-chip-inner"><span class="fc-label">Raita/Soup</span>${ln.raita}</div></div>
-        <div class="food-chip">🍛 <div class="food-chip-inner"><span class="fc-label">Main Veg</span>${ln.main}</div></div>
-        <div class="food-chip">🫘 <div class="food-chip-inner"><span class="fc-label">Dal</span>${ln.dal}</div></div>
-        <div class="food-chip">🍚 <div class="food-chip-inner"><span class="fc-label">Rice</span>${ln.rice}</div></div>
-        <div class="food-chip">🫓 <div class="food-chip-inner"><span class="fc-label">Bread</span>${ln.bread}</div></div>`;
-      if (ln.dessert) lunchItems += `<div class="food-chip">🍮 <div class="food-chip-inner"><span class="fc-label">Dessert</span>${ln.dessert}</div></div>`;
       html += `
         <div class="t-item" style="position:relative;">
           <div class="t-time" style="top:16px;">${start}</div>
           <div class="t-dot" style="background:#27ae60;box-shadow:0 0 0 2px #27ae60;"></div>
           <div class="break-card long-break">
             <div class="break-title">🍱 Lunch Break <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">${start}–${end}</span></div>
-            <div class="food-row">${lunchItems}</div>
-            ${ln.yummy ? `<div class="yummy-strip">⭐ Yummy of the Day: ${ln.yummy}</div>` : ''}
-            ${es ? `<div class="snack-strip">🌆 Evening Snack: ${es}</div>` : ''}
+            ${lunchBody()}
           </div>
         </div>`;
     } else {
@@ -1613,10 +1977,303 @@ function renderTimeline() {
       </div>
     </div>`;
 
+  const after = AFTER_SCHOOL[ttKey];
+  if (after) {
+    const [aStart, aEnd, aName, aIcon] = after;
+    html += `
+    <div class="t-item" style="position:relative;">
+      <div class="t-time">${aStart}</div>
+      <div class="t-dot" style="background:#8e44ad;box-shadow:0 0 0 2px #8e44ad;"></div>
+      <div class="period-card after-card after-${aName.toLowerCase()}" style="border-left-color:#8e44ad;" role="button" tabindex="0" onclick="afterSchoolFx('${aName}', event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();afterSchoolFx('${aName}', event);}">
+        <span class="period-icon">${aIcon}</span>
+        <div class="period-info">
+          <div class="period-name">${aName}<span class="tap-hint">👆 tap me</span></div>
+          <div class="period-time">${aStart} – ${aEnd}</div>
+        </div>
+        <span class="period-badge">After School</span>
+      </div>
+    </div>`;
+  }
+
   html += `</div>`;
   html += `<div class="day-end">— End of ${scheduleName}'s schedule —</div>`;
 
   wrap.innerHTML = html;
+}
+
+
+// ── AFTER-SCHOOL TAP EFFECTS ────────────────────────────────────────────────
+// Football: a 3-shot penalty shootout vs a moving keeper; goals trigger a ball-burst celebration.
+// Robotics: worker robots build a giant robot block by block, which then powers up.
+let afterFxBusy = false;
+function afterSchoolFx(kind, evt) {
+  if (afterFxBusy) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  afterFxBusy = true;
+  const card = evt && evt.currentTarget;
+  const r = card ? card.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+  const ox = (evt && evt.clientX) || r.left + r.width / 2;
+  const oy = (evt && evt.clientY) || r.top + r.height / 2;
+  const layer = document.createElement('div');
+  layer.className = 'fx-layer';
+  document.body.appendChild(layer);
+  const done = () => { layer.remove(); afterFxBusy = false; };
+  if (kind === 'Football') footballFx(layer, ox, oy, done);
+  else robotFx(layer, ox, oy, done);
+}
+
+// Emoji burst that bounces around the screen, then drops off it (goal celebration)
+function bounceBurst(layer, ox, oy, emojis, n) {
+  const W = innerWidth, H = innerHeight, R = 17;
+  const balls = [];
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'fx-ball';
+    el.textContent = emojis[i % emojis.length];
+    layer.appendChild(el);
+    const a = Math.random() * Math.PI * 2;
+    const sp = 8 + Math.random() * 12;
+    balls.push({ el, x: ox - R, y: oy - R, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 10, rot: 0, vr: (Math.random() - 0.5) * 30 });
+  }
+  const t0 = performance.now();
+  function step(now) {
+    const t = now - t0;
+    const floorOn = t < 1600;               // then the floor "opens" and everything falls away
+    let alive = 0;
+    for (const b of balls) {
+      b.vy += 0.6;
+      b.x += b.vx; b.y += b.vy; b.rot += b.vr;
+      if (b.x < 0)          { b.x = 0;          b.vx = Math.abs(b.vx) * 0.9; b.vr *= -1; }
+      if (b.x > W - 2 * R)  { b.x = W - 2 * R;  b.vx = -Math.abs(b.vx) * 0.9; b.vr *= -1; }
+      if (b.y < 0)          { b.y = 0;          b.vy = Math.abs(b.vy) * 0.8; }
+      if (floorOn && b.y > H - 2 * R) { b.y = H - 2 * R; b.vy = -Math.abs(b.vy) * 0.82; b.vx *= 0.96; }
+      if (b.y < H + 60) alive++;
+      b.el.style.transform = `translate(${b.x}px, ${b.y}px) rotate(${b.rot}deg)`;
+    }
+    if (alive && t < 5000 && layer.isConnected) requestAnimationFrame(step); else balls.forEach(b => b.el.remove());
+  }
+  requestAnimationFrame(step);
+}
+
+function footballFx(layer, ox, oy, done) {
+  const W = innerWidth, H = innerHeight;
+  const SHOTS = 3;
+  layer.classList.add('fx-game');
+  const add = (cls, html) => { const el = document.createElement('div'); el.className = cls; if (html) el.innerHTML = html; layer.appendChild(el); return el; };
+
+  // Pitch: goal, six-yard line, penalty spot, keeper, kicker, ball
+  const goal = { w: Math.min(W * 0.8, 340), h: 120, top: 80 };
+  goal.left = (W - goal.w) / 2;
+  const goalEl = add('pk-goal');
+  Object.assign(goalEl.style, { left: goal.left + 'px', top: goal.top + 'px', width: goal.w + 'px', height: goal.h + 'px' });
+  add('pk-line').style.top = (goal.top + goal.h) + 'px';
+  const spotY = H - 170;
+  const spot = add('pk-spot'); spot.style.left = (W / 2 - 5) + 'px'; spot.style.top = (spotY + 14) + 'px';
+  const keeper = add('pk-keeper', '🙆');
+  const kY = goal.top + goal.h - 60;
+  const player = add('pk-player', '🏃');
+  player.style.left = (W / 2 + 28) + 'px'; player.style.top = (spotY + 20) + 'px';
+  const ball = add('pk-ball', '⚽');
+  const hud = add('pk-hud');
+  const msg = add('pk-msg');
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'pk-close'; closeBtn.type = 'button'; closeBtn.textContent = '✕'; closeBtn.setAttribute('aria-label', 'Close game');
+  layer.appendChild(closeBtn);
+
+  let shot = 0, goals = 0, busy = false, finished = false, keeperX = W / 2, diving = false;
+  const results = [];
+  const placeBall = () => { ball.style.transform = `translate(${W / 2 - 18}px, ${spotY - 18}px)`; };
+  const drawHud = () => {
+    const dots = results.map(r => r ? '✅' : '❌').concat(Array(SHOTS - results.length).fill('⚪')).join('');
+    hud.innerHTML = finished ? `Full time!<span class="pk-dots">${dots}</span>`
+      : `👆 Tap the goal to shoot! · Shot ${Math.min(shot + 1, SHOTS)}/${SHOTS}<span class="pk-dots">${dots}</span>`;
+  };
+  const say = (text, small) => {
+    msg.textContent = text; msg.classList.toggle('small', !!small);
+    msg.classList.remove('show'); void msg.offsetWidth; msg.classList.add('show');
+  };
+  placeBall(); drawHud();
+  window.FxSounds && FxSounds.whistle();
+
+  // Keeper shuffles across the goal line until a shot is taken
+  const t0 = performance.now();
+  (function patrol(now) {
+    if (!layer.isConnected) return;
+    if (!diving) {
+      keeperX = W / 2 + Math.sin((now - t0) / 420) * (goal.w / 2 - 40);
+      keeper.style.transition = 'none';
+      keeper.style.left = (keeperX - 27) + 'px'; keeper.style.top = kY + 'px'; keeper.style.transform = 'none';
+    }
+    requestAnimationFrame(patrol);
+  })(t0);
+
+  function finish() {
+    finished = true; drawHud();
+    window.FxSounds && FxSounds.fulltime(goals >= 2);
+    const verdict = goals === SHOTS ? '🏆 Hat-trick hero!' : goals === 2 ? '🥇 Great shooting!' : goals === 1 ? '👍 Nice try!' : '💪 Keep practising!';
+    say(`${verdict}\nUv scored ${goals}/${SHOTS}`, true);
+    if (goals >= 2) bounceBurst(layer, W / 2, H / 2, ['⚽', '🏆', '⭐', '🎉'], 30);
+    setTimeout(close, 3200);
+  }
+  function close() {
+    if (!layer.isConnected) return;
+    document.removeEventListener('keydown', onKey);
+    layer.classList.add('fx-fade');
+    setTimeout(done, 600);
+  }
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  closeBtn.addEventListener('click', e => { e.stopPropagation(); close(); });
+
+  layer.addEventListener('pointerdown', e => {
+    if (busy || finished || e.target === closeBtn) return;
+    busy = true;
+    msg.classList.remove('show');
+    const tx = e.clientX, ty = e.clientY;
+    const inGoal = tx > goal.left + 6 && tx < goal.left + goal.w - 6 && ty > goal.top + 6 && ty < goal.top + goal.h;
+
+    // Keeper guesses a spot to dive to — sometimes right, sometimes not
+    diving = true;
+    const guess = Math.random() < 0.4 ? tx : goal.left + 40 + Math.random() * (goal.w - 80);
+    const diveX = Math.max(goal.left + 10, Math.min(goal.left + goal.w - 10, guess));
+    keeper.style.transition = '';
+    keeper.style.left = (diveX - 27) + 'px';
+    keeper.style.transform = `rotate(${diveX < keeperX ? -35 : 35}deg)`;
+
+    window.FxSounds && FxSounds.kick();
+    player.style.transform = 'scaleX(-1) translateY(-10px) rotate(-15deg)';
+    setTimeout(() => { player.style.transform = 'scaleX(-1)'; }, 250);
+
+    // Ball flies with a little arc, spin and perspective shrink
+    const sx = W / 2, sy = spotY, dur = 480, s0 = performance.now();
+    (function fly(now) {
+      const k = Math.min(1, (now - s0) / dur), e2 = 1 - Math.pow(1 - k, 2);
+      const x = sx + (tx - sx) * e2, y = sy + (ty - sy) * e2 - Math.sin(k * Math.PI) * 40;
+      ball.style.transform = `translate(${x - 18}px, ${y - 18}px) rotate(${k * 720}deg) scale(${1 - 0.4 * k})`;
+      if (k < 1) return requestAnimationFrame(fly);
+
+      const saved = inGoal && Math.abs(diveX - tx) < 48 && ty > kY - 20;
+      const scored = inGoal && !saved;
+      results.push(scored); if (scored) goals++;
+      if (scored) {
+        say('GOOOAL! 🎉');
+        window.FxSounds && FxSounds.goal();
+        goalEl.classList.remove('shake'); void goalEl.offsetWidth; goalEl.classList.add('shake');
+        bounceBurst(layer, tx, ty, ['⚽', '🎉', '⭐'], 18);
+      } else if (saved) {
+        say('SAVED! 🧤');
+        window.FxSounds && FxSounds.save();
+        ball.style.transform += ` translate(${(tx < W / 2 ? -1 : 1) * 60}px, 60px)`;
+      } else {
+        say('MISS! 😅');
+        window.FxSounds && FxSounds.miss();
+      }
+      shot++;
+      drawHud();
+      setTimeout(() => {
+        diving = false; busy = false;
+        placeBall();
+        if (shot >= SHOTS) finish(); else { drawHud(); msg.classList.remove('show'); }
+      }, 1300);
+    })(s0);
+  });
+}
+
+function robotFx(layer, ox, oy, done) {
+  const W = innerWidth, H = innerHeight;
+  // Giant robot blueprint (one char = one block, '.' = empty)
+  const PLAN = [
+    '...R...',
+    '...S...',
+    '.SSSSS.',
+    '.SESES.',
+    '.SSSSS.',
+    '.SMMMS.',
+    '...S...',
+    'BBBBBBB',
+    'B.BYB.B',
+    'B.BBB.B',
+    '..BBB..',
+    '..L.L..',
+    '..L.L..',
+  ];
+  const COLORS = { R: '#ff5252', S: '#b0bec5', E: '#00e5ff', M: '#455a64', B: '#1e88e5', Y: '#ffd600', L: '#546e7a' };
+  const cell = Math.floor(Math.min(W / 11, (H - 200) / PLAN.length, 34));
+  const gridW = PLAN[0].length * cell, gridH = PLAN.length * cell;
+  const groundY = H - 70;
+  const gx = (W - gridW) / 2, gy = groundY - gridH - 6;
+
+  // Worker robots walk in along the ground
+  const workers = [0, 1, 2].map(i => {
+    const el = document.createElement('div');
+    el.className = 'fx-robot stomp';
+    el.textContent = '🤖';
+    el.style.top = (groundY - 4) + 'px';
+    el.style.left = (i === 1 ? W + 40 : -60) + 'px';
+    el.style.transition = 'left 0.7s ease-out';
+    layer.appendChild(el);
+    return el;
+  });
+  const homes = [W * 0.12, W * 0.5 - 22, W * 0.88 - 44];
+  requestAnimationFrame(() => requestAnimationFrame(() => workers.forEach((el, i) => { el.style.left = homes[i] + 'px'; })));
+  window.FxSounds && FxSounds.robotChatter();
+
+  // Build from the feet up, like real construction
+  const blocks = [];
+  for (let r = PLAN.length - 1; r >= 0; r--) {
+    for (let c = 0; c < PLAN[r].length; c++) {
+      const ch = PLAN[r][c];
+      if (ch !== '.') blocks.push({ r, c, ch });
+    }
+  }
+  const eyes = [];
+  const STEP = 55;
+  blocks.forEach((bk, i) => {
+    setTimeout(() => {
+      const w = i % 3;
+      const el = document.createElement('div');
+      el.className = 'fx-block' + (bk.ch === 'E' ? ' eye' : '');
+      el.style.width = el.style.height = (cell - 2) + 'px';
+      el.style.background = COLORS[bk.ch];
+      el.style.left = (homes[w] + 12) + 'px';
+      el.style.top = (groundY - 10) + 'px';
+      el.style.transform = 'scale(0.4) rotate(90deg)';
+      layer.appendChild(el);
+      if (bk.ch === 'E') eyes.push(el);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.left = (gx + bk.c * cell + 1) + 'px';
+        el.style.top = (gy + bk.r * cell + 1) + 'px';
+        el.style.transform = 'none';
+      }));
+      setTimeout(() => {
+        const sp = document.createElement('div');
+        sp.className = 'fx-spark';
+        sp.textContent = '✨';
+        window.FxSounds && FxSounds.blockPlace(i / blocks.length);
+        sp.style.left = (gx + bk.c * cell + cell / 2 - 7) + 'px';
+        sp.style.top = (gy + bk.r * cell - 4) + 'px';
+        layer.appendChild(sp);
+        setTimeout(() => sp.remove(), 450);
+      }, 420);
+    }, 800 + i * STEP);
+  });
+
+  // Power up: eyes glow, workers cheer, banner pops
+  const builtAt = 800 + blocks.length * STEP + 500;
+  setTimeout(() => {
+    eyes.forEach(e => e.classList.add('on'));
+    window.FxSounds && FxSounds.powerUp();
+    workers.forEach(el => { el.classList.remove('stomp'); el.textContent = '🙌'; });
+    const tag = document.createElement('div');
+    tag.className = 'fx-built';
+    tag.textContent = '🛠️ Built by Uv!';
+    tag.style.top = Math.max(12, gy - 56) + 'px';
+    layer.appendChild(tag);
+    requestAnimationFrame(() => requestAnimationFrame(() => tag.classList.add('show')));
+  }, builtAt);
+
+  setTimeout(() => layer.classList.add('fx-fade'), builtAt + 2000);
+  setTimeout(done, builtAt + 2700);
 }
 
 init();
@@ -1866,6 +2523,75 @@ init();
     }
   }
 
+  // ── After-school tap game sounds (Football shootout / Robotics build) ──
+  function fxTone(freq, at, dur, type, vol, freqEnd) {
+    const ac = ctx(), t = ac.currentTime + at;
+    const osc = ac.createOscillator(), g = ac.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    if (freqEnd) osc.frequency.exponentialRampToValueAtTime(freqEnd, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.2, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g).connect(ac.destination);
+    osc.start(t); osc.stop(t + dur + 0.02);
+    return osc;
+  }
+  function fxNoise(at, dur, vol, filterFreq, filterType, attack) {
+    const ac = ctx(), t = ac.currentTime + at;
+    const src = ac.createBufferSource(); src.buffer = noiseBuffer(ac, dur);
+    const f = ac.createBiquadFilter(); f.type = filterType || 'lowpass'; f.frequency.value = filterFreq || 1000;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + (attack || 0.005));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(ctx().destination);
+    src.start(t);
+  }
+  function fxWhistle(at, dur) {
+    const ac = ctx(), t = ac.currentTime + at;
+    const osc = ac.createOscillator(), lfo = ac.createOscillator(), depth = ac.createGain(), g = ac.createGain();
+    osc.frequency.value = 2600; lfo.frequency.value = 32; depth.gain.value = 180;
+    lfo.connect(depth).connect(osc.frequency);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+    g.gain.setValueAtTime(0.12, t + dur - 0.04);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g).connect(ac.destination);
+    osc.start(t); lfo.start(t); osc.stop(t + dur + 0.02); lfo.stop(t + dur + 0.02);
+  }
+  function fxPlay(fn) { return (...a) => { if (!soundEnabled) return; try { fn(...a); } catch (e) {} }; }
+
+  window.FxSounds = {
+    // Football
+    whistle:    fxPlay(() => { fxWhistle(0, 0.18); fxWhistle(0.26, 0.4); }),
+    kick:       fxPlay(() => { fxNoise(0, 0.07, 0.5, 900); fxTone(160, 0, 0.12, 'sine', 0.5, 50); }),
+    goal:       fxPlay(() => {
+      fxNoise(0, 0.12, 0.35, 400, 'lowpass');                       // ball hits the net
+      fxNoise(0.05, 2.0, 0.22, 1000, 'bandpass', 0.35);             // crowd roar
+      [523, 659, 784, 1047].forEach((f, i) => fxTone(f, 0.15 + i * 0.12, 0.3, 'triangle', 0.18));
+    }),
+    save:       fxPlay(() => { fxTone(140, 0, 0.18, 'sine', 0.5, 45); fxNoise(0, 0.08, 0.3, 600); fxNoise(0.1, 0.9, 0.12, 500, 'bandpass', 0.2); }),
+    miss:       fxPlay(() => { fxTone(520, 0, 0.6, 'sawtooth', 0.08, 140); fxNoise(0.05, 0.8, 0.1, 450, 'bandpass', 0.25); }),
+    fulltime:   fxPlay((won) => {
+      fxWhistle(0, 0.2); fxWhistle(0.28, 0.2); fxWhistle(0.56, 0.6);
+      if (won) [523, 659, 784, 1047, 784, 1047].forEach((f, i) => fxTone(f, 1.3 + i * 0.13, i === 5 ? 0.6 : 0.2, 'square', 0.08));
+    }),
+    // Robotics
+    robotChatter: fxPlay(() => {
+      for (let i = 0; i < 8; i++) fxTone(400 + Math.random() * 1200, i * 0.09, 0.07, 'square', 0.06, 300 + Math.random() * 1500);
+    }),
+    blockPlace: fxPlay((progress) => {                              // pitch climbs as the robot grows
+      fxTone(500 + progress * 700, 0, 0.06, 'triangle', 0.12, 350 + progress * 500);
+      fxNoise(0, 0.03, 0.08, 3000, 'highpass');
+    }),
+    powerUp:    fxPlay(() => {
+      fxTone(150, 0, 0.7, 'sawtooth', 0.08, 1200);
+      [784, 988, 1175, 1568].forEach((f, i) => fxTone(f, 0.75 + i * 0.1, 0.25, 'square', 0.07));
+      fxTone(1568, 1.2, 0.5, 'sine', 0.1);
+    }),
+  };
+
   window.HeroSounds = {
     playThunder, playRepulsor, playSmash, playWebThwip, playShieldClang, playHeroSound, tryPlayDaySound,
     setEnabled: (v) => { soundEnabled = v; },
@@ -1890,7 +2616,11 @@ init();
 // ── SCHOOL CALENDAR DATA — Holidays (AY 2026-27) + Primary (Gr 1-5) Events ──
 const HOLIDAYS_LIST = [{"start": "2026-08-15", "end": "2026-08-15", "day": "Saturday", "label": "Independence Day (NID) Grade 1-11", "type": "holiday"}, {"start": "2026-08-15", "end": "2026-08-15", "day": "Saturday", "label": "EY-Independence Day Holiday", "type": "holiday"}, {"start": "2026-08-16", "end": "2026-08-16", "day": "Sunday", "label": "Parsi New Year", "type": "holiday"}, {"start": "2026-08-26", "end": "2026-08-26", "day": "Wednesday", "label": "Eid-E-Milad", "type": "holiday"}, {"start": "2026-08-27", "end": "2026-08-27", "day": "Thursday", "label": "School wide holiday", "type": "holiday"}, {"start": "2026-08-28", "end": "2026-08-28", "day": "Friday", "label": "Raksha Bandhan", "type": "holiday"}, {"start": "2026-09-05", "end": "2026-09-05", "day": "Saturday", "label": "Dahi Handi / Teacher's Day", "type": "holiday"}, {"start": "2026-09-14", "end": "2026-09-14", "day": "Monday", "label": "Ganesh Chaturthi", "type": "holiday"}, {"start": "2026-09-18", "end": "2026-09-18", "day": "Friday", "label": "Gauri Pooja", "type": "holiday"}, {"start": "2026-09-19", "end": "2026-09-19", "day": "Saturday", "label": "Gauri Visarjan", "type": "holiday"}, {"start": "2026-09-25", "end": "2026-09-25", "day": "Friday", "label": "Anant Chaturdashi", "type": "holiday"}, {"start": "2026-10-02", "end": "2026-10-02", "day": "Friday", "label": "Mahatma Gandhi Jayanti", "type": "holiday"}, {"start": "2026-10-20", "end": "2026-10-20", "day": "Tuesday", "label": "Dusshera", "type": "holiday"}, {"start": "2026-11-06", "end": "2026-11-17", "day": "Friday\u2013Tuesday", "label": "Diwali Vacations", "type": "holiday"}, {"start": "2026-11-24", "end": "2026-11-24", "day": "Tuesday", "label": "Guru Nanak Jayanti", "type": "holiday"}, {"start": "2026-12-23", "end": "2027-01-03", "day": "Wednesday\u2013Sunday", "label": "Winter Vacations", "type": "holiday"}, {"start": "2027-01-15", "end": "2027-01-15", "day": "Friday", "label": "Makar Sankranti", "type": "holiday"}, {"start": "2027-01-26", "end": "2027-01-26", "day": "Tuesday", "label": "Republic Day (NID)", "type": "holiday"}, {"start": "2027-01-26", "end": "2027-01-26", "day": "Tuesday", "label": "EY-Republic Day (NID) - Holiday", "type": "holiday"}, {"start": "2027-02-19", "end": "2027-02-19", "day": "Friday", "label": "Shivaji Jayanti", "type": "holiday"}, {"start": "2027-03-06", "end": "2027-03-06", "day": "Saturday", "label": "Mahashivratri", "type": "holiday"}, {"start": "2027-03-10", "end": "2027-03-10", "day": "Wednesday", "label": "Eid-ul-Fitar", "type": "holiday"}, {"start": "2027-03-21", "end": "2027-03-21", "day": "Sunday", "label": "Navroze", "type": "holiday"}, {"start": "2027-03-22", "end": "2027-03-22", "day": "Monday", "label": "Holi", "type": "holiday"}, {"start": "2027-03-22", "end": "2027-03-28", "day": "Monday\u2013Sunday", "label": "Spring Break", "type": "holiday"}, {"start": "2027-03-26", "end": "2027-03-26", "day": "Friday", "label": "Good Friday", "type": "holiday"}, {"start": "2027-03-28", "end": "2027-03-28", "day": "Sunday", "label": "Easter Sunday", "type": "holiday"}, {"start": "2027-04-07", "end": "2027-04-07", "day": "Wednesday", "label": "Gudipadwa", "type": "holiday"}, {"start": "2027-04-14", "end": "2027-04-14", "day": "Wednesday", "label": "Dr. Ambedkar Jayanti", "type": "holiday"}, {"start": "2027-05-01", "end": "2027-05-01", "day": "Saturday", "label": "Maharashtra Day", "type": "holiday"}, {"start": "2027-05-17", "end": "2027-05-17", "day": "Monday", "label": "Eid-al-Adha", "type": "holiday"}, {"start": "2027-05-20", "end": "2027-05-20", "day": "Thursday", "label": "Summer Vacations Begin \u2014 Last Day of School, Early Years", "type": "holiday"}, {"start": "2027-05-21", "end": "2027-05-21", "day": "Friday", "label": "Summer Vacations Begin \u2014 Last Day of School, Grades 1-11", "type": "holiday"}];
 const PRIMARY_EVENTS = [{"start": "2026-07-07", "end": "2026-07-07", "day": "Tuesday", "label": "Primary Orientation Grades 1-2 & Uniform Distribution", "type": "event"}, {"start": "2026-07-08", "end": "2026-07-08", "day": "Wednesday", "label": "Primary Orientation Grades 3 & 4 & Uniform Distribution", "type": "event"}, {"start": "2026-07-09", "end": "2026-07-09", "day": "Thursday", "label": "Primary Orientation Grade 5 & Uniform Distribution", "type": "event"}, {"start": "2026-07-13", "end": "2026-07-13", "day": "Monday", "label": "School Re-opens", "type": "event"}, {"start": "2026-07-14", "end": "2026-07-17", "day": "Tuesday\u2013Friday", "label": "Interviews for Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-18", "end": "2026-07-18", "day": "Saturday", "label": "List of Finalists \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-20", "end": "2026-07-22", "day": "Monday\u2013Wednesday", "label": "Campaigning \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-23", "end": "2026-07-23", "day": "Thursday", "label": "Speeches & Voting \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-24", "end": "2026-07-24", "day": "Friday", "label": "Declaration of Results \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-07-27", "end": "2026-07-27", "day": "Monday", "label": "Primary Checkpoint Awards Grade 5 (2026-27 Gr 6)", "type": "event"}, {"start": "2026-07-31", "end": "2026-07-31", "day": "Friday", "label": "Early Exit to All Students", "type": "event"}, {"start": "2026-08-01", "end": "2026-08-01", "day": "Saturday", "label": "CNS Mumbai 10th Year Celebration", "type": "event"}, {"start": "2026-08-07", "end": "2026-08-07", "day": "Friday", "label": "PTA Elections", "type": "event"}, {"start": "2026-08-15", "end": "2026-08-15", "day": "Saturday", "label": "Independence Day Celebration & Student Council Investiture Ceremony", "type": "event"}, {"start": "2026-08-21", "end": "2026-08-21", "day": "Friday", "label": "Open House \u2014 Student Council / Interact Club & Fawn Council", "type": "event"}, {"start": "2026-08-22", "end": "2026-08-23", "day": "Saturday\u2013Sunday", "label": "Student-Council Off Site Leadership Session", "type": "event"}, {"start": "2026-08-22", "end": "2026-08-22", "day": "Saturday", "label": "Meet & Greet HRTs Grades 1-5 / PTA Interface", "type": "event"}, {"start": "2026-09-04", "end": "2026-09-04", "day": "Friday", "label": "Teacher's Day Celebration (Student Early Release)", "type": "event"}, {"start": "2026-09-11", "end": "2026-09-11", "day": "Friday", "label": "Grandparents Day Celebrations (Whole School)", "type": "event"}, {"start": "2026-10-19", "end": "2026-11-03", "day": "Monday\u2013Tuesday", "label": "1st Summative Assessments Grades 1-8", "type": "event"}, {"start": "2026-11-05", "end": "2026-11-05", "day": "Thursday", "label": "Children's Day Celebration, Picnic", "type": "event"}, {"start": "2026-11-06", "end": "2026-11-17", "day": "Friday\u2013Tuesday", "label": "Diwali Vacations", "type": "event"}, {"start": "2026-11-18", "end": "2026-11-18", "day": "Wednesday", "label": "School Reopens", "type": "event"}, {"start": "2026-12-05", "end": "2026-12-05", "day": "Saturday", "label": "Shree Chatrabhuj Narsee Jayanti (Gayatri Hawan)", "type": "event"}, {"start": "2026-12-11", "end": "2026-12-11", "day": "Friday", "label": "PTM Grades 3-5", "type": "event"}, {"start": "2026-12-11", "end": "2026-12-11", "day": "Friday", "label": "Primary Sports Day Grades 1-2", "type": "event"}, {"start": "2026-12-18", "end": "2026-12-18", "day": "Friday", "label": "Primary Sports Day Grades 3-5", "type": "event"}, {"start": "2026-12-21", "end": "2026-12-21", "day": "Monday", "label": "PTM Grades 1 & 2", "type": "event"}, {"start": "2026-12-22", "end": "2026-12-22", "day": "Tuesday", "label": "Christmas Celebrations Grades 1-5", "type": "event"}, {"start": "2026-12-23", "end": "2027-01-03", "day": "Wednesday\u2013Sunday", "label": "Winter Vacations", "type": "event"}, {"start": "2027-01-04", "end": "2027-01-04", "day": "Monday", "label": "School Reopens", "type": "event"}, {"start": "2027-01-05", "end": "2027-01-07", "day": "Tuesday\u2013Thursday", "label": "Primary Class Photo Grades 1-5", "type": "event"}, {"start": "2027-01-09", "end": "2027-01-09", "day": "Saturday", "label": "PTA Fiesta", "type": "event"}, {"start": "2027-01-23", "end": "2027-01-25", "day": "Saturday\u2013Monday", "label": "Quintessence V @ Mumbai", "type": "event"}, {"start": "2027-01-26", "end": "2027-01-26", "day": "Tuesday", "label": "78th Republic Day (NID)", "type": "event"}, {"start": "2027-02-02", "end": "2027-02-05", "day": "Tuesday\u2013Friday", "label": "Overnight Trip Grade 5", "type": "event"}, {"start": "2027-02-03", "end": "2027-02-05", "day": "Wednesday\u2013Friday", "label": "Overnight Trip Grade 4", "type": "event"}, {"start": "2027-03-11", "end": "2027-03-11", "day": "Thursday", "label": "Dress Rehearsal Grade 3", "type": "event"}, {"start": "2027-03-12", "end": "2027-03-12", "day": "Friday", "label": "Annual Day Grade 3", "type": "event"}, {"start": "2027-03-12", "end": "2027-03-12", "day": "Friday", "label": "Dress Rehearsal Grades 4 & 5", "type": "event"}, {"start": "2027-03-13", "end": "2027-03-13", "day": "Saturday", "label": "Annual Day Grades 4 & 5", "type": "event"}, {"start": "2027-03-14", "end": "2027-03-14", "day": "Sunday", "label": "Shree Narsee Monjee Birth Anniversary", "type": "event"}, {"start": "2027-03-19", "end": "2027-03-19", "day": "Friday", "label": "Dress Rehearsal Grades 1 & 2", "type": "event"}, {"start": "2027-03-20", "end": "2027-03-20", "day": "Saturday", "label": "Annual Day Grades 1 & 2", "type": "event"}, {"start": "2027-03-22", "end": "2027-03-28", "day": "Monday\u2013Sunday", "label": "Spring Break", "type": "event"}, {"start": "2027-03-29", "end": "2027-03-29", "day": "Monday", "label": "School Reopens", "type": "event"}, {"start": "2027-04-16", "end": "2027-04-16", "day": "Friday", "label": "PTM Grades 4-5", "type": "event"}, {"start": "2027-04-17", "end": "2027-04-17", "day": "Saturday", "label": "PTM Grades 1-3", "type": "event"}, {"start": "2027-05-03", "end": "2027-05-14", "day": "Monday\u2013Friday", "label": "2nd Summative Assessment Grades 1-5", "type": "event"}, {"start": "2027-05-12", "end": "2027-05-14", "day": "Wednesday\u2013Friday", "label": "Cambridge Primary Checkpoint Exam", "type": "event"}, {"start": "2027-05-18", "end": "2027-05-21", "day": "Tuesday\u2013Friday", "label": "School Team Tryouts", "type": "event"}, {"start": "2027-05-21", "end": "2027-05-21", "day": "Friday", "label": "Last Day of School Grades 1-11", "type": "event"}];
-const SCHOOL_CALENDAR = [...HOLIDAYS_LIST, ...PRIMARY_EVENTS].sort((a, b) => a.start.localeCompare(b.start));
+const OLYMPIAD_EVENTS = OLYMPIADS.map(o => ({
+  start: o.date, end: o.date, label: `🏅 ${o.name} (${o.code})`, type: 'event',
+  day: new Date(o.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long' }),
+}));
+const SCHOOL_CALENDAR = [...HOLIDAYS_LIST, ...PRIMARY_EVENTS, ...OLYMPIAD_EVENTS].sort((a, b) => a.start.localeCompare(b.start));
 
 function ymKey(d) { return d.slice(0, 7); }
 
@@ -1995,21 +2725,6 @@ document.getElementById('calToggleBtn').addEventListener('click', () => {
 renderCalendarHighlights();
 renderCalendarFull();
 
-// ── FORMAL CA1 EXAM SCHEDULE ─────────────────────────────────────────────────
-const EXAM_SCHEDULE = [
-  { date: '2026-08-14', day: 'Friday',    subject: 'Science', topic: 'Unit 1: Plants are living things' },
-  { date: '2026-08-15', day: 'Saturday',  weekend: true },
-  { date: '2026-08-16', day: 'Sunday',    weekend: true },
-  { date: '2026-08-17', day: 'Monday',    subject: 'Math', topic: 'Unit 1: Numbers 1 to 1000' },
-  { date: '2026-08-18', day: 'Tuesday',   subject: 'DL&C', topic: 'Unit 1: Making programs clear' },
-  { date: '2026-08-19', day: 'Wednesday' },
-  { date: '2026-08-20', day: 'Thursday',  subject: 'Marathi', topic: 'Unit 2 — इ, ई ची मात्रा (pg 14–23)' },
-  { date: '2026-08-21', day: 'Friday',    subject: 'English', topic: 'Unit 1 — Dictation words' },
-  { date: '2026-08-22', day: 'Saturday',  weekend: true },
-  { date: '2026-08-23', day: 'Sunday',    weekend: true },
-  { date: '2026-08-24', day: 'Monday',    subject: 'Hindi', topic: "Swar, Vyanjan (पुनरावर्तन), Amaatrik Shabd (अमात्रिक शब्द), 'आ' की मात्रा" },
-];
-
 function examDateLabel(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
 }
@@ -2017,26 +2732,62 @@ function examDateLabel(dateStr) {
 function renderExamSchedule() {
   const wrap = document.getElementById('examScheduleList');
   if (!wrap) return;
-  let html = '<div class="cal-card-grid">';
-  EXAM_SCHEDULE.forEach(row => {
-    const dateLabel = examDateLabel(row.date);
-    if (row.weekend) {
-      html += `<div class="exam-row weekend"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">Weekend</span></div>`;
-    } else if (row.subject) {
-      html += `<div class="exam-row examday">
-        <span class="exam-row-badge">📝 Exam</span>
-        <span class="exam-row-date">${dateLabel}</span>
-        <div class="exam-row-info">
-          <span class="exam-row-subject">${row.subject}</span>
-          <span class="exam-row-topic">${row.topic}</span>
-        </div>
-      </div>`;
-    } else {
-      html += `<div class="exam-row blank"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">No exam scheduled</span></div>`;
-    }
+  const todayStr = getTodayStr();
+  let html = '';
+  EXAM_SETS.forEach(set => {
+    const examDays = set.rows.filter(r => r.subject);
+    const done = examDays.length && todayStr > examDays[examDays.length - 1].date;
+    html += `<div class="calendar-section">
+      <div class="calendar-header">
+        <h2>📝 ${set.title}${done ? ' <span style="font-size:0.65em;font-weight:400;color:var(--muted);">(completed)</span>' : ''}</h2>
+      </div>
+      <div class="cal-legend">🟧 = Weekend / holiday &nbsp;·&nbsp; 📝 = Exam day &nbsp;·&nbsp; — = No exam scheduled</div>
+      <div class="cal-card-grid">`;
+    set.rows.forEach(row => {
+      const dateLabel = examDateLabel(row.date);
+      if (row.weekend || row.holiday) {
+        html += `<div class="exam-row weekend"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">${row.holiday ? row.holiday + ' — holiday' : 'Weekend'}</span></div>`;
+      } else if (row.subject) {
+        html += `<div class="exam-row examday">
+          <span class="exam-row-badge">📝 Exam</span>
+          <span class="exam-row-date">${dateLabel}</span>
+          <div class="exam-row-info">
+            <span class="exam-row-subject">${row.subject}${row.time ? ` <span class="exam-row-topic">· ${row.time}</span>` : ''}</span>
+            <span class="exam-row-topic">${row.topic}</span>
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="exam-row blank"><span class="exam-row-date">${dateLabel}</span><span class="exam-row-subject">No exam scheduled</span></div>`;
+      }
+    });
+    html += '</div>';
+    if (set.note) html += `<div class="cal-empty" style="margin-top:8px;">${set.note}</div>`;
+    html += '</div>';
+    if (set === EXAM_SETS[0]) html += olympiadScheduleHTML(todayStr);
   });
-  html += '</div><div class="cal-empty" style="margin-top:8px;">Schedule continues beyond 24 Aug — will be added as it becomes available.</div>';
   wrap.innerHTML = html;
+}
+
+function olympiadScheduleHTML(todayStr) {
+  const allDone = todayStr > OLYMPIADS[OLYMPIADS.length - 1].date;
+  let html = `<div class="calendar-section">
+    <div class="calendar-header">
+      <h2>🏅 Olympiads 2026-27${allDone ? ' <span style="font-size:0.65em;font-weight:400;color:var(--muted);">(completed)</span>' : ''}</h2>
+    </div>
+    <div class="cal-legend">SOF Olympiads for Grade 2 &nbsp;·&nbsp; ✅ = done</div>
+    <div class="cal-card-grid">`;
+  OLYMPIADS.forEach(o => {
+    const done = todayStr > o.date;
+    html += `<div class="exam-row examday olympiad${done ? ' blank' : ''}">
+      <span class="exam-row-badge">${done ? '✅ Done' : '🏅 ' + o.code}</span>
+      <span class="exam-row-date">${examDateLabel(o.date)}</span>
+      <div class="exam-row-info">
+        <span class="exam-row-subject">${o.code}</span>
+        <span class="exam-row-topic">${o.name}</span>
+      </div>
+    </div>`;
+  });
+  return html + '</div></div>';
 }
 
 function daysBetween(fromStr, toStr) {
@@ -2050,48 +2801,168 @@ function renderExamAlert() {
   const textEl = document.getElementById('examAlertText');
   if (!banner || !textEl) return;
 
-  const examDays = EXAM_SCHEDULE.filter(r => r.subject);
-  if (examDays.length === 0) { banner.classList.remove('show'); return; }
-
   const todayStr = getTodayStr();
-  const examStart = examDays[0].date;
-  const examEnd = examDays[examDays.length - 1].date;
-  const daysToStart = daysBetween(todayStr, examStart);
-
-  if (todayStr >= examStart && todayStr <= examEnd) {
-    const todaysExam = examDays.find(r => r.date === todayStr);
-    textEl.innerHTML = todaysExam
-      ? `Exam today: <strong>${todaysExam.subject}</strong> — All the best! 🌟`
-      : `CA1 Exams are underway — next paper coming up 📚`;
-    banner.classList.add('show');
-  } else if (daysToStart >= 0 && daysToStart <= 7) {
-    textEl.innerHTML = daysToStart === 0
-      ? `CA1 Exams start today — good luck! 🌟`
-      : `<span class="exam-alert-count">${daysToStart}</span> day${daysToStart === 1 ? '' : 's'} to go for CA1 Exams!`;
-    banner.classList.add('show');
-  } else {
-    banner.classList.remove('show');
+  const set = EXAM_SETS.slice().reverse().find(st => {
+    const d = st.rows.filter(r => r.subject);
+    return d.length && todayStr <= d[d.length - 1].date;
+  });
+  const msgs = [];
+  if (set) {
+    const examDays = set.rows.filter(r => r.subject);
+    const examStart = examDays[0].date;
+    const examEnd = examDays[examDays.length - 1].date;
+    const daysToStart = daysBetween(todayStr, examStart);
+    if (todayStr >= examStart && todayStr <= examEnd) {
+      const todaysExam = examDays.find(r => r.date === todayStr);
+      msgs.push(todaysExam
+        ? `Exam today: <strong>${todaysExam.subject}</strong> — All the best! 🌟`
+        : `${set.name} exams are underway — next paper coming up 📚`);
+    } else if (daysToStart >= 0 && daysToStart <= 7) {
+      msgs.push(daysToStart === 0
+        ? `${set.name} exams start today — good luck! 🌟`
+        : `<span class="exam-alert-count">${daysToStart}</span> day${daysToStart === 1 ? '' : 's'} to go for ${set.name} exams!`);
+    }
   }
+
+  // Next Olympiad, counted down over its final week
+  const oly = OLYMPIADS.find(o => o.date >= todayStr);
+  if (oly) {
+    const d = daysBetween(todayStr, oly.date);
+    if (d === 0) msgs.push(`🏅 <strong>${oly.code}</strong> Olympiad today — go get it!`);
+    else if (d <= 7) msgs.push(`🏅 <span class="exam-alert-count">${d}</span> day${d === 1 ? '' : 's'} to ${oly.code}`);
+  }
+
+  textEl.innerHTML = msgs.join(' &nbsp;·&nbsp; ');
+  banner.classList.toggle('show', msgs.length > 0);
 }
 
 renderExamSchedule();
 renderExamAlert();
 
-// ── HOMEWORK & NOTICES (from ManageBac — updated manually) ──────────────────
-const HOMEWORK_UPDATED = '2026-09-12';
-const HOMEWORK_NOTICES = [
-  { date: '2026-09-15', type: 'homework', subject: 'Math',    title: 'Workbook pages 60-61 & 63', detail: 'Q1, Q2, Q3 and Q8' },
-  { date: '2026-09-15', type: 'homework', subject: 'Marathi', title: 'Glossary words — pg 26 & 31 (इ / ई मात्रा)', detail: 'Write on revision pg 103 in the textbook; return the textbook to school' },
-  { date: '2026-09-11', type: 'homework', subject: 'Science', title: 'Workbook — Life Cycle & Food Chain', detail: 'Pages 50, 51, 53… — due date has passed, check it’s submitted' },
-  { dateLabel: 'Last week of Sep', type: 'test',    subject: 'Math',    title: 'Surprise test — Tables 2 to 10', detail: 'Keep practising multiplication tables 2–10' },
-  { dateLabel: '28 Sep – 6 Oct',   type: 'notice',  subject: 'School',  title: 'Continuous Assessment 2 (CA2)', detail: 'No early dispersal on assessment days; arrive on time' },
-];
+// ── HOMEWORK & NOTICES (from ManageBac, synced via a published Google Sheet) ─
+// ONE-TIME SETUP: export tasks from ManageBac to Excel (or copy them in by hand),
+// upload/paste into the Google Sheet below, share it "Anyone with the link ▸
+// Viewer", then keep it updated — the page re-fetches it fresh on every load.
+// Header row (exact names): date, date_label, type, subject, title, detail, status,
+//   synced_at, posted_at
+//   - date: YYYY-MM-DD for anything with a fixed due date (sorts first, drives
+//     the "due today / overdue" alert banner)
+//   - date_label: free text used only when date is left blank, e.g. "Last week of Sep"
+//   - type: homework | test | notice | event (event = needs Uv to actively
+//     do/bring/wear/prepare something — a celebration, costume day, performance —
+//     as opposed to notice, which is passive FYI: recaps, digests, file uploads)
+//   - posted_at: YYYY-MM-DD - the day the notification/task actually appeared
+//     on ManageBac. The list is sorted by this, newest first, so the top of
+//     the list is always whatever turned up most recently. Rows without it
+//     fall back to their due date.
+//   - status: leave blank while pending, or "done" once it's submitted/completed —
+//     done items get a green check, sort to the bottom, and stop counting toward
+//     the overdue/due-soon alert banner
+//   - synced_at: NOT per-row — put one value in the first data row only (e.g.
+//     cell H2), everything else in this column stays blank. This is the
+//     timestamp of the last real "Update homework" pass (when notifications
+//     were actually pulled from ManageBac), NOT when a visitor's browser
+//     happened to load the page. Update it by hand (ISO-ish, e.g.
+//     2026-09-13T09:09:12+05:30) each time you sync — the page reads it to
+//     show "Synced ..." and flags itself "Stale" once it's over 8h old.
+//
+// Tapping "✅ Done" / "↩️ Undo" (or "👁️ Read" / "↩️ Unread" for notices) on a
+// row writes the `status` cell straight back to the sheet via
+// HomeworkAppScript.gs (see that file for the one-time deploy steps) — paste
+// the resulting /exec URL into HOMEWORK_GS_URL below. Leave it blank to keep
+// the buttons working locally only (no write-back).
+const HOMEWORK_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1WRm9BBGGFUrw2_ZU8fbarnruAlvxNIMtc7-jubwY9gM/export?format=csv&gid=0';
+const HOMEWORK_GS_URL = 'https://script.google.com/macros/s/AKfycbx8NZxvFomB8_0hQa4RF8essSL6GThrKjChuaa6L52rexFh8Qe2-GLgfz-HBWBSD8Xp/exec';
+
+let HOMEWORK_NOTICES = [];
+// Finished homework and read notices pile up fast. Keep them folded away
+// behind a "Show completed" button so the list only ever opens on what
+// still needs doing; the toggle survives re-renders within a visit.
+let hwShowDone = false;
+let homeworkSyncedAt = null;
+let homeworkSyncStale = false;
+let homeworkSyncFailed = false;
+const HOMEWORK_STALE_HOURS = 8;
+
+function parseHomeworkCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        fields.push(cur.trim()); cur = '';
+      } else cur += ch;
+    }
+    fields.push(cur.trim());
+    rows.push(fields);
+  }
+  return rows;
+}
+
+async function loadHomeworkNotices() {
+  try {
+    const res = await fetch(HOMEWORK_SHEET_CSV, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const rows = parseHomeworkCSV(text);
+    if (!rows.length) throw new Error('No data rows');
+
+    const header = rows[0].map(h => h.toLowerCase().trim());
+    const idx = {
+      date:      header.indexOf('date'),
+      dateLabel: header.indexOf('date_label'),
+      type:      header.indexOf('type'),
+      subject:   header.indexOf('subject'),
+      title:     header.indexOf('title'),
+      detail:    header.indexOf('detail'),
+      status:    header.indexOf('status'),
+      syncedAt:  header.indexOf('synced_at'),
+      postedAt:  header.indexOf('posted_at'),
+    };
+
+    HOMEWORK_NOTICES = rows.slice(1)
+      .map((r, i) => ({
+        date:      idx.date      > -1 && r[idx.date]      ? r[idx.date].trim()      : '',
+        dateLabel: idx.dateLabel > -1 && r[idx.dateLabel] ? r[idx.dateLabel].trim() : '',
+        type:      (idx.type > -1 && r[idx.type] ? r[idx.type].trim() : 'notice'),
+        subject:   idx.subject > -1 ? r[idx.subject] || '' : '',
+        title:     idx.title   > -1 ? r[idx.title]   || '' : '',
+        detail:    idx.detail  > -1 ? r[idx.detail]  || '' : '',
+        status:    idx.status  > -1 && r[idx.status] ? r[idx.status].trim().toLowerCase() : 'pending',
+        postedAt:  idx.postedAt > -1 && r[idx.postedAt] ? r[idx.postedAt].trim() : '',
+        sheetRow:  i + 2, // header is row 1 — matches the CSV export's row order 1:1
+      }))
+      .filter(item => item.title);
+
+    // synced_at lives in exactly one data row (whichever one it was typed
+    // into) — scan for the first non-blank value rather than assuming row 2.
+    const syncedAtRaw = idx.syncedAt > -1
+      ? (rows.slice(1).map(r => r[idx.syncedAt]).find(v => v && v.trim()) || '')
+      : '';
+    const parsedSyncedAt = syncedAtRaw ? new Date(syncedAtRaw.trim()) : null;
+    homeworkSyncedAt = (parsedSyncedAt && !isNaN(parsedSyncedAt)) ? parsedSyncedAt : null;
+    homeworkSyncStale = homeworkSyncedAt
+      ? (Date.now() - homeworkSyncedAt.getTime()) / 3600000 > HOMEWORK_STALE_HOURS
+      : false;
+  } catch (err) {
+    console.error('Homework sync failed:', err);
+    homeworkSyncFailed = true;
+  }
+}
 
 function hwDateLabel(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 function hwStatusOf(item) {
+  if (item.status === 'done') return 'done';
   if (!item.date) return 'no-date';
   const diff = daysBetween(getTodayStr(), item.date);
   if (diff < 0) return 'overdue';
@@ -2099,41 +2970,192 @@ function hwStatusOf(item) {
   return 'upcoming';
 }
 
-const HW_TYPE_LABEL = { homework: 'HW', test: 'Test', notice: 'Notice' };
-const HW_STATUS_LABEL = { overdue: 'Overdue', 'due-soon': 'Due soon', upcoming: 'Upcoming', 'no-date': 'No fixed date' };
+const HW_TYPE_LABEL = { homework: 'HW', test: 'Test', notice: 'Notice', event: '🎉 Action' };
+const HW_STATUS_LABEL = { overdue: 'Overdue', 'due-soon': 'Due soon', upcoming: 'Upcoming', 'no-date': 'No fixed date', done: '✅ Done' };
 
 function renderHomeworkNotices() {
   const wrap = document.getElementById('homeworkNoticesList');
   const updatedLabel = document.getElementById('hwUpdatedLabel');
   if (!wrap) return;
-  if (updatedLabel) updatedLabel.textContent = `Updated ${hwDateLabel(HOMEWORK_UPDATED)}`;
+  if (updatedLabel) {
+    if (homeworkSyncedAt) {
+      const stamp = `${homeworkSyncedAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${homeworkSyncedAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}`;
+      updatedLabel.textContent = homeworkSyncStale ? `⚠️ Stale — last synced ${stamp}` : `Synced ${stamp}`;
+      updatedLabel.style.color = homeworkSyncStale ? '#e65100' : 'var(--muted)';
+      updatedLabel.style.fontWeight = homeworkSyncStale ? '700' : '400';
+    } else {
+      updatedLabel.textContent = homeworkSyncFailed ? 'Sync failed' : '';
+      updatedLabel.style.color = 'var(--muted)';
+      updatedLabel.style.fontWeight = '400';
+    }
+  }
 
+  if (homeworkSyncFailed && !HOMEWORK_NOTICES.length) {
+    wrap.innerHTML = '<div class="cal-empty">Couldn’t load homework/notices from the sheet — try refreshing.</div>';
+    return;
+  }
+  if (!HOMEWORK_NOTICES.length) {
+    wrap.innerHTML = '<div class="cal-empty">No homework or notices right now 🎉</div>';
+    return;
+  }
+
+  // Newest arrivals first: whatever ManageBac posted most recently sits at the
+  // top, so "what's new since I last looked" is the first thing you read.
+  // Finished/read rows still sink to the bottom. Rows with no posted_at fall
+  // back to their due date so they never jump above genuinely new items.
   const sorted = [...HOMEWORK_NOTICES].sort((a, b) => {
+    const aDone = a.status === 'done', bDone = b.status === 'done';
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    const aPosted = a.postedAt || a.date || '';
+    const bPosted = b.postedAt || b.date || '';
+    if (aPosted && bPosted && aPosted !== bPosted) return bPosted.localeCompare(aPosted);
+    if (aPosted && !bPosted) return -1;
+    if (bPosted && !aPosted) return 1;
     if (a.date && b.date) return a.date.localeCompare(b.date);
     if (a.date) return -1;
     if (b.date) return 1;
     return 0;
   });
 
-  let html = '<div class="cal-card-grid">';
-  sorted.forEach(item => {
-    const status = hwStatusOf(item);
-    const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
-    html += `<div class="hw-row ${status}">
-      <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
-      <div class="hw-row-info">
-        <div class="hw-row-top">
-          <span class="hw-row-subject">${item.subject}</span>
-          <span class="hw-status-pill ${status}">${HW_STATUS_LABEL[status]}</span>
-        </div>
-        <span class="hw-row-title">${item.title}</span>
-        <span class="hw-row-detail">${item.detail}</span>
-        <span class="hw-row-date">📅 ${dateText}</span>
-      </div>
-    </div>`;
-  });
-  html += '</div><div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks — updated here by hand, not live-synced.</div>';
+  const pending = sorted.filter(i => i.status !== 'done');
+  const completed = sorted.filter(i => i.status === 'done');
+
+  let html = pending.length
+    ? '<div class="cal-card-grid">' + pending.map(hwRowHtml).join('') + '</div>'
+    : '<div class="cal-empty">All caught up — nothing pending 🎉</div>';
+
+  if (completed.length) {
+    html += `<button type="button" class="hw-done-toggle" onclick="toggleHomeworkDone()">${hwShowDone ? '▲ Hide' : '▼ Show'} ${completed.length} completed</button>`;
+    if (hwShowDone) {
+      html += '<div class="cal-card-grid hw-done-grid">' + completed.map(hwRowHtml).join('') + '</div>';
+    }
+  }
+
+  html += '<div class="cal-empty" style="margin-top:8px;">Pulled from ManageBac notifications/tasks, synced live from a Google Sheet.</div>';
   wrap.innerHTML = html;
+}
+
+function toggleHomeworkDone() {
+  hwShowDone = !hwShowDone;
+  renderHomeworkNotices();
+}
+
+function hwRowHtml(item) {
+  const status = hwStatusOf(item);
+  const dateText = item.date ? hwDateLabel(item.date) : item.dateLabel;
+  // "Added" = the day it showed up on ManageBac. Anything from today or
+  // yesterday gets the NEW treatment so fresh arrivals are obvious.
+  const addedText = item.postedAt ? hwDateLabel(item.postedAt) : '';
+  const isFresh = item.postedAt ? daysBetween(item.postedAt, getTodayStr()) <= 1 : false;
+  const isDone = item.status === 'done';
+  // Pure FYI items (type "notice") aren't "done" in any real sense — they're
+  // read or unread. Everything else (homework/test/event) is an action.
+  const isReadType = item.type === 'notice';
+  const doneStatusLabel = isReadType ? '👁️ Read' : HW_STATUS_LABEL.done;
+  const actionLabel = isDone ? (isReadType ? '↩️ Unread' : '↩️ Undo') : (isReadType ? '👁️ Read' : '✅ Done');
+  const statusPillLabel = status === 'done' ? doneStatusLabel : HW_STATUS_LABEL[status];
+  return `<div class="hw-row ${status}">
+    <span class="hw-row-badge type-${item.type}">${HW_TYPE_LABEL[item.type] || item.type}</span>
+    <div class="hw-row-info">
+      <div class="hw-row-top">
+        <span class="hw-row-subject">${item.subject}</span>
+        <span class="hw-status-pill ${status}">${statusPillLabel}</span>
+      </div>
+      <span class="hw-row-title">${item.title}</span>
+      <span class="hw-row-detail">${item.detail}</span>
+      <div class="hw-row-bottom">
+        <div class="hw-row-dates">
+          <span class="hw-row-date">📅 ${item.date ? 'Due ' + dateText : dateText}</span>
+          ${addedText ? `<span class="hw-row-added${isFresh ? ' fresh' : ''}">${isFresh ? '🆕' : '📥'} Added ${addedText}</span>` : ''}
+        </div>
+        <button type="button" class="hw-row-action" onclick="markHomeworkStatus(${item.sheetRow}, '${isDone ? '' : 'done'}')">${actionLabel}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── WRITE-BACK: tapping ✅ Done / ↩️ Undo writes the `status` cell straight
+// back to the sheet via HomeworkAppScript.gs, so it sticks for everyone —
+// not just this browser. Updates the UI immediately either way. ──────────
+async function markHomeworkStatus(row, newStatus) {
+  const item = HOMEWORK_NOTICES.find(i => i.sheetRow === row);
+  if (!item) return;
+
+  // Celebrate every time something is finished (not un-done), overdue or
+  // not — every "Done" hit deserves confetti. Notices are just marked
+  // read/unread, not achievements, so they stay confetti-free.
+  if (newStatus === 'done' && item.type !== 'notice') {
+    fireHomeworkCelebration();
+  }
+
+  const prevStatus = item.status;
+  item.status = newStatus || 'pending';
+  renderHomeworkNotices();
+  renderHomeworkAlert();
+
+  if (!HOMEWORK_GS_URL) return; // no backend deployed yet — local-only toggle
+
+  try {
+    const res = await fetch(HOMEWORK_GS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight on Apps Script
+      body: JSON.stringify({ row, status: newStatus }),
+    });
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(data.message || 'Unknown error');
+  } catch (err) {
+    console.error('Failed to sync homework status:', err);
+    item.status = prevStatus;
+    renderHomeworkNotices();
+    renderHomeworkAlert();
+  }
+}
+
+// ── CELEBRATION 🎉 — a full-page confetti rain, a different flavor every
+// time ✅ Done lands before the deadline: smiley (his favorite, weighted
+// to show up most), flower, candy, chocolate. Never repeats the same
+// flavor twice in a row. Lightweight DOM particles animated via the Web
+// Animations API — same approach as the Exams page's fireConfetti(),
+// just emoji instead of colored rectangles, and raining across the whole
+// viewport instead of one spot. No canvas or external library needed. ───
+const CELEBRATION_EMOJI = {
+  smiley:    ['😄', '😊', '🥳', '😁', '🤩', '😆', '🤗', '⭐'],
+  flower:    ['🌸', '🌼', '🌻', '🌷', '💐', '🌹'],
+  candy:     ['🍬', '🍭', '🍡', '🧁', '🍩'],
+  chocolate: ['🍫', '🍪'],
+};
+const CELEBRATION_POOL = ['smiley', 'smiley', 'flower', 'candy', 'chocolate']; // smiley weighted 2x
+let lastCelebrationType = null;
+
+function fireHomeworkCelebration() {
+  const choices = CELEBRATION_POOL.filter(t => t !== lastCelebrationType);
+  const type = choices[Math.floor(Math.random() * choices.length)];
+  lastCelebrationType = type;
+  fireEmojiRain(CELEBRATION_EMOJI[type]);
+}
+
+function fireEmojiRain(emojis) {
+  const count = 44;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'hw-celebrate-piece';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.top = '-40px';
+    el.style.fontSize = (18 + Math.random() * 18) + 'px';
+    document.body.appendChild(el);
+
+    const drift = Math.random() * 200 - 100;
+    const rot = Math.random() * 520 - 260;
+    const duration = 1900 + Math.random() * 1500;
+    const delay = Math.random() * 450;
+
+    el.animate([
+      { transform: 'translate(0, 0) rotate(0deg)', opacity: 0 },
+      { transform: `translate(${drift * 0.3}px, 45vh) rotate(${rot * 0.5}deg)`, opacity: 1, offset: 0.18 },
+      { transform: `translate(${drift}px, 108vh) rotate(${rot}deg)`, opacity: 0.9 },
+    ], { duration, delay, easing: 'cubic-bezier(.25,.46,.45,.94)', fill: 'backwards' }).onfinish = () => el.remove();
+  }
 }
 
 function renderHomeworkAlert() {
@@ -2142,7 +3164,7 @@ function renderHomeworkAlert() {
   if (!banner || !textEl) return;
 
   const todayStr = getTodayStr();
-  const dated = HOMEWORK_NOTICES.filter(i => i.date);
+  const dated = HOMEWORK_NOTICES.filter(i => i.date && i.status !== 'done');
   const overdue = dated.filter(i => i.date < todayStr);
   const dueToday = dated.filter(i => i.date === todayStr);
   const dueSoon = dated.filter(i => i.date > todayStr && daysBetween(todayStr, i.date) <= 3);
@@ -2165,8 +3187,10 @@ function renderHomeworkAlert() {
   }
 }
 
-renderHomeworkNotices();
-renderHomeworkAlert();
+loadHomeworkNotices().then(() => {
+  renderHomeworkNotices();
+  renderHomeworkAlert();
+});
 </script>
 
 </body>

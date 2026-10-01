@@ -16,7 +16,8 @@
     --card: var(--surface2);
     --hgreen:#2dd4a0; --hamber:#f0a532; --hred:#f0545c; --hblue:#4f8ef7;
   }
-  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem;max-width:760px;margin:0 auto}
+  .page{padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem;max-width:760px;margin:0 auto;transition:max-width .2s}
+  .page.exam-wide{max-width:1140px}
 
   /* ═══ HERO THEMES — each test wears a different superhero mode,
      same trick as 2026_school.html: swap CSS custom properties off a
@@ -26,6 +27,8 @@
   :root[data-theme="light"] [data-hero="cap"]{ --accent:#1b2a68; --accent-dim:#e7ecff; }
   [data-hero="hulk"]{ --accent:#4ade52; --accent-dim:rgba(74,222,82,.16); --hero-glow:#b34dff; }
   :root[data-theme="light"] [data-hero="hulk"]{ --accent:#2e7d32; --accent-dim:#e3ffd6; }
+  [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
+  :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
 
   .hero-badge{
     width:64px;height:64px;border-radius:50%;margin-bottom:0.9rem;display:flex;align-items:center;
@@ -40,6 +43,20 @@
     background:radial-gradient(circle,#7cff3f 0%,#2e7d32 75%);
     animation:hero-smash 1.5s cubic-bezier(.36,.07,.19,.97) infinite;
   }
+  /* Iron Man: helmet hovering on repulsor thrust (arc-reactor blue glow below) */
+  [data-hero="ironman"] .hero-badge{
+    background:radial-gradient(circle at 50% 40%,#1d3b63 0%,#0a1428 78%);
+    box-shadow:0 0 22px 5px var(--hero-glow),0 0 0 3px #f5c542,0 4px 14px rgba(0,0,0,.25);
+    animation:hero-hover 2.4s ease-in-out infinite;
+  }
+  [data-hero="ironman"] .hero-badge svg{width:46px;height:46px;display:block}
+  [data-hero="ironman"] .hero-badge::after{
+    content:'';position:absolute;left:50%;bottom:-16px;width:26px;height:9px;margin-left:-13px;border-radius:50%;
+    background:radial-gradient(ellipse,#bff9ff 0%,#3ff0ff 45%,transparent 75%);filter:blur(1.5px);
+    animation:hero-thrust .5s ease-in-out infinite alternate;
+  }
+  @keyframes hero-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes hero-thrust{from{opacity:.55;transform:scaleX(.8)}to{opacity:1;transform:scaleX(1.15)}}
   @keyframes hero-spin{to{transform:rotate(360deg)}}
   @keyframes hero-smash{
     0%,55%,100%{transform:scale(1) rotate(0)}
@@ -62,6 +79,7 @@
   .picker-block{margin-bottom:1.75rem}
   .picker-label{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.6rem}
   .chip-row{display:flex;gap:0.55rem;flex-wrap:wrap}
+  .chip-row[hidden]{display:none}
   .big-chip{
     padding:0.75rem 1.2rem;border-radius:14px;border:1px solid var(--border);background:var(--surface);
     color:var(--text);font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .15s;
@@ -98,6 +116,11 @@
   .q-topic{display:inline-block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;
     padding:0.25rem 0.65rem;border-radius:999px;background:var(--surface2);color:var(--muted);margin-bottom:0.9rem}
   .q-text{font-family:'Fraunces',serif;font-weight:700;font-size:1.2rem;line-height:1.45;margin-bottom:1.3rem}
+  /* Optional picture for a question (sheet's "Image" column). Drawn as
+     printed paper, so it keeps a white card in dark mode too. */
+  .q-img{display:block;max-width:100%;max-height:340px;margin:-0.4rem auto 1.3rem;background:#fff;
+    border:1px solid var(--border);border-radius:12px;padding:0.5rem}
+  .q-img[hidden]{display:none}
 
   .opt-list{display:flex;flex-direction:column;gap:0.6rem}
   .opt-btn{
@@ -112,7 +135,48 @@
     display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0}
   .opt-btn.selected .opt-letter{background:var(--accent);color:#0a0f0d;border-color:var(--accent)}
 
+  /* OMR-style bubble answers — Olympiad tests only. Row stays neutral, the
+     letter itself is the hollow/filled "bubble" — mirrors marking a real
+     OMR answer sheet more closely than a fully-highlighted card. */
+  .opt-list.omr-style .opt-btn{background:transparent;border-color:var(--border)}
+  .opt-list.omr-style .opt-btn.selected{background:var(--surface2);border-color:var(--border);color:var(--text);font-weight:500}
+  .opt-list.omr-style .opt-letter{width:30px;height:30px;border:2px solid var(--muted);background:transparent;font-size:0.8rem}
+  .opt-list.omr-style .opt-btn.selected .opt-letter{background:var(--accent);border-color:var(--accent);color:#0a0f0d;box-shadow:0 0 0 3px var(--accent-dim)}
+
+  /* Olympiad question card is read-only — marking happens on the OMR
+     sheet only, so strip the button affordances (cursor, hover, disabled
+     dimming) but keep the "selected" look at full strength. */
+  .opt-list.read-only .opt-btn{cursor:default}
+  .opt-list.read-only .opt-btn:hover{border-color:var(--border)}
+  .opt-list.read-only .opt-btn[disabled]{opacity:1;cursor:default}
+
   .symbol-row{display:flex;gap:0.8rem}
+  /* Drag-and-drop questions (Order / Match). Pointer events, so a finger on
+     the iPad works the same as a mouse; a tap-then-tap fallback also works. */
+  .dd-hint{font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem}
+  .order-list{display:flex;flex-direction:column;gap:0.5rem}
+  .dd-card{display:flex;align-items:center;gap:0.7rem;padding:0.8rem 1rem;border-radius:12px;
+    border:1.5px solid var(--border);background:var(--surface);font-weight:600;font-size:0.95rem;
+    cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;transition:border-color .12s,box-shadow .12s}
+  .dd-card .dd-num{flex:0 0 auto;width:1.7rem;height:1.7rem;border-radius:50%;display:inline-flex;align-items:center;
+    justify-content:center;background:var(--accent-dim);color:var(--accent);font-size:0.8rem}
+  .dd-card .dd-grip{margin-left:auto;color:var(--muted);font-size:1.1rem}
+  .dd-card.picked{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+  .dd-card.dragging{position:relative;z-index:20;box-shadow:0 10px 24px rgba(0,0,0,0.25);cursor:grabbing}
+  .dd-pool{display:flex;flex-wrap:wrap;gap:0.5rem;min-height:3.2rem;padding:0.6rem;border-radius:12px;
+    border:1.5px dashed var(--border);margin-bottom:0.8rem}
+  .dd-pool .dd-card,.dd-bucket .dd-card{padding:0.55rem 0.8rem;font-size:0.85rem}
+  .dd-buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.6rem}
+  .dd-bucket{border-radius:12px;border:2px solid var(--border);padding:0.5rem;min-height:5.5rem;display:flex;
+    flex-direction:column;gap:0.4rem;background:var(--bg)}
+  .dd-bucket.hot{border-color:var(--accent);background:var(--accent-dim)}
+  /* Devanagari tests: ु vs ू is the whole skill, so the script has to be big */
+  .lang-deva .q-text{font-size:1.4rem}
+  .lang-deva .opt-btn,.lang-deva .dd-card{font-size:1.3rem}
+  .lang-deva .dd-pool .dd-card,.lang-deva .dd-bucket .dd-card{font-size:1.15rem}
+  .lang-deva .dd-bucket-title{font-size:1rem}
+  .dd-bucket-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+    padding:0.25rem 0.5rem;border-radius:8px;color:#fff;align-self:flex-start}
   .symbol-btn{flex:1;padding:1.4rem;border-radius:12px;border:1px solid var(--border);background:var(--surface2);
     font-size:2rem;font-weight:700;cursor:pointer;color:var(--text);transition:all .12s;min-height:80px}
   .symbol-btn.selected{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
@@ -135,6 +199,39 @@
   .qdot.answered{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
   .qdot.current{border-color:var(--text);color:var(--text)}
 
+  /* ── OMR answer-sheet sidebar — Olympiad tests only ──
+     Mimics the actual SOF/MTG "MARK YOUR ANSWERS" bubble sheet: a paper
+     card with alternating shaded rows and A/B/C/D circles per question,
+     split into 25-row column blocks the way the real sheet is. Colors are
+     hardcoded (not theme vars) on purpose — it's meant to read as a
+     physical scanned sheet, not part of the app chrome. */
+  .exam-layout{display:flex;gap:1.5rem;align-items:flex-start}
+  .exam-main{flex:1;min-width:0}
+  .omr-panel{display:none;flex-shrink:0;width:340px;background:#fbf4f7;border:1px solid #d9b6c9;
+    border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.3);padding:0.85rem 0.8rem;
+    position:sticky;top:calc(var(--nav-h) + 1rem);max-height:calc(100vh - var(--nav-h) - 2rem);
+    overflow-y:auto;font-family:'Epilogue',sans-serif}
+  .exam-layout.has-omr .omr-panel{display:block}
+  .exam-layout.has-omr .qgrid{display:none}
+  .omr-head{background:#8c2d54;color:#fff;text-align:center;font-weight:700;font-size:0.72rem;
+    letter-spacing:0.06em;text-transform:uppercase;padding:0.55rem;border-radius:6px;margin-bottom:0.7rem}
+  .omr-cols{display:flex;gap:0.5rem;flex-wrap:wrap}
+  .omr-col{flex:1;min-width:150px}
+  .omr-row{display:flex;align-items:center;gap:0.35rem;padding:0.22rem 0.3rem;border-radius:4px}
+  .omr-row:nth-child(odd){background:rgba(140,45,84,.08)}
+  .omr-row.current{outline:2px solid #8c2d54;outline-offset:-2px}
+  .omr-qnum{width:18px;font-size:0.7rem;font-weight:700;color:#6b2140;flex-shrink:0;cursor:pointer;text-align:right}
+  .omr-bubbles{display:flex;gap:0.28rem}
+  .omr-bubble{width:17px;height:17px;border-radius:50%;border:1.4px solid #8c2d54;background:#fff;
+    color:#8c2d54;font-size:0.52rem;font-weight:700;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+  .omr-bubble.filled{background:#8c2d54;color:#fff;box-shadow:0 0 0 2px rgba(140,45,84,.25)}
+
+  @media (max-width:900px){
+    .exam-layout{flex-direction:column}
+    .omr-panel{width:100%;position:static;max-height:none}
+  }
+
   /* ── Results ── */
   #results-view{display:none;text-align:center}
   .score-emoji{font-size:3.5rem;margin-bottom:0.5rem}
@@ -154,6 +251,17 @@
     mix-blend-mode:screen;filter:blur(0.5px);
   }
   .firework-particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:600}
+
+  /* Iron Man fly-by after a finished test */
+  .flyby{position:fixed;left:0;top:0;z-index:650;pointer-events:none;will-change:transform}
+  .flyby svg{width:84px;height:84px;display:block;filter:drop-shadow(0 0 14px #ff2d3d)}
+  .flyby-trail{position:absolute;right:56px;top:34px;width:260px;height:14px;border-radius:14px;
+    transform-origin:100% 50%;background:linear-gradient(270deg,#fff 0%,#3ff0ff 25%,rgba(63,240,255,0) 100%);
+    filter:blur(1.5px) drop-shadow(0 0 8px #3ff0ff)}
+  .theme-switch{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;font-size:0.78rem;color:var(--muted)}
+  .theme-switch button{border:1.5px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;
+    padding:0.4rem 0.85rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Epilogue',sans-serif;min-height:38px}
+  .theme-switch button.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
 
   .hero-speech-bubble{
     position:fixed;top:34%;left:50%;transform:translate(-50%,-50%) scale(0.3);
@@ -211,54 +319,7 @@
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="index.html">deepu<span>-life</span></a>
-  <div class="nav-right">
-    <div class="nav-pills">
-      <a href="index.html" class="nav-pill">🏃 Tracker</a>
-      <a href="todo.html" class="nav-pill">✅ To-Do</a>
-      <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="nav-pill">🥧 PiePoints</a>
-      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-      <a href="2026_school.html" class="nav-pill">🏫 School</a>
-      <a href="exam.html" class="nav-pill active" aria-current="page">🧮 Exams</a>
-      <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-      <a href="health-private.html" class="nav-pill">🩺 Health</a>
-      <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
-      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
-      <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
-    </div>
-    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
-    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
-  </div>
-</nav>
-<div class="nav-drawer-backdrop"></div>
-<div class="nav-drawer">
-  <div class="nav-drawer-inner">
-    <div class="nav-drawer-group">
-      <div class="nav-drawer-label">Public</div>
-      <div class="nav-drawer-list">
-        <a href="index.html" class="nav-pill">🏃 Tracker</a>
-        <a href="todo.html" class="nav-pill">✅ To-Do</a>
-        <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="nav-pill">🥧 PiePoints</a>
-        <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-        <a href="2026_school.html" class="nav-pill">🏫 School</a>
-        <a href="exam.html" class="nav-pill active" aria-current="page">🧮 Exams</a>
-        <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
-        <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
-      </div>
-    </div>
-    <div class="nav-drawer-group">
-      <div class="nav-drawer-label">🔒 Private</div>
-      <div class="nav-drawer-list">
-        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-        <a href="health-private.html" class="nav-pill">🩺 Health</a>
-        <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-        <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
-      </div>
-    </div>
-  </div>
-</div>
+<deepu-nav active="exam"></deepu-nav>
 
 <div class="page" id="page-root" data-hero="cap">
 
@@ -276,14 +337,43 @@
 
   <!-- ═══ PICKER ═══ -->
   <div id="picker-view">
-    <div class="picker-block">
+    <!-- Exam first, then the subjects that exam has tests for. CA =
+         Cumulative Assessment, SA = Summative Assessment. -->
+    <div class="picker-block" id="exam-picker">
+      <div class="picker-label">Exam</div>
+      <div class="chip-row">
+        <button class="big-chip" data-exam="ca1">📝 CA1 <small>Aug · done</small></button>
+        <button class="big-chip active" data-exam="ca2">📝 CA2 <small>28 Sep – 6 Oct</small></button>
+        <button class="big-chip" data-exam="sa1">🏆 SA1 <small>26 Oct – 2 Nov</small></button>
+        <button class="big-chip" data-exam="olympiad">🏅 Olympiad</button>
+      </div>
+    </div>
+
+    <div class="picker-block" id="subject-picker">
       <div class="picker-label">Subject</div>
-      <div class="chip-row" id="subject-chips">
-        <button class="big-chip active" data-subject="maths">🔢 Mathematics</button>
+      <div class="chip-row" data-exam-subjects="ca1" hidden>
+        <button class="big-chip" data-subject="maths">🔢 Mathematics</button>
         <button class="big-chip" data-subject="dlc">💻 DL&amp;C <small>Digital Learning &amp; Computers</small></button>
         <button class="big-chip" data-subject="english">🔤 English <small>Dictation Words</small></button>
         <button class="big-chip" data-subject="social">🌍 Social Studies <small>The Wider World</small></button>
+      </div>
+      <div class="chip-row" data-exam-subjects="ca2">
+        <button class="big-chip" data-subject="ca2maths">🔢 Maths <small>Units 3 &amp; 9</small></button>
+        <button class="big-chip" data-subject="ca2dlc">💻 DL&amp;C <small>Be a designer</small></button>
+        <button class="big-chip" data-subject="ca2marathi">📖 Marathi <small>उ &amp; ऊ ची मात्रा</small></button>
+        <button class="big-chip" data-subject="ca2english">🔤 English <small>Let's have a party</small></button>
+        <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
+      </div>
+      <div class="chip-row" data-exam-subjects="sa1" hidden>
+        <div class="empty-hist">Tests coming before the First Term Summative (26 Oct – 2 Nov): English, DL&amp;C, Hindi, Science, Marathi, Maths.</div>
+      </div>
+      <div class="chip-row" data-exam-subjects="olympiad" hidden>
+        <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO · 22 Sep</small></button>
+        <button class="big-chip" data-subject="ieo">🔤 English <small>IEO · 30 Sep</small></button>
+        <button class="big-chip" disabled>🔬 Science <small>ISO · soon</small></button>
+        <button class="big-chip" disabled>🔢 Maths <small>IMO · soon</small></button>
+        <button class="big-chip" disabled>💻 Computers <small>ICSO · soon</small></button>
       </div>
     </div>
 
@@ -291,7 +381,13 @@
       <div class="picker-label">Test</div>
       <div class="chip-row" id="test-chips">
         <button class="big-chip active" data-test="Test A - Regular" data-hero="cap">🛡️ Regular <small>Captain America mode</small></button>
-        <button class="big-chip" data-test="Test B - Harder" data-hero="hulk">👊 Harder <small>Hulk SMASH mode</small></button>
+        <button class="big-chip" id="harder-chip" data-test="Test B - Harder" data-hero="ironman">🦾 Harder <small>Iron Man flight mode</small></button>
+      </div>
+      <!-- Which superhero the Harder test wears. Remembered on this device. -->
+      <div class="theme-switch" id="harder-theme-switch">
+        <span>Harder mode:</span>
+        <button type="button" data-harder="ironman">🦾 Iron Man</button>
+        <button type="button" data-harder="hulk">👊 Hulk</button>
       </div>
     </div>
 
@@ -315,19 +411,29 @@
       <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
     </div>
 
-    <div class="q-card">
-      <span class="q-topic" id="q-topic">Place Value</span>
-      <div class="q-text" id="q-text">Loading…</div>
-      <div id="q-input-area"></div>
-    </div>
+    <div class="exam-layout" id="exam-layout">
+      <div class="exam-main">
+        <div class="q-card">
+          <span class="q-topic" id="q-topic">Place Value</span>
+          <div class="q-text" id="q-text">Loading…</div>
+          <img class="q-img" id="q-img" alt="" hidden>
+          <div id="q-input-area"></div>
+        </div>
 
-    <div class="exam-nav">
-      <button class="nav-btn" id="prev-btn">← Back</button>
-      <button class="nav-btn primary" id="next-btn">Next →</button>
-      <button class="nav-btn submit" id="submit-btn" style="display:none">✓ Submit test</button>
-    </div>
+        <div class="exam-nav">
+          <button class="nav-btn" id="prev-btn">← Back</button>
+          <button class="nav-btn primary" id="next-btn">Next →</button>
+          <button class="nav-btn submit" id="submit-btn" style="display:none">✓ Submit test</button>
+        </div>
 
-    <div class="qgrid" id="qgrid"></div>
+        <div class="qgrid" id="qgrid"></div>
+      </div>
+
+      <aside class="omr-panel" id="omr-panel">
+        <div class="omr-head">Mark your answers</div>
+        <div class="omr-cols" id="omr-cols"></div>
+      </aside>
+    </div>
   </div>
 
   <!-- ═══ RESULTS ═══ -->
@@ -401,6 +507,30 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1280612197&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=552736091&single=true&output=csv",
   },
+  ca2maths: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1916905751&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=85477057&single=true&output=csv",
+  },
+  ca2marathi: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=749783096&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=818239443&single=true&output=csv",
+  },
+  ca2english: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1995270521&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1034913331&single=true&output=csv",
+  },
+  ca2dlc: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1116564800&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=2068431257&single=true&output=csv",
+  },
+  ieo: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=413510104&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=2007406486&single=true&output=csv",
+  },
+  gk: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=0&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHVK79MfVbLfq-K3c8UkRJpkDng8H3kk-cAm4MeHrsYFrqtLiiSYfxRlcM_1PlUwlAo14omFehefcH/pub?gid=152720249&single=true&output=csv",
+  },
 };
 const RESULTS_GS_URL = "https://script.google.com/macros/s/AKfycbzX-GXOlaiuOOhfGbIi3Nz0-_Em5mK4uDzWQPb_AlO1qph3jkhRwHLt1lPxRDriVlnu/exec";
 
@@ -420,7 +550,56 @@ const TOPIC_EMOJI = {
   "Oceans & Seas": "🌊",
   "Communities & Traditions": "🤝",
   "Planet Earth": "🌎",
+  "Me and My Surroundings": "🏠",
+  "Plants and Animals": "🐾",
+  "India and the World": "🌐",
+  "Science and Technology": "🔬",
+  "Language and Literature": "📚",
+  "Earth and Its Environment": "🌱",
+  "Transport and Communication": "🚆",
+  "Sports": "🏅",
+  "Maths Fun": "➗",
+  "Life Skills": "🧭",
+  "Current Affairs and Developments": "📰",
+  "Addition": "➕",
+  "Subtraction": "➖",
+  "Money": "💵",
+  "Regrouping Tens": "🔟",
+  "Complements": "🧩",
+  "Word and Structure Knowledge": "🔤",
+  "Reading": "📖",
+  "Spoken and Written Expression": "💬",
+  "Achievers Section": "🏆",
+  "Efficient Algorithms": "⚡",
+  "Repetition in Tasks": "🔁",
+  "Multiple Algorithms": "🧩",
+  "Celebrations": "🎉",
+  "Reading Texts": "📖",
+  "Instructions": "📋",
+  "-ing and -ed Words": "✏️",
+  "Compound Words": "🔗",
+  "Punctuation": "💬",
+  "Name the Picture": "🖼️",
+  "Meanings": "💬",
+  "Sort the Matra": "🧺",
+  "Complete the Word": "✏️",
+  "Word Building": "🧱",
+  "Rearrange": "🔀",
+  "Read & Understand": "📖",
+  "Spot the Spelling": "🔍",
+  "Odd One Out": "🕵️",
+  "Count the Matra": "🔢",
+  "Make New Words": "✨",
 };
+
+// Iron Man helmet — red shell, gold faceplate, glowing eyes.
+const IRONMAN_HELMET_SVG = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M32 3C19 3 9 12 9 27v14c0 9 7 17 23 20 16-3 23-11 23-20V27C55 12 45 3 32 3z" fill="#c8102e" stroke="#6d0a1a" stroke-width="1.5"/>
+  <path d="M32 3v15" stroke="#f5c542" stroke-width="3" stroke-linecap="round"/>
+  <path d="M17 20h30l-2 24c-1 6-7 11-13 12-6-1-12-6-13-12z" fill="#f5c542" stroke="#b8860b" stroke-width="1.5"/>
+  <path d="M20 27l9 2.5-.5 4.5-8-2z M44 27l-9 2.5.5 4.5 8-2z" fill="#eaffff" stroke="#7fefff" stroke-width="1"/>
+  <path d="M22 40l6 4M42 40l-6 4M28 49h8M29 52h6" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+</svg>`;
 
 // Each test wears a hero identity — badge, tag line, headline and confetti
 // colors all switch together. Add more entries here as more tests show up.
@@ -439,7 +618,7 @@ const HERO_THEME = {
     voicePitch: 1.0, voiceRate: 0.9,
   },
   hulk: {
-    badge: "👊", tag: "Hulk SMASH Mode",
+    badge: "👊", chip: "👊 Harder", chipSub: "Hulk SMASH mode", tag: "Hulk SMASH Mode",
     title: "SMASH this test!",
     sub: "The harder test — trickier numbers, bigger brain muscles. Hulk believes in you.",
     confetti: ["#4ade52", "#b34dff", "#0f1c0d"],
@@ -448,17 +627,70 @@ const HERO_THEME = {
     bubbleText: "YOU SMASHED IT!! 💪",
     voicePitch: 0.45, voiceRate: 0.75,
   },
+  // Iron Man — the Harder test can wear this instead of Hulk (see
+  // HARDER_HERO below). `finish` gives a line about FLYING for every score
+  // band; it is shown on the results screen, spoken, and put in the bubble.
+  ironman: {
+    badge: "🦾", badgeHTML: IRONMAN_HELMET_SVG,
+    chip: "🦾 Harder", chipSub: "Iron Man flight mode",
+    tag: "Iron Man Flight Mode",
+    title: "Suit up and FLY this test!",
+    sub: "The harder test — trickier questions, higher altitude. Repulsors charged, Jarvis is ready. Let's fly.",
+    confetti: ["#c8102e", "#f5c542", "#3ff0ff"],
+    cheer: "Iron Man says: you FLEW this exam! 🚀",
+    voiceLine: "Jarvis, log it. Perfect flight. You flew that exam like a champion!",
+    bubbleText: "YOU FLEW THIS EXAM! 🚀",
+    voicePitch: 0.85, voiceRate: 1.0,
+    finish: [
+      { min: 100, text: "PERFECT FLIGHT! You didn't just take that test — you FLEW it! 🚀",
+        say: "Jarvis, log it. Perfect flight. You flew that exam like a champion!", bubble: "PERFECT FLIGHT! YOU FLEW IT! 🚀" },
+      { min: 90, text: "You flew this exam! Repulsors at full power! 🚀",
+        say: "Nice flying! You flew right through that exam!", bubble: "YOU FLEW THIS EXAM! 🚀" },
+      { min: 70, text: "Good flight! A little more thrust and you'll fly even higher. 🦾",
+        say: "Good flight, pilot. A little more thrust and next time we fly even higher!", bubble: "GOOD FLIGHT — FLY HIGHER NEXT TIME! 🦾" },
+      { min: 0, text: "Even Iron Man crashes before he learns to fly. Check the misses, then take off again! 🔧",
+        say: "Every pilot crashes before they learn to fly. Fix the flaws, and take off again!", bubble: "TAKE OFF AGAIN! 🔧" },
+    ],
+  },
 };
 
+// Which hero the "Harder" test wears — switchable from the picker (the
+// toggle under the Test chips) and remembered on this device. Hulk's theme
+// is all still here; flip the toggle to bring him back.
+const HARDER_KEY = 'deepu-exam-harder-hero';
+let HARDER_HERO = 'ironman';
+try { const v = localStorage.getItem(HARDER_KEY); if (v && HERO_THEME[v] && v !== 'cap') HARDER_HERO = v; } catch (e) {}
+function applyHarderHero() {
+  const h = HERO_THEME[HARDER_HERO];
+  const chip = document.getElementById('harder-chip');
+  chip.dataset.hero = HARDER_HERO;
+  chip.innerHTML = `${h.chip || '👊 Harder'} <small>${h.chipSub || h.tag}</small>`;
+  document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => b.classList.toggle('active', b.dataset.harder === HARDER_HERO));
+  if (CURRENT_TEST === 'Test B - Harder') { CURRENT_HERO = HARDER_HERO; updateHeroUI(); }
+}
+document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => {
+  b.addEventListener('click', () => {
+    HARDER_HERO = b.dataset.harder;
+    try { localStorage.setItem(HARDER_KEY, HARDER_HERO); } catch (e) {}
+    applyHarderHero();
+  });
+});
+
 let CURRENT_QUESTIONS = [];
-let CURRENT_SUBJECT = "maths";
+let CURRENT_EXAM = "ca2";
+let CURRENT_SUBJECT = "ca2maths";
 let CURRENT_TEST = "Test A - Regular";
 let CURRENT_HERO = "cap";
 let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2marathi: "CA2 Marathi", gk: "GK (IGKO)", ieo: "English (IEO)" };
+// Olympiad-tagged subjects get the OMR-bubble answer style instead of the
+// regular full-width card — add future ones (imo/iso/ieo/icso) here.
+const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
+// Tests written in Devanagari get bigger type (see .lang-deva).
+const DEVANAGARI_SUBJECTS = new Set(["ca2marathi"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
@@ -466,7 +698,8 @@ function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_S
 function updateHeroUI() {
   const h = HERO_THEME[CURRENT_HERO];
   document.getElementById('page-root').setAttribute('data-hero', CURRENT_HERO);
-  document.getElementById('hero-badge').textContent = h.badge;
+  const badgeEl = document.getElementById('hero-badge');
+  if (h.badgeHTML) badgeEl.innerHTML = h.badgeHTML; else badgeEl.textContent = h.badge;
   document.getElementById('hero-tag').textContent = h.tag;
   const titleEl = document.getElementById('hero-title');
   const subEl = document.getElementById('hero-sub');
@@ -511,6 +744,7 @@ function rowsToQuestions(rows) {
     d: header.indexOf('option d'),
     correct: header.indexOf('correct answer'),
     points: header.indexOf('points'),
+    image: header.indexOf('image'),
   };
   return rows.slice(1)
     .filter(r => r[idx.question] && r[idx.question].trim())
@@ -522,6 +756,8 @@ function rowsToQuestions(rows) {
       options: [r[idx.a], r[idx.b], r[idx.c], r[idx.d]].filter(o => o && o.trim()),
       correct: (r[idx.correct] || '').trim(),
       points: Number(r[idx.points]) || 5,
+      // Optional — a repo-relative path like assets/exam/sa1-maths/coins.svg
+      image: idx.image >= 0 ? (r[idx.image] || '').trim() : '',
     }));
 }
 
@@ -535,13 +771,30 @@ async function loadQuestions(testName) {
 }
 
 // ── PICKER ──────────────────────────────────────────────────────────
-document.querySelectorAll('#subject-chips .big-chip[data-subject]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#subject-chips .big-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    CURRENT_SUBJECT = btn.dataset.subject;
-  });
+function selectSubject(btn) {
+  document.querySelectorAll('#subject-picker .big-chip').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  CURRENT_SUBJECT = btn ? btn.dataset.subject : '';
+  document.getElementById('start-btn').disabled = !btn;
+}
+
+// Picking an exam shows only its subjects and selects the first one that
+// has tests (SA1 has none yet, so Start stays disabled there).
+function selectExam(exam) {
+  CURRENT_EXAM = exam;
+  document.querySelectorAll('#exam-picker .big-chip').forEach(b => b.classList.toggle('active', b.dataset.exam === exam));
+  document.querySelectorAll('[data-exam-subjects]').forEach(row => { row.hidden = row.dataset.examSubjects !== exam; });
+  selectSubject(document.querySelector(`[data-exam-subjects="${exam}"] .big-chip[data-subject]`));
+}
+
+document.querySelectorAll('#exam-picker .big-chip').forEach(btn => {
+  btn.addEventListener('click', () => selectExam(btn.dataset.exam));
 });
+document.querySelectorAll('#subject-picker .big-chip[data-subject]').forEach(btn => {
+  btn.addEventListener('click', () => selectSubject(btn));
+});
+selectExam(CURRENT_EXAM);
+applyHarderHero();
 
 document.querySelectorAll('#test-chips .big-chip').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -569,6 +822,7 @@ function shuffleArray(arr) {
 }
 
 document.getElementById('start-btn').addEventListener('click', async () => {
+  PERFECT_AUDIO.pause(); AFTER_VOICE = null;  // stop a still-playing recording
   const btn = document.getElementById('start-btn');
   btn.textContent = 'Loading…'; btn.disabled = true;
   try {
@@ -577,7 +831,10 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
     document.getElementById('picker-view').style.display = 'none';
     document.getElementById('exam-view').style.display = 'block';
+    document.getElementById('page-root').classList.toggle('exam-wide', OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT));
+    document.getElementById('page-root').classList.toggle('lang-deva', DEVANAGARI_SUBJECTS.has(CURRENT_SUBJECT));
     buildQGrid();
+    buildOMRPanel();
     renderQuestion();
   } catch (err) {
     alert('Could not load questions. ' + err.message);
@@ -586,7 +843,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
 });
 
 // ── EXAM RENDER ─────────────────────────────────────────────────────
+let ATTEMPT = 0;
 function buildQGrid() {
+  ATTEMPT++;
   const grid = document.getElementById('qgrid');
   grid.innerHTML = '';
   CURRENT_QUESTIONS.forEach((q, i) => {
@@ -598,6 +857,54 @@ function buildQGrid() {
   });
 }
 
+// ── OMR SIDEBAR — Olympiad tests only. Rebuilt whenever a fresh test
+// starts (question count/order changes); synced (not rebuilt) on every
+// answer/navigation so it doesn't lose scroll position mid-test. ──
+function buildOMRPanel() {
+  const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
+  document.getElementById('exam-layout').classList.toggle('has-omr', isOlympiad);
+  const colsWrap = document.getElementById('omr-cols');
+  colsWrap.innerHTML = '';
+  if (!isOlympiad) return;
+
+  const CHUNK = 25; // matches the real SOF sheet's column split
+  for (let start = 0; start < CURRENT_QUESTIONS.length; start += CHUNK) {
+    const col = document.createElement('div');
+    col.className = 'omr-col';
+    CURRENT_QUESTIONS.slice(start, start + CHUNK).forEach((q, j) => {
+      const i = start + j;
+      const letters = ['A', 'B', 'C', 'D'].slice(0, Math.max(q.options.length, 2));
+      const row = document.createElement('div');
+      row.className = 'omr-row';
+      row.dataset.index = i;
+      row.innerHTML = `<span class="omr-qnum">${i + 1}</span><span class="omr-bubbles">${
+        letters.map(L => `<span class="omr-bubble" data-letter="${L}">${L}</span>`).join('')
+      }</span>`;
+      row.querySelector('.omr-qnum').addEventListener('click', () => { CURRENT_INDEX = i; renderQuestion(); });
+      row.querySelectorAll('.omr-bubble').forEach(b => {
+        b.addEventListener('click', () => {
+          CURRENT_ANSWERS[i] = b.dataset.letter;
+          CURRENT_INDEX = i;
+          renderQuestion();
+        });
+      });
+      col.appendChild(row);
+    });
+    colsWrap.appendChild(col);
+  }
+  syncOMRPanel();
+}
+
+function syncOMRPanel() {
+  if (!OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT)) return;
+  document.querySelectorAll('.omr-row').forEach(row => {
+    const i = Number(row.dataset.index);
+    row.classList.toggle('current', i === CURRENT_INDEX);
+    const ans = CURRENT_ANSWERS[i];
+    row.querySelectorAll('.omr-bubble').forEach(b => b.classList.toggle('filled', !!ans && b.dataset.letter === ans));
+  });
+}
+
 function renderQuestion() {
   const q = CURRENT_QUESTIONS[CURRENT_INDEX];
   const total = CURRENT_QUESTIONS.length;
@@ -605,20 +912,30 @@ function renderQuestion() {
   document.getElementById('progress-fill').style.width = `${((CURRENT_INDEX + 1) / total) * 100}%`;
   document.getElementById('q-topic').textContent = `${TOPIC_EMOJI[q.topic] || '📘'} ${q.topic}`;
   document.getElementById('q-text').textContent = q.question;
+  const img = document.getElementById('q-img');
+  img.hidden = !q.image;
+  if (q.image) img.src = q.image; else img.removeAttribute('src');
 
   const area = document.getElementById('q-input-area');
   area.innerHTML = '';
   const saved = CURRENT_ANSWERS[CURRENT_INDEX];
 
-  if (q.type === 'MCQ' || q.type === 'True/False') {
+  if (q.type === 'Order') renderOrder(q, area);
+  else if (q.type === 'Match') renderMatch(q, area);
+  else if (q.type === 'MCQ' || q.type === 'True/False') {
+    const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
     const wrap = document.createElement('div');
-    wrap.className = 'opt-list';
+    wrap.className = 'opt-list' + (isOlympiad ? ' omr-style read-only' : '');
     q.options.forEach((opt, i) => {
       const letter = String.fromCharCode(65 + i);
       const b = document.createElement('button');
       b.className = 'opt-btn' + (saved === letter ? ' selected' : '');
       b.innerHTML = `<span class="opt-letter">${letter}</span><span>${opt}</span>`;
-      b.addEventListener('click', () => { CURRENT_ANSWERS[CURRENT_INDEX] = letter; renderQuestion(); });
+      // Olympiad tests: the question card is read-only — answers are only
+      // marked on the OMR sheet, same as filling a real bubble sheet
+      // instead of circling the printed question paper.
+      if (isOlympiad) b.disabled = true;
+      else b.addEventListener('click', () => { CURRENT_ANSWERS[CURRENT_INDEX] = letter; renderQuestion(); });
       wrap.appendChild(b);
     });
     area.appendChild(wrap);
@@ -634,7 +951,7 @@ function renderQuestion() {
     });
     area.appendChild(wrap);
   } else {
-    const isNumeric = /^-?\d+$/.test(q.correct);
+    const isNumeric = /^-?\d+$/.test(q.correct);  // "a|b" alternatives stay text
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'text-answer';
@@ -653,6 +970,125 @@ function renderQuestion() {
     d.classList.toggle('answered', CURRENT_ANSWERS[i] !== undefined && CURRENT_ANSWERS[i] !== '');
     d.classList.toggle('current', i === CURRENT_INDEX);
   });
+  syncOMRPanel();
+}
+
+// ── DRAG & DROP (Order / Match) ─────────────────────────────────────
+// Order: the sheet lists the options A–D in the CORRECT order (Correct
+// Answer "ABCD"); cards start shuffled and the answer is the letters in the
+// order the child leaves them. Match: each option is "item=Group"; chips are
+// dropped into group buckets and the answer is a JSON map of item → group.
+const SCRATCH_COLORS = { Events: '#e6a700', Motion: '#4c97ff', Looks: '#9966ff', Sound: '#cf63cf', Control: '#ffab19' };
+
+function shuffledFor(q, n) {
+  if (q._att !== ATTEMPT) {
+    let idx;
+    do { idx = shuffleArray([...Array(n).keys()]); } while (n > 1 && idx.every((v, k) => v === k));
+    q._att = ATTEMPT; q._shuffle = idx;
+  }
+  return q._shuffle;
+}
+
+// Pointer-based drag: moves the element with the finger/mouse, and on
+// release reports what it was dropped on. A plain tap calls onTap instead.
+function makeDraggable(el, { onDrop, onTap, onHover }) {
+  el.addEventListener('pointerdown', e => {
+    if (e.button !== undefined && e.button !== 0) return;
+    const sx = e.clientX, sy = e.clientY;
+    let dragging = false;
+    el.setPointerCapture(e.pointerId);
+    const under = (x, y) => { el.style.visibility = 'hidden'; const t = document.elementFromPoint(x, y); el.style.visibility = ''; return t; };
+    const move = ev => {
+      const dx = ev.clientX - sx, dy = ev.clientY - sy;
+      if (!dragging && Math.hypot(dx, dy) > 6) { dragging = true; el.classList.add('dragging'); }
+      if (dragging) { el.style.transform = `translate(${dx}px,${dy}px)`; onHover && onHover(under(ev.clientX, ev.clientY)); }
+    };
+    const up = ev => {
+      el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
+      el.classList.remove('dragging'); el.style.transform = '';
+      onHover && onHover(null);
+      if (dragging) onDrop(under(ev.clientX, ev.clientY)); else onTap();
+    };
+    el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  });
+}
+
+let DD_PICKED = null;  // tap-then-tap fallback: the card picked by the first tap
+
+function renderOrder(q, area) {
+  const i = CURRENT_INDEX;
+  const letters = q.options.map((_, k) => String.fromCharCode(65 + k));
+  let order = CURRENT_ANSWERS[i] ? CURRENT_ANSWERS[i].split('') : shuffledFor(q, letters.length).map(k => letters[k]);
+  const save = () => { CURRENT_ANSWERS[i] = order.join(''); DD_PICKED = null; renderQuestion(); };
+  area.innerHTML = '<div class="dd-hint">✋ Drag the cards into the right order (or tap one card, then tap where it should go).</div>';
+  const list = document.createElement('div'); list.className = 'order-list';
+  order.forEach((L, pos) => {
+    const card = document.createElement('div');
+    card.className = 'dd-card' + (DD_PICKED === L ? ' picked' : '');
+    card.dataset.letter = L;
+    card.innerHTML = `<span class="dd-num">${pos + 1}</span><span>${q.options[L.charCodeAt(0) - 65]}</span><span class="dd-grip">⠿</span>`;
+    const moveTo = target => {
+      const t = target && target.closest('.dd-card');
+      if (!t || t === card) return;
+      order.splice(order.indexOf(L), 1);
+      order.splice([...list.children].indexOf(t), 0, L);
+      save();
+    };
+    makeDraggable(card, {
+      onDrop: moveTo,
+      onTap: () => {
+        if (DD_PICKED && DD_PICKED !== L) { const t = list.querySelector(`[data-letter="${DD_PICKED}"]`); const from = DD_PICKED; DD_PICKED = null; order.splice(order.indexOf(from), 1); order.splice([...list.children].indexOf(card), 0, from); save(); }
+        else { DD_PICKED = DD_PICKED === L ? null : L; renderQuestion(); }
+      },
+    });
+    list.appendChild(card);
+  });
+  area.appendChild(list);
+}
+
+function parseMatch(q) {
+  const items = q.options.map(o => { const k = o.lastIndexOf('='); return { text: o.slice(0, k).trim(), group: o.slice(k + 1).trim() }; });
+  const groups = [...new Set(items.map(it => it.group))];
+  return { items, groups };
+}
+
+function renderMatch(q, area) {
+  const i = CURRENT_INDEX;
+  const { items, groups } = parseMatch(q);
+  let placed = {};
+  try { placed = JSON.parse(CURRENT_ANSWERS[i] || '{}'); } catch (e) {}
+  const save = () => { CURRENT_ANSWERS[i] = Object.keys(placed).length ? JSON.stringify(placed) : ''; DD_PICKED = null; renderQuestion(); };
+  const assign = (k, target) => {
+    const b = target && target.closest('[data-group]');
+    if (!b) return false;
+    if (b.dataset.group === '') delete placed[k]; else placed[k] = b.dataset.group;
+    save(); return true;
+  };
+  area.innerHTML = '<div class="dd-hint">✋ Drag each card into the right box (or tap a card, then tap a box).</div>';
+  const pool = document.createElement('div'); pool.className = 'dd-pool'; pool.dataset.group = '';
+  const buckets = document.createElement('div'); buckets.className = 'dd-buckets';
+  const bucketEls = {};
+  groups.forEach(g => {
+    const b = document.createElement('div'); b.className = 'dd-bucket'; b.dataset.group = g;
+    b.innerHTML = `<span class="dd-bucket-title" style="background:${SCRATCH_COLORS[g] || 'var(--accent)'}">${g}</span>`;
+    b.addEventListener('click', e => { if (DD_PICKED !== null && !e.target.closest('.dd-card')) assign(DD_PICKED, b); });
+    bucketEls[g] = b; buckets.appendChild(b);
+  });
+  pool.addEventListener('click', e => { if (DD_PICKED !== null && !e.target.closest('.dd-card')) assign(DD_PICKED, pool); });
+  const hover = t => { Object.values(bucketEls).forEach(b => b.classList.toggle('hot', !!t && t.closest('.dd-bucket') === b)); };
+  shuffledFor(q, items.length).forEach(k => {
+    const chip = document.createElement('div');
+    chip.className = 'dd-card' + (DD_PICKED === String(k) ? ' picked' : '');
+    chip.textContent = items[k].text;
+    makeDraggable(chip, {
+      onHover: hover,
+      onDrop: t => assign(String(k), t),
+      onTap: () => { DD_PICKED = DD_PICKED === String(k) ? null : String(k); renderQuestion(); },
+    });
+    (placed[k] && bucketEls[placed[k]] ? bucketEls[placed[k]] : pool).appendChild(chip);
+  });
+  if (!pool.children.length) pool.innerHTML = '<span class="dd-hint" style="margin:0">All placed ✔ — drag a card back here to change it.</span>';
+  area.appendChild(pool); area.appendChild(buckets);
 }
 
 document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
@@ -662,7 +1098,35 @@ document.getElementById('submit-btn').addEventListener('click', submitExam);
 // ── GRADING ─────────────────────────────────────────────────────────
 function normalize(v) { return String(v || '').trim().toLowerCase().replace(/\s+/g, ' '); }
 
+// ── PERFECT-SCORE RECORDING ─────────────────────────────────────────
+// A family voice recording that plays on a 100%, right after the hero's
+// text-to-speech line. iOS only lets audio play from a tap, so the Submit tap
+// "unlocks" it (a silent play/pause) and the real play happens seconds later.
+const PERFECT_AUDIO = new Audio('assets/audio/perfect-score.m4a');
+PERFECT_AUDIO.preload = 'auto';
+let PERFECT_AUDIO_UNLOCKED = false;
+let AFTER_VOICE = null;  // set on a perfect score; run once when speech ends
+
+function unlockPerfectAudio() {
+  if (PERFECT_AUDIO_UNLOCKED) return;
+  PERFECT_AUDIO.muted = true;
+  const p = PERFECT_AUDIO.play();
+  const done = () => { PERFECT_AUDIO.pause(); PERFECT_AUDIO.currentTime = 0; PERFECT_AUDIO.muted = false; };
+  if (p && p.then) p.then(() => { PERFECT_AUDIO_UNLOCKED = true; done(); }).catch(done);
+  else done();
+}
+
+function playPerfectRecording() {
+  try { PERFECT_AUDIO.muted = false; PERFECT_AUDIO.currentTime = 0; PERFECT_AUDIO.play().catch(() => {}); } catch (e) {}
+}
+
+function runAfterVoice() {
+  const f = AFTER_VOICE; AFTER_VOICE = null;
+  if (f) f();
+}
+
 function submitExam() {
+  unlockPerfectAudio();
   const unanswered = CURRENT_QUESTIONS.filter((_, i) => !CURRENT_ANSWERS[i]).length;
   if (unanswered > 0 && !confirm(`${unanswered} question(s) still unanswered. Submit anyway?`)) return;
 
@@ -679,13 +1143,35 @@ function submitExam() {
     let given = CURRENT_ANSWERS[i] || '';
     let correctDisplay = q.correct;
     let isCorrect;
-    if (q.type === 'MCQ' || q.type === 'True/False') {
-      const idx = { A: 0, B: 1, C: 2, D: 3 }[q.correct];
-      correctDisplay = q.options[idx];
-      isCorrect = given === q.correct;
-      given = given ? q.options[{ A: 0, B: 1, C: 2, D: 3 }[given]] : '(no answer)';
+    if (q.type === 'Order') {
+      const txt = seq => seq.split('').map(L => q.options[L.charCodeAt(0) - 65]).join(' → ');
+      const want = q.options.map((_, k) => String.fromCharCode(65 + k)).join('');
+      isCorrect = given === want;
+      correctDisplay = txt(want);
+      given = given ? txt(given) : '(not moved)';
+    } else if (q.type === 'Match') {
+      const { items } = parseMatch(q);
+      let placed = {};
+      try { placed = JSON.parse(given || '{}'); } catch (e) {}
+      isCorrect = items.every((it, k) => placed[k] === it.group);
+      correctDisplay = items.map(it => `${it.text} → ${it.group}`).join(' · ');
+      given = Object.keys(placed).length ? items.map((it, k) => `${it.text} → ${placed[k] || '?'}`).join(' · ') : '(no answer)';
+    } else if (q.type === 'MCQ' || q.type === 'True/False') {
+      // "Correct Answer" is usually a letter (A/B/C/D), but some sheets
+      // (e.g. GK/IGKO) store the full option text instead — support both.
+      const LETTER_IDX = { A: 0, B: 1, C: 2, D: 3 };
+      let correctIdx = LETTER_IDX[q.correct];
+      if (correctIdx === undefined) correctIdx = q.options.findIndex(o => normalize(o) === normalize(q.correct));
+      const correctLetter = correctIdx >= 0 ? String.fromCharCode(65 + correctIdx) : q.correct;
+      correctDisplay = correctIdx >= 0 ? q.options[correctIdx] : q.correct;
+      isCorrect = given === correctLetter;
+      given = given ? q.options[LETTER_IDX[given]] : '(no answer)';
     } else {
-      isCorrect = normalize(given) === normalize(q.correct);
+      // Short answers may list accepted alternatives with "|" (e.g.
+      // "$0.65|65c|65") — the first one is what's shown as correct.
+      const accepted = q.correct.split('|');
+      isCorrect = accepted.some(a => normalize(given) === normalize(a));
+      correctDisplay = accepted[0];
       given = given || '(no answer)';
     }
 
@@ -705,9 +1191,14 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
   const pct = Math.round((scored / maxScore) * 100);
   document.getElementById('score-big').textContent = `${scored}/${maxScore}`;
   const emojiEl = document.getElementById('score-emoji');
-  emojiEl.textContent = pct === 100 ? '🏆' : pct >= 90 ? '🎉' : pct >= 70 ? '👍' : '💪';
+  // Heroes with a `finish` table (Iron Man) get a line — about flying — for
+  // EVERY score band, spoken and shown; others keep the classic behaviour.
+  const fin = (HERO_THEME[CURRENT_HERO].finish || []).find(f => pct >= f.min) || null;
+  emojiEl.textContent = fin ? (pct === 100 ? '🏆' : pct >= 90 ? '🚀' : pct >= 70 ? '🦾' : '🔧')
+    : pct === 100 ? '🏆' : pct >= 90 ? '🎉' : pct >= 70 ? '👍' : '💪';
   emojiEl.classList.toggle('perfect', pct === 100);
-  const heroLine = pct === 100 ? `PERFECT SCORE! ${HERO_THEME[CURRENT_HERO].cheer}`
+  const heroLine = fin ? fin.text
+    : pct === 100 ? `PERFECT SCORE! ${HERO_THEME[CURRENT_HERO].cheer}`
     : pct >= 90 ? HERO_THEME[CURRENT_HERO].cheer
     : pct >= 70 ? 'Solid effort!' : 'Keep practicing — you\'ll get there!';
   document.getElementById('score-sub').textContent =
@@ -732,8 +1223,49 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
     list.appendChild(item);
   });
 
-  if (pct === 100) { fireConfetti(); firePerfectScoreShow(); }
+  // On a 100%, the family recording follows whichever voice line plays.
+  // Safety net: if the device never reports the speech ending, play anyway.
+  if (pct === 100) { AFTER_VOICE = playPerfectRecording; setTimeout(runAfterVoice, 9000); }
+  // Speech has to start synchronously inside the tap that submitted (iOS).
+  if (fin) { fireFlyby(pct >= 90 ? 2 : 1); fireHeroVoiceLine(fin.say, fin.bubble); }
+  if (pct === 100) { fireConfetti(); firePerfectScoreShow(!!fin); }
   else if (pct >= 90) { fireConfetti(); }
+}
+
+// ── Iron Man fly-by: the helmet streaks across the screen on a cyan
+//    repulsor trail, with a whoosh. `passes` = how many times he flies by. ──
+function playWhoosh() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx(), now = ctx.currentTime, len = 0.9;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / d.length);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2.2;
+    bp.frequency.setValueAtTime(300, now); bp.frequency.exponentialRampToValueAtTime(3200, now + len);
+    const g = ctx.createGain(); g.gain.value = 0.5;
+    src.connect(bp).connect(g).connect(ctx.destination); src.start(now);
+    setTimeout(() => ctx.close(), 1300);
+  } catch (e) { /* no Web Audio — the visuals still fly */ }
+}
+
+function fireFlyby(passes) {
+  playWhoosh();
+  const W = window.innerWidth, H = window.innerHeight;
+  for (let n = 0; n < passes; n++) {
+    const el = document.createElement('div');
+    el.className = 'flyby';
+    el.innerHTML = `<div class="flyby-trail"></div>${IRONMAN_HELMET_SVG}`;
+    const y0 = H * (n ? 0.85 : 0.72), y1 = H * (n ? 0.3 : 0.08);
+    const x0 = -300, x1 = W + 120;
+    el.querySelector('.flyby-trail').style.transform = `rotate(${Math.atan2(y1 - y0, x1 - x0) * 180 / Math.PI}deg)`;
+    document.body.appendChild(el);
+    el.animate(
+      [{ transform: `translate(${x0}px, ${y0}px)` }, { transform: `translate(${x1}px, ${y1}px)` }],
+      { duration: 1500, delay: n * 700, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'both' }
+    ).onfinish = () => el.remove();
+  }
 }
 
 function fireConfetti() {
@@ -797,12 +1329,12 @@ function playImpactBoom() {
 //    setTimeout callback, since it's no longer "inside" the user gesture.
 //    The bubble is pure visual, so it's fine to stagger via animate()'s
 //    own delay option instead of a setTimeout. ──
-function fireHeroVoiceLine() {
+function fireHeroVoiceLine(say, bubbleText) {
   const h = HERO_THEME[CURRENT_HERO];
 
   const bubble = document.createElement('div');
   bubble.className = 'hero-speech-bubble';
-  bubble.textContent = h.bubbleText;
+  bubble.textContent = bubbleText || h.bubbleText;
   document.body.appendChild(bubble);
   bubble.animate(
     [
@@ -815,8 +1347,10 @@ function fireHeroVoiceLine() {
   ).onfinish = () => bubble.remove();
 
   try {
-    if (!('speechSynthesis' in window)) return;
-    const utter = new SpeechSynthesisUtterance(h.voiceLine);
+    if (!('speechSynthesis' in window)) { setTimeout(runAfterVoice, 2500); return; }
+    const utter = new SpeechSynthesisUtterance(say || h.voiceLine);
+    utter.onend = () => setTimeout(runAfterVoice, 300);
+    utter.onerror = () => setTimeout(runAfterVoice, 300);
     utter.pitch = h.voicePitch;
     utter.rate = h.voiceRate;
     utter.volume = 1;
@@ -826,11 +1360,11 @@ function fireHeroVoiceLine() {
     if (enVoice) utter.voice = enVoice;
     window.speechSynthesis.cancel(); // clear any queued speech first
     window.speechSynthesis.speak(utter);
-  } catch (e) { /* speech unsupported — bubble text still lands the joke */ }
+  } catch (e) { setTimeout(runAfterVoice, 2500); /* speech unsupported — bubble text still lands the joke */ }
 }
 
 // ── PERFECT SCORE: fireworks + laser show ────────────────────────────
-function firePerfectScoreShow() {
+function firePerfectScoreShow(voiceAlreadyFired) {
   playImpactBoom();
 
   // white screen flash for impact
@@ -845,7 +1379,7 @@ function firePerfectScoreShow() {
   // Called synchronously (not setTimeout) so speechSynthesis.speak() still
   // counts as user-gesture-triggered on iOS Safari; the bubble's own
   // animation delay handles staggering it after the PERFECT SCORE banner.
-  fireHeroVoiceLine();
+  if (!voiceAlreadyFired) fireHeroVoiceLine();
 
   // big banner text, themed to whichever hero is active
   const banner = document.createElement('div');
@@ -959,11 +1493,12 @@ function renderHistory() {
 
 // ── RESET / RETAKE ──────────────────────────────────────────────────
 document.getElementById('retake-btn').addEventListener('click', () => {
+  PERFECT_AUDIO.pause(); AFTER_VOICE = null;  // stop a still-playing recording
   CURRENT_QUESTIONS = shuffleArray(CURRENT_QUESTIONS);
   CURRENT_ANSWERS = {}; CURRENT_INDEX = 0;
   document.getElementById('results-view').style.display = 'none';
   document.getElementById('exam-view').style.display = 'block';
-  buildQGrid(); renderQuestion();
+  buildQGrid(); buildOMRPanel(); renderQuestion();
 });
 document.getElementById('home-btn').addEventListener('click', () => {
   document.getElementById('results-view').style.display = 'none';

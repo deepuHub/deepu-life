@@ -6,762 +6,201 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#0a0f0d"/>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox=%220%200%2032%2032%22%3E%3Crect%20width=%2232%22%20height=%2232%22%20rx=%226%22%20fill=%22%230a0f0d%22%2F%3E%3Ctext%20x=%2216%22%20y=%2223%22%20font-family=%22Georgia%2Cserif%22%20font-weight=%22900%22%20font-size=%2222%22%20text-anchor=%22middle%22%20fill=%22%23c8f04a%22%3Ed%3C%2Ftext%3E%3Ccircle%20cx=%2226%22%20cy=%2226%22%20r=%223%22%20fill=%22%23c8f04a%22%2F%3E%3C%2Fsvg%3E"/>
-  <title>deepu-life — Running · Reading · Growing · Cycling</title>
+  <title>deepu-life</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/tracker-theme.css">
-  <link rel="stylesheet" href="assets/css/timeline.css">
   <style>
-/* ═══════════════════════ TABS (page-specific tab coloring) ═══════ */
-.nav-pill[data-tab="run"].active{background:var(--run-dim);border-color:var(--run);color:var(--run)}
-.nav-pill[data-tab="read"].active{background:var(--read-dim);border-color:var(--read);color:var(--read)}
-.nav-pill[data-tab="grow"].active{background:var(--grow-dim);border-color:var(--grow);color:var(--grow)}
-.nav-pill[data-tab="cycle"].active{background:var(--cycle-dim);border-color:var(--cycle);color:var(--cycle)}
+.home{padding:calc(var(--nav-h) + clamp(1.5rem,5vw,3.5rem)) var(--pad) 3rem;max-width:1180px}
+.home-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.4rem,7vw,4.6rem);line-height:0.95;letter-spacing:-0.04em}
+.home-title em{font-style:italic;font-weight:300;color:var(--muted)}
+.home-sub{margin-top:0.9rem;color:var(--muted);font-size:clamp(0.85rem,2vw,0.98rem);max-width:460px;line-height:1.6}
 
-/* ═══════════════════════ HERO ═════════════════════════════ */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h)+3rem) var(--pad) 3rem;border-bottom:1px solid var(--border)}
-.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
-.hero-cell{background:var(--surface);padding:clamp(0.9rem,2.5vw,2rem);display:flex;flex-direction:column;gap:0.35rem;opacity:0;animation:fadeUp 0.7s forwards}
-.hero-cell:nth-child(1){animation-delay:.1s}.hero-cell:nth-child(2){animation-delay:.25s}.hero-cell:nth-child(3){animation-delay:.4s}.hero-cell:nth-child(4){animation-delay:.55s}
-.hero-cell-link{cursor:pointer;text-decoration:none;color:inherit;transition:background 0.2s}
-.hero-cell-link:hover{background:var(--surface2)}
-.hero-cell-icon{font-size:clamp(1.2rem,3vw,1.8rem)}
-.hero-cell-label{font-size:clamp(0.58rem,1.3vw,0.7rem);letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
-.hero-cell-stat{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.5rem,4vw,3rem);line-height:1;letter-spacing:-0.03em}
-.hero-cell-sub{font-size:clamp(0.65rem,1.3vw,0.82rem);color:var(--muted)}
-.run-c{color:var(--run)}.read-c{color:var(--read)}.grow-c{color:var(--grow)}.cycle-c{color:var(--cycle)}
-.hero-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.8rem,10vw,8rem);line-height:0.92;letter-spacing:-0.04em;opacity:0;animation:fadeUp 0.8s 0.5s forwards}
-.hero-title em{font-style:italic;font-weight:300;color:var(--muted)}
-.hero-sub{margin-top:1.2rem;font-size:clamp(0.85rem,2vw,1rem);color:var(--muted);max-width:440px;line-height:1.6;opacity:0;animation:fadeUp 0.8s 0.7s forwards}
+.group{margin-top:clamp(2rem,5vw,3rem)}
+.group-label{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.9rem;display:flex;align-items:center;gap:0.75rem}
+.group-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.7rem}
 
-/* ═══════════════════════ TABS ═════════════════════════════ */
-.tab-section{display:none;animation:fadeIn 0.3s ease}
-.tab-section.active{display:block}
+.card{--ac:var(--muted);position:relative;display:flex;flex-direction:column;gap:0.35rem;min-height:128px;padding:1.05rem 1.1rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;
+  transition:border-color 0.2s,transform 0.2s}
+.card:hover{border-color:var(--ac);transform:translateY(-2px)}
+.card:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.card-icon{font-size:1.45rem;line-height:1}
+.card-name{font-family:'Fraunces',serif;font-weight:700;font-size:1.08rem;margin-top:0.35rem}
+.card-desc{font-size:0.78rem;color:var(--muted);line-height:1.45}
+.card-stat{margin-top:auto;padding-top:0.6rem;display:flex;align-items:baseline;gap:0.4rem;flex-wrap:wrap}
+.card-stat b{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem;color:var(--ac);letter-spacing:-0.02em}
+.card-stat span{font-size:0.7rem;color:var(--muted)}
+.card-lock{position:absolute;top:0.9rem;right:0.95rem;font-size:0.72rem;opacity:0.55}
 
-/* ═══════════════════════ SECTION HEADER ══════════════════ */
-.sec-head{padding:clamp(1.5rem,4vw,3rem) var(--pad) 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
-.sec-eyebrow{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.4rem}
-.sec-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,4.5rem);letter-spacing:-0.03em;line-height:1}
+.saved-note{margin-top:2.2rem;font-size:0.72rem;color:var(--muted)}
 
-/* view toggle */
+.visit-tile{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 2rem;padding:1.15rem 1.3rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.visit-big{display:flex;align-items:baseline;gap:0.55rem}
+.visit-wave{font-size:1.6rem;align-self:center}
+.visit-big b{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,5vw,2.6rem);line-height:1;color:var(--grow);letter-spacing:-0.03em}
+.visit-big span{font-size:0.8rem;color:var(--muted)}
+.visit-flags{display:flex;flex-wrap:wrap;gap:0.4rem;flex:1;min-width:0}
+.visit-chip{display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.7rem;border-radius:999px;border:1px solid var(--border);font-size:0.76rem;white-space:nowrap}
+.visit-chip em{font-style:normal;color:var(--muted)}
+.visit-status{width:100%;font-size:0.68rem;color:var(--muted)}
 
-
-
-
-
-
-/* ═══════════════════════ SUMMARY ══════════════════════════ */
-.summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.5rem;padding:1.25rem var(--pad)}
-.summary-chip{background:var(--surface);border:1px solid var(--border);padding:0.85rem 1rem;border-radius:3px;display:flex;flex-direction:column;gap:0.15rem}
-.chip-lbl{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
-.chip-val{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.1rem,3vw,1.5rem);line-height:1.1}
-
-/* ═══════════════════════ ADD FORM ═════════════════════════ */
-
-
-
-
-
-.finp:focus{border-color:var(--muted)}
-
-
-
-
-/* ═══════════════════════ LIST VIEW ════════════════════════ */
-.list-wrap{padding:1.5rem var(--pad) 3rem}
-.twrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:3px}
-.etable{width:100%;border-collapse:collapse;min-width:420px}
-.etable th{text-align:left;font-size:0.64rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:0.7rem 1rem;border-bottom:1px solid var(--border);background:var(--surface);white-space:nowrap}
-.etable td{padding:0.85rem 1rem;border-bottom:1px solid var(--border);font-size:0.88rem;vertical-align:middle}
-.etable tbody tr:last-child td{border-bottom:none}
-.etable tr:hover td{background:var(--surface)}
-.card-list{display:none;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:3px}
-.ecard{background:var(--surface);padding:1rem;display:flex;flex-direction:column;gap:0.45rem}
-.ecard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem}
-.ecard-title{font-weight:500;font-size:0.95rem}
-.ecard-meta{display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center}
-.ecard-note{font-size:0.78rem;color:var(--muted);line-height:1.4}
-
-.empty-st{text-align:center;padding:4rem 2rem;color:var(--muted)}
-.empty-st .emo{font-size:2.5rem;display:block;margin-bottom:1rem}
-
-/* ═══════════════════════ QUOTES MODAL ═════════════════════ */
-.qmodal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.2s ease}
-.qmodal{background:var(--surface);border:1px solid var(--border);border-radius:6px;max-width:640px;width:100%;max-height:85svh;display:flex;flex-direction:column;overflow:hidden}
-.qmodal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-shrink:0}
-.qmodal-title{font-family:'Fraunces',serif;font-weight:700;font-size:1.1rem;line-height:1.3;color:var(--read)}
-.qmodal-author{font-size:0.78rem;color:var(--muted);margin-top:0.2rem}
-.qmodal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.4rem;line-height:1;padding:0.1rem 0.3rem;border-radius:3px;flex-shrink:0;transition:color 0.2s}
-.qmodal-close:hover{color:var(--text)}
-.qmodal-body{overflow-y:auto;padding:1rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1rem}
-.qmodal-body::-webkit-scrollbar{width:4px}
-.qmodal-body::-webkit-scrollbar-track{background:transparent}
-.qmodal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.q-item{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--read);border-radius:3px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.4rem}
-.q-text{font-size:0.88rem;line-height:1.65;color:var(--text)}
-.q-page{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
-.q-count{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:0 1.5rem 0.5rem}
-/* Quotes button on slide */
-.quotes-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:1px solid var(--read-dim);border-radius:999px;background:var(--read-dim);color:var(--read);font-size:0.75rem;font-weight:500;font-family:'Epilogue',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.03em}
-.quotes-btn:hover{background:var(--read);color:#0a0f0d}
-
-
-
-
-/* ═══ LIST SECTION LABEL ════════════════════════════════ */
-.list-section-label{
-  font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;
-  color:var(--muted);padding:1.5rem var(--pad) 0.75rem;
-  display:flex;align-items:center;gap:0.75rem;
-}
-.list-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ═══ SHEETS BUTTON ═════════════════════════════════════ */
-.sheets-btn{
-  display:inline-flex;align-items:center;gap:0.45rem;
-  padding:0.42rem 1rem;border-radius:999px;
-  font-size:0.75rem;font-weight:500;letter-spacing:0.03em;
-  border:1px solid var(--run-dim);background:var(--run-dim);color:var(--run);
-  text-decoration:none;font-family:'Epilogue',sans-serif;
-  transition:all 0.2s;white-space:nowrap;
-}
-.sheets-btn:hover{background:var(--run);color:#0a0f0d}
-.sheets-btn-read{border-color:var(--read-dim);background:var(--read-dim);color:var(--read)}
-.sheets-btn-read:hover{background:var(--read);color:#0a0f0d}
-.sheets-btn-grow{border-color:var(--grow-dim);background:var(--grow-dim);color:var(--grow)}
-.sheets-btn-grow:hover{background:var(--grow);color:#0a0f0d}.sheets-btn-cycle{border-color:var(--cycle-dim);background:var(--cycle-dim);color:var(--cycle)}.sheets-btn-cycle:hover{background:var(--cycle);color:#0a0f0d}
-
-/* ═══ LAST SYNCED BADGE ═══════════════════════════════════ */
-.sync-badge{
-  font-size:0.63rem;color:var(--muted);letter-spacing:0.06em;
-  display:flex;align-items:center;gap:0.35rem;
-}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-.sync-dot.ok{background:#4acfa8;box-shadow:0 0 6px #4acfa8}
-.sync-dot.err{background:#ff8080}
-
-/* ═══════════════════════ FOOTER ═══════════════════════════ */
-footer{padding:2.5rem var(--pad);padding-bottom:calc(2.5rem + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--border)}
-.flogo{font-family:'Fraunces',serif;font-weight:900;font-size:1.25rem}
-.flogo span{color:var(--run)}
-.fright{font-size:0.76rem;color:var(--muted)}
-.flinks{display:flex;gap:1rem;margin-top:0.3rem;flex-wrap:wrap}
-.flinks a{color:var(--muted);text-decoration:none;font-size:0.76rem}
-.flinks a:hover{color:var(--text)}
-
-/* ═══════════════════════ ANIMATIONS ═══════════════════════ */
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* ═══════════════════════ RESPONSIVE ═══════════════════════ */
-@media(max-width:768px){.ht{display:none!important}}
 @media(max-width:480px){
-  :root{--nav-h:56px}
-  .hero-grid{grid-template-columns:1fr}
-  .hero-cell{flex-direction:row;align-items:center;gap:1rem}
-  .hero-cell>div{display:flex;flex-direction:column;gap:0.2rem}
-  .hero-cell-icon{font-size:1.5rem;flex-shrink:0}
-  .hero-cell-stat{font-size:1.8rem}
-  .summary-strip{grid-template-columns:repeat(2,1fr)}
-  
-  .twrap{display:none!important}.card-list{display:flex}
-  footer{flex-direction:column;align-items:flex-start}
-  .tl-nav{height:130px}
-  .tl-marker{width:72px}
-  .tl-keyhint{display:none}
-  .tl-prev-teaser,.tl-next-teaser{display:none}
-}
-
-  .fg-read{grid-template-columns:2fr 1.5fr 120px 130px 120px}
-  .fg-grow{grid-template-columns:1.2fr 130px 130px 120px 1.5fr 130px}
+  .cards{grid-template-columns:repeat(2,1fr);gap:0.5rem}
+  .card{min-height:112px;padding:0.9rem}
+  .card-desc{display:none}
 }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">deepu<span>-life</span></a>
-  <div class="nav-right">
-    <div class="nav-pills">
-      <button class="nav-pill active" data-tab="run"  onclick="showTab('run')">🏃 Run</button>
-      <button class="nav-pill"        data-tab="read" onclick="showTab('read')">📚 Read</button>
-      <button class="nav-pill"  data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
-      <a href="todo.html" class="nav-pill">✅ To-Do</a>
-      <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="nav-pill">🥧 PiePoints</a>
-      <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-      <a href="2026_school.html" class="nav-pill">🏫 School</a>
-      <a href="exam.html" class="nav-pill">🧮 Exams</a>
-      <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-      <a href="health-private.html" class="nav-pill">🩺 Health</a>
-      <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-      <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
-      <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
-      <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
-    </div>
-    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀️</button>
-    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
-  </div>
-</nav>
-<div class="nav-drawer-backdrop"></div>
-<div class="nav-drawer">
-  <div class="nav-drawer-inner">
-    <div class="nav-drawer-group">
-      <div class="nav-drawer-label">Public</div>
-      <div class="nav-drawer-list">
-        <button class="nav-pill" data-tab="run" onclick="showTab('run')">🏃 Run</button>
-        <button class="nav-pill" data-tab="read" onclick="showTab('read')">📚 Read</button>
-        <button class="nav-pill" data-tab="cycle" onclick="showTab('cycle')">🚴 Cycle</button>
-        <a href="todo.html" class="nav-pill">✅ To-Do</a>
-        <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="nav-pill">🥧 PiePoints</a>
-        <a href="quotes.html" class="nav-pill">💬 Quotes</a>
-        <a href="2026_school.html" class="nav-pill">🏫 School</a>
-        <a href="exam.html" class="nav-pill">🧮 Exams</a>
-        <a href="half-marathon.html" class="nav-pill">🏅 Half Marathon</a>
-        <a href="embers-tides-private.html" class="nav-pill">🔥 Embers</a>
-      </div>
-    </div>
-    <div class="nav-drawer-group">
-      <div class="nav-drawer-label">🔒 Private</div>
-      <div class="nav-drawer-list">
-        <a href="kid-private.html" class="nav-pill">🎒 Kid</a>
-        <a href="health-private.html" class="nav-pill">🩺 Health</a>
-        <a href="results-private.html" class="nav-pill">🎓 BEd Results</a>
-        <a href="apple-health-private.html" class="nav-pill">🍎 Apple Health</a>
-      </div>
-    </div>
-  </div>
-</div>
+<deepu-nav active="index"></deepu-nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-grid">
-    <div class="hero-cell"><span class="hero-cell-icon">🏃</span><div>
-      <span class="hero-cell-label">Total distance</span>
-      <div class="hero-cell-stat run-c" id="h-miles">0 <small style="font-size:.4em">mi</small></div>
-      <span class="hero-cell-sub" id="h-runs">0 runs logged</span></div></div>
-    <div class="hero-cell"><span class="hero-cell-icon">📚</span><div>
-      <span class="hero-cell-label">Books finished</span>
-      <div class="hero-cell-stat read-c" id="h-books">0</div>
-      <span class="hero-cell-sub" id="h-reading">0 total in list</span></div></div>
-          <div class="hero-cell"><span class="hero-cell-icon">🚴</span><div>
-          <span class="hero-cell-label">Total distance</span>
-          <div class="hero-cell-stat cycle-c" id="h-km">0 <small>km</small></div>
-          <span class="hero-cell-sub" id="h-rides">0 rides logged</span></div></div>
-    <a href="https://pie-pulse-play.lovable.app" target="_blank" rel="noopener" class="hero-cell hero-cell-link"><span class="hero-cell-icon">🥧</span><div>
-      <span class="hero-cell-label">Mini Game</span>
-      <div class="hero-cell-stat">PiePoints</div>
-      <span class="hero-cell-sub">Score tracker, opens in new tab ↗</span></div></a>
-  </div>
-  <h1 class="hero-title">Run.<br><em>Read.</em><br>Grow.<br>Cycle.</h1>
-  <p class="hero-sub">A personal life tracker for Deepu — logging every mile, every page, every harvest, every km.</p>
-</section>
-
-<!-- ══ 🏃 RUN ══════════════════════════════════════════════ -->
-<section class="tab-section active" id="tab-run">
-  <div class="sec-head">
-    <div><p class="sec-eyebrow run-c">01 — Running</p><h2 class="sec-title">Run log.</h2></div>
-    <a id="sheets-link" href="#" target="_blank" class="sheets-btn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      Add in Sheets
-    </a>
-  </div>
-  <div class="summary-strip" id="run-sum"></div>
-  <div id="run-tv"></div>
-  <div id="run-lv" class="list-wrap">
-    <div class="list-section-label">All Runs</div>
-    <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Pace</th><th class="ht">Notes</th></tr></thead><tbody id="run-tbody"></tbody></table></div>
-    <div class="card-list" id="run-cards"></div>
-    <div class="empty-st" id="run-empty"><span class="emo">🏃</span>No runs yet — add one in Google Sheets!</div>
-  </div>
-</section>
-
-<!-- ══ 📚 READ ═════════════════════════════════════════════ -->
-<section class="tab-section" id="tab-read">
-  <div class="sec-head">
-    <div><p class="sec-eyebrow read-c">02 — Reading</p><h2 class="sec-title">Book list.</h2></div>
-    <a id="sheets-link-read" href="#" target="_blank" class="sheets-btn sheets-btn-read">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      Add in Sheets
-    </a>
-  </div>
-  <div class="summary-strip" id="read-sum"></div>
-  <div id="read-now-row" class="read-now-row"></div>
-    <div id="read-tv"></div>
-  <div id="read-lv" class="list-wrap">
-    <div class="list-section-label">All Books</div>
-    <div class="twrap"><table class="etable"><thead><tr><th>Title</th><th class="ht">Author</th><th class="ht">Category</th><th>Status</th><th class="ht">Quotes</th><th class="ht">Added</th></tr></thead><tbody id="read-tbody"></tbody></table></div>
-    <div class="card-list" id="read-cards"></div>
-    <div class="empty-st" id="read-empty"><span class="emo">📚</span>No books yet — add one in Google Sheets!</div>
-  </div>
-</section>
-
-<!-- ══ 🌱 GROW ═════════════════════════════════════════════ -->
-<section class="tab-section" id="tab-grow">
-  <div class="sec-head">
-    <div><p class="sec-eyebrow grow-c">03 — Hydroponics</p><h2 class="sec-title">Grow log.</h2></div>
-    <a id="sheets-link-grow" href="#" target="_blank" class="sheets-btn sheets-btn-grow">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      Add in Sheets
-    </a>
-  </div>
-  <div class="summary-strip" id="grow-sum"></div>
-  <div id="grow-tv"></div>
-  <div id="grow-lv" class="list-wrap">
-    <div class="list-section-label">All Plants</div>
-    <div class="twrap"><table class="etable"><thead><tr><th>Plant</th><th class="ht">Started</th><th class="ht">System</th><th>Days</th><th>Status</th><th class="ht">Notes</th></tr></thead><tbody id="grow-tbody"></tbody></table></div>
-    <div class="card-list" id="grow-cards"></div>
-    <div class="empty-st" id="grow-empty"><span class="emo">🌱</span>No plants yet — add one in Google Sheets!</div>
-  </div>
-</section>
-
-<!-- ══ 🚴 CYCLE ══════════════════════════════════════════════ --><section class="tab-section" id="tab-cycle"> <div class="sec-head"> <div><p class="sec-eyebrow cycle-c">04 — Cycling</p><h2 class="sec-title">Ride log.</h2></div> <a id="sheets-link-cycle" href="#" target="_blank" class="sheets-btn sheets-btn-cycle"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg> Add in Sheets</a> </div> <div class="summary-strip" id="cycle-sum"></div> <div id="cycle-tv"></div> <div id="cycle-lv" class="list-wrap"> <div class="list-section-label">All Rides</div> <div class="twrap"><table class="etable"><thead><tr><th>Date</th><th>Distance</th><th>Duration</th><th class="ht">Type</th><th class="ht">Zone</th><th>Status</th><th class="ht">Notes</th></tr></thead><tbody id="cycle-tbody"></tbody></table></div> <div class="card-list" id="cycle-cards"></div> <div class="empty-st" id="cycle-empty"><span class="emo">🚴</span>No rides yet — add one in Google Sheets!</div> </div></section><footer>
-  <div class="flogo">deepu<span>-life</span></div>
-  <div class="fright">Standalone tracker · Deepu's personal hub
-    <div class="flinks">
-      <a href="https://deepuhub.github.io" target="_blank">DeepuHub →</a>
-      <a href="https://deepuhub.github.io/reading-list/" target="_blank">Reading List →</a>
-      <a href="https://github.com/deepuHub" target="_blank">GitHub →</a>
-    </div>
-  </div>
-</footer>
+<main class="home">
+  <h1 class="home-title">deepu<em>-life.</em></h1>
+  <p class="home-sub">Everything in one place — pick where to go.</p>
+  <div id="groups"></div>
+  <section class="group" aria-label="Visitors">
+    <div class="group-label">Visitors</div>
+    <div class="visit-tile" id="visitors" aria-live="polite"></div>
+  </section>
+  <p class="saved-note" id="saved-note"></p>
+</main>
 
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/nav.js"></script>
-<script src="assets/js/timeline.js"></script>
+<script src="assets/js/activity.js"></script>
 <script>
-/* ══════════════════════════════════════════════════════════
-   CONFIG
-   After completing SETUP.md, paste your two values here:
-══════════════════════════════════════════════════════════ */
-const GS_URL      = 'https://script.google.com/macros/s/AKfycbyJyCwv2hh4m5RHbVgaTOiInv8kgoyIppYlFlrqoYgOzF8hGBNEH6gyqtK7CI1ngm4eVQ/exec';   // Apps Script Web App URL
-const GS_SHEET_ID = '1IqAAGq7i0MUtz1wwv23qfjjNGiIMIwigbpvK2zssUxE';   // Google Sheet ID (from the URL: /d/THIS_PART/edit)
+/* Static launcher: everything renders straight away. The figures on
+   Run / Read / Cycle / Half Marathon come from the copy those pages save
+   in this browser's localStorage (assets/js/activity.js), so they appear
+   once any of those pages has been opened on this device. The visitor
+   tile is the only network work, and it runs after the page is drawn. */
+const ACCENT = { run:'var(--run)', read:'var(--read)', cycle:'var(--cycle)', marathon:'var(--plan)' };
+const savedData = readTrackerCache;
 
-/* ══════════════════════════════════════════════════════════
-   IN-MEMORY DATA
-══════════════════════════════════════════════════════════ */
-const DB = { runs:[], books:[], plants:[], cycling:[] };
-
-/* ══════════════════════════════════════════════════════════
-   UI HELPERS — loader, banner, sync badge
-══════════════════════════════════════════════════════════ */
-function showLoader(msg='Loading from Google Sheets…') {
-  let el = document.getElementById('gs-loader');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'gs-loader';
-    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,15,13,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;font-family:Epilogue,sans-serif;color:#6b7d6e;font-size:0.88rem;letter-spacing:0.06em;backdrop-filter:blur(8px)';
-    el.innerHTML = `
-      <svg class="gs-athlete" viewBox="0 0 100 100" width="76" height="76" fill="none" stroke="#c8f04a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-        <g class="gs-scene gs-scene-run">
-          <g class="gs-run-bob">
-            <circle class="gs-frame-a" cx="62" cy="16" r="7"/>
-            <path class="gs-frame-a" d="M60,23 Q54,37 48,52 M56,28 L44,26 L36,36 M56,28 L66,36 L72,50 M48,52 L38,58 L42,74 M48,52 L60,64 L74,68"/>
-            <circle class="gs-frame-b" cx="62" cy="16" r="7"/>
-            <path class="gs-frame-b" d="M60,23 Q54,37 48,52 M56,28 L68,24 L76,32 M56,28 L46,38 L38,50 M48,52 L60,56 L66,72 M48,52 L36,62 L20,64"/>
-          </g>
-        </g>
-        <g class="gs-scene gs-scene-cycle">
-          <circle cx="18" cy="80" r="13" stroke-width="3.5"/>
-          <circle cx="72" cy="80" r="13" stroke-width="3.5"/>
-          <path d="M18,80 L44,72 L72,80 M44,72 L36,46 M36,46 L60,48 L72,80" stroke-width="3.5"/>
-          <circle cx="50" cy="20" r="7"/>
-          <path d="M47,27 L38,46 M42,31 L60,48"/>
-          <g class="gs-pedal-a"><path d="M44,72 L30,60 L23,70"/></g>
-          <g class="gs-pedal-b"><path d="M44,72 L30,60 L23,70"/></g>
-        </g>
-        <g class="gs-scene gs-scene-swim">
-          <path d="M6,72 Q13,66 20,72 T34,72" stroke-width="3" opacity="0.45"/>
-          <path d="M42,80 Q49,74 56,80 T70,80" stroke-width="3" opacity="0.45"/>
-          <circle cx="20" cy="38" r="7"/>
-          <path d="M27,40 L70,46"/>
-          <path class="gs-frame-a" d="M29,39 L44,20 L58,14 M29,40 L24,54 L14,64 M70,46 L84,38 L96,30"/>
-          <path class="gs-frame-b" d="M29,40 L24,54 L14,64 M29,39 L44,20 L58,14 M70,46 L84,54 L96,66"/>
-        </g>
-      </svg>
-      <div id="gs-loader-msg">${msg}</div>`;
-    const s = document.createElement('style');
-    s.textContent = `
-      @keyframes gs-swap{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
-      @keyframes gs-bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
-      @keyframes gs-pedal{to{transform:rotate(360deg)}}
-      @keyframes gs-scene-run-k{0%,32%{opacity:1}33%,100%{opacity:0}}
-      @keyframes gs-scene-cycle-k{0%,32%{opacity:0}33%,65%{opacity:1}66%,100%{opacity:0}}
-      @keyframes gs-scene-swim-k{0%,65%{opacity:0}66%,99%{opacity:1}100%{opacity:0}}
-      .gs-scene{opacity:0}
-      .gs-scene-run{animation:gs-scene-run-k 6s steps(1) infinite}
-      .gs-scene-cycle{animation:gs-scene-cycle-k 6s steps(1) infinite}
-      .gs-scene-swim{animation:gs-scene-swim-k 6s steps(1) infinite}
-      .gs-frame-a{animation:gs-swap 0.7s steps(1) infinite}
-      .gs-frame-b{opacity:0;animation:gs-swap 0.7s steps(1) infinite reverse}
-      .gs-run-bob{animation:gs-bob 0.35s ease-in-out infinite alternate}
-      .gs-pedal-a,.gs-pedal-b{transform-origin:45px 70px;animation:gs-pedal 1s linear infinite}
-      .gs-pedal-b{animation-delay:-0.5s}
-    `;
-    document.head.appendChild(s);
-    document.body.appendChild(el);
-  } else {
-    document.getElementById('gs-loader-msg').textContent = msg;
-  }
-}
-function hideLoader() { document.getElementById('gs-loader')?.remove(); }
-
-function showBanner(msg, type='error') {
-  document.getElementById('gs-banner')?.remove();
-  const el = document.createElement('div');
-  el.id = 'gs-banner';
-  const colors = { error:'#ff8080', success:'#c8f04a', info:'#4acfa8', warn:'#f0a83c' };
-  const bgs    = { error:'#2e0a0a',  success:'#1a2e10', info:'#0a2e26', warn:'#2e1a00' };
-  const c = colors[type]||colors.info;
-  el.style.cssText = `position:fixed;top:var(--nav-h,60px);left:0;right:0;z-index:400;padding:0.7rem 1.5rem;font-size:0.82rem;font-family:Epilogue,sans-serif;display:flex;justify-content:space-between;align-items:center;gap:1rem;background:${bgs[type]||bgs.info};color:${c};border-bottom:1px solid ${c}33`;
-  el.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:${c};font-size:1.1rem;line-height:1">×</button>`;
-  document.body.appendChild(el);
-  if (type !== 'error') setTimeout(() => el.remove(), 4000);
+function statsFor(data) {
+  if (!data) return {};
+  const dist = rows => rows.reduce((s, r) => s + (parseFloat(r.dist) || 0), 0);
+  const done = rows => rows.filter(r => String(r.status || '').toLowerCase() === 'done').length;
+  const runs = data.runs || [], books = data.books || [], rides = data.cycling || [], plan = data.plan || [];
+  return {
+    run:      runs.length  ? [`${dist(runs).toFixed(1)} mi`, `${runs.length} races`] : null,
+    read:     books.length ? [done(books), `of ${books.length} books`] : null,
+    cycle:    rides.length ? [`${dist(rides).toFixed(0)} km`, `${rides.length} rides`] : null,
+    marathon: plan.length  ? [`${done(plan)}/${plan.length}`, 'sessions done'] : null,
+  };
 }
 
-function setSyncBadge(state, timeStr) {
-  const badge = document.getElementById('sync-badge');
-  if (!badge) return;
-  const dot   = badge.querySelector('.sync-dot');
-  const label = badge.querySelector('.sync-label');
-  if (state === 'ok')  { dot.className='sync-dot ok';  label.textContent = `Synced ${timeStr}`; }
-  if (state === 'err') { dot.className='sync-dot err'; label.textContent = 'Sync failed'; }
-  if (state === 'loading') { dot.className='sync-dot'; label.textContent = 'Loading…'; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function cardHTML(link, stat) {
+  const ac = ACCENT[link.key] ? ` style="--ac:${ACCENT[link.key]}"` : '';
+  return `<a class="card" href="${link.href}"${ac}>
+    ${link.group === 'private' ? '<span class="card-lock" aria-label="Private">🔒</span>' : ''}
+    <span class="card-icon" aria-hidden="true">${link.icon}</span>
+    <span class="card-name">${esc(link.label)}</span>
+    ${link.desc ? `<span class="card-desc">${esc(link.desc)}</span>` : ''}
+    ${stat ? `<span class="card-stat"><b>${esc(stat[0])}</b><span>${esc(stat[1])}</span></span>` : ''}
+  </a>`;
 }
 
-/* Wire "Add in Sheets" buttons to the actual Sheet URL */
-function setSheetLinks() {
-  if (!GS_SHEET_ID) return;
-  const base = `https://docs.google.com/spreadsheets/d/${GS_SHEET_ID}/edit#gid=`;
-  // gid values are set in setupSheets() — use 0, 1, 2 as defaults
-  // (Apps Script seeds them in order: Runs=first, Books=second, Plants=third)
-  document.getElementById('sheets-link')?.setAttribute('href', base + '0');
-  document.getElementById('sheets-link-read')?.setAttribute('href', base + '1');
-  document.getElementById('sheets-link-grow')?.setAttribute('href', base + '2');   document.getElementById('sheets-link-cycle')?.setAttribute('href', base + '3');
+const saved = savedData();
+const stats = statsFor(saved && saved.data);
+const links = (window.DEEPU_LINKS || []).filter(l => l.key !== 'index');
+const GROUPS = [['public', 'Public'], ['private', 'Private']];
+
+document.getElementById('groups').innerHTML = GROUPS.map(([g, label]) => `
+  <section class="group" aria-label="${label}">
+    <div class="group-label">${label}</div>
+    <div class="cards">${links.filter(l => l.group === g).map(l => cardHTML(l, stats[l.key])).join('')}</div>
+  </section>`).join('');
+
+if (saved && saved.at) {
+  const d = new Date(saved.at);
+  document.getElementById('saved-note').textContent =
+    `Figures saved in this browser ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}, ${d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})} — open a page to refresh them.`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   GOOGLE SHEETS — fetch data
-══════════════════════════════════════════════════════════ */
-async function gsGet() {
-  if (!GS_URL) {
-    showBanner('⚠ Not connected yet — showing demo data. Follow SETUP.md to connect Google Sheets.', 'warn');
-    loadDemoData();
+/* ── Visitor counter ─────────────────────────────────────────────────
+   Each browser counts once per day. The visitor's own browser asks
+   country.is for its two-letter country code; only that code reaches
+   the Sheet (AppScript.gs → Visits tab), never an IP address. */
+const VISIT_CACHE_KEY = 'deepu-visits-cache';
+const VISIT_DAY_KEY   = 'deepu-visit-day';
+const todayKey = () => new Date().toLocaleDateString('en-CA');
+const regionName = (() => {
+  try { const dn = new Intl.DisplayNames(['en'], { type: 'region' }); return code => dn.of(code); }
+  catch (e) { return code => code; }
+})();
+const flagOf = code => /^[A-Z]{2}$/.test(code) && code !== 'ZZ'
+  ? String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : '🌐';
+const countryName = code => code === 'ZZ' ? 'Somewhere' : regionName(code);
+
+function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+
+function renderVisits(saved, status) {
+  const el = document.getElementById('visitors');
+  const v = saved && saved.visits;
+  const STATUS = {
+    loading: 'Updating…',
+    pending: 'Counter switches on once AppScript.gs is redeployed.',
+    error:   'Could not reach the counter just now.',
+  };
+  const note = status ? STATUS[status] : `Updated ${fmtTime(saved.at)} · each browser counts once a day`;
+  if (!v) {
+    el.innerHTML = `<div class="visit-big"><span class="visit-wave" aria-hidden="true">👋</span><b>—</b><span>visits</span></div>
+      <div class="visit-status">${note}</div>`;
     return;
   }
-  setSyncBadge('loading');
-  showLoader();
+  const top = v.countries.slice(0, 5);
+  el.innerHTML = `
+    <div class="visit-big"><span class="visit-wave" aria-hidden="true">👋</span><b>${v.total.toLocaleString('en-US')}</b>
+      <span>visit${v.total !== 1 ? 's' : ''} · ${v.countries.length} countr${v.countries.length !== 1 ? 'ies' : 'y'}</span></div>
+    <div class="visit-flags">${top.map(c =>
+      `<span class="visit-chip" title="${esc(countryName(c.country))}"><span aria-hidden="true">${flagOf(c.country)}</span>${esc(countryName(c.country))} <em>${c.count}</em></span>`).join('')}
+      ${v.countries.length > top.length ? `<span class="visit-chip"><em>+${v.countries.length - top.length} more</em></span>` : ''}</div>
+    <div class="visit-status">${note}</div>`;
+}
+
+async function lookupCountry() {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 4000);
   try {
-    const res  = await fetch(GS_URL + '?action=getAll', { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await fetch('https://api.country.is/', { signal: ctrl.signal });
+    return (await res.json()).country || 'ZZ';
+  } catch (e) {
+    return 'ZZ';
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function refreshVisits() {
+  const cached = (() => { try { return JSON.parse(lsGet(VISIT_CACHE_KEY)); } catch (e) { return null; } })();
+  renderVisits(cached, 'loading');
+  const counted = lsGet(VISIT_DAY_KEY) === todayKey();
+  const url = counted
+    ? `${GS_URL}?action=visits`
+    : `${GS_URL}?action=hit&country=${encodeURIComponent(await lookupCountry())}`;
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    DB.runs   = data.runs   || [];
-    DB.books  = data.books  || [];
-    DB.plants = data.plants || [];     DB.cycling = data.cycling || [];
-    hideLoader();
-    const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-    setSyncBadge('ok', `at ${now}`);
-    renderAll();
-  } catch(e) {
-    hideLoader();
-    setSyncBadge('err');
-    showBanner(`❌ Could not load from Google Sheets: ${e.message}`, 'error');
-    loadDemoData();
+    // A deployment older than the counter ignores ?action= and returns the tracker data instead.
+    if (!data.visits) { renderVisits(cached, 'pending'); return; }
+    if (!counted) lsSet(VISIT_DAY_KEY, todayKey());
+    const fresh = { at: Date.now(), visits: data.visits };
+    lsSet(VISIT_CACHE_KEY, JSON.stringify(fresh));
+    renderVisits(fresh);
+  } catch (e) {
+    renderVisits(cached, 'error');
   }
 }
 
-function loadDemoData() {
-  DB.runs = [
-    {id:'1',date:'2015-12-01',dist:'3.1', time:'',  note:'5K race 🏅 First ever race!'},
-    {id:'2',date:'2018-12-01',dist:'6.2', time:'',  note:'10K race 🏅 Chased it down with a 4-week plan'},
-    {id:'3',date:'2020-01-25',dist:'6.2', time:'',  note:'10K race 🏅 Jan 2020 — beat the previous time!'},
-    {id:'4',date:'2024-12-01',dist:'13.1',time:'',  note:'Half Marathon 🏅🥇 Finally did it!'},
-  ];
-  DB.books = [
-    {id:'1',title:'Learning How to Learn',   author:'Dr. Barbara Oakley',  cat:'Learning', status:'done',    added:'2016-05-21',quotes:''},
-    {id:'2',title:'Playing It My Way',        author:'Sachin Tendulkar',    cat:'Biography',status:'done',    added:'2016-05-25',quotes:''},
-    {id:'3',title:'Machine Learning is Fun!', author:'Adam Geitgey',        cat:'AI/ML',    status:'done',    added:'2017-11-18',quotes:"Face embeddings embed a face into 128 numbers — once trained, works on any new face.|Sequence-to-sequence learning rewrote machine translation overnight."},
-    {id:'4',title:'The DevOps Handbook',      author:'Gene Kim et al.',     cat:'Tech',     status:'done',    added:'2019-07-31',quotes:"Stop starting. Start finishing.|Don't fight stupid, make more awesome."},
-    {id:'5',title:'Factfulness',              author:'Hans Rosling',        cat:'Non-Fiction',status:'done',  added:'2019-08-17',quotes:"The world cannot be understood without numbers — and not with numbers alone.|The blame instinct stops us finding the real cause."},
-    {id:'6',title:'The Almanack of Naval Ravikant',author:'Eric Jorgenson', cat:'Self',     status:'done',    added:'2025-02-13',quotes:'Specific knowledge cannot be trained. It can only be discovered.|Value your time at an hourly rate and ruthlessly spend to save it.'},
-    {id:'7',title:'Zero to One',              author:'Peter Thiel',         cat:'Business', status:'done',    added:'2025-06-11',quotes:''},
-    {id:'8',title:'The Art of Doing Twice the Work',author:'Jeff Sutherland',cat:'Productivity',status:'reading',added:'2025-07-01',quotes:''},
-    {id:'9',title:'Educated',                 author:'Tara Westover',       cat:'Biography',status:'planned', added:'2025-07-01',quotes:''},
-    {id:'10',title:'Army of None',            author:'Paul Scharre',        cat:'AI/ML',    status:'planned', added:'2025-07-01',quotes:''},
-  ];
-  DB.plants = [
-    {id:'1',name:'Basil',   date:'2025-02-10',system:'Kratky',status:'growing',   note:'Week 4, smells amazing'},
-    {id:'2',name:'Spinach', date:'2025-02-20',system:'DWC',   status:'growing',   note:'Day 18, dense leaves'},
-    {id:'3',name:'Lettuce', date:'2025-01-20',system:'NFT',   status:'harvested', note:'Great yield — 2 heads'},
-    {id:'4',name:'Mint',    date:'2024-11-10',system:'Kratky',status:'harvested', note:'Harvested 3 times!'},
-    {id:'5',name:'Cilantro',date:'2024-10-01',system:'DWC',   status:'failed',    note:'Bolted too fast'},
-  ];
-  DB.cycling = [ {id:'1',date:'2024-01-15',dist:'25',duration:'1:10:00',type:'outdoor',zone:'zone2',note:'First 25km ride! 🚴'}, {id:'2',date:'2024-03-20',dist:'40',duration:'1:45:00',type:'outdoor',zone:'zone3',note:'Morning endurance ride'}, {id:'3',date:'2024-06-01',dist:'50',duration:'2:05:00',type:'outdoor',zone:'zone3',note:'50km milestone ride! 🚴‍♂️'}, ]; renderAll();
-}
-
-/* ══════════════════════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════════════════════ */
-const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const fmtS = d => { if(!d) return '—'; const p=String(d).split('-'); return `${MO[+p[1]-1]} ${+p[2]}`; };
-const fmtF = d => { if(!d) return '—'; const p=String(d).split('-'); return `${MO[+p[1]-1]} ${+p[2]}, ${p[0]}`; };
-const daysFrom = d => Math.floor((Date.now()-new Date(String(d)+'T00:00:00').getTime())/86400000);
-const chips = arr => arr.map(c => `<div class="summary-chip"><span class="chip-lbl">${c.l}</span><span class="chip-val ${c.cls||''}">${c.v}</span></div>`).join('');
-const parseQuotes = q => !q||typeof q!=='string' ? [] : q.split('|').map(s=>s.trim()).filter(Boolean).map(s=>({content:s}));
-
-/* ══════════════════════════════════════════════════════════
-   TAB / VIEW STATE
-══════════════════════════════════════════════════════════ */
-function showTab(tab) {
-  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
-  tlSetActiveTab(tab);
-  window.scrollTo({ top: document.querySelector('.hero').offsetHeight, behavior:'smooth' });
-}
-
-/* ══════════════════════════════════════════════════════════
-   🏃 RUN RENDERER
-══════════════════════════════════════════════════════════ */
-const runCfg = {
-  color:'#c8f04a', icon:'🏃',
-  getDate: r => r.date,
-  getBarH: r => parseFloat(r.dist) || 1,
-  makeMarkerVal: r => `${r.dist}mi`,
-  getTeaserTitle: r => `${r.dist} mi`,
-  makeSlide: r => {
-    const pace = r.time && r.dist ? (parseFloat(r.time)/parseFloat(r.dist)).toFixed(1)+' min/mi' : null;
-    return `<div class="tl-slide-inner">
-      <div class="tl-date">${fmtF(r.date)}</div>
-      <div class="tl-stat run-c">${r.dist}<small> mi</small></div>
-      <div class="tl-meta">
-        ${r.time ? `<span class="badge b-neu">${r.time} min</span>` : ''}
-        ${pace   ? `<span class="badge b-run">⚡ ${pace}</span>` : ''}
-      </div>
-      ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}
-    </div>`;
-  }
-};
-
-function renderRuns() {
-  const runs = [...DB.runs].sort((a,b) => String(a.date) < String(b.date) ? -1 : 1);
-  const tbody = document.getElementById('run-tbody');
-  const cards = document.getElementById('run-cards');
-  const empty = document.getElementById('run-empty');
-  tbody.innerHTML = ''; cards.innerHTML = '';
-  empty.style.display = runs.length ? 'none' : 'block';
-  runs.forEach(r => {
-    const pace = r.time && r.dist ? (parseFloat(r.time)/parseFloat(r.dist)).toFixed(1)+' min/mi' : '—';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${fmtF(r.date)}</td><td><strong class="run-c">${r.dist} mi</strong></td><td>${r.time?r.time+' min':'—'}</td><td class="ht" style="color:var(--muted)">${pace}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;
-    tbody.appendChild(tr);
-    const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title run-c">${r.dist} mi</span></div><div class="ecard-meta"><span class="badge b-run">${fmtS(r.date)}</span>${r.time?`<span class="badge b-neu">${r.time} min</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}`;
-    cards.appendChild(c);
-  });
-  tlBuild('run', runs, runCfg);
-  const total = runs.reduce((s,r) => s+parseFloat(r.dist||0), 0);
-  document.getElementById('run-sum').innerHTML = chips([
-    {l:'Total',    v:total.toFixed(1)+' mi', cls:'run-c'},
-    {l:'Races',    v:runs.length},
-    {l:'Longest',  v:runs.length ? Math.max(...runs.map(r=>parseFloat(r.dist||0)))+' mi' : '—', cls:'run-c'},
-    {l:'Avg',      v:runs.length ? (total/runs.length).toFixed(1)+' mi' : '—'},
-  ]);
-  updateHero();
-}
-
-/* ══════════════════════════════════════════════════════════
-   📚 READ RENDERER
-══════════════════════════════════════════════════════════ */
-const readCfg = {
-  color:'#f0a83c', icon:'📚',
-  getDate: b => b.added,
-  getBarH: _ => 1,
-  makeMarkerVal: b => b.status==='done' ? '✓' : b.status==='reading' ? '…' : '○',
-  getTeaserTitle: b => b.title,
-  makeSlide: b => {
-    const badge = b.status==='done' ? `<span class="badge b-done">Done ✓</span>` : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>` : `<span class="badge b-plan">Planned</span>`;
-    const qs    = parseQuotes(b.quotes);
-    const qBtn  = qs.length ? `<button class="quotes-btn" onclick="openQuotes('${b.id}')">📖 ${qs.length} Quote${qs.length!==1?'s':''}</button>` : '';
-    return `<div class="tl-slide-inner">
-      <div class="tl-date">Added ${fmtF(b.added)}</div>
-      <div class="tl-headline" style="color:var(--read)">${b.title}</div>
-      <div class="tl-meta">
-        ${badge}
-        ${b.cat    ? `<span class="badge b-read">${b.cat}</span>` : ''}
-        ${b.author ? `<span style="font-size:.9rem;color:var(--muted)">by ${b.author}</span>` : ''}
-      </div>
-      ${qBtn ? `<div style="margin-top:0.75rem">${qBtn}</div>` : ''}
-    </div>`;
-  }
-};
-
-function renderBooks() {
-  const books = [...DB.books].sort((a,b) => String(a.added) < String(b.added) ? -1 : 1);
-  const tbody = document.getElementById('read-tbody');
-  const cards = document.getElementById('read-cards');
-  const empty = document.getElementById('read-empty');
-  tbody.innerHTML = ''; cards.innerHTML = '';
-  empty.style.display = books.length ? 'none' : 'block';
-  books.forEach(b => {
-    const badge = b.status==='done' ? `<span class="badge b-done">Done ✓</span>` : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>` : `<span class="badge b-plan">Planned</span>`;
-    const qs   = parseQuotes(b.quotes);
-    const qbtn = qs.length ? `<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0;white-space:nowrap">📖 ${qs.length}q</button>` : '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><strong>${b.title}</strong></td><td class="ht" style="color:var(--muted)">${b.author||'—'}</td><td class="ht"><span class="badge b-read">${b.cat||'—'}</span></td><td>${badge}</td><td class="ht">${qbtn}</td><td class="ht" style="color:var(--muted);font-size:.82rem">${fmtF(b.added)}</td>`;
-    tbody.appendChild(tr);
-    const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${b.title}</span></div><div class="ecard-meta">${badge}${b.cat?`<span class="badge b-read">${b.cat}</span>`:''}${b.author?`<span style="font-size:.78rem;color:var(--muted)">${b.author}</span>`:''}${qs.length?`<button onclick="openQuotes('${b.id}')" style="background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0">📖 ${qs.length}q</button>`:''}</div>`;
-    cards.appendChild(c);
-  });
-  tlBuild('read', books, readCfg);
-    // ── Reading-now chips + smart default ───────────────
-    const readingNow = books.filter(b => b.status === 'reading')
-      .sort((a,b) => String(b.added) > String(a.added) ? 1 : -1);
-    const rnRow = document.getElementById('read-now-row');
-    if (rnRow) {
-      if (readingNow.length) {
-        rnRow.innerHTML = readingNow.map(b =>
-          `<button class="read-now-chip" onclick="tlGoTo('read',${books.indexOf(b)})">${escHtml(b.title)}</button>`
-        ).join('');
-        rnRow.style.display = 'flex';
-        tlGoTo('read', books.indexOf(readingNow[0]));
-      } else {
-        rnRow.style.display = 'none';
-        tlGoTo('read', books.length - 1);
-      }
-    }
-  const done    = books.filter(b=>b.status==='done').length;
-  const reading = books.filter(b=>b.status==='reading').length;
-  document.getElementById('read-sum').innerHTML = chips([
-    {l:'Total',   v:books.length},
-    {l:'Finished',v:done,    cls:'read-c'},
-    {l:'Reading', v:reading},
-    {l:'Planned', v:books.length-done-reading},
-  ]);
-  updateHero();
-}
-
-/* ══════════════════════════════════════════════════════════
-   🌱 GROW RENDERER
-══════════════════════════════════════════════════════════ */
-const growCfg = {
-  color:'#4acfa8', icon:'🌱',
-  getDate: p => p.date,
-  getBarH: p => Math.max(1, daysFrom(p.date)),
-  makeMarkerVal: p => p.status==='growing' ? '🌿' : p.status==='harvested' ? '✓' : '✗',
-  getTeaserTitle: p => p.name,
-  makeSlide: p => {
-    const days  = daysFrom(p.date);
-    const badge = p.status==='growing' ? `<span class="badge b-grow">Growing 🌿</span>` : p.status==='harvested' ? `<span class="badge b-done">Harvested ✓</span>` : `<span class="badge b-fail">Failed ✗</span>`;
-    return `<div class="tl-slide-inner">
-      <div class="tl-date">Started ${fmtF(p.date)}</div>
-      <div class="tl-stat grow-c">${days}<small> days</small></div>
-      <div class="tl-headline" style="font-size:clamp(1.5rem,4vw,2.8rem);color:var(--grow)">${p.name}</div>
-      <div class="tl-meta">
-        ${badge}
-        ${p.system ? `<span class="badge" style="background:var(--grow-dim);color:var(--grow)">${p.system}</span>` : ''}
-      </div>
-      ${p.note ? `<div class="tl-note">${p.note}</div>` : ''}
-    </div>`;
-  }
-};
-
-function renderPlants() {
-  const plants = [...DB.plants].sort((a,b) => String(a.date) < String(b.date) ? -1 : 1);
-  const tbody  = document.getElementById('grow-tbody');
-  const cards  = document.getElementById('grow-cards');
-  const empty  = document.getElementById('grow-empty');
-  tbody.innerHTML = ''; cards.innerHTML = '';
-  empty.style.display = plants.length ? 'none' : 'block';
-  plants.forEach(p => {
-    const days  = daysFrom(p.date);
-    const badge = p.status==='growing' ? `<span class="badge b-grow">Growing 🌿</span>` : p.status==='harvested' ? `<span class="badge b-done">Harvested ✓</span>` : `<span class="badge b-fail">Failed ✗</span>`;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><strong>${p.name}</strong></td><td class="ht" style="color:var(--muted)">${fmtS(p.date)}</td><td class="ht"><span class="badge" style="background:var(--grow-dim);color:var(--grow)">${p.system||'—'}</span></td><td class="grow-c">${days}d</td><td>${badge}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.note||'—'}</td>`;
-    tbody.appendChild(tr);
-    const c = document.createElement('div'); c.className = 'ecard';
-    c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title">${p.name}</span></div><div class="ecard-meta">${badge}<span class="badge b-grow">${days}d</span>${p.system?`<span class="badge b-neu">${p.system}</span>`:''}</div>${p.note?`<div class="ecard-note">${p.note}</div>`:''}`;
-    cards.appendChild(c);
-  });
-  tlBuild('grow', plants, growCfg);
-  const growing   = plants.filter(p=>p.status==='growing').length;
-  const harvested = plants.filter(p=>p.status==='harvested').length;
-  document.getElementById('grow-sum').innerHTML = chips([
-    {l:'Total',     v:plants.length},
-    {l:'Growing',   v:growing,   cls:'grow-c'},
-    {l:'Harvested', v:harvested, cls:'grow-c'},
-    {l:'Failed',    v:plants.length-growing-harvested},
-  ]);
-  updateHero();
-}
-
-/* ══════════════════════════════════════════════════════════    🚴 CYCLE RENDERER ══════════════════════════════════════════════════════════ */ const cycleCfg = {   color:'#a78bfa', icon:'🚴',   getDate: r => r.date,   getBarH: r => parseFloat(r.dist) || 1,   makeMarkerVal: r => `${r.dist}km`,   getTeaserTitle: r => `${r.dist} km`,   makeSlide: r => {     return `<div class="tl-slide-inner">       <div class="tl-date">${fmtF(r.date)}</div>       <div class="tl-stat cycle-c">${r.dist}<small> km</small></div>       <div class="tl-meta">         ${r.duration ? `<span class="badge b-neu">${r.duration}</span>` : ''}         ${r.type ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.type}</span>` : ''}         ${r.zone ? `<span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${r.zone}</span>${r.status?`<span class="badge ${r.status.toLowerCase()==='skipped'?'b-fail':r.status.toLowerCase()==='done'?'b-done':'b-neu'}">${r.status}</span>`:''}` : ''}       </div>       ${r.note ? `<div class="tl-note">${r.note}</div>` : ''}     </div>`;   } }; function renderRides() {   const rides = [...(DB.cycling||[])].sort((a,b) => String(a.date)<String(b.date)?-1:1);   const tbody = document.getElementById('cycle-tbody');   const cards = document.getElementById('cycle-cards');   const empty = document.getElementById('cycle-empty');   if (!tbody) return;   tbody.innerHTML = ''; cards.innerHTML = '';   empty.style.display = rides.length ? 'none' : 'block';   rides.forEach(r => {     const tr = document.createElement('tr');     tr.innerHTML = `<td>${fmtS(r.date)}</td><td><strong class="cycle-c">${r.dist} km</strong></td><td>${r.duration||'—'}</td><td class="ht">${r.type||'—'}</td><td class="ht">${r.zone||'—'}</td><td>${r.status?`<span class="badge ${r.status.toLowerCase()==='skipped'?'b-fail':r.status.toLowerCase()==='done'?'b-done':'b-neu'}">${r.status}</span>`:'—'}</td><td class="ht" style="color:var(--muted);font-size:.82rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.note||'—'}</td>`;     tbody.appendChild(tr);     const c = document.createElement('div'); c.className='ecard';     c.innerHTML = `<div class="ecard-top" style="justify-content:flex-start"><span class="ecard-title cycle-c">${r.dist} km</span></div><div class="ecard-meta"><span class="badge" style="background:var(--cycle-dim);color:var(--cycle)">${fmtS(r.date)}</span>${r.duration?`<span class="badge b-neu">${r.duration}</span>`:''} ${r.status?`<span class="badge ${r.status.toLowerCase()==='skipped'?'b-fail':r.status.toLowerCase()==='done'?'b-done':'b-neu'}">${r.status}</span>`:''}</div>${r.note?`<div class="ecard-note">${r.note}</div>`:''}` ;     cards.appendChild(c);   });   tlBuild('cycle', rides, cycleCfg);   const total = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);   const longest = rides.length ? Math.max(...rides.map(r=>parseFloat(r.dist||0))) : 0;   document.getElementById('cycle-sum').innerHTML = chips([     {l:'Total km', v:total.toFixed(0)+' km', cls:'cycle-c'},     {l:'Rides', v:rides.length},     {l:'Longest', v:rides.length ? longest+' km' : '—', cls:'cycle-c'},     {l:'Avg', v:rides.length ? (total/rides.length).toFixed(0)+' km' : '—'},   ]);   updateHero(); } function renderAll() { renderRuns(); renderBooks(); renderPlants(); renderRides(); }
-
-/* ══════════════════════════════════════════════════════════
-   HERO
-══════════════════════════════════════════════════════════ */
-function updateHero() {
-  const { runs, books, plants } = DB;
-  const mi = runs.reduce((s,r) => s+parseFloat(r.dist||0), 0);
-  document.getElementById('h-miles').innerHTML = `${mi.toFixed(1)} <small style="font-size:.4em">mi</small>`;
-  document.getElementById('h-runs').textContent = `${runs.length} race${runs.length!==1?'s':''} logged`;
-  const done = books.filter(b=>b.status==='done').length;
-  document.getElementById('h-books').textContent  = done;
-  document.getElementById('h-reading').textContent = `${books.length} total in list`;
-  const growing   = plants.filter(p=>p.status==='growing').length;
-  const harvested = plants.filter(p=>p.status==='harvested').length;
-  const hPlants = document.getElementById('h-plants');
-  if (hPlants) hPlants.textContent = growing;
-  const hHarvests = document.getElementById('h-harvests');
-  if (hHarvests) hHarvests.textContent = `${harvested} harvest${harvested!==1?'s':''}`;
-    const rides = DB.cycling || [];
-  const km = rides.reduce((s,r) => s+parseFloat(r.dist||0), 0);
-  const hkm = document.getElementById('h-km');
-  if (hkm) hkm.innerHTML = `${km.toFixed(0)} <small>km</small>`;
-  const hrides = document.getElementById('h-rides');
-  if (hrides) hrides.textContent = `${rides.length} ride${rides.length!==1?'s':''} logged`;
-}
-
-/* ══════════════════════════════════════════════════════════
-   QUOTES MODAL
-══════════════════════════════════════════════════════════ */
-function openQuotes(bookId) {
-  const b = DB.books.find(b => String(b.id) === String(bookId));
-  if (!b) return;
-  const qs = parseQuotes(b.quotes);
-  if (!qs.length) { showBanner('No quotes for this book yet — add them in Sheets under the Quotes column, separated by |', 'info'); return; }
-  document.getElementById('qmodal')?.remove();
-  const modal = document.createElement('div');
-  modal.className = 'qmodal-overlay'; modal.id = 'qmodal';
-  modal.innerHTML = `
-    <div class="qmodal" role="dialog" aria-modal="true">
-      <div class="qmodal-head">
-        <div>
-          <div class="qmodal-title">${escHtml(b.title)}</div>
-          <div class="qmodal-author">by ${escHtml(b.author||'')}</div>
-        </div>
-        <button class="qmodal-close" onclick="closeQuotes()">×</button>
-      </div>
-      <div class="q-count">${qs.length} quote${qs.length!==1?'s':''}</div>
-      <div class="qmodal-body">${qs.map(q=>`<div class="q-item"><div class="q-text">${escHtml(q.content)}</div></div>`).join('')}</div>
-    </div>`;
-  document.body.appendChild(modal);
-  modal.addEventListener('click', e => { if (e.target===modal) closeQuotes(); });
-  document.addEventListener('keydown', onModalKey);
-}
-function closeQuotes() { document.getElementById('qmodal')?.remove(); document.removeEventListener('keydown', onModalKey); }
-function onModalKey(e) { if (e.key==='Escape') closeQuotes(); }
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* ══════════════════════════════════════════════════════════
-   INIT
-══════════════════════════════════════════════════════════ */
-tlSetActiveTab('run');
-setSheetLinks();
-gsGet();
+refreshVisits();
 </script>
 </body>
 </html>

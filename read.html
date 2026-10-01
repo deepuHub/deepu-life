@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>Read — deepu-life</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <link rel="stylesheet" href="assets/css/timeline.css">
+  <link rel="stylesheet" href="assets/css/activity.css">
+  <style>
+    .read-now-row{display:none;flex-wrap:wrap;align-items:center;gap:0.4rem;padding:0 var(--pad) 1rem}
+    .read-now-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-right:0.3rem}
+    .read-now-chip{padding:0.35rem 0.85rem;border-radius:999px;border:1px solid var(--read-dim);background:var(--read-dim);color:var(--read);font-family:'Epilogue',sans-serif;font-size:0.75rem;font-weight:500;cursor:pointer;transition:all 0.2s}
+    .read-now-chip:hover{background:var(--read);color:#0a0f0d}
+
+    .quotes-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:1px solid var(--read-dim);border-radius:999px;background:var(--read-dim);color:var(--read);font-size:0.75rem;font-weight:500;font-family:'Epilogue',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.03em}
+    .quotes-btn:hover{background:var(--read);color:#0a0f0d}
+    .quotes-link{background:none;border:none;cursor:pointer;color:var(--read);font-size:0.75rem;padding:0;white-space:nowrap;font-family:'Epilogue',sans-serif}
+
+    .qmodal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.2s ease}
+    .qmodal{background:var(--surface);border:1px solid var(--border);border-radius:6px;max-width:640px;width:100%;max-height:85svh;display:flex;flex-direction:column;overflow:hidden}
+    .qmodal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-shrink:0}
+    .qmodal-title{font-family:'Fraunces',serif;font-weight:700;font-size:1.1rem;line-height:1.3;color:var(--read)}
+    .qmodal-author{font-size:0.78rem;color:var(--muted);margin-top:0.2rem}
+    .qmodal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.4rem;line-height:1;padding:0.1rem 0.3rem;border-radius:3px;flex-shrink:0;transition:color 0.2s}
+    .qmodal-close:hover{color:var(--text)}
+    .qmodal-body{overflow-y:auto;padding:1rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1rem}
+    .q-item{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--read);border-radius:3px;padding:0.9rem 1rem}
+    .q-text{font-size:0.88rem;line-height:1.65;color:var(--text)}
+    .q-count{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:0.75rem 1.5rem 0}
+  </style>
+</head>
+<body>
+
+<deepu-nav active="read"></deepu-nav>
+
+<main class="page" style="--ac:var(--read);--ac-dim:var(--read-dim)">
+  <div class="sec-head">
+    <div><p class="sec-eyebrow read-c">Reading</p><h1 class="sec-title">Book list.</h1></div>
+    <div class="sec-actions">
+      <a id="sheets-link" href="#" target="_blank" rel="noopener" class="sheets-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        Add in Sheets
+      </a>
+      <div class="sync-badge" id="sync-badge"><span class="sync-dot"></span><span class="sync-label">Loading…</span></div>
+    </div>
+  </div>
+  <div class="summary-strip" id="read-sum"></div>
+  <div class="read-now-row" id="read-now-row"></div>
+  <div id="read-tv"></div>
+  <div class="list-wrap">
+    <div class="list-section-label">All Books</div>
+    <div class="twrap"><table class="etable"><thead><tr><th>Title</th><th class="ht">Author</th><th class="ht">Category</th><th>Status</th><th class="ht">Quotes</th><th class="ht">Added</th></tr></thead><tbody id="read-tbody"></tbody></table></div>
+    <div class="card-list" id="read-cards"></div>
+    <div class="empty-st" id="read-empty"><span class="emo">📚</span>No books yet — add one in the <strong>Books</strong> tab in Google Sheets.</div>
+  </div>
+</main>
+
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/timeline.js"></script>
+<script src="assets/js/activity.js"></script>
+<script>
+let BOOKS = [];
+
+const statusBadge = b => b.status==='done'    ? `<span class="badge b-done">Done ✓</span>`
+                       : b.status==='reading' ? `<span class="badge b-prog">Reading…</span>`
+                       :                        `<span class="badge b-plan">Planned</span>`;
+
+const readCfg = {
+  color:'#f0a83c', icon:'📚',
+  getDate: b => b.added,
+  getBarH: _ => 1,
+  makeMarkerVal: b => b.status==='done' ? '✓' : b.status==='reading' ? '…' : '○',
+  getTeaserTitle: b => b.title,
+  makeSlide: b => {
+    const qs = parseQuotes(b.quotes);
+    return `<div class="tl-slide-inner">
+      <div class="tl-date">Added ${fmtF(b.added)}</div>
+      <div class="tl-headline" style="color:var(--read)">${escHtml(b.title)}</div>
+      <div class="tl-meta">
+        ${statusBadge(b)}
+        ${b.cat    ? `<span class="badge b-read">${escHtml(b.cat)}</span>` : ''}
+        ${b.author ? `<span style="font-size:.9rem;color:var(--muted)">by ${escHtml(b.author)}</span>` : ''}
+      </div>
+      ${qs.length ? `<div style="margin-top:0.75rem"><button class="quotes-btn" onclick="openQuotes('${escHtml(b.id)}')">📖 ${qs.length} Quote${qs.length!==1?'s':''}</button></div>` : ''}
+    </div>`;
+  }
+};
+
+function render(data) {
+  setSheetLink(document.getElementById('sheets-link'), 'Books', data.gids);
+  BOOKS = [...(data.books || [])].sort((a,b) => String(a.added) < String(b.added) ? -1 : 1);
+  document.getElementById('read-empty').style.display = BOOKS.length ? 'none' : 'block';
+
+  const qLink = b => { const n = parseQuotes(b.quotes).length; return n ? `<button class="quotes-link" onclick="openQuotes('${escHtml(b.id)}')">📖 ${n}q</button>` : ''; };
+
+  document.getElementById('read-tbody').innerHTML = BOOKS.map(b => `<tr>
+    <td><strong>${escHtml(b.title)}</strong></td>
+    <td class="ht" style="color:var(--muted)">${escHtml(b.author || '—')}</td>
+    <td class="ht"><span class="badge b-read">${escHtml(b.cat || '—')}</span></td>
+    <td>${statusBadge(b)}</td>
+    <td class="ht">${qLink(b)}</td>
+    <td class="ht" style="color:var(--muted);font-size:.82rem">${fmtF(b.added)}</td>
+  </tr>`).join('');
+
+  document.getElementById('read-cards').innerHTML = BOOKS.map(b => `<div class="ecard">
+    <div class="ecard-top"><span class="ecard-title">${escHtml(b.title)}</span></div>
+    <div class="ecard-meta">${statusBadge(b)}${b.cat ? `<span class="badge b-read">${escHtml(b.cat)}</span>` : ''}${b.author ? `<span style="font-size:.78rem;color:var(--muted)">${escHtml(b.author)}</span>` : ''}${qLink(b)}</div>
+  </div>`).join('');
+
+  // Open on the most recently added book still being read, else the latest book.
+  const readingNow = BOOKS.filter(b => b.status === 'reading')
+    .sort((a,b) => String(b.added) > String(a.added) ? 1 : -1);
+  const startIdx = readingNow.length ? BOOKS.indexOf(readingNow[0]) : BOOKS.length - 1;
+  tlBuild('read', BOOKS, { ...readCfg, startIdx });
+  tlSetActiveTab('read');
+
+  const rnRow = document.getElementById('read-now-row');
+  rnRow.innerHTML = readingNow.length
+    ? `<span class="read-now-label">Reading now</span>` + readingNow.map(b =>
+        `<button class="read-now-chip" onclick="tlGoTo('read',${BOOKS.indexOf(b)})">${escHtml(b.title)}</button>`).join('')
+    : '';
+  rnRow.style.display = readingNow.length ? 'flex' : 'none';
+
+  const done    = BOOKS.filter(b => b.status==='done').length;
+  const reading = readingNow.length;
+  document.getElementById('read-sum').innerHTML = chips([
+    {l:'Total',    v:BOOKS.length},
+    {l:'Finished', v:done, cls:'read-c'},
+    {l:'Reading',  v:reading},
+    {l:'Planned',  v:BOOKS.length - done - reading},
+  ]);
+}
+
+function openQuotes(bookId) {
+  const b = BOOKS.find(b => String(b.id) === String(bookId));
+  if (!b) return;
+  const qs = parseQuotes(b.quotes);
+  if (!qs.length) { showBanner('No quotes for this book yet — add them in the Quotes column, separated by |', 'info'); return; }
+  closeQuotes();
+  const modal = document.createElement('div');
+  modal.className = 'qmodal-overlay'; modal.id = 'qmodal';
+  modal.innerHTML = `
+    <div class="qmodal" role="dialog" aria-modal="true" aria-label="Quotes from ${escHtml(b.title)}">
+      <div class="qmodal-head">
+        <div>
+          <div class="qmodal-title">${escHtml(b.title)}</div>
+          ${b.author ? `<div class="qmodal-author">by ${escHtml(b.author)}</div>` : ''}
+        </div>
+        <button class="qmodal-close" aria-label="Close" onclick="closeQuotes()">×</button>
+      </div>
+      <div class="q-count">${qs.length} quote${qs.length!==1?'s':''}</div>
+      <div class="qmodal-body">${qs.map(q => `<div class="q-item"><div class="q-text">${escHtml(q.content)}</div></div>`).join('')}</div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeQuotes(); });
+  document.addEventListener('keydown', onModalKey);
+}
+function closeQuotes() { document.getElementById('qmodal')?.remove(); document.removeEventListener('keydown', onModalKey); }
+function onModalKey(e) { if (e.key === 'Escape') closeQuotes(); }
+
+setSheetLink(document.getElementById('sheets-link'), 'Books');
+loadTracker(render);
+</script>
+</body>
+</html>
