@@ -1793,7 +1793,7 @@ const EXAM_SETS = [
   },
 ];
 
-// ── OLYMPIADS (SOF, 2026-27) — the five Udhbhav is registered for as a
+// ── OLYMPIADS (SOF, 2026-27) — the five Uv is registered for as a
 // Grade 2 student (IHO and ISSO are Grades 3-5 only). One paper each, so they
 // live apart from EXAM_SETS: their own schedule card, a day-view card and a
 // countdown line in the alert banner.
@@ -2111,7 +2111,7 @@ function footballFx(layer, ox, oy, done) {
     finished = true; drawHud();
     window.FxSounds && FxSounds.fulltime(goals >= 2);
     const verdict = goals === SHOTS ? '🏆 Hat-trick hero!' : goals === 2 ? '🥇 Great shooting!' : goals === 1 ? '👍 Nice try!' : '💪 Keep practising!';
-    say(`${verdict}\nUdhbhav scored ${goals}/${SHOTS}`, true);
+    say(`${verdict}\nUv scored ${goals}/${SHOTS}`, true);
     if (goals >= 2) bounceBurst(layer, W / 2, H / 2, ['⚽', '🏆', '⭐', '🎉'], 30);
     setTimeout(close, 3200);
   }
@@ -2266,7 +2266,7 @@ function robotFx(layer, ox, oy, done) {
     workers.forEach(el => { el.classList.remove('stomp'); el.textContent = '🙌'; });
     const tag = document.createElement('div');
     tag.className = 'fx-built';
-    tag.textContent = '🛠️ Built by Udhbhav!';
+    tag.textContent = '🛠️ Built by Uv!';
     tag.style.top = Math.max(12, gy - 56) + 'px';
     layer.appendChild(tag);
     requestAnimationFrame(() => requestAnimationFrame(() => tag.classList.add('show')));
@@ -2848,7 +2848,7 @@ renderExamAlert();
 //   - date: YYYY-MM-DD for anything with a fixed due date (sorts first, drives
 //     the "due today / overdue" alert banner)
 //   - date_label: free text used only when date is left blank, e.g. "Last week of Sep"
-//   - type: homework | test | notice | event (event = needs Udhbhav to actively
+//   - type: homework | test | notice | event (event = needs Uv to actively
 //     do/bring/wear/prepare something — a celebration, costume day, performance —
 //     as opposed to notice, which is passive FYI: recaps, digests, file uploads)
 //   - posted_at: YYYY-MM-DD - the day the notification/task actually appeared
