@@ -1051,6 +1051,8 @@
     .cal-card-date { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
     .cal-card-badge { font-size: 0.62rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; flex: 0 0 auto; background: var(--accent2); }
     .cal-card.event .cal-card-badge { background: var(--accent); }
+    .cal-card.test { border-left-color: #d9480f; }
+    .cal-card.test .cal-card-badge { background: #d9480f; }
     .cal-empty { font-size: 0.82rem; color: var(--muted); padding: 8px 2px; font-style: italic; }
 
     .calendar-full { margin-top: 10px; border-top: 1.5px dashed var(--line); padding-top: 14px; }
@@ -2620,7 +2622,13 @@ const OLYMPIAD_EVENTS = OLYMPIADS.map(o => ({
   start: o.date, end: o.date, label: `🏅 ${o.name} (${o.code})`, type: 'event',
   day: new Date(o.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long' }),
 }));
-const SCHOOL_CALENDAR = [...HOLIDAYS_LIST, ...PRIMARY_EVENTS, ...OLYMPIAD_EVENTS].sort((a, b) => a.start.localeCompare(b.start));
+// Class tests and unit reviews posted on ManageBac (not in the school's
+// printed calendar). type 'test' gets its own 📝 badge on the calendar.
+const CLASS_TESTS = [
+  { start: '2026-10-07', end: '2026-10-07', day: 'Wednesday', type: 'test',
+    label: 'Social Studies Unit Review — Unit 2: Our Nation (revise from the SS In-house book; return it to school)' },
+];
+const SCHOOL_CALENDAR = [...HOLIDAYS_LIST, ...PRIMARY_EVENTS, ...OLYMPIAD_EVENTS, ...CLASS_TESTS].sort((a, b) => a.start.localeCompare(b.start));
 
 function ymKey(d) { return d.slice(0, 7); }
 
@@ -2636,8 +2644,8 @@ function inMonth(item, ym) {
 }
 
 function calCardHTML(e) {
-  const icon = e.type === 'holiday' ? '🎉' : '📌';
-  const badge = e.type === 'holiday' ? 'Holiday' : 'School Event';
+  const icon = e.type === 'holiday' ? '🎉' : e.type === 'test' ? '📝' : '📌';
+  const badge = e.type === 'holiday' ? 'Holiday' : e.type === 'test' ? 'Class Test' : 'School Event';
   return `<div class="cal-card ${e.type}">
     <span class="cal-card-icon">${icon}</span>
     <div class="cal-card-info">
@@ -2660,7 +2668,7 @@ function renderCalendarHighlights() {
   function subGroupHTML(ym, heading) {
     const items = SCHOOL_CALENDAR.filter(e => inMonth(e, ym));
     const holidays = items.filter(e => e.type === 'holiday');
-    const events = items.filter(e => e.type === 'event');
+    const events = items.filter(e => e.type === 'event' || e.type === 'test');
     let h = `<div class="cal-month-block"><div class="cal-month-title">${heading} — ${monthLabel(ym)}</div>`;
     h += `<div class="cal-subgroup-title">🎉 Holidays</div><div class="cal-card-grid">`;
     h += holidays.length ? holidays.map(e => calCardHTML(e)).join('') : `<div class="cal-empty">No holidays this month.</div>`;
@@ -2705,7 +2713,7 @@ function renderCalendarFull() {
   }
 
   const holidays = SCHOOL_CALENDAR.filter(e => e.type === 'holiday');
-  const events = SCHOOL_CALENDAR.filter(e => e.type === 'event');
+  const events = SCHOOL_CALENDAR.filter(e => e.type === 'event' || e.type === 'test');
 
   let html = '';
   html += `<div class="cal-full-section"><div class="cal-full-section-title">🎉 All Holidays</div>${sectionHTML(holidays, '🎉')}</div>`;
