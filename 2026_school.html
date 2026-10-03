@@ -1811,6 +1811,19 @@ function olympiadOn(dateStr) {
   return OLYMPIADS.find(o => o.date === dateStr) || null;
 }
 
+// ── CLASS TESTS — unit reviews posted on ManageBac (not in the printed school
+// calendar or a formal exam set). Shown on the day timeline, the Exams tab,
+// the countdown banner and (type 'test', 📝 badge) the school calendar.
+const CLASS_TESTS = [
+  { start: '2026-10-07', end: '2026-10-07', day: 'Wednesday', type: 'test',
+    subject: 'Social Studies', topic: 'Unit Review — Unit 2: Our Nation (revise from the SS In-house book; return it to school)',
+    label: 'Social Studies Unit Review — Unit 2: Our Nation (revise from the SS In-house book; return it to school)' },
+];
+
+function classTestOn(dateStr) {
+  return CLASS_TESTS.find(t => t.start === dateStr) || null;
+}
+
 function examOn(dateStr) {
   for (const set of EXAM_SETS) {
     const row = set.rows.find(r => r.date === dateStr && r.subject);
@@ -1852,6 +1865,17 @@ function renderTimeline() {
       <div class="exam-row-info">
         <span class="exam-row-subject">${oly.code} today</span>
         <span class="exam-row-topic">${oly.name}</span>
+      </div>
+    </div>`;
+  }
+
+  const ct = classTestOn(currentDay);
+  if (ct) {
+    html += `<div class="exam-row examday" style="margin-bottom:14px;">
+      <span class="exam-row-badge">📝 Class Test</span>
+      <div class="exam-row-info">
+        <span class="exam-row-subject">${ct.subject} test today</span>
+        <span class="exam-row-topic">${ct.topic}</span>
       </div>
     </div>`;
   }
@@ -2624,12 +2648,6 @@ const OLYMPIAD_EVENTS = OLYMPIADS.map(o => ({
   start: o.date, end: o.date, label: `🏅 ${o.name} (${o.code})`, type: 'event',
   day: new Date(o.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long' }),
 }));
-// Class tests and unit reviews posted on ManageBac (not in the school's
-// printed calendar). type 'test' gets its own 📝 badge on the calendar.
-const CLASS_TESTS = [
-  { start: '2026-10-07', end: '2026-10-07', day: 'Wednesday', type: 'test',
-    label: 'Social Studies Unit Review — Unit 2: Our Nation (revise from the SS In-house book; return it to school)' },
-];
 const SCHOOL_CALENDAR = [...HOLIDAYS_LIST, ...PRIMARY_EVENTS, ...OLYMPIAD_EVENTS, ...CLASS_TESTS].sort((a, b) => a.start.localeCompare(b.start));
 
 function ymKey(d) { return d.slice(0, 7); }
@@ -2773,9 +2791,29 @@ function renderExamSchedule() {
     html += '</div>';
     if (set.note) html += `<div class="cal-empty" style="margin-top:8px;">${set.note}</div>`;
     html += '</div>';
-    if (set === EXAM_SETS[0]) html += olympiadScheduleHTML(todayStr);
+    if (set === EXAM_SETS[0]) html += classTestScheduleHTML(todayStr) + olympiadScheduleHTML(todayStr);
   });
   wrap.innerHTML = html;
+}
+
+function classTestScheduleHTML(todayStr) {
+  if (!CLASS_TESTS.length) return '';
+  let html = `<div class="calendar-section">
+    <div class="calendar-header"><h2>📝 Class Tests</h2></div>
+    <div class="cal-legend">Unit reviews from ManageBac &nbsp;·&nbsp; ✅ = done</div>
+    <div class="cal-card-grid">`;
+  CLASS_TESTS.forEach(t => {
+    const done = todayStr > t.start;
+    html += `<div class="exam-row examday${done ? ' blank' : ''}">
+      <span class="exam-row-badge">${done ? '✅ Done' : '📝 Test'}</span>
+      <span class="exam-row-date">${examDateLabel(t.start)}</span>
+      <div class="exam-row-info">
+        <span class="exam-row-subject">${t.subject}</span>
+        <span class="exam-row-topic">${t.topic}</span>
+      </div>
+    </div>`;
+  });
+  return html + '</div></div>';
 }
 
 function olympiadScheduleHTML(todayStr) {
@@ -2832,6 +2870,14 @@ function renderExamAlert() {
         ? `${set.name} exams start today — good luck! 🌟`
         : `<span class="exam-alert-count">${daysToStart}</span> day${daysToStart === 1 ? '' : 's'} to go for ${set.name} exams!`);
     }
+  }
+
+  // Next class test, counted down over its final week
+  const nextTest = CLASS_TESTS.find(t => t.start >= todayStr);
+  if (nextTest) {
+    const d = daysBetween(todayStr, nextTest.start);
+    if (d === 0) msgs.push(`📝 <strong>${nextTest.subject}</strong> test today — all the best!`);
+    else if (d <= 7) msgs.push(`📝 <span class="exam-alert-count">${d}</span> day${d === 1 ? '' : 's'} to ${nextTest.subject} test`);
   }
 
   // Next Olympiad, counted down over its final week
