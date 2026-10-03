@@ -27,6 +27,8 @@
   :root[data-theme="light"] [data-hero="cap"]{ --accent:#1b2a68; --accent-dim:#e7ecff; }
   [data-hero="hulk"]{ --accent:#4ade52; --accent-dim:rgba(74,222,82,.16); --hero-glow:#b34dff; }
   :root[data-theme="light"] [data-hero="hulk"]{ --accent:#2e7d32; --accent-dim:#e3ffd6; }
+  [data-hero="trex"]{ --accent:#7bd94a; --accent-dim:rgba(123,217,74,.16); --hero-glow:#f2a516; }
+  :root[data-theme="light"] [data-hero="trex"]{ --accent:#3f7d1f; --accent-dim:#e6f7d9; }
   [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
 
@@ -363,7 +365,7 @@
         <button class="big-chip" data-subject="ca2marathi">📖 Marathi <small>उ &amp; ऊ ची मात्रा</small></button>
         <button class="big-chip" data-subject="ca2english">🔤 English <small>Let's have a party</small></button>
         <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
-        <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
+        <button class="big-chip" data-subject="ca2science">🦖 Science <small>Staying alive · Dino mode</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="sa1" hidden>
         <div class="empty-hist">Tests coming before the First Term Summative (26 Oct – 2 Nov): English, DL&amp;C, Hindi, Science, Marathi, Maths.</div>
@@ -515,6 +517,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=749783096&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=818239443&single=true&output=csv",
   },
+  ca2science: {
+    // TODO — publish "CA2_Science_TestA_Regular" and "CA2_Science_TestB_Harder"
+    // tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ca2english: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1995270521&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1034913331&single=true&output=csv",
@@ -579,6 +587,12 @@ const TOPIC_EMOJI = {
   "-ing and -ed Words": "✏️",
   "Compound Words": "🔗",
   "Punctuation": "💬",
+  "Human Organs": "🫀",
+  "Animal Groups": "🐾",
+  "Life Cycles": "🐸",
+  "Food Chains": "🌿",
+  "Fossils": "🦴",
+  "Think like a Scientist": "🔬",
   "Name the Picture": "🖼️",
   "Meanings": "💬",
   "Sort the Matra": "🧺",
@@ -630,6 +644,28 @@ const HERO_THEME = {
   // Iron Man — the Harder test can wear this instead of Hulk (see
   // HARDER_HERO below). `finish` gives a line about FLYING for every score
   // band; it is shown on the results screen, spoken, and put in the bubble.
+  // Dino Explorer — Science wears this on both tests (see SUBJECT_HERO), since
+  // dinosaurs are the kid's favourite. Lines are about digging up fossils.
+  trex: {
+    badge: "🦖", tag: "Dino Explorer Mode",
+    title: "ROAR through this test!",
+    sub: "Grab your brush and magnifying glass, Dino Explorer — every right answer is a fossil waiting to be dug up!",
+    confetti: ["#7bd94a", "#f2a516", "#8a5a2b"],
+    cheer: "T-Rex ROARS for you! 🦖",
+    voiceLine: "ROAR! Dino Explorer, you dug up every single fossil!",
+    bubbleText: "ROAR! PERFECT DIG! 🦖",
+    voicePitch: 0.5, voiceRate: 0.8,
+    finish: [
+      { min: 100, text: "PERFECT DIG! You found every fossil — the museum wants YOU! 🦖",
+        say: "ROAR! Dino Explorer, you dug up every single fossil!", bubble: "ROAR! PERFECT DIG! 🦖" },
+      { min: 90, text: "Mega-ROAR! Almost every fossil found — just a tiny bone left in the sand! 🦕",
+        say: "Mega roar! You found almost every fossil!", bubble: "MEGA ROAR! 🦕" },
+      { min: 70, text: "Good digging! Brush away a little more sand and you'll find the rest. 🦴",
+        say: "Good digging, explorer! A little more brushing and you will find the rest!", bubble: "GOOD DIGGING! 🦴" },
+      { min: 0, text: "Even a T-Rex had to practise its roar! Check the misses and dig again. ⛏️",
+        say: "Even a T-Rex practised its roar! Let's dig again!", bubble: "DIG AGAIN! ⛏️" },
+    ],
+  },
   ironman: {
     badge: "🦾", badgeHTML: IRONMAN_HELMET_SVG,
     chip: "🦾 Harder", chipSub: "Iron Man flight mode",
@@ -666,7 +702,7 @@ function applyHarderHero() {
   chip.dataset.hero = HARDER_HERO;
   chip.innerHTML = `${h.chip || '👊 Harder'} <small>${h.chipSub || h.tag}</small>`;
   document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => b.classList.toggle('active', b.dataset.harder === HARDER_HERO));
-  if (CURRENT_TEST === 'Test B - Harder') { CURRENT_HERO = HARDER_HERO; updateHeroUI(); }
+  if (CURRENT_TEST === 'Test B - Harder') refreshHero();
 }
 document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => {
   b.addEventListener('click', () => {
@@ -685,7 +721,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2marathi: "CA2 Marathi", gk: "GK (IGKO)", ieo: "English (IEO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2marathi: "CA2 Marathi", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
@@ -694,6 +730,14 @@ const DEVANAGARI_SUBJECTS = new Set(["ca2marathi"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
+
+// Subjects that wear their own hero on BOTH tests, overriding the chip's.
+const SUBJECT_HERO = { ca2science: "trex" };
+function refreshHero() {
+  CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
+    || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
+  updateHeroUI();
+}
 
 function updateHeroUI() {
   const h = HERO_THEME[CURRENT_HERO];
@@ -776,6 +820,7 @@ function selectSubject(btn) {
   if (btn) btn.classList.add('active');
   CURRENT_SUBJECT = btn ? btn.dataset.subject : '';
   document.getElementById('start-btn').disabled = !btn;
+  if (typeof HARDER_HERO !== 'undefined') refreshHero();
 }
 
 // Picking an exam shows only its subjects and selects the first one that
@@ -801,8 +846,7 @@ document.querySelectorAll('#test-chips .big-chip').forEach(btn => {
     document.querySelectorAll('#test-chips .big-chip').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     CURRENT_TEST = btn.dataset.test;
-    CURRENT_HERO = btn.dataset.hero || 'cap';
-    updateHeroUI();
+    refreshHero();
   });
 });
 
