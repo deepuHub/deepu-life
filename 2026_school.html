@@ -1148,9 +1148,17 @@
       background-size: 14px 14px; box-shadow: 0 6px 0 rgba(0,0,0,0.12); }
     .pk-goal.shake { animation: pk-net 0.5s ease-out; }
     @keyframes pk-net { 20% { background-position: 0 6px; transform: scale(1.03); } 60% { background-position: 0 -3px; } }
+    .pk-goal.clang { animation: pk-clang 0.5s ease-out; }
+    @keyframes pk-clang {
+      0%, 100% { border-color: #fff; transform: translateX(0); }
+      15% { border-color: #ffd600; transform: translateX(-3px); box-shadow: 0 0 22px 4px rgba(255,214,0,0.8); }
+      35% { transform: translateX(3px); }
+      55% { transform: translateX(-2px); }
+      75% { transform: translateX(1px); }
+    }
     .pk-line { position: absolute; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.85); }
     .pk-spot { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
-    .pk-keeper { position: absolute; font-size: 54px; line-height: 1; transition: left 0.28s ease-out, transform 0.28s ease-out; }
+    .pk-keeper { position: absolute; font-size: 54px; line-height: 1; transition: left 0.28s ease-out, top 0.28s ease-out, transform 0.28s ease-out; }
     .pk-player { position: absolute; font-size: 48px; line-height: 1; transform: scaleX(-1); }
     .pk-ball { position: absolute; left: 0; top: 0; font-size: 36px; line-height: 1; will-change: transform; }
     .pk-hud { position: absolute; left: 0; right: 0; top: 10px; text-align: center; color: #fff;
@@ -2094,7 +2102,7 @@ function footballFx(layer, ox, oy, done) {
   const add = (cls, html) => { const el = document.createElement('div'); el.className = cls; if (html) el.innerHTML = html; layer.appendChild(el); return el; };
 
   // Pitch: goal, six-yard line, penalty spot, keeper, kicker, ball
-  const goal = { w: Math.min(W * 0.8, 340), h: 120, top: 80 };
+  const goal = { w: Math.min(W * 0.7, 290), h: 108, top: 84 };
   goal.left = (W - goal.w) / 2;
   const goalEl = add('pk-goal');
   Object.assign(goalEl.style, { left: goal.left + 'px', top: goal.top + 'px', width: goal.w + 'px', height: goal.h + 'px' });
@@ -2114,11 +2122,11 @@ function footballFx(layer, ox, oy, done) {
 
   let shot = 0, goals = 0, busy = false, finished = false, keeperX = W / 2, diving = false;
   const results = [];
-  const placeBall = () => { ball.style.transform = `translate(${W / 2 - 18}px, ${spotY - 18}px)`; };
+  const placeBall = () => { ball.style.transition = 'none'; ball.style.transform = `translate(${W / 2 - 18}px, ${spotY - 18}px)`; };
   const drawHud = () => {
     const dots = results.map(r => r ? '✅' : '❌').concat(Array(SHOTS - results.length).fill('⚪')).join('');
     hud.innerHTML = finished ? `Full time!<span class="pk-dots">${dots}</span>`
-      : `👆 Tap the goal to shoot! · Shot ${Math.min(shot + 1, SHOTS)}/${SHOTS}<span class="pk-dots">${dots}</span>`;
+      : `👆 Aim for the corners — mind the posts! · Shot ${Math.min(shot + 1, SHOTS)}/${SHOTS}<span class="pk-dots">${dots}</span>`;
   };
   const say = (text, small) => {
     msg.textContent = text; msg.classList.toggle('small', !!small);
@@ -2132,7 +2140,7 @@ function footballFx(layer, ox, oy, done) {
   (function patrol(now) {
     if (!layer.isConnected) return;
     if (!diving) {
-      keeperX = W / 2 + Math.sin((now - t0) / 420) * (goal.w / 2 - 40);
+      keeperX = W / 2 + Math.sin((now - t0) / 280) * (goal.w / 2 - 36);
       keeper.style.transition = 'none';
       keeper.style.left = (keeperX - 27) + 'px'; keeper.style.top = kY + 'px'; keeper.style.transform = 'none';
     }
@@ -2162,14 +2170,15 @@ function footballFx(layer, ox, oy, done) {
     busy = true;
     msg.classList.remove('show');
     const tx = e.clientX, ty = e.clientY;
-    const inGoal = tx > goal.left + 6 && tx < goal.left + goal.w - 6 && ty > goal.top + 6 && ty < goal.top + goal.h;
 
     // Keeper guesses a spot to dive to — sometimes right, sometimes not
     diving = true;
-    const guess = Math.random() < 0.4 ? tx : goal.left + 40 + Math.random() * (goal.w - 80);
+    const guess = Math.random() < 0.6 ? tx + (Math.random() - 0.5) * 50 : goal.left + 30 + Math.random() * (goal.w - 60);
     const diveX = Math.max(goal.left + 10, Math.min(goal.left + goal.w - 10, guess));
     keeper.style.transition = '';
     keeper.style.left = (diveX - 27) + 'px';
+    // leap up for high shots
+    keeper.style.top = (ty < goal.top + goal.h * 0.4 ? goal.top + 4 : kY) + 'px';
     keeper.style.transform = `rotate(${diveX < keeperX ? -35 : 35}deg)`;
 
     window.FxSounds && FxSounds.kick();
@@ -2184,22 +2193,48 @@ function footballFx(layer, ox, oy, done) {
       ball.style.transform = `translate(${x - 18}px, ${y - 18}px) rotate(${k * 720}deg) scale(${1 - 0.4 * k})`;
       if (k < 1) return requestAnimationFrame(fly);
 
-      const saved = inGoal && Math.abs(diveX - tx) < 48 && ty > kY - 20;
-      const scored = inGoal && !saved;
-      results.push(scored); if (scored) goals++;
-      if (scored) {
+      // Real shots wobble a little, so hugging the corners is risky
+      const fx = tx + (Math.random() - 0.5) * 24, fy = ty + (Math.random() - 0.5) * 24;
+      const right = goal.left + goal.w, bottom = goal.top + goal.h;
+      const withinX = fx > goal.left - 8 && fx < right + 8;
+      const hitPost = fy > goal.top - 4 && fy < bottom && (Math.abs(fx - goal.left) < 13 || Math.abs(fx - right) < 13);
+      const hitBar  = withinX && Math.abs(fy - goal.top) < 13;
+      const inNet = fx > goal.left + 13 && fx < right - 13 && fy > goal.top + 13 && fy < bottom;
+      const high = fy < goal.top + goal.h * 0.4;                 // top-corner shots are harder to reach, but he can get a hand to them
+      const saved = !hitPost && !hitBar && inNet && Math.abs(diveX - fx) < (high ? 44 : 54);
+      const deflect = (dx, dy) => {
+        ball.style.transition = 'transform 0.55s cubic-bezier(.2,.8,.3,1)';
+        ball.style.transform = `translate(${fx + dx - 18}px, ${fy + dy - 18}px) rotate(1260deg) scale(0.6)`;
+      };
+      let scored = false;
+      if (hitPost || hitBar) {
+        window.FxSounds && FxSounds.post();
+        goalEl.classList.remove('clang'); void goalEl.offsetWidth; goalEl.classList.add('clang');
+        if (Math.random() < 0.3) {                         // rattles off the woodwork and trickles in
+          scored = true;
+          deflect(hitBar ? 0 : (fx < W / 2 ? 26 : -26), hitBar ? 34 : 18);
+          say('OFF THE POST… IN! 😱');
+          setTimeout(() => { window.FxSounds && FxSounds.goal(); bounceBurst(layer, fx, fy, ['⚽', '🎉', '⭐'], 18); }, 450);
+        } else {                                            // bounces back out into play
+          const out = hitBar ? 0 : (fx < W / 2 ? -1 : 1);
+          deflect(out * (70 + Math.random() * 60) || (Math.random() - 0.5) * 120, hitBar ? 130 : 90 + Math.random() * 50);
+          say('POST! 💥');
+        }
+      } else if (saved) {
+        window.FxSounds && FxSounds.save();
+        deflect((fx < diveX ? -1 : 1) * (60 + Math.random() * 50), 70 + Math.random() * 40);   // parried away
+        say('SAVED! 🧤');
+      } else if (inNet) {
+        scored = true;
         say('GOOOAL! 🎉');
         window.FxSounds && FxSounds.goal();
         goalEl.classList.remove('shake'); void goalEl.offsetWidth; goalEl.classList.add('shake');
-        bounceBurst(layer, tx, ty, ['⚽', '🎉', '⭐'], 18);
-      } else if (saved) {
-        say('SAVED! 🧤');
-        window.FxSounds && FxSounds.save();
-        ball.style.transform += ` translate(${(tx < W / 2 ? -1 : 1) * 60}px, 60px)`;
+        bounceBurst(layer, fx, fy, ['⚽', '🎉', '⭐'], 18);
       } else {
         say('MISS! 😅');
         window.FxSounds && FxSounds.miss();
       }
+      results.push(scored); if (scored) goals++;
       shot++;
       drawHud();
       setTimeout(() => {
@@ -2605,6 +2640,10 @@ init();
       [523, 659, 784, 1047].forEach((f, i) => fxTone(f, 0.15 + i * 0.12, 0.3, 'triangle', 0.18));
     }),
     save:       fxPlay(() => { fxTone(140, 0, 0.18, 'sine', 0.5, 45); fxNoise(0, 0.08, 0.3, 600); fxNoise(0.1, 0.9, 0.12, 500, 'bandpass', 0.2); }),
+    post:       fxPlay(() => {                                           // metallic clang off the woodwork
+      fxTone(1250, 0, 0.7, 'sine', 0.22); fxTone(1870, 0, 0.45, 'triangle', 0.12); fxTone(3100, 0, 0.25, 'sine', 0.06);
+      fxNoise(0, 0.04, 0.3, 4000, 'highpass');
+    }),
     miss:       fxPlay(() => { fxTone(520, 0, 0.6, 'sawtooth', 0.08, 140); fxNoise(0.05, 0.8, 0.1, 450, 'bandpass', 0.25); }),
     fulltime:   fxPlay((won) => {
       fxWhistle(0, 0.2); fxWhistle(0.28, 0.2); fxWhistle(0.56, 0.6);
