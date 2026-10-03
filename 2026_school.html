@@ -1774,6 +1774,7 @@ const EXAM_SETS = [
       { date: '2026-10-04', day: 'Sunday',    weekend: true },
       { date: '2026-10-05', day: 'Monday',    subject: 'Hindi', topic: 'इ, ई, उ, ऊ की मात्रा' },
       { date: '2026-10-06', day: 'Tuesday',   subject: 'Science', topic: 'Unit 4 — Staying Alive: 4.1 Human organs, 4.2 Animal groups and different life cycles, 4.3 Food chains, 4.4 Fossils' },
+      { date: '2026-10-07', day: 'Wednesday', subject: 'Social Studies', topic: 'Unit Review — Unit 2: Our Nation (revise from the SS In-house book; return it to school)' },
     ],
   },
   {
@@ -1820,8 +1821,13 @@ const CLASS_TESTS = [
     label: 'Social Studies Unit Review — Unit 2: Our Nation (revise from the SS In-house book; return it to school)' },
 ];
 
+// Class tests that aren't already a row in an exam set (those show there instead)
+function standaloneClassTests() {
+  return CLASS_TESTS.filter(t => !examOn(t.start));
+}
+
 function classTestOn(dateStr) {
-  return CLASS_TESTS.find(t => t.start === dateStr) || null;
+  return standaloneClassTests().find(t => t.start === dateStr) || null;
 }
 
 function examOn(dateStr) {
@@ -2797,12 +2803,13 @@ function renderExamSchedule() {
 }
 
 function classTestScheduleHTML(todayStr) {
-  if (!CLASS_TESTS.length) return '';
+  const tests = standaloneClassTests();
+  if (!tests.length) return '';
   let html = `<div class="calendar-section">
     <div class="calendar-header"><h2>📝 Class Tests</h2></div>
     <div class="cal-legend">Unit reviews from ManageBac &nbsp;·&nbsp; ✅ = done</div>
     <div class="cal-card-grid">`;
-  CLASS_TESTS.forEach(t => {
+  tests.forEach(t => {
     const done = todayStr > t.start;
     html += `<div class="exam-row examday${done ? ' blank' : ''}">
       <span class="exam-row-badge">${done ? '✅ Done' : '📝 Test'}</span>
@@ -2873,7 +2880,7 @@ function renderExamAlert() {
   }
 
   // Next class test, counted down over its final week
-  const nextTest = CLASS_TESTS.find(t => t.start >= todayStr);
+  const nextTest = standaloneClassTests().find(t => t.start >= todayStr);
   if (nextTest) {
     const d = daysBetween(todayStr, nextTest.start);
     if (d === 0) msgs.push(`📝 <strong>${nextTest.subject}</strong> test today — all the best!`);
