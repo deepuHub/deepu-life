@@ -1197,7 +1197,7 @@
 <div class="header">
   <div class="header-actions">
     <a class="theme-toggle" href="index.html" aria-label="Back to deepu-life" title="Back to deepu-life" style="text-decoration:none">🏠</a>
-    <button class="theme-toggle" type="button" data-sound-toggle aria-label="Mute sound" title="Toggle sound">🔊</button>
+    <button class="theme-toggle" type="button" data-sound-toggle aria-label="Unmute sound" title="Unmute sound">🔇</button>
     <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle color mode">🌙</button>
   </div>
   <div id="sound-hint">🔊 Tap anywhere for sound</div>
@@ -2306,7 +2306,7 @@ init();
 // ── HERO SOUND ENGINE (synthesized, no external files) ─────────────────────
 (function(){
   let audioCtx = null;
-  let soundEnabled = true;
+  let soundEnabled = false;   // muted by default; the 🔇/🔊 button turns sound on
 
   let pendingInitialSound = null;
   let initialSoundPlayed = false;
@@ -2514,6 +2514,7 @@ init();
 
   function tryPlayDaySound(soundKey) {
     pendingInitialSound = soundKey;
+    if (!soundEnabled) return;
     const ac = ctx();
     if (ac.state === 'running') {
       initialSoundPlayed = true;
@@ -2608,6 +2609,7 @@ init();
       soundEnabled = !soundEnabled;
       soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
       soundBtn.setAttribute('title', soundEnabled ? 'Mute sound' : 'Unmute sound');
+      soundBtn.setAttribute('aria-label', soundEnabled ? 'Mute sound' : 'Unmute sound');
     });
   }
 })();
