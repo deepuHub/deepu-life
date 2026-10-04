@@ -28,6 +28,7 @@
     { key: 'carnatic', href: 'carnatic-private.html',       icon: '🎙️', label: 'Carnatic',      group: 'private', desc: 'Vocal journey at Artium' },
     { key: 'ideas',    href: 'ideas-private.html',          icon: '💡', label: 'Ideas',         group: 'private', desc: 'Ideas and projects, with verdicts' },
     { key: 'loans',    href: 'loans-private.html',          icon: '🏦', label: 'Loans',         group: 'private', desc: 'Car and house loans' },
+    { key: 'trips',    href: 'trips-private.html',          icon: '🧳', label: 'Trips',         group: 'private', desc: 'Group trips from Splitwise, across years' },
   ];
   // index.html builds its launcher cards from this same list.
   window.DEEPU_LINKS = LINKS;

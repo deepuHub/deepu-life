@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trips — deepu-life</title>
+<meta name="description" content="Every group trip, from the Splitwise exports: what each cost, where it went, who fronted it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧳%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600&family=Fraunces:wght@900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<script src="assets/js/theme.js"></script>
+<style>
+  /* ── Passport skin: stamped teal over night paper. Teal is spend, coral is
+        what is owed. Overrides the tracker palette for this page only;
+        --run drives the nav accent. ── */
+  :root{
+    --bg:#08100f;--surface:rgba(14,26,25,.72);--surface2:#111f1e;--border:#223836;
+    --text:#e8f3f1;--muted:#8fa8a4;--muted2:#5d7773;
+    --run:#2dd4bf;--run-dim:#0b2724;
+    --hot:#fb7185;--good:#4ade80;--rule:rgba(45,212,191,.05);
+  }
+  :root[data-theme="light"]{
+    --bg:#f3f8f6;--surface:#ffffff;--surface2:#e8f1ee;--border:#cfe0db;
+    --text:#10211f;--muted:#4c6965;--muted2:#7d9893;
+    --run:#0f766e;--run-dim:#d7efea;
+    --hot:#be123c;--good:#15803d;--rule:rgba(15,118,110,.05);
+  }
+  body::before{opacity:.02}
+  body{
+    background:var(--bg);
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      radial-gradient(820px 520px at 90% -12%, rgba(45,212,191,.13), transparent),
+      radial-gradient(700px 440px at -8% 108%, rgba(251,113,133,.06), transparent);
+    background-size:100% 30px, auto, auto;
+    background-attachment:fixed;
+  }
+  [hidden]{display:none !important}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:calc(var(--nav-h) + 2.6rem) var(--pad) 5rem}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+
+  .hero{text-align:center;margin-bottom:2.4rem}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--muted2);margin-bottom:.9rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.2rem,8vw,3.6rem);line-height:1;
+           letter-spacing:-.03em;color:var(--run);font-variant-numeric:tabular-nums}
+  .hero .cap{margin-top:.6rem;font-size:.9rem;font-weight:300;color:var(--muted);max-width:56ch;margin-inline:auto;line-height:1.6}
+  .hero .cap b{color:var(--text);font-weight:500}
+
+  /* ── sign-in gate ── */
+  .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:34vh}
+  .gate-icon{font-size:2.2rem}
+  .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem}
+  .gate p{font-size:.88rem;font-weight:300;line-height:1.7;color:var(--muted);max-width:46ch}
+  .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+              background:var(--run-dim);color:var(--run);border:1px solid var(--run);font-family:'JetBrains Mono',monospace;
+              font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s;
+              -webkit-tap-highlight-color:transparent}
+  .btn-signin:hover{background:var(--run);color:var(--bg)}
+  .btn-signin:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  .gate-error{color:var(--hot);font-size:.8rem;max-width:52ch}
+
+  main{display:flex;flex-direction:column;gap:1.15rem}
+  .card{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:1.4rem}
+  .card > h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.15rem;letter-spacing:-.01em;
+             display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+  .card > h2 .right{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.14em;
+                    font-weight:400;color:var(--muted)}
+  .card > p.lead{margin-top:.4rem;font-size:.83rem;font-weight:300;color:var(--muted);line-height:1.7;max-width:70ch}
+  .card > p.lead b{color:var(--text);font-weight:500}
+
+  /* ── toolbar ── */
+  .toolbar{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;padding:.55rem 1.1rem;border-radius:999px;
+       background:var(--surface2);color:var(--text);border:1px solid var(--border);cursor:pointer;
+       font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em;
+       -webkit-tap-highlight-color:transparent}
+  .btn:hover{border-color:var(--run);color:var(--run)}
+  .btn.primary{background:var(--run-dim);color:var(--run);border-color:var(--run)}
+  .btn.primary:hover{background:var(--run);color:var(--bg)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  select,input[type=text]{min-height:44px;padding:.5rem .8rem;border-radius:10px;background:var(--surface2);color:var(--text);
+                          border:1px solid var(--border);font:inherit;font-size:.85rem}
+  .status{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;color:var(--muted)}
+  .status.err{color:var(--hot)}
+
+  /* ── import panel ── */
+  .facts{display:grid;grid-template-columns:max-content 1fr;gap:.35rem 1.2rem;margin:1rem 0;font-size:.85rem}
+  .facts dt{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.12em;padding-top:.15rem}
+  .facts dd{margin:0}
+  .row-actions{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;margin-top:.4rem}
+
+  /* ── bars ── */
+  .legend{display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin:1rem 0 .4rem;font-size:.72rem;color:var(--muted)}
+  .legend i{display:inline-block;width:.7rem;height:.7rem;border-radius:3px;margin-right:.4rem;vertical-align:-1px}
+  .trip{display:grid;grid-template-columns:minmax(7rem,12rem) 1fr auto;gap:.9rem;align-items:center;width:100%;
+        text-align:left;background:none;border:0;border-top:1px solid var(--border);padding:.8rem 0;cursor:pointer;color:inherit;
+        font:inherit;min-height:44px;-webkit-tap-highlight-color:transparent}
+  .trip:first-of-type{border-top:0}
+  .trip:hover .t-name{color:var(--run)}
+  .trip:focus-visible{outline:2px solid var(--run);outline-offset:2px}
+  .trip.sel .t-name{color:var(--run)}
+  .t-name{font-weight:500;font-size:.92rem}
+  .t-name s{display:block;text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+            color:var(--muted);margin-top:.15rem}
+  .t-amt{font-family:'JetBrains Mono',monospace;font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums}
+  .t-amt s{display:block;text-decoration:none;font-size:.56rem;letter-spacing:.08em;color:var(--muted)}
+  .stack{display:flex;height:16px;border-radius:999px;overflow:hidden;background:var(--surface2);border:1px solid var(--border)}
+  .stack span{display:block;height:100%}
+  .brow{display:grid;grid-template-columns:minmax(6rem,10rem) 1fr 6.5rem 3rem;gap:.8rem;align-items:center;
+        padding:.45rem 0;font-size:.85rem}
+  .brow .stack{height:12px}
+  .brow .pct{color:var(--muted);text-align:right;font-size:.7rem}
+  .brow .amt{text-align:right;font-size:.78rem}
+
+  table{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:.9rem}
+  th{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.12em;font-weight:400;color:var(--muted);text-align:right;
+     padding:.4rem .5rem;border-bottom:1px solid var(--border)}
+  td{padding:.5rem;text-align:right;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left}
+  td.pos{color:var(--good)} td.neg{color:var(--hot)}
+  .settle{margin-top:1rem;display:flex;flex-direction:column;gap:.35rem;font-size:.85rem}
+  .settle b{font-weight:500}
+  .note{margin-top:.8rem;font-size:.72rem;color:var(--muted);line-height:1.6}
+
+  footer{margin-top:3.2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.62rem;
+         letter-spacing:.12em;color:var(--muted)}
+
+  @media(max-width:640px){
+    .trip{grid-template-columns:1fr auto}
+    .trip .stack{grid-column:1 / -1;order:3}
+    .brow{grid-template-columns:1fr 5.5rem}
+    .brow .stack,.brow .pct{display:none}
+    th:nth-child(3),td:nth-child(3){display:none}
+  }
+</style>
+</head>
+<body>
+
+<deepu-nav active="trips"></deepu-nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker" id="asof">GROUP TRIPS</div>
+    <h1 id="total">—</h1>
+    <p class="cap" id="cap"></p>
+  </header>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private trip ledger</h2>
+    <p>Every trip lives in a private Google Sheet. Sign in with the Google account that owns it — anyone else’s sign-in is rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <main id="main" hidden>
+    <section class="card">
+      <div class="toolbar">
+        <button class="btn primary" id="import-btn" type="button">⬆ IMPORT TRIP</button>
+        <input type="file" id="file" accept=".csv,text/csv" hidden>
+        <button class="btn" id="charts-btn" type="button">▦ ADD CHARTS TO SHEET</button>
+        <label id="cur-wrap" hidden><select id="cur" aria-label="Currency"></select></label>
+        <span class="status" id="status" role="status"></span>
+      </div>
+      <div id="import-panel" hidden></div>
+    </section>
+    <div id="body"></div>
+  </main>
+
+  <footer id="foot"></footer>
+</div>
+
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/trips-core.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   trips-private.html — every group trip in one place.
+
+   THE IDEA: Splitwise already does the splitting for one trip. This page
+   answers what it can't — across all the trips, what did each cost, where
+   did the money go, and who ends up fronting it. Import a Splitwise CSV
+   and the trip's name, year, dates, currency, people and every expense
+   are read from the file itself (the name from the filename — Splitwise
+   has no group-name column). Nothing is typed in.
+
+   DATA — a private Google Sheet, two tabs (created for you on first
+   sign-in if they are missing):
+
+     Trips     trip_id | name | year | start | end | currency | people | imported_at
+               `people` is a ";"-joined list.
+     Expenses  trip_id | date | description | category | cost | payer | nets
+               One row per Splitwise row. `nets` is "Ana=50.00;Ben=-50.00":
+               Splitwise's signed column per person (paid minus owed), kept
+               as it came so balances are exact. Splitwise's own "Payment"
+               rows (settle-ups) move balances but are not counted as spend.
+
+   ONE-TIME SETUP:
+     1. Create an empty Google Sheet in Drive. Leave sharing Restricted.
+     2. Put its id (the /d/<id>/ part of the URL) in SPREADSHEET_ID below.
+     3. Export each trip from Splitwise (group ▸ Export as CSV) and use
+        IMPORT TRIP here.
+
+   WHAT THIS PAGE WRITES: appended rows on Trips and Expenses when you
+   import, and a `Charts` tab when you ask for native charts in the
+   Sheet. The token is `spreadsheets` (read + write) — the same as the
+   Bucket List and Ideas pages. To remove or fix a trip, edit or delete
+   its rows in the Sheet; the page never deletes.
+═══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1X-y2IiW94QcF6ds100F9wNtLNUmoi6RftPZwBqgxxH0';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+const HEADERS = {
+  Trips:    ['trip_id', 'name', 'year', 'start', 'end', 'currency', 'people', 'imported_at'],
+  Expenses: ['trip_id', 'date', 'description', 'category', 'cost', 'payer', 'nets'],
+};
+const COLORS = ['#2dd4bf', '#f5a524', '#7dd3fc', '#fb7185', '#c084fc', '#4ade80', '#fb923c', '#f472b6'];
+const OTHER_COLOR = '#6f6152';
+
+const T = window.TripsCore;
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+let tokenClient, accessToken = null;
+let TRIPS = [], EXPS = [];
+let selected = '', currency = '', pending = null;
+
+/* ── money ─────────────────────────────────────────────────────────*/
+function money(n, cur){
+  try {
+    return new Intl.NumberFormat(cur === 'INR' ? 'en-IN' : undefined,
+      { style: 'currency', currency: cur || 'INR', maximumFractionDigits: 0 }).format(n);
+  } catch (e){ return Math.round(n).toLocaleString() + ' ' + cur; }
+}
+const day = iso => {
+  const d = new Date(iso);
+  return isNaN(d) ? (iso || '') : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+};
+const colorOf = (cats, c) => { const i = cats.indexOf(c); return i < 0 ? OTHER_COLOR : COLORS[i % COLORS.length]; };
+
+/* ── sheets api ────────────────────────────────────────────────────*/
+async function api(path, opts){
+  const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}${path}`, {
+    method: (opts && opts.method) || 'GET',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: opts && opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Trips sheet.');
+  if (res.status === 404) throw new Error('Sheet not found — check SPREADSHEET_ID in this page’s source.');
+  if (!res.ok){
+    let detail = '';
+    try { detail = (await res.json()).error.message; } catch (e){}
+    throw new Error(`Sheets API error ${res.status}${detail ? ': ' + detail : ''}`);
+  }
+  return res.json();
+}
+
+/* Create whichever of the two tabs is missing, header row included. */
+async function ensureTabs(){
+  const meta = await api('?fields=sheets.properties.title');
+  const have = new Set((meta.sheets || []).map(s => s.properties.title));
+  const need = Object.keys(HEADERS).filter(t => !have.has(t));
+  if (!need.length) return;
+  await api(':batchUpdate', { method: 'POST', body: { requests: need.map(title => ({ addSheet: { properties: { title } } })) } });
+  await api('/values:batchUpdate', { method: 'POST', body: {
+    valueInputOption: 'RAW',
+    data: need.map(t => ({ range: `${t}!A1`, values: [HEADERS[t]] })),
+  } });
+}
+
+async function loadAll(){
+  const r = await api('/values:batchGet?ranges=Trips&ranges=Expenses&valueRenderOption=UNFORMATTED_VALUE');
+  const [trips, exps] = (r.valueRanges || []).map(v => v.values || []);
+  TRIPS = rowsOf(trips).map(o => ({
+    id: String(o.trip_id), name: String(o.name || ''), year: o.year, start: String(o.start || ''), end: String(o.end || ''),
+    currency: String(o.currency || 'INR'), people: String(o.people || '').split(';').filter(Boolean),
+  })).filter(t => t.id);
+  EXPS = rowsOf(exps).map(o => ({
+    tripId: String(o.trip_id), date: String(o.date || ''), description: String(o.description || ''),
+    category: String(o.category || 'Other'), cost: T.num(o.cost) || 0, payer: String(o.payer || ''), nets: String(o.nets || ''),
+  })).filter(e => e.tripId);
+}
+/* Header-driven, so columns can be reordered in the Sheet. */
+function rowsOf(values){
+  if (!values.length) return [];
+  const h = values[0].map(x => String(x || '').toLowerCase().trim());
+  return values.slice(1).map(r => { const o = {}; h.forEach((k, i) => { o[k] = r[i] == null ? '' : r[i]; }); return o; });
+}
+
+/* ── auth ──────────────────────────────────────────────────────────*/
+function showGateError(msg){ $('gate-error').textContent = msg; }
+function initAuth(){
+  if (!SPREADSHEET_ID){
+    $('signin-btn').style.display = 'none';
+    showGateError('No Sheet wired up yet — see the setup steps in this page’s source.');
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID, scope: SCOPES,
+    callback: resp => {
+      if (resp.error){ showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  $('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+async function onSignedIn(){
+  try {
+    await ensureTabs();
+    await loadAll();
+    $('gate').style.display = 'none';
+    $('main').hidden = false;
+    render();
+  } catch (e){ showGateError(e.message); }
+}
+
+/* ── derived ───────────────────────────────────────────────────────*/
+function currencies(){ return [...new Set(TRIPS.map(t => t.currency))]; }
+function summaries(){
+  return TRIPS.filter(t => t.currency === currency)
+    .map(t => T.tripSummary(t, EXPS.filter(e => e.tripId === t.id)))
+    .sort((a, b) => (a.trip.start || '').localeCompare(b.trip.start || ''));
+}
+
+/* ── render ────────────────────────────────────────────────────────*/
+function render(){
+  const curs = currencies();
+  if (!curs.includes(currency)) currency = curs[0] || 'INR';
+  $('cur-wrap').hidden = curs.length < 2;
+  $('cur').innerHTML = curs.map(c => `<option${c === currency ? ' selected' : ''}>${esc(c)}</option>`).join('');
+
+  const sums = summaries();
+  if (!sums.some(s => s.trip.id === selected)) selected = sums.length ? sums[sums.length - 1].trip.id : '';
+
+  const grand = sums.reduce((a, s) => a + s.total, 0);
+  const everyone = new Set(sums.flatMap(s => s.people.map(p => p.name)));
+  $('total').textContent = sums.length ? money(grand, currency) : '—';
+  $('cap').innerHTML = sums.length
+    ? `<b>${sums.length}</b> trip${sums.length === 1 ? '' : 's'} · <b>${everyone.size}</b> people · ` +
+      `${esc(sums[0].trip.year || '')}${sums.length > 1 ? '–' + esc(sums[sums.length - 1].trip.year || '') : ''}` +
+      (curs.length > 1 ? ` · showing ${esc(currency)} only` : '')
+    : 'No trips yet — import a Splitwise CSV to start.';
+
+  if (!sums.length){
+    $('body').innerHTML = `<section class="card"><h2>No trips yet</h2>
+      <p class="lead">In Splitwise open the group, then <b>Export as CSV</b>, and use <b>Import trip</b> above. The name, dates,
+      currency, people and every expense are read from the file.</p></section>`;
+    $('foot').textContent = '';
+    return;
+  }
+
+  const m = T.matrix(sums);
+  const legend = `<div class="legend">${m.cats.map(c => `<span><i style="background:${colorOf(m.cats, c)}"></i>${esc(c)}</span>`).join('')}</div>`;
+  const maxTotal = Math.max(...sums.map(s => s.total), 1);
+
+  const tripRows = sums.map((s, i) => {
+    const row = m.rows[i];
+    const segs = row.values.map((v, k) => v > 0
+      ? `<span style="width:${(v / maxTotal) * 100}%;background:${colorOf(m.cats, m.cats[k])}" title="${esc(m.cats[k])} ${esc(money(v, currency))}"></span>` : '').join('');
+    return `<button class="trip${s.trip.id === selected ? ' sel' : ''}" data-trip="${esc(s.trip.id)}" type="button">
+      <span class="t-name">${esc(s.trip.name)}<s>${esc(s.trip.year || '')} · ${s.trip.people.length || s.people.length} PEOPLE</s></span>
+      <span class="stack" aria-hidden="true">${segs}</span>
+      <span class="t-amt">${esc(money(s.total, currency))}<s>${esc(money(s.perHead, currency))} / HEAD</s></span>
+    </button>`;
+  }).join('');
+
+  const allCats = [...m.totals.entries()].sort((a, b) => b[1] - a[1]);
+  const catRows = allCats.map(([c, v]) => barRow(c, v, grand, colorOf(m.cats, c), allCats[0][1])).join('');
+
+  const gp = T.groupPeople(sums);
+  const peopleRows = gp.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(money(p.paid, currency))}</td>
+    <td>${p.trips}</td><td class="${p.net >= 0 ? 'pos' : 'neg'}">${p.net >= 0 ? '+' : '−'}${esc(money(Math.abs(p.net), currency))}</td></tr>`).join('');
+
+  $('body').innerHTML = `
+    <section class="card">
+      <h2>Every trip <span class="right">${sums.length} · SPEND BY CATEGORY</span></h2>
+      <p class="lead">Bars are scaled to the biggest trip. <b>Tap a trip</b> for its detail below.</p>
+      ${legend}${tripRows}
+    </section>
+    <section class="card">
+      <h2>Where it all went <span class="right">ALL TRIPS</span></h2>
+      <div style="margin-top:.6rem">${catRows}</div>
+    </section>
+    <section class="card">
+      <h2>Who fronts the money <span class="right">ALL TRIPS</span></h2>
+      <p class="lead">Paid is what each person put down across every trip. Net is what they are still owed (+) or owe (−) on the
+      Splitwise books, summed over trips.</p>
+      <table><thead><tr><th>PERSON</th><th>PAID</th><th>TRIPS</th><th>NET</th></tr></thead><tbody>${peopleRows}</tbody></table>
+    </section>
+    <section class="card" id="detail">${detail(sums.find(s => s.trip.id === selected), m.cats)}</section>`;
+
+  document.querySelectorAll('.trip').forEach(b => b.addEventListener('click', () => {
+    selected = b.dataset.trip; render();
+    $('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+  $('foot').textContent = `${TRIPS.length} TRIPS · ${EXPS.length} EXPENSES · READ FROM YOUR PRIVATE SHEET`;
+}
+
+function barRow(label, value, total, color, max){
+  return `<div class="brow"><span>${esc(label)}</span>
+    <span class="stack"><span style="width:${(value / max) * 100}%;background:${color}"></span></span>
+    <span class="amt num">${esc(money(value, currency))}</span>
+    <span class="pct num">${total > 0 ? Math.round((value / total) * 100) : 0}%</span></div>`;
+}
+
+function detail(s, cats){
+  if (!s) return '';
+  const t = s.trip;
+  const top = s.categories.length ? s.categories[0].amount : 1;
+  const sets = T.settlements(s.people);
+  const dates = t.start ? `${day(t.start)}${t.end && t.end !== t.start ? ' → ' + day(t.end) : ''}` : '';
+  return `<h2>${esc(t.name)} <span class="right">${esc(t.year || '')}${dates ? ' · ' + esc(dates).toUpperCase() : ''}</span></h2>
+    <p class="lead"><b>${esc(money(s.total, currency))}</b> across ${s.count} expenses —
+    <b>${esc(money(s.perHead, currency))}</b> a head over ${s.people.length} people.</p>
+    <div style="margin-top:.8rem">${s.categories.map(c => barRow(c.category, c.amount, s.total, colorOf(cats, c.category), top)).join('')}</div>
+    <table><thead><tr><th>PERSON</th><th>PAID</th><th>SHARE</th><th>BALANCE</th></tr></thead><tbody>
+      ${s.people.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(money(p.paid, currency))}</td><td>${esc(money(p.share, currency))}</td>
+        <td class="${p.net >= 0 ? 'pos' : 'neg'}">${p.net >= 0 ? '+' : '−'}${esc(money(Math.abs(p.net), currency))}</td></tr>`).join('')}
+    </tbody></table>
+    ${sets.length ? `<div class="settle"><span class="mono" style="font-size:.6rem;color:var(--muted)">STILL TO SETTLE ON SPLITWISE</span>
+      ${sets.map(x => `<span><b>${esc(x.from)}</b> pays <b>${esc(x.to)}</b> ${esc(money(x.amount, currency))}</span>`).join('')}</div>`
+      : `<p class="note">Everyone is settled up.</p>`}`;
+}
+
+/* ── import ────────────────────────────────────────────────────────*/
+function setStatus(msg, err){ const s = $('status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
+
+$('import-btn').addEventListener('click', () => $('file').click());
+$('file').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    pending = T.parseSplitwise(await file.text(), file.name);
+    if (!pending.rows.length) throw new Error('No expenses found in that file.');
+    setStatus('');
+    showImport();
+  } catch (err){ pending = null; $('import-panel').hidden = true; setStatus(err.message, true); }
+});
+
+function showImport(){
+  const i = pending.info;
+  const p = $('import-panel');
+  p.hidden = false;
+  p.innerHTML = `<dl class="facts">
+    <dt>TRIP NAME</dt><dd><input type="text" id="imp-name" value="${esc(i.name)}" maxlength="80"></dd>
+    <dt>DATES</dt><dd>${esc(day(i.startDate))} → ${esc(day(i.endDate))} (year ${esc(i.year)})</dd>
+    <dt>CURRENCY</dt><dd>${esc(i.currency)}</dd>
+    <dt>PEOPLE</dt><dd>${i.people.length} — ${esc(i.people.join(', '))}</dd>
+    <dt>EXPENSES</dt><dd>${pending.rows.length}${pending.skipped ? ` (${pending.skipped} skipped: bad date or cost)` : ''}</dd>
+  </dl>
+  <div class="row-actions">
+    <button class="btn primary" id="imp-go" type="button">IMPORT TO SHEET</button>
+    <button class="btn" id="imp-cancel" type="button">CANCEL</button>
+  </div>`;
+  $('imp-cancel').addEventListener('click', () => { pending = null; p.hidden = true; });
+  $('imp-go').addEventListener('click', runImport);
+}
+
+async function runImport(){
+  const name = $('imp-name').value.trim();
+  if (!name){ setStatus('Give the trip a name.', true); return; }
+  const i = pending.info;
+  const id = T.slug(name) + (i.year ? '-' + i.year : '');
+  if (TRIPS.some(t => t.id === id)){ setStatus(`“${name}” is already imported — rename it to import again.`, true); return; }
+  $('imp-go').disabled = true;
+  setStatus('Importing…');
+  try {
+    await api(`/values/Trips!A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, { method: 'POST', body: {
+      values: [[id, name, i.year, i.startDate, i.endDate, i.currency, i.people.join(';'), new Date().toISOString()]],
+    } });
+    const rows = pending.rows.map(r => [id, r.date, r.description, r.category, r.cost, r.payer, r.nets]);
+    for (let k = 0; k < rows.length; k += 1000){
+      await api(`/values/Expenses!A:G:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, { method: 'POST', body: { values: rows.slice(k, k + 1000) } });
+    }
+    pending = null;
+    $('import-panel').hidden = true;
+    await loadAll();
+    currency = i.currency;
+    selected = id;
+    render();
+    setStatus(`Imported ${rows.length} expenses into “${name}”.`);
+  } catch (e){
+    setStatus(e.message, true);
+    $('imp-go') && ($('imp-go').disabled = false);
+  }
+}
+
+/* ── native charts, written into the Sheet ─────────────────────────
+   Not images: real Google Sheets charts on a `Charts` tab, driven by a
+   category × trip table written next to them, so they stay editable and
+   follow the numbers. The tab is rebuilt from scratch each time. */
+$('charts-btn').addEventListener('click', addChartsToSheet);
+async function addChartsToSheet(){
+  const sums = summaries();
+  if (!sums.length){ setStatus('Import a trip first.', true); return; }
+  const btn = $('charts-btn');
+  btn.disabled = true;
+  setStatus('Building charts in the Sheet…');
+  try {
+    const m = T.matrix(sums);
+    const n = sums.length;
+    const meta = await api('?fields=sheets.properties(sheetId,title)');
+    const old = (meta.sheets || []).find(s => s.properties.title === 'Charts');
+    const sheetId = (Date.now() % 2000000000) + 1;
+    const reqs = [];
+    if (old) reqs.push({ deleteSheet: { sheetId: old.properties.sheetId } });
+    reqs.push({ addSheet: { properties: { sheetId, title: 'Charts', gridProperties: { rowCount: Math.max(60, n + 40), columnCount: m.cats.length + 3 } } } });
+    await api(':batchUpdate', { method: 'POST', body: { requests: reqs } });
+
+    const table = [['Trip', ...m.cats, 'Total'],
+      ...m.rows.map(r => [r.label, ...r.values, r.total])];
+    await api(`/values/${encodeURIComponent('Charts!A1')}?valueInputOption=RAW`, { method: 'PUT', body: { values: table } });
+
+    const range = (c0, c1) => ({ sources: [{ sheetId, startRowIndex: 0, endRowIndex: n + 1, startColumnIndex: c0, endColumnIndex: c1 }] });
+    const anchor = row => ({ overlayPosition: { anchorCell: { sheetId, rowIndex: row, columnIndex: 0 }, widthPixels: 780, heightPixels: 360 } });
+    const axes = [{ position: 'BOTTOM_AXIS', title: 'Trip' }, { position: 'LEFT_AXIS', title: `Spend (${currency})` }];
+    const charts = [
+      { addChart: { chart: { position: anchor(n + 3), spec: {
+        title: `Spend by category, per trip (${currency})`,
+        basicChart: { chartType: 'COLUMN', stackedType: 'STACKED', legendPosition: 'BOTTOM_LEGEND', headerCount: 1, axis: axes,
+          domains: [{ domain: { sourceRange: range(0, 1) } }],
+          series: m.cats.map((c, k) => ({ series: { sourceRange: range(k + 1, k + 2) }, targetAxis: 'LEFT_AXIS' })) } } } } },
+      { addChart: { chart: { position: anchor(n + 22), spec: {
+        title: `Total spend per trip (${currency})`,
+        basicChart: { chartType: 'COLUMN', legendPosition: 'NO_LEGEND', headerCount: 1, axis: axes,
+          domains: [{ domain: { sourceRange: range(0, 1) } }],
+          series: [{ series: { sourceRange: range(m.cats.length + 1, m.cats.length + 2) }, targetAxis: 'LEFT_AXIS' }] } } } } },
+    ];
+    await api(':batchUpdate', { method: 'POST', body: { requests: charts } });
+    setStatus('Charts tab updated in the Sheet.');
+  } catch (e){ setStatus(e.message, true); }
+  btn.disabled = false;
+}
+
+$('cur').addEventListener('change', e => { currency = e.target.value; render(); });
+
+initAuth();
+</script>
+</body>
+</html>
