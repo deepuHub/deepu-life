@@ -25,6 +25,7 @@
 | 🎙️ Carnatic (`carnatic-private.html`) | Carnatic vocal journey at Artium — badge medallions, lesson ladder, riyaaz log | Private — Google Sign-In |
 | 💡 Ideas (`ideas-private.html`) | Ideas and projects — date each one turned up, status, AI verdict on whether to chase it, impact × effort matrix | Private — Google Sign-In |
 | 🏦 Loans (`loans-private.html`) | The car and the house — burn-down of each schedule, the builder's construction-linked ladder, and who paid for what | Private — Google Sign-In |
+| 🧳 Trips (`trips-private.html`) | Every group trip from its Splitwise export — spend per trip and by category, who fronts the money, who still owes whom; native charts can be written into the Sheet | Private — Google Sign-In |
 
 Private pages render nothing until Google authenticates the one account with access to that page's Sheet — enforced by Google, not by the page.
 
@@ -129,6 +130,20 @@ what the rest of this site already does, and writes back `verdict`, `confidence`
 re-score is asked for by name — which is what makes a verdict overridden by hand on the page stick. A
 review must never touch `status` either; that is the family's call, the same rule as the School page's
 homework sync.
+
+**Trips — import a Splitwise CSV, no typing.** `trips-private.html` reads two tabs, created on first sign-in if
+missing: `Trips` (`trip_id | name | year | start | end | currency | people | imported_at`) and `Expenses`
+(`trip_id | date | description | category | cost | payer | nets`). **Import trip** parses a Splitwise group export in the
+browser (`assets/js/trips-core.js`) and appends to both tabs — the name comes from the filename (Splitwise has no
+group-name column; editable before saving), the dates, year, currency and people from the file itself. `nets` is
+Splitwise's signed column per person (`Ana=50.00;Ben=-50.00`), kept as exported so balances are exact. Splitwise's
+`Payment` rows (settle-ups) move balances but are not counted as spend. Importing a trip whose id already exists is
+refused; to fix or remove a trip, edit its rows in the Sheet — the page never deletes.
+
+**Add charts to Sheet** rebuilds a `Charts` tab with a category × trip table and two native Google Sheets charts
+(stacked spend by category per trip, total per trip) via the Sheets API `addChart` — editable in Sheets, not images.
+Group totals are per currency (a currency picker appears when trips differ). Same `spreadsheets` OAuth scope as the
+Bucket List and Ideas pages. One-time setup: create an empty Sheet, put its id in `SPREADSHEET_ID`.
 
 **Loans — a tab per schedule.** `loans-private.html` reads seven tabs, each with only the columns it
 actually uses. Unlike Bucket List, Carnatic and Ideas — which are flat single tabs — the loans data is
