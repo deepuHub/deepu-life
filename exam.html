@@ -364,7 +364,7 @@
         <button class="big-chip" data-subject="ca2dlc">💻 DL&amp;C <small>Be a designer</small></button>
         <button class="big-chip" data-subject="ca2marathi">📖 Marathi <small>उ &amp; ऊ ची मात्रा</small></button>
         <button class="big-chip" data-subject="ca2english">🔤 English <small>Let's have a party</small></button>
-        <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
+        <button class="big-chip" data-subject="ca2hindi">📚 Hindi <small>इ ई उ ऊ की मात्रा</small></button>
         <button class="big-chip" data-subject="ca2science">🦖 Science <small>Staying alive · Dino mode</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="sa1" hidden>
@@ -512,6 +512,12 @@ const SHEET_CSV = {
   ca2maths: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1916905751&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=85477057&single=true&output=csv",
+  },
+  ca2hindi: {
+    // TODO — publish "CA2_Hindi_TestA_Regular" and "CA2_Hindi_TestB_Harder"
+    // tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
   },
   ca2marathi: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=749783096&single=true&output=csv",
@@ -719,12 +725,12 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2marathi: "CA2 Marathi", gk: "GK (IGKO)", ieo: "English (IEO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
 // Tests written in Devanagari get bigger type (see .lang-deva).
-const DEVANAGARI_SUBJECTS = new Set(["ca2marathi"]);
+const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
