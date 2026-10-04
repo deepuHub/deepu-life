@@ -98,7 +98,8 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 
 function cardHTML(link, stat) {
   const ac = ACCENT[link.key] ? ` style="--ac:${ACCENT[link.key]}"` : '';
-  return `<a class="card" href="${link.href}"${ac}>
+  const ext = link.external ? ' target="_blank" rel="noopener"' : '';
+  return `<a class="card" href="${link.href}"${ac}${ext}>
     ${link.group === 'private' ? '<span class="card-lock" aria-label="Private">🔒</span>' : ''}
     <span class="card-icon" aria-hidden="true">${link.icon}</span>
     <span class="card-name">${esc(link.label)}</span>

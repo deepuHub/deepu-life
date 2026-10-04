@@ -19,6 +19,7 @@
     { key: 'exam',     href: 'exam.html',                   icon: '🧮', label: 'Exams',         group: 'public',  desc: 'Practice tests, auto-scored' },
     { key: 'marathon', href: 'half-marathon.html',          icon: '🏅', label: 'Half Marathon', group: 'public',  desc: 'Training plan and race countdown' },
     { key: 'embers',   href: 'embers-tides-private.html',   icon: '🔥', label: 'Embers',        group: 'public',  desc: 'Coded intake index' },
+    { key: 'piepoints',href: 'https://pie-pulse-play.lovable.app', icon: '🥧', label: 'PiePoints', group: 'public',  desc: 'Score tracker, opens in new tab', external: true },
     { key: 'kid',      href: 'kid-private.html',            icon: '🎒', label: 'Kid',           group: 'private', desc: 'Report cards and CA results' },
     { key: 'health',   href: 'health-private.html',         icon: '🩺', label: 'Health',        group: 'private', desc: 'Vitals, labs and trend flags' },
     { key: 'results',  href: 'results-private.html',        icon: '🎓', label: 'BEd Results',   group: 'private', desc: 'Semester results, subject by subject' },
@@ -34,7 +35,8 @@
 
   function pillHTML(link, active) {
     const isActive = link.key === active;
-    return `<a href="${link.href}" class="nav-pill${isActive ? ' active' : ''}"${isActive ? ' aria-current="page"' : ''}>${link.icon} ${link.label}</a>`;
+    const ext = link.external ? ' target="_blank" rel="noopener"' : '';
+    return `<a href="${link.href}" class="nav-pill${isActive ? ' active' : ''}"${isActive ? ' aria-current="page"' : ''}${ext}>${link.icon} ${link.label}</a>`;
   }
 
   function groupHTML(group, label, active) {
