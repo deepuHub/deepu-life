@@ -29,6 +29,8 @@
   :root[data-theme="light"] [data-hero="hulk"]{ --accent:#2e7d32; --accent-dim:#e3ffd6; }
   [data-hero="trex"]{ --accent:#7bd94a; --accent-dim:rgba(123,217,74,.16); --hero-glow:#f2a516; }
   :root[data-theme="light"] [data-hero="trex"]{ --accent:#3f7d1f; --accent-dim:#e6f7d9; }
+  [data-hero="tiranga"]{ --accent:#ff9933; --accent-dim:rgba(255,153,51,.16); --hero-glow:#138808; }
+  :root[data-theme="light"] [data-hero="tiranga"]{ --accent:#b85c00; --accent-dim:#fff0dc; }
   [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
 
@@ -153,6 +155,18 @@
   .opt-list.read-only .opt-btn[disabled]{opacity:1;cursor:default}
 
   .symbol-row{display:flex;gap:0.8rem}
+  /* Colour-the-flag (Paint) and tap-all (Multi) questions */
+  .paint-wrap{display:flex;flex-direction:column;align-items:center;gap:0.9rem}
+  .paint-flag{width:min(360px,100%);height:auto;touch-action:manipulation}
+  .paint-flag .band{cursor:pointer;stroke:#6b6b6b;stroke-width:3;transition:filter .12s}
+  .paint-flag .band:hover{filter:brightness(0.96) drop-shadow(0 0 5px var(--accent))}
+  .palette{display:flex;gap:0.7rem;flex-wrap:wrap;justify-content:center}
+  .swatch-b{display:flex;flex-direction:column;align-items:center;gap:0.25rem;background:none;border:none;cursor:pointer;
+    font-family:'Epilogue',sans-serif;font-size:0.72rem;font-weight:600;color:var(--muted);padding:0}
+  .swatch{width:46px;height:46px;border-radius:50%;border:3px solid var(--border);display:block;transition:transform .12s}
+  .swatch-b.on .swatch{border-color:var(--text);transform:scale(1.18);box-shadow:0 0 0 4px var(--accent-dim)}
+  .swatch-b.on{color:var(--text)}
+  .review-fact{font-size:0.78rem;margin-top:0.4rem;color:var(--accent);line-height:1.45}
   /* Drag-and-drop questions (Order / Match). Pointer events, so a finger on
      the iPad works the same as a mouse; a tap-then-tap fallback also works. */
   .dd-hint{font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem}
@@ -366,6 +380,7 @@
         <button class="big-chip" data-subject="ca2english">🔤 English <small>Let's have a party</small></button>
         <button class="big-chip" data-subject="ca2hindi">📚 Hindi <small>इ ई उ ऊ की मात्रा</small></button>
         <button class="big-chip" data-subject="ca2science">🦖 Science <small>Staying alive · Dino mode</small></button>
+        <button class="big-chip" data-subject="ca2social">🇮🇳 Social Studies <small>Our Nation · Wed 7 Oct</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="sa1" hidden>
         <div class="empty-hist">Tests coming before the First Term Summative (26 Oct – 2 Nov): English, DL&amp;C, Hindi, Science, Marathi, Maths.</div>
@@ -521,6 +536,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=749783096&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=818239443&single=true&output=csv",
   },
+  ca2social: {
+    // TODO — publish "CA2_Social_TestA_Regular" and "CA2_Social_TestB_Harder"
+    // tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ca2science: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1886424914&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1683957543&single=true&output=csv",
@@ -589,6 +610,13 @@ const TOPIC_EMOJI = {
   "-ing and -ed Words": "✏️",
   "Compound Words": "🔗",
   "Punctuation": "💬",
+  "National Flag": "🇮🇳",
+  "National Symbols": "🦚",
+  "Anthem & Emblem": "🎵",
+  "Leaders of the Nation": "🏛️",
+  "Festivals": "🪔",
+  "Traditional Attire": "🥻",
+  "Food & Culture": "🍛",
   "Human Organs": "🫀",
   "Animal Groups": "🐾",
   "Life Cycles": "🐸",
@@ -649,7 +677,7 @@ const HERO_THEME = {
   // Dino Explorer — Science wears this on both tests (see SUBJECT_HERO), since
   // dinosaurs are the kid's favourite. Lines are about digging up fossils.
   trex: {
-    badge: "🦖", tag: "Dino Explorer Mode",
+    badge: "🦖", tag: "Dino Explorer Mode", flybyEmoji: "🦖",
     title: "ROAR through this test!",
     sub: "Grab your brush and magnifying glass, Dino Explorer — every right answer is a fossil waiting to be dug up!",
     confetti: ["#7bd94a", "#f2a516", "#8a5a2b"],
@@ -666,6 +694,27 @@ const HERO_THEME = {
         say: "Good digging, explorer! A little more brushing and you will find the rest!", bubble: "GOOD DIGGING! 🦴" },
       { min: 0, text: "Even a T-Rex had to practise its roar! Check the misses and dig again. ⛏️",
         say: "Even a T-Rex practised its roar! Let's dig again!", bubble: "DIG AGAIN! ⛏️" },
+    ],
+  },
+  // Tiranga Explorer — Social Studies (Our Nation) wears this on both tests.
+  tiranga: {
+    badge: "🇮🇳", tag: "Tiranga Explorer Mode", flybyEmoji: "🦚",
+    title: "Hoist the Tiranga on this test!",
+    sub: "Mor the Peacock is your guide through Our Nation — flags, festivals, leaders and more. Let's explore India!",
+    confetti: ["#ff9933", "#ffffff", "#138808", "#1f3a93"],
+    cheer: "Mor the Peacock dances for you! 🦚",
+    voiceLine: "Jai Hind! Explorer, you know your India!",
+    bubbleText: "JAI HIND! 🇮🇳",
+    voicePitch: 1.1, voiceRate: 0.95,
+    finish: [
+      { min: 100, text: "PERFECT SCORE! The whole nation is proud of you — Jai Hind! 🇮🇳",
+        say: "Jai Hind! Explorer, you know your India!", bubble: "JAI HIND! 🇮🇳" },
+      { min: 90, text: "Mor the Peacock is dancing! Just one little thing left to learn about India. 🦚",
+        say: "Wonderful! Mor the peacock is dancing for you!", bubble: "MOR IS DANCING! 🦚" },
+      { min: 70, text: "Great exploring! Read the 💡 facts below and you'll know even more about India. 🧭",
+        say: "Great exploring! Read the facts and you will know even more about India!", bubble: "GREAT EXPLORING! 🧭" },
+      { min: 0, text: "Every explorer learns on the way! Read the 💡 facts below and try again. 🌟",
+        say: "Every explorer keeps learning! Read the facts and try again!", bubble: "TRY AGAIN, EXPLORER! 🌟" },
     ],
   },
   ironman: {
@@ -723,7 +772,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2social: "CA2 Social Studies", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
@@ -734,7 +783,7 @@ const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi"]);
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
@@ -791,6 +840,7 @@ function rowsToQuestions(rows) {
     correct: header.indexOf('correct answer'),
     points: header.indexOf('points'),
     image: header.indexOf('image'),
+    fact: header.indexOf('fact'),
   };
   return rows.slice(1)
     .filter(r => r[idx.question] && r[idx.question].trim())
@@ -804,6 +854,8 @@ function rowsToQuestions(rows) {
       points: Number(r[idx.points]) || 5,
       // Optional — a repo-relative path like assets/exam/sa1-maths/coins.svg
       image: idx.image >= 0 ? (r[idx.image] || '').trim() : '',
+      // Optional — a 'learn more' line shown under the question in the review
+      fact: idx.fact >= 0 ? (r[idx.fact] || '').trim() : '',
     }));
 }
 
@@ -968,6 +1020,8 @@ function renderQuestion() {
 
   if (q.type === 'Order') renderOrder(q, area);
   else if (q.type === 'Match') renderMatch(q, area);
+  else if (q.type === 'Paint') renderPaint(q, area);
+  else if (q.type === 'Multi') renderMulti(q, area);
   else if (q.type === 'MCQ' || q.type === 'True/False') {
     const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
     const wrap = document.createElement('div');
@@ -1092,6 +1146,62 @@ function renderOrder(q, area) {
   area.appendChild(list);
 }
 
+// ── PAINT — colour the flag. Tap a colour, then tap a stripe. The sheet's
+// Correct Answer lists the stripe colours top→bottom ("saffron|white|green");
+// Options A–D are the palette. The answer is stored as JSON {top,middle,bottom}.
+const PAINT_COLORS = { saffron: '#FF9933', white: '#FFFFFF', green: '#138808', blue: '#1F3A93', red: '#D62828', yellow: '#FFD60A' };
+let PAINT_BRUSH = { q: -1, color: null };
+function renderPaint(q, area) {
+  const i = CURRENT_INDEX;
+  const regions = ['top', 'middle', 'bottom'];
+  let painted = {};
+  try { painted = JSON.parse(CURRENT_ANSWERS[i] || '{}'); } catch (e) {}
+  const palette = (q.options.length ? q.options : ['saffron', 'white', 'green', 'blue']).map(o => o.trim().toLowerCase());
+  if (PAINT_BRUSH.q !== i) PAINT_BRUSH = { q: i, color: null };
+  const save = () => { CURRENT_ANSWERS[i] = Object.keys(painted).length ? JSON.stringify(painted) : ''; renderQuestion(); };
+  area.innerHTML = '<div class="dd-hint">🎨 Tap a colour, then tap a stripe to paint it. Tap a stripe again with another colour to change it.</div>';
+  const wrap = document.createElement('div'); wrap.className = 'paint-wrap';
+  let spokes = '';
+  for (let k = 0; k < 24; k++) { const a = k * Math.PI / 12; spokes += `<line x1="${180 + 6 * Math.cos(a)}" y1="${105 + 6 * Math.sin(a)}" x2="${180 + 26 * Math.cos(a)}" y2="${105 + 26 * Math.sin(a)}" stroke="#1F3A93" stroke-width="1.6"/>`; }
+  const band = (r, y) => `<rect class="band" data-region="${r}" x="14" y="${y}" width="332" height="70" fill="${painted[r] ? PAINT_COLORS[painted[r]] : 'url(#hatch)'}"/>`;
+  wrap.innerHTML = `<svg class="paint-flag" viewBox="0 0 360 230">
+    <defs><pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#f1f1f1"/><line x1="0" y1="0" x2="0" y2="10" stroke="#cfcfcf" stroke-width="3"/></pattern></defs>
+    <rect x="2" y="4" width="9" height="224" rx="3" fill="#7b5a3a"/>
+    ${band('top', 10)}${band('middle', 80)}${band('bottom', 150)}
+    <g pointer-events="none"><circle cx="180" cy="105" r="28" fill="none" stroke="#1F3A93" stroke-width="3"/><circle cx="180" cy="105" r="4" fill="#1F3A93"/>${spokes}</g></svg>`;
+  wrap.querySelectorAll('.band').forEach(b => b.addEventListener('click', () => {
+    if (!PAINT_BRUSH.color) { const h = wrap.querySelector('.dd-hint') || area.querySelector('.dd-hint'); if (h) h.textContent = '👆 Pick a colour from the palette first!'; return; }
+    painted[b.dataset.region] = PAINT_BRUSH.color; save();
+  }));
+  const pal = document.createElement('div'); pal.className = 'palette';
+  palette.forEach(c => {
+    const sw = document.createElement('button'); sw.className = 'swatch-b' + (PAINT_BRUSH.color === c ? ' on' : '');
+    sw.innerHTML = `<span class="swatch" style="background:${PAINT_COLORS[c] || c}"></span>${c}`;
+    sw.addEventListener('click', () => { PAINT_BRUSH = { q: i, color: c }; renderQuestion(); });
+    pal.appendChild(sw);
+  });
+  wrap.appendChild(pal); area.appendChild(wrap);
+}
+
+// ── MULTI — tap ALL the right answers. Correct Answer is the letters ("AC"). ──
+function renderMulti(q, area) {
+  const i = CURRENT_INDEX;
+  const sel = (CURRENT_ANSWERS[i] || '').split('').filter(Boolean);
+  area.innerHTML = '<div class="dd-hint">👆 Tap ALL the right answers — there can be more than one!</div>';
+  const wrap = document.createElement('div'); wrap.className = 'opt-list';
+  q.options.forEach((opt, k) => {
+    const L = String.fromCharCode(65 + k), on = sel.includes(L);
+    const b = document.createElement('button'); b.className = 'opt-btn' + (on ? ' selected' : '');
+    b.innerHTML = `<span class="opt-letter">${on ? '✓' : L}</span><span>${opt}</span>`;
+    b.addEventListener('click', () => {
+      const next = on ? sel.filter(x => x !== L) : [...sel, L];
+      CURRENT_ANSWERS[i] = next.sort().join(''); renderQuestion();
+    });
+    wrap.appendChild(b);
+  });
+  area.appendChild(wrap);
+}
+
 function parseMatch(q) {
   const items = q.options.map(o => { const k = o.lastIndexOf('='); return { text: o.slice(0, k).trim(), group: o.slice(k + 1).trim() }; });
   const groups = [...new Set(items.map(it => it.group))];
@@ -1195,6 +1305,21 @@ function submitExam() {
       isCorrect = given === want;
       correctDisplay = txt(want);
       given = given ? txt(given) : '(not moved)';
+    } else if (q.type === 'Paint') {
+      const want = q.correct.split('|').map(x => x.trim().toLowerCase());
+      let placed = {};
+      try { placed = JSON.parse(given || '{}'); } catch (e) {}
+      const names = ['top', 'middle', 'bottom'];
+      isCorrect = names.every((r, k) => placed[r] === want[k]);
+      correctDisplay = names.map((r, k) => `${r}: ${want[k]}`).join(' · ');
+      given = Object.keys(placed).length ? names.map(r => `${r}: ${placed[r] || 'not painted'}`).join(' · ') : '(not painted)';
+    } else if (q.type === 'Multi') {
+      const want = q.correct.replace(/[^A-D]/gi, '').toUpperCase().split('').sort().join('');
+      const got = (given || '').split('').sort().join('');
+      const txt = L => L ? L.split('').map(x => q.options[x.charCodeAt(0) - 65]).join(' + ') : '';
+      isCorrect = got === want;
+      correctDisplay = txt(want);
+      given = got ? txt(got) : '(no answer)';
     } else if (q.type === 'Match') {
       const { items } = parseMatch(q);
       let placed = {};
@@ -1223,7 +1348,7 @@ function submitExam() {
 
     if (isCorrect) { scored += q.points; topicScores[q.topic].got += q.points; }
     else { wrongQuestions.push(q.qnum || (i + 1)); }
-    reviewRows.push({ q: q.question, given, correctDisplay, isCorrect, topic: q.topic });
+    reviewRows.push({ q: q.question, given, correctDisplay, isCorrect, topic: q.topic, fact: q.fact });
   });
 
   showResults(scored, maxScore, topicScores, reviewRows);
@@ -1265,7 +1390,7 @@ function showResults(scored, maxScore, topicScores, reviewRows) {
     const item = document.createElement('div');
     item.className = 'review-item ' + (r.isCorrect ? 'correct' : 'wrong');
     item.innerHTML = `<div class="review-q">${r.isCorrect ? '✅' : '❌'} <span>Q${i+1}. ${r.q}</span></div>
-      <div class="review-a">Your answer: <b>${r.given}</b>${r.isCorrect ? '' : ` &nbsp;·&nbsp; Correct answer: <b>${r.correctDisplay}</b>`}</div>`;
+      <div class="review-a">Your answer: <b>${r.given}</b>${r.isCorrect ? '' : ` &nbsp;·&nbsp; Correct answer: <b>${r.correctDisplay}</b>`}</div>${r.fact ? `<div class="review-fact">💡 ${r.fact}</div>` : ''}`;
     list.appendChild(item);
   });
 
@@ -1302,7 +1427,8 @@ function fireFlyby(passes) {
   for (let n = 0; n < passes; n++) {
     const el = document.createElement('div');
     el.className = 'flyby';
-    el.innerHTML = `<div class="flyby-trail"></div>${IRONMAN_HELMET_SVG}`;
+    const hf = HERO_THEME[CURRENT_HERO];
+    el.innerHTML = `<div class="flyby-trail"></div>${hf.flybyEmoji ? `<span style="font-size:68px;line-height:1;display:block">${hf.flybyEmoji}</span>` : IRONMAN_HELMET_SVG}`;
     const y0 = H * (n ? 0.85 : 0.72), y1 = H * (n ? 0.3 : 0.08);
     const x0 = -300, x1 = W + 120;
     el.querySelector('.flyby-trail').style.transform = `rotate(${Math.atan2(y1 - y0, x1 - x0) * 180 / Math.PI}deg)`;
