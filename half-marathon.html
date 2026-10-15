@@ -55,6 +55,9 @@
     .s-day{color:var(--muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em}
     .s-date{color:var(--muted);font-size:0.68rem}
     .s-type{font-weight:500;font-size:0.88rem;flex:1}
+    .s-main{flex:1;display:flex;flex-direction:column;gap:0.15rem;min-width:0}
+    .s-target{color:var(--muted);font-size:0.74rem;line-height:1.35}
+    .session.is-rest .s-type{color:var(--muted);font-weight:400}
 
     .empty-st{color:var(--muted);font-size:0.85rem;padding:1rem 0 2rem;text-align:center}
 
@@ -168,6 +171,10 @@ function statusClass(status) {
   return 'is-planned';
 }
 
+function isRest(s) {
+  return /rest/i.test(s.type || '');
+}
+
 function groupByWeek(rows) {
   const map = new Map();
   rows.forEach(r => {
@@ -185,8 +192,8 @@ function groupByWeek(rows) {
 const planCfg = {
   color: '#f0c94a', icon: '🏅',
   getDate: s => s.date,
-  getBarH: s => s.type === 'Long Run' ? 3 : s.type === 'Speed Run' ? 2 : 1,
-  makeMarkerVal: s => s.type === 'Long Run' ? 'LR' : s.type === 'Speed Run' ? 'SR' : 'RR',
+  getBarH: s => s.type === 'Long Run' ? 3 : s.type === 'Speed Run' ? 2 : isRest(s) ? 0.5 : 1,
+  makeMarkerVal: s => s.type === 'Long Run' ? 'LR' : s.type === 'Speed Run' ? 'SR' : isRest(s) ? 'R' : 'RR',
   getTeaserTitle: s => s.type || '',
   makeSlide: s => {
     const dayStr = s.date ? getDayOfWeek(s.date) : s.day;
@@ -261,12 +268,13 @@ function render() {
 
   const sorted = [...PLAN].sort((a, b) => (+a.id) - (+b.id));
 
-  const done    = PLAN.filter(r => (r.status||'').toLowerCase() === 'done').length;
-  const skipped = PLAN.filter(r => (r.status||'').toLowerCase() === 'skipped').length;
-  const upcoming = PLAN.length - done - skipped;
+  const runs    = PLAN.filter(r => !isRest(r));
+  const done    = runs.filter(r => (r.status||'').toLowerCase() === 'done').length;
+  const skipped = runs.filter(r => (r.status||'').toLowerCase() === 'skipped').length;
+  const upcoming = runs.length - done - skipped;
 
   sumEl.innerHTML = `
-    <div class="summary-chip"><span class="chip-lbl">Sessions</span><span class="chip-val">${PLAN.length}</span></div>
+    <div class="summary-chip"><span class="chip-lbl">Sessions</span><span class="chip-val">${runs.length}</span></div>
     <div class="summary-chip"><span class="chip-lbl">Done</span><span class="chip-val" style="color:var(--success)">${done}</span></div>
     <div class="summary-chip"><span class="chip-lbl">Skipped</span><span class="chip-val" style="color:var(--danger)">${skipped}</span></div>
     <div class="summary-chip"><span class="chip-lbl">Upcoming</span><span class="chip-val">${upcoming}</span></div>
@@ -281,12 +289,15 @@ function render() {
       ${sessions.map(s => {
         const dayStr = s.date ? getDayOfWeek(s.date) : s.day;
         return `
-        <div class="session ${statusClass(s.status)}">
+        <div class="session ${statusClass(s.status)}${isRest(s) ? ' is-rest' : ''}">
           <span class="s-daydate">
             <span class="s-day">${dayStr || ''}</span>
             <span class="s-date">${fmtDate(s.date) || '—'}</span>
           </span>
-          <span class="s-type">${s.type || ''}</span>
+          <span class="s-main">
+            <span class="s-type">${s.type || ''}</span>
+            ${s.target ? `<span class="s-target">${s.target}</span>` : ''}
+          </span>
           ${statusBadge(s.status)}
         </div>`;
       }).join('')}
