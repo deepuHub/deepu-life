@@ -31,6 +31,8 @@
   :root[data-theme="light"] [data-hero="trex"]{ --accent:#3f7d1f; --accent-dim:#e6f7d9; }
   [data-hero="tiranga"]{ --accent:#ff9933; --accent-dim:rgba(255,153,51,.16); --hero-glow:#138808; }
   :root[data-theme="light"] [data-hero="tiranga"]{ --accent:#b85c00; --accent-dim:#fff0dc; }
+  [data-hero="artist"]{ --accent:#ff5d8f; --accent-dim:rgba(255,93,143,.16); --hero-glow:#1e88e5; }
+  :root[data-theme="light"] [data-hero="artist"]{ --accent:#c2185b; --accent-dim:#ffe3ee; }
   [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
 
@@ -360,7 +362,7 @@
       <div class="chip-row">
         <button class="big-chip" data-exam="ca1">📝 CA1 <small>Aug · done</small></button>
         <button class="big-chip active" data-exam="ca2">📝 CA2 <small>28 Sep – 6 Oct</small></button>
-        <button class="big-chip" data-exam="sa1">🏆 SA1 <small>26 Oct – 2 Nov</small></button>
+        <button class="big-chip" data-exam="sa1">🏆 SA1 <small>19 Oct – 2 Nov</small></button>
         <button class="big-chip" data-exam="olympiad">🏅 Olympiad</button>
       </div>
     </div>
@@ -383,7 +385,13 @@
         <button class="big-chip" data-subject="ca2social">🇮🇳 Social Studies <small>Our Nation · Wed 7 Oct</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="sa1" hidden>
-        <div class="empty-hist">Tests coming before the First Term Summative (26 Oct – 2 Nov): English, DL&amp;C, Hindi, Science, Marathi, Maths.</div>
+        <button class="big-chip" data-subject="sa1art">🎨 Art &amp; Design Theory <small>MCQs · Mon 19 Oct</small></button>
+        <button class="big-chip" disabled>🔤 English <small>soon</small></button>
+        <button class="big-chip" disabled>💻 DL&amp;C <small>soon</small></button>
+        <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
+        <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
+        <button class="big-chip" disabled>📖 Marathi <small>soon</small></button>
+        <button class="big-chip" disabled>🔢 Maths <small>soon</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="olympiad" hidden>
         <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO · 22 Sep</small></button>
@@ -536,6 +544,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=749783096&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=818239443&single=true&output=csv",
   },
+  sa1art: {
+    // TODO — publish "SA1_Art_TestA_Regular" and "SA1_Art_TestB_Harder" tabs
+    // to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ca2social: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1103703159&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=387042907&single=true&output=csv",
@@ -608,6 +622,12 @@ const TOPIC_EMOJI = {
   "-ing and -ed Words": "✏️",
   "Compound Words": "🔗",
   "Punctuation": "💬",
+  "Texture": "🧶",
+  "Lines": "〰️",
+  "Colour": "🌈",
+  "Pablo Picasso": "🖼️",
+  "Leaf Printing": "🍃",
+  "Warm & Cool Colours": "🌡️",
   "National Flag": "🇮🇳",
   "National Symbols": "🦚",
   "Anthem & Emblem": "🎵",
@@ -715,6 +735,27 @@ const HERO_THEME = {
         say: "Every explorer keeps learning! Read the facts and try again!", bubble: "TRY AGAIN, EXPLORER! 🌟" },
     ],
   },
+  // Little Picasso — Art & Design Theory wears this on both tests.
+  artist: {
+    badge: "🎨", tag: "Little Picasso Mode", flybyEmoji: "🖌️",
+    title: "Paint this test like a masterpiece!",
+    sub: "Pip the Paintbrush is your guide through lines, colours, Picasso and leaf prints. Let's make some art!",
+    confetti: ["#e53935", "#fdd835", "#1e88e5", "#43a047", "#8e24aa"],
+    cheer: "Pip the Paintbrush waves a rainbow for you! 🖌️",
+    voiceLine: "Bravo, little artist! What a masterpiece!",
+    bubbleText: "WHAT A MASTERPIECE! 🎨",
+    voicePitch: 1.15, voiceRate: 0.95,
+    finish: [
+      { min: 100, text: "MASTERPIECE! Every colour in the right place — bravo, little artist! 🎨",
+        say: "Bravo, little artist! What a masterpiece!", bubble: "WHAT A MASTERPIECE! 🎨" },
+      { min: 90, text: "Almost a masterpiece! Just one tiny brushstroke to fix. 🖌️",
+        say: "Almost a masterpiece! Just one tiny brushstroke to fix!", bubble: "ALMOST A MASTERPIECE! 🖌️" },
+      { min: 70, text: "Lovely colours! Read the 💡 facts below and your next picture will be even better. 🌈",
+        say: "Lovely colours! Read the facts and your next picture will be even better!", bubble: "LOVELY COLOURS! 🌈" },
+      { min: 0, text: "Every great artist keeps practising! Read the 💡 facts below and paint again. 🖌️",
+        say: "Every great artist keeps practising! Read the facts and paint again!", bubble: "PAINT AGAIN! 🖌️" },
+    ],
+  },
   ironman: {
     badge: "🦾", badgeHTML: IRONMAN_HELMET_SVG,
     chip: "🦾 Harder", chipSub: "Iron Man flight mode",
@@ -770,7 +811,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2social: "CA2 Social Studies", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2social: "CA2 Social Studies", sa1art: "SA1 Art & Design Theory", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
@@ -781,7 +822,7 @@ const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi"]);
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
