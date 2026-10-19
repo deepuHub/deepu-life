@@ -1367,6 +1367,31 @@ const TIMETABLE = {
 };
 
 // ── AFTER-SCHOOL ACTIVITIES ─────────────────────────────────────────────────
+// ── ONE-OFF DAY OVERRIDES — replace the regular timetable for a single date ──
+const DAY_OVERRIDES = {
+  '2026-11-05': {
+    title: 'Grades 1 & 2 School Picnic — PUNO, Phoenix Avenue of Stars Mall, Viman Nagar',
+    intro: "Children's Day Celebration + picnic. No regular classes today; school buses run on their usual schedules.",
+    schedule: [
+      ['07:45', '🏫', 'Reporting to school', 'Report'],
+      ['08:30', '🚌', 'Departure from school — pre-packed snacks en-route', 'Depart'],
+      ['09:00', '🎮', 'Arrival at the venue — fun games and play begin', 'Onwards'],
+      ['11:00', '🍪', 'Mid-morning snacks, followed by fun and dance', 'Snacks'],
+      ['12:30', '🚌', 'Departure from Phoenix', 'Return'],
+      ['13:00', '🍱', 'Arrival at school — lunch, then extended fun at school', 'Lunch'],
+      ['15:00', '🏠', 'Regular dispersal', 'Home'],
+    ],
+    notes: [
+      ['🎽', 'Wear the PE uniform and the school ID card.'],
+      ['🎒', 'Carry: water bottle, hand towel, an extra pair of uniform. Socks are mandatory.'],
+      ['🧸', 'Bring only the necessary items.'],
+      ['🤒', 'If your child is unwell, please do not send them for the picnic.'],
+      ['📸', 'Picnic photo collages will be shared on ManageBac.'],
+      ['📝', 'Parent consent form is mandatory — done only when you get the Google Forms response copy by email. Form closes Thu 29 Oct, 11:00 pm.'],
+    ],
+  },
+};
+
 const AFTER_SCHOOL = {
   mon: ['15:00','16:00','Football',  '⚽'],
   tue: ['15:00','17:00','Robotics',  '🤖'],
@@ -1461,6 +1486,7 @@ Object.entries(OCT_LUNCH).forEach(([d, v]) => {
 });
 // Dates with no lunch menu yet (Maths SA1, 2 Nov) are still school days.
 if (!MENU['2026-11-02']) MENU['2026-11-02'] = { noMenu: true };
+if (!MENU['2026-11-05']) MENU['2026-11-05'] = { noMenu: true };   // picnic day: pre-packed snacks + lunch at school
 if (!MENU['2026-10-02']) MENU['2026-10-02'] = { holiday: true, label: 'Mahatma Gandhi Jayanti' };
 if (!MENU['2026-10-20']) MENU['2026-10-20'] = { holiday: true, label: 'Dusshera' };
 
@@ -1507,6 +1533,7 @@ const MONTHS = [
       { label: 'Week 4 · Oct 19–23', days: ['2026-10-19','2026-10-20','2026-10-21','2026-10-22','2026-10-23'] },
       // SA1 runs to Mon 2 Nov (Maths), so its last paper sits in this week.
       { label: 'Week 5 · Oct 26 – Nov 2', days: ['2026-10-26','2026-10-27','2026-10-28','2026-10-29','2026-10-30','2026-11-02'] },
+      { label: 'Nov 5 · Picnic 🎈', days: ['2026-11-05'] },
     ]
   },
 ];
@@ -1531,6 +1558,7 @@ const DAY_NAMES = {
   '2026-10-19':'Mon','2026-10-20':'Tue','2026-10-21':'Wed','2026-10-22':'Thu','2026-10-23':'Fri',
   '2026-10-26':'Mon','2026-10-27':'Tue','2026-10-28':'Wed','2026-10-29':'Thu','2026-10-30':'Fri',
   '2026-11-02':'Mon',
+  '2026-11-05':'Thu',
 };
 const WEEKDAY_BY_DATE = DAY_NAMES;
 const TT_KEY = { 'Mon':'mon','Tue':'tue','Wed':'wed','Thu':'thu','Fri':'fri' };
@@ -1910,6 +1938,32 @@ function renderTimeline() {
       <h3>It's a Holiday!</h3>
       <p>${menuData.label ? menuData.label + ' — ' : ''}No school today. Enjoy the day! 🎊</p>
     </div>`;
+    wrap.innerHTML = html;
+    return;
+  }
+
+  const override = DAY_OVERRIDES[currentDay];
+  if (override) {
+    html += `<div class="shortday-card">
+      <span class="h-emoji">🎈</span>
+      <div><strong>${override.title}</strong><p>${override.intro}</p></div>
+    </div><div class="timeline" style="margin-top:14px;">`;
+    override.schedule.forEach(([time, icon, what, badge]) => {
+      html += `
+        <div class="t-item c-circle" style="position:relative;">
+          <div class="t-time">${time}</div>
+          <div class="t-dot"></div>
+          <div class="period-card">
+            <span class="period-icon">${icon}</span>
+            <div class="period-info"><div class="period-name">${what}</div><div class="period-time">${time}</div></div>
+            <span class="period-badge">${badge}</span>
+          </div>
+        </div>`;
+    });
+    html += `</div><div class="break-card short-break" style="margin-top:14px;">
+        <div class="break-title">📋 Important notes</div>
+        ${override.notes.map(([i, t]) => `<div style="margin:6px 0;font-size:0.88rem;">${i} ${t}</div>`).join('')}
+      </div><div class="day-end">— End of the picnic day —</div>`;
     wrap.innerHTML = html;
     return;
   }
