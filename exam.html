@@ -169,6 +169,47 @@
   .swatch-b.on .swatch{border-color:var(--text);transform:scale(1.18);box-shadow:0 0 0 4px var(--accent-dim)}
   .swatch-b.on{color:var(--text)}
   .review-fact{font-size:0.78rem;margin-top:0.4rem;color:var(--accent);line-height:1.45}
+  /* 🔊 read-aloud */
+  .tts-btn{float:right;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;
+    padding:0.3rem 0.75rem;font-family:'Epilogue',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer}
+  .tts-btn:hover,.tts-btn.speaking{border-color:var(--accent);color:var(--accent)}
+  .listen-btn{display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-bottom:0.9rem;padding:0.9rem;
+    border-radius:14px;border:2px dashed var(--accent);background:var(--accent-dim);color:var(--accent);
+    font-family:'Epilogue',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer}
+  /* 🦖 Dino Egg Quest (SA1) */
+  .quest{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1rem 1.1rem}
+  .quest-title{font-family:'Fraunces',serif;font-weight:700;font-size:1.15rem;margin-bottom:0.2rem}
+  .quest-sub{font-size:0.8rem;color:var(--muted);margin-bottom:0.9rem;line-height:1.5}
+  .egg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:0.65rem}
+  .egg-card{text-align:center;border-radius:14px;padding:0.55rem 0.35rem 0.6rem;background:var(--bg);border:1.5px solid var(--border);
+    cursor:pointer;font-family:'Epilogue',sans-serif;color:var(--text)}
+  .egg-card svg{width:84px;height:70px;display:block;margin:0 auto 0.2rem}
+  .egg-card .egg-sub{font-weight:700;font-size:0.8rem}
+  .egg-card .egg-state{font-size:0.68rem;color:var(--muted);margin-top:0.15rem;line-height:1.35}
+  .egg-card.ready{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+  .egg-card.ready svg,.egg-card.next svg{animation:egg-wobble 1.4s ease-in-out infinite}
+  .egg-card.ready .egg-state{color:var(--accent);font-weight:700}
+  .egg-card.hatched{background:var(--accent-dim);border-color:var(--accent)}
+  @keyframes egg-wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
+  .quest-champ{margin-top:0.9rem;text-align:center;font-weight:700}
+  .quest-champ button,.hatch-cta button{margin-top:0.5rem}
+  .hatch-cta{margin:0.4rem auto 1.4rem;max-width:420px}
+  .hatch-cta button{width:100%;padding:0.9rem 1rem;border-radius:14px;border:2px solid var(--accent);background:var(--accent-dim);
+    color:var(--accent);font-family:'Epilogue',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;animation:egg-wobble 1.4s ease-in-out infinite}
+  .hatch-overlay{position:fixed;inset:0;background:rgba(10,10,20,0.62);display:flex;align-items:center;justify-content:center;z-index:700;padding:16px}
+  .hatch-box{background:var(--surface);border-radius:22px;padding:1.4rem 1.3rem 1.2rem;text-align:center;max-width:360px;width:100%;
+    border:2px solid var(--accent);font-family:'Epilogue',sans-serif;color:var(--text)}
+  .hatch-stage{position:relative;height:170px}
+  .hatch-stage svg{position:absolute;left:50%;top:0;width:200px;height:166px;margin-left:-100px}
+  .hatch-egg{animation:hatch-shake 1.3s ease-in-out both, hatch-pop 0.35s ease-in 1.3s both}
+  .hatch-dino{opacity:0;animation:hatch-dino 0.7s cubic-bezier(.2,1.6,.4,1) 1.45s both}
+  .hatch-title,.hatch-fact,.hatch-box button{opacity:0;animation:hatch-fade 0.5s ease 1.9s both}
+  .hatch-title{font-family:'Fraunces',serif;font-weight:700;font-size:1.25rem;margin:0.4rem 0 0.3rem}
+  .hatch-fact{font-size:0.82rem;color:var(--muted);line-height:1.5;margin-bottom:0.9rem}
+  @keyframes hatch-shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-9deg)}30%{transform:rotate(8deg)}45%{transform:rotate(-12deg)}60%{transform:rotate(11deg)}75%{transform:rotate(-14deg)}90%{transform:rotate(14deg)}}
+  @keyframes hatch-pop{to{transform:scale(1.35);opacity:0}}
+  @keyframes hatch-dino{0%{opacity:0;transform:scale(0.2) translateY(30px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+  @keyframes hatch-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   /* Drag-and-drop questions (Order / Match). Pointer events, so a finger on
      the iPad works the same as a mouse; a tap-then-tap fallback also works. */
   .dd-hint{font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem}
@@ -367,6 +408,9 @@
       </div>
     </div>
 
+    <!-- 🦖 Dino Egg Quest — shown on the SA1 tab (see renderQuest) -->
+    <div class="picker-block quest" id="dino-quest" hidden></div>
+
     <div class="picker-block" id="subject-picker">
       <div class="picker-label">Subject</div>
       <div class="chip-row" data-exam-subjects="ca1" hidden>
@@ -439,6 +483,7 @@
     <div class="exam-layout" id="exam-layout">
       <div class="exam-main">
         <div class="q-card">
+          <button type="button" class="tts-btn" id="tts-btn" aria-label="Read this question aloud">🔊 Read to me</button>
           <span class="q-topic" id="q-topic">Place Value</span>
           <div class="q-text" id="q-text">Loading…</div>
           <img class="q-img" id="q-img" alt="" hidden>
@@ -466,6 +511,7 @@
     <div class="score-emoji" id="score-emoji">🎉</div>
     <div class="score-big" id="score-big">0/100</div>
     <div class="score-sub" id="score-sub"></div>
+    <div class="hatch-cta" id="hatch-cta"></div>
 
     <div class="topic-breakdown" id="topic-breakdown"></div>
 
@@ -809,7 +855,7 @@ let CURRENT_ANSWERS = {};
 let CURRENT_INDEX = 0;
 let STUDENT_NAME = "RoadRunner";
 
-const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2social: "CA2 Social Studies", sa1art: "SA1 Art & Design Theory", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
+const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", social: "Social Studies", ca2maths: "CA2 Maths", ca2dlc: "CA2 DL&C", ca2english: "CA2 English", ca2science: "CA2 Science", ca2social: "CA2 Social Studies", sa1art: "SA1 Art & Design Theory", sa1english: "SA1 English", sa1dlc: "SA1 DL&C", sa1hindi: "SA1 Hindi", sa1science: "SA1 Science", sa1marathi: "SA1 Marathi", sa1maths: "SA1 Maths", ca2marathi: "CA2 Marathi", ca2hindi: "CA2 Hindi", gk: "GK (IGKO)", ieo: "English (IEO)" };
 // Olympiad-tagged subjects get the OMR-bubble answer style instead of the
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
@@ -818,6 +864,215 @@ const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
+
+// ── 🔊 READ ALOUD ───────────────────────────────────────────────────
+// Reads the question and its options with the device's built-in voices.
+// English parts use an English voice and Devanagari parts a Hindi voice
+// (Marathi voice if the device has one), so mixed questions read naturally.
+let TTS_VOICES = [];
+function ttsLoadVoices() { try { TTS_VOICES = window.speechSynthesis.getVoices() || []; } catch (e) {} }
+if ('speechSynthesis' in window) {
+  ttsLoadVoices();
+  try { window.speechSynthesis.addEventListener('voiceschanged', ttsLoadVoices); } catch (e) {}
+}
+function ttsVoice(lang) {
+  const L = lang.toLowerCase();
+  const norm = v => v.lang.toLowerCase().replace('_', '-');
+  return TTS_VOICES.find(v => norm(v) === L) || TTS_VOICES.find(v => norm(v).startsWith(L.slice(0, 2))) || null;
+}
+function ttsClean(t) {
+  return String(t || '')
+    .replace(/\p{Extended_Pictographic}|️|‍|⃣/gu, '')
+    .replace(/_{2,}/g, ' blank ').replace(/☐/g, ' box ').replace(/[−–]/g, ' minus ').replace(/×/g, ' times ')
+    .replace(/\s+/g, ' ').trim();
+}
+function ttsStop() { try { window.speechSynthesis.cancel(); } catch (e) {} document.getElementById('tts-btn')?.classList.remove('speaking'); }
+function speakText(text, slow) {
+  if (!('speechSynthesis' in window)) return;
+  ttsStop();
+  const segs = ttsClean(text).split(/([ऀ-ॿ][ऀ-ॿ\s।॥,.?!'‘’-]*)/).filter(x => x && x.trim());
+  const btn = document.getElementById('tts-btn');
+  segs.forEach((seg, k) => {
+    const deva = /[ऀ-ॿ]/.test(seg);
+    const lang = deva ? ((CURRENT_SUBJECT || '').includes('marathi') && ttsVoice('mr-IN') ? 'mr-IN' : 'hi-IN') : 'en-IN';
+    const u = new SpeechSynthesisUtterance(seg);
+    u.lang = lang;
+    const v = ttsVoice(lang) || (deva ? null : (ttsVoice('en-GB') || ttsVoice('en-US')));
+    if (v) u.voice = v;
+    u.rate = deva ? 0.78 : (slow ? 0.8 : 0.92);
+    if (k === segs.length - 1) u.onend = () => btn?.classList.remove('speaking');
+    window.speechSynthesis.speak(u);
+  });
+  btn?.classList.add('speaking');
+}
+function questionSpeech(q) {
+  let opts = q.options || [];
+  if (q.type === 'Match') opts = parseMatch(q).items.map(it => it.text);
+  if (q.type === 'Paint') opts = [];
+  const list = opts.length ? ' ' + opts.map((o, i) => (q.type === 'Order' || q.type === 'Match') ? `${o}.` : `${String.fromCharCode(65 + i)}: ${o}.`).join(' ') : '';
+  return `${q.question}${list}`;
+}
+
+// ── 🦖 DINO EGG QUEST (SA1) ─────────────────────────────────────────
+// Every SA1 subject has an egg. Score 80%+ on any of its SA1 tests and the
+// egg is ready; tapping it plays the hatching. Scores come from this
+// device's history AND the results sheet (so iPad and Mac agree); which eggs
+// have been opened is remembered per device.
+const QUEST_PASS = 80;
+const SA1_QUEST = [
+  { key: 'sa1art',     name: 'Art & Design', date: '2026-10-19', egg: '#ff8fb1', dino: 'ankylosaurus',    dinoName: 'Ankylosaurus',
+    fact: 'Ankylosaurus was covered in armour like a tank and swung a heavy club on its tail.' },
+  { key: 'sa1english', name: 'English',      date: '2026-10-26', egg: '#ffb347', dino: 'parasaurolophus', dinoName: 'Parasaurolophus',
+    fact: 'Scientists think Parasaurolophus made loud honking sounds through its long head crest — a real dino trumpet!' },
+  { key: 'sa1dlc',     name: 'DL&C',         date: '2026-10-27', egg: '#9aa5b1', dino: 'raptor',          dinoName: 'Robo-Raptor',
+    fact: 'Real Velociraptors were only about the size of a turkey — and they had feathers!' },
+  { key: 'sa1hindi',   name: 'Hindi',        date: '2026-10-28', egg: '#f4a259', dino: 'triceratops',     dinoName: 'Triceratops',
+    fact: 'Triceratops had three horns on its face and a big bony frill around its neck.' },
+  { key: 'sa1science', name: 'Science',      date: '2026-10-29', egg: '#7cc6fe', dino: 'brachiosaurus',   dinoName: 'Brachiosaurus',
+    fact: 'Brachiosaurus was taller than a three-storey building and ate leaves from the treetops.' },
+  { key: 'sa1marathi', name: 'Marathi',      date: '2026-10-30', egg: '#b39ddb', dino: 'stegosaurus',     dinoName: 'Stegosaurus',
+    fact: 'Stegosaurus had big plates along its back and sharp spikes on its tail.' },
+  { key: 'sa1maths',   name: 'Maths',        date: '2026-11-02', egg: '#8bd17c', dino: 'trex',            dinoName: 'T-Rex',
+    fact: 'Tyrannosaurus rex had teeth as long as bananas — the king of the dinosaurs!' },
+];
+const QUEST_SEEN_KEY = 'deepu-dino-hatched';
+let QUEST_REMOTE = [];
+function questSeen() { try { return JSON.parse(localStorage.getItem(QUEST_SEEN_KEY) || '[]'); } catch (e) { return []; } }
+function questMarkSeen(key) { try { const s = questSeen(); if (!s.includes(key)) { s.push(key); localStorage.setItem(QUEST_SEEN_KEY, JSON.stringify(s)); } } catch (e) {} }
+function questBest(key) {
+  const prefix = `${SUBJECT_LABEL[key]} — `;
+  let local = [];
+  try { local = JSON.parse(localStorage.getItem('deepu-exam-history') || '[]'); } catch (e) {}
+  const pcts = [...local.map(h => [h.test, h.pct]), ...QUEST_REMOTE.map(r => [r.test, r.percent])]
+    .filter(([t]) => String(t || '').startsWith(prefix)).map(([, p]) => Number(p) || 0);
+  return pcts.length ? Math.max(...pcts) : null;
+}
+
+function eggSVG(color, cracked) {
+  return `<svg viewBox="0 0 120 100"><ellipse cx="60" cy="96" rx="26" ry="3.5" fill="rgba(0,0,0,.15)"/>
+    <ellipse cx="60" cy="54" rx="30" ry="40" fill="${color}" stroke="#2d2d2d" stroke-width="2.5"/>
+    <ellipse cx="48" cy="38" rx="6" ry="8" fill="#fff" opacity=".45"/><circle cx="70" cy="64" r="6" fill="#fff" opacity=".35"/>
+    <circle cx="52" cy="74" r="4" fill="#fff" opacity=".35"/><circle cx="72" cy="36" r="3.5" fill="#fff" opacity=".35"/>
+    ${cracked ? '<path d="M34 52 l7 7 l7 -8 l7 8 l7 -8 l7 8 l7 -7 l7 6" fill="none" stroke="#2d2d2d" stroke-width="2.5" stroke-linejoin="round"/>' : ''}</svg>`;
+}
+function dinoSVG(kind) {
+  const S = 'stroke="#2d2d2d" stroke-width="2.2" stroke-linejoin="round"';
+  const eye = (x, y) => `<circle cx="${x}" cy="${y}" r="3.4" fill="#fff" stroke="#2d2d2d" stroke-width="1.2"/><circle cx="${x + 0.8}" cy="${y}" r="1.6" fill="#2d2d2d"/>`;
+  const legs = (xs, y, h, c) => xs.map(x => `<rect x="${x}" y="${y}" width="9" height="${h}" rx="3" fill="${c}" ${S}/>`).join('');
+  const shadow = '<ellipse cx="58" cy="94" rx="40" ry="4" fill="rgba(0,0,0,.15)"/>';
+  const d = {
+    trex: `${shadow}<path d="M8 58 C22 52 36 44 52 44 C60 44 66 46 72 44 L80 30 C84 22 96 20 106 24 C112 27 113 34 108 36 L100 37 L104 42 C100 46 94 46 90 45 C86 54 80 62 72 66 L74 84 L81 87 L66 87 L64 70 C60 71 56 71 52 70 L54 84 L61 87 L46 87 L44 68 C30 66 18 62 8 58 Z" fill="#5cb85c" ${S}/>
+      <path d="M80 52 L89 57 L87 60" fill="none" ${S}/><path d="M92 37 l2 3 l2 -3 l2 3 l2 -3" fill="#fff" stroke="#2d2d2d" stroke-width="1"/>${eye(97, 29)}`,
+    brachiosaurus: `${shadow}<path d="M26 58 C16 60 8 64 3 71 C12 69 19 67 28 65 Z" fill="#5aa0d8" ${S}/>${legs([30, 42, 58, 68], 66, 22, '#5aa0d8')}
+      <ellipse cx="50" cy="60" rx="29" ry="15" fill="#5aa0d8" ${S}/><path d="M64 52 C74 40 80 26 84 13 L93 15 C89 30 83 45 75 58 Z" fill="#5aa0d8" ${S}/>
+      <ellipse cx="93" cy="12" rx="10" ry="6.5" fill="#5aa0d8" ${S}/>${eye(96, 10)}`,
+    triceratops: `${shadow}<path d="M24 58 C14 60 8 62 3 67 C12 68 18 66 27 64 Z" fill="#e07a3f" ${S}/>${legs([30, 42, 58, 70], 66, 21, '#e07a3f')}
+      <ellipse cx="52" cy="60" rx="30" ry="16" fill="#e07a3f" ${S}/><circle cx="83" cy="49" r="17" fill="#f6c08f" ${S}/>
+      <path d="M80 50 C88 44 101 46 110 55 C105 61 96 64 86 62 Z" fill="#e07a3f" ${S}/>
+      <path d="M92 47 L105 33 L97 49 Z M86 47 L95 31 L90 48 Z M105 52 L114 46 L110 56 Z" fill="#fff8e7" ${S}/>${eye(95, 52)}`,
+    stegosaurus: `${shadow}${[[28,50,8,16],[38,45,10,22],[50,43,10,24],[62,44,10,22],[73,49,8,16]].map(([x,y,w,h]) => `<path d="M${x} ${y + 6} L${x + w / 2} ${y - h + 6} L${x + w} ${y + 6} Z" fill="#f4c542" ${S}/>`).join('')}
+      <path d="M24 60 C14 58 8 54 3 49 C9 57 16 63 27 66 Z" fill="#8e6bd4" ${S}/><path d="M8 52 L2 44 M13 56 L8 47" ${S}/>
+      ${legs([30, 42, 58, 70], 66, 21, '#8e6bd4')}<ellipse cx="52" cy="60" rx="30" ry="14" fill="#8e6bd4" ${S}/>
+      <path d="M78 58 L88 61" ${S}/><ellipse cx="91" cy="63" rx="9" ry="5.5" fill="#8e6bd4" ${S}/>${eye(93, 61)}`,
+    parasaurolophus: `${shadow}<path d="M26 56 C14 54 8 52 2 50 C10 58 18 62 28 64 Z" fill="#d94f70" ${S}/>${legs([34, 46], 64, 23, '#d94f70')}${legs([62], 64, 21, '#d94f70')}
+      <ellipse cx="50" cy="58" rx="26" ry="14" fill="#d94f70" ${S}/><path d="M68 52 C74 44 78 36 82 30 L89 32 C87 40 81 50 75 58 Z" fill="#d94f70" ${S}/>
+      <path d="M85 26 C79 19 70 14 58 11 L60 16 C70 19 77 24 83 31 Z" fill="#8c2741" ${S}/>
+      <path d="M82 25 C90 22 100 26 104 31 C98 35 90 36 84 34 Z" fill="#d94f70" ${S}/>${eye(89, 28)}`,
+    raptor: `${shadow}<path d="M8 50 C24 48 38 44 52 46 C58 46 64 44 68 40 L78 28 C82 22 96 22 106 26 C110 28 110 33 106 34 L94 36 C88 42 80 52 72 58 L76 76 L83 85 L72 85 L68 64 L58 66 L60 76 L67 85 L56 85 L52 66 C38 62 20 56 8 50 Z" fill="#9aa5b1" ${S}/>
+      <rect x="90" y="25" width="14" height="6" rx="3" fill="#2ecc71" stroke="#2d2d2d" stroke-width="1.4"/>
+      <path d="M96 23 L98 14" ${S}/><circle cx="98" cy="13" r="2.6" fill="#ff5d5d" stroke="#2d2d2d" stroke-width="1.2"/>
+      <circle cx="50" cy="52" r="1.8" fill="#2d2d2d"/><circle cx="60" cy="51" r="1.8" fill="#2d2d2d"/><path d="M76 46 L84 52 L82 55" fill="none" ${S}/>`,
+    ankylosaurus: `${shadow}${legs([30, 44, 62, 74], 66, 18, '#f4a261')}
+      <path d="M22 62 C14 62 10 62 7 61" fill="none" ${S}/><circle cx="7" cy="60" r="6.5" fill="#e76f51" ${S}/>
+      <path d="M18 68 C22 44 78 40 92 62 L92 68 Z" fill="#f4a261" ${S}/>
+      ${[['#e63946',30,52],['#fcbf49',40,46],['#2a9d8f',52,43],['#457b9d',64,44],['#9b5de5',76,50]].map(([c,x,y]) => `<path d="M${x - 5} ${y + 4} L${x} ${y - 8} L${x + 5} ${y + 4} Z" fill="${c}" ${S}/>`).join('')}
+      <ellipse cx="97" cy="64" rx="9" ry="6.5" fill="#f4a261" ${S}/>${eye(99, 62)}`,
+  }[kind] || '';
+  return `<svg viewBox="0 0 120 100">${d}</svg>`;
+}
+
+function renderQuest() {
+  const box = document.getElementById('dino-quest');
+  if (!box) return;
+  box.hidden = CURRENT_EXAM !== 'sa1';
+  if (box.hidden) return;
+  const seen = questSeen(), today = new Date().toISOString().slice(0, 10);
+  const next = SA1_QUEST.find(q => q.date >= today && !(questBest(q.key) >= QUEST_PASS));
+  let hatched = 0;
+  const cards = SA1_QUEST.map(q => {
+    const best = questBest(q.key), passed = best !== null && best >= QUEST_PASS, opened = passed && seen.includes(q.key);
+    if (opened) hatched++;
+    const date = new Date(q.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+    const cls = opened ? 'hatched' : passed ? 'ready' : (next && next.key === q.key ? 'next' : '');
+    const state = opened ? `🦖 ${q.dinoName}<br>best ${best}%`
+      : passed ? '🥚 Tap to hatch!'
+      : best !== null ? `best ${best}% · need ${QUEST_PASS}%` : `exam ${date}`;
+    return `<button type="button" class="egg-card ${cls}" data-key="${q.key}">${opened ? dinoSVG(q.dino) : eggSVG(q.egg, passed)}
+      <div class="egg-sub">${q.name}</div><div class="egg-state">${state}</div></button>`;
+  }).join('');
+  const champ = hatched === SA1_QUEST.length
+    ? `<div class="quest-champ">🏆 You hatched them all — SA1 Dino Champion!<br><button type="button" class="start-btn" onclick="printDinoCertificate()">🖨️ Print my certificate</button></div>` : '';
+  box.innerHTML = `<div class="quest-title">🥚 Dino Egg Quest</div>
+    <div class="quest-sub">Score ${QUEST_PASS}% or more on any SA1 test to hatch that subject's egg. Hatch all ${SA1_QUEST.length} to become the <b>SA1 Dino Champion</b>! · ${hatched}/${SA1_QUEST.length} hatched</div>
+    <div class="egg-grid">${cards}</div>${champ}`;
+  box.querySelectorAll('.egg-card').forEach(c => c.addEventListener('click', () => {
+    const q = SA1_QUEST.find(x => x.key === c.dataset.key);
+    if (c.classList.contains('ready') || c.classList.contains('hatched')) { hatchEgg(q.key, c.classList.contains('hatched')); return; }
+    const chip = document.querySelector(`#subject-picker .big-chip[data-subject="${q.key}"]`);
+    if (chip) { selectSubject(chip); document.getElementById('start-btn').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }));
+}
+
+// The hatching show. `again` = replaying an egg that was already opened.
+function hatchEgg(key, again) {
+  const q = SA1_QUEST.find(x => x.key === key);
+  if (!q) return;
+  const best = questBest(key);
+  questMarkSeen(key);
+  const ov = document.createElement('div');
+  ov.className = 'hatch-overlay';
+  ov.innerHTML = `<div class="hatch-box">
+    <div class="hatch-stage">${again ? '' : `<div class="hatch-egg">${eggSVG(q.egg, true)}</div>`}<div class="hatch-dino" style="${again ? 'animation-delay:0s' : ''}">${dinoSVG(q.dino)}</div></div>
+    <div class="hatch-title" style="${again ? 'animation-delay:.2s' : ''}">${again ? `Your ${q.dinoName}!` : `You hatched ${/^[AEIOU]/i.test(q.dinoName) ? 'an' : 'a'} ${q.dinoName}! 🎉`}</div>
+    <div class="hatch-fact" style="${again ? 'animation-delay:.3s' : ''}">${q.fact}<br><b>${q.name}: best ${best}%</b></div>
+    <button type="button" class="start-btn" style="${again ? 'animation-delay:.4s' : ''}">${again ? 'Back to my eggs' : 'Add to my Dino Museum 🦕'}</button></div>`;
+  document.body.appendChild(ov);
+  if (!again) setTimeout(() => { try { playImpactBoom(); } catch (e) {} try { fireConfetti(); } catch (e) {} }, 1350);
+  const close = () => { ov.remove(); renderQuest(); document.getElementById('hatch-cta').innerHTML = ''; };
+  ov.querySelector('button').addEventListener('click', close);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+}
+
+// After an SA1 test: if this score earns an unopened egg, offer the hatch.
+function questAfterResult(pct) {
+  const cta = document.getElementById('hatch-cta');
+  cta.innerHTML = '';
+  const q = SA1_QUEST.find(x => x.key === CURRENT_SUBJECT);
+  if (!q || pct < QUEST_PASS || questSeen().includes(q.key)) return;
+  cta.innerHTML = `<button type="button">🥚 Your ${q.name} egg is wiggling! Tap to hatch it!</button>`;
+  cta.querySelector('button').addEventListener('click', () => hatchEgg(q.key, false));
+}
+
+function printDinoCertificate() {
+  const rows = SA1_QUEST.map(q => `<div class="r">${dinoSVG(q.dino)}<b>${q.dinoName}</b><span>${q.name} · best ${questBest(q.key)}%</span></div>`).join('');
+  const w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SA1 Dino Champion</title><style>
+    @page{size:A4 landscape;margin:12mm} body{font-family:'Avenir Next',Arial,sans-serif;text-align:center;color:#222;margin:0}
+    .card{border:6px double #3f7d1f;border-radius:24px;padding:24px 28px} h1{font-size:40px;margin:6px 0;color:#3f7d1f}
+    .name{font-size:30px;font-weight:700;margin:6px 0 2px} .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:22px 0 10px}
+    .r svg{width:100%;height:90px} .r b{display:block;font-size:14px} .r span{font-size:12px;color:#555}</style></head><body><div class="card">
+    <div style="font-size:54px">🏆</div><h1>SA1 Dino Champion</h1><div>This certificate is proudly awarded to</div>
+    <div class="name">${STUDENT_NAME}</div><div>for hatching every egg in the First Term Summative Dino Egg Quest!</div>
+    <div class="grid">${rows}</div><div style="color:#666">${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+    </div><script>setTimeout(()=>print(),400)<\/script></body></html>`);
+  w.document.close();
+}
+
+if (RESULTS_GS_URL) {
+  fetch(RESULTS_GS_URL, { cache: 'no-store' }).then(r => r.json())
+    .then(d => { QUEST_REMOTE = (d && d.results) || []; renderQuest(); }).catch(() => {});
+}
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
 const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist" };
@@ -878,6 +1133,7 @@ function rowsToQuestions(rows) {
     points: header.indexOf('points'),
     image: header.indexOf('image'),
     fact: header.indexOf('fact'),
+    say: header.indexOf('say'),
   };
   return rows.slice(1)
     .filter(r => r[idx.question] && r[idx.question].trim())
@@ -893,6 +1149,8 @@ function rowsToQuestions(rows) {
       image: idx.image >= 0 ? (r[idx.image] || '').trim() : '',
       // Optional — a 'learn more' line shown under the question in the review
       fact: idx.fact >= 0 ? (r[idx.fact] || '').trim() : '',
+      // Optional — the hidden word a Listen question speaks aloud
+      say: idx.say >= 0 ? (r[idx.say] || '').trim() : '',
     }));
 }
 
@@ -921,6 +1179,7 @@ function selectExam(exam) {
   document.querySelectorAll('#exam-picker .big-chip').forEach(b => b.classList.toggle('active', b.dataset.exam === exam));
   document.querySelectorAll('[data-exam-subjects]').forEach(row => { row.hidden = row.dataset.examSubjects !== exam; });
   selectSubject(document.querySelector(`[data-exam-subjects="${exam}"] .big-chip[data-subject]`));
+  renderQuest();
 }
 
 document.querySelectorAll('#exam-picker .big-chip').forEach(btn => {
@@ -1041,6 +1300,7 @@ function syncOMRPanel() {
 }
 
 function renderQuestion() {
+  ttsStop();
   const q = CURRENT_QUESTIONS[CURRENT_INDEX];
   const total = CURRENT_QUESTIONS.length;
   document.getElementById('progress-label').textContent = `Question ${CURRENT_INDEX + 1} of ${total}`;
@@ -1059,7 +1319,16 @@ function renderQuestion() {
   else if (q.type === 'Match') renderMatch(q, area);
   else if (q.type === 'Paint') renderPaint(q, area);
   else if (q.type === 'Multi') renderMulti(q, area);
-  else if (q.type === 'MCQ' || q.type === 'True/False') {
+  else if (q.type === 'MCQ' || q.type === 'True/False' || q.type === 'Listen') {
+    // Listen: a hidden word (the sheet's "Say" column) is spoken aloud and the
+    // child picks how it is spelt — like a dictation, without typing.
+    if (q.type === 'Listen') {
+      const lb = document.createElement('button');
+      lb.type = 'button'; lb.className = 'listen-btn';
+      lb.innerHTML = '🔊 Tap to hear the word';
+      lb.addEventListener('click', () => speakText(q.say || '', true));
+      area.appendChild(lb);
+    }
     const isOlympiad = OLYMPIAD_SUBJECTS.has(CURRENT_SUBJECT);
     const wrap = document.createElement('div');
     wrap.className = 'opt-list' + (isOlympiad ? ' omr-style read-only' : '');
@@ -1285,6 +1554,11 @@ function renderMatch(q, area) {
 }
 
 document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
+document.getElementById('tts-btn').addEventListener('click', () => {
+  const btn = document.getElementById('tts-btn');
+  if (btn.classList.contains('speaking')) { ttsStop(); return; }      // second tap stops it
+  speakText(questionSpeech(CURRENT_QUESTIONS[CURRENT_INDEX]));
+});
 document.getElementById('next-btn').addEventListener('click', () => { if (CURRENT_INDEX < CURRENT_QUESTIONS.length - 1) { CURRENT_INDEX++; renderQuestion(); } });
 document.getElementById('submit-btn').addEventListener('click', submitExam);
 
@@ -1364,7 +1638,7 @@ function submitExam() {
       isCorrect = items.every((it, k) => placed[k] === it.group);
       correctDisplay = items.map(it => `${it.text} → ${it.group}`).join(' · ');
       given = Object.keys(placed).length ? items.map((it, k) => `${it.text} → ${placed[k] || '?'}`).join(' · ') : '(no answer)';
-    } else if (q.type === 'MCQ' || q.type === 'True/False') {
+    } else if (q.type === 'MCQ' || q.type === 'True/False' || q.type === 'Listen') {
       // "Correct Answer" is usually a letter (A/B/C/D), but some sheets
       // (e.g. GK/IGKO) store the full option text instead — support both.
       const LETTER_IDX = { A: 0, B: 1, C: 2, D: 3 };
@@ -1390,6 +1664,7 @@ function submitExam() {
 
   showResults(scored, maxScore, topicScores, reviewRows);
   logResult(scored, maxScore, wrongQuestions);
+  questAfterResult(Math.round((scored / maxScore) * 100));
 }
 
 function showResults(scored, maxScore, topicScores, reviewRows) {
