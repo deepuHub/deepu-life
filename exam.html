@@ -35,6 +35,8 @@
   :root[data-theme="light"] [data-hero="artist"]{ --accent:#c2185b; --accent-dim:#ffe3ee; }
   [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
+  [data-hero="ticket"]{ --accent:#f5b800; --accent-dim:rgba(245,184,0,.16); --hero-glow:#7b3f00; }
+  :root[data-theme="light"] [data-hero="ticket"]{ --accent:#8a5a00; --accent-dim:#fff4cc; }
 
   .hero-badge{
     width:64px;height:64px;border-radius:50%;margin-bottom:0.9rem;display:flex;align-items:center;
@@ -430,7 +432,7 @@
       </div>
       <div class="chip-row" data-exam-subjects="sa1" hidden>
         <button class="big-chip" data-subject="sa1art">🎨 Art &amp; Design Theory <small>MCQs · Mon 19 Oct</small></button>
-        <button class="big-chip" disabled>🔤 English <small>soon</small></button>
+        <button class="big-chip" data-subject="sa1english">🎫 English <small>Roald Dahl &amp; jokes · Mon 26 Oct</small></button>
         <button class="big-chip" disabled>💻 DL&amp;C <small>soon</small></button>
         <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
@@ -602,6 +604,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1886424914&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1683957543&single=true&output=csv",
   },
+  sa1english: {
+    // TODO — publish "SA1_English_TestA_Regular" and "SA1_English_TestB_Harder"
+    // tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ca2english: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1995270521&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1034913331&single=true&output=csv",
@@ -666,6 +674,21 @@ const TOPIC_EMOJI = {
   "-ing and -ed Words": "✏️",
   "Compound Words": "🔗",
   "Punctuation": "💬",
+  "Nouns & Adjectives": "🏷️",
+  "Noun Phrases": "🧩",
+  "Sentences": "✅",
+  "Verbs & Tense": "⏰",
+  "Story Order": "🏔️",
+  "Synonyms & Opposites": "↔️",
+  "Spelling": "🔤",
+  "Articles": "🅰️",
+  "Puns & Riddles": "😂",
+  "Homonyms": "🔁",
+  "Limericks": "🎵",
+  "Alliteration": "🐝",
+  "Onomatopoeia": "💥",
+  "Onomatopoeia & Alliteration": "💥",
+  "Calligrams & Mnemonics": "✍️",
   "Texture": "🧶",
   "Lines": "〰️",
   "Colour": "🌈",
@@ -798,6 +821,28 @@ const HERO_THEME = {
         say: "Lovely colours! Read the facts and your next picture will be even better!", bubble: "LOVELY COLOURS! 🌈" },
       { min: 0, text: "Every great artist keeps practising! Read the 💡 facts below and paint again. 🖌️",
         say: "Every great artist keeps practising! Read the facts and paint again!", bubble: "PAINT AGAIN! 🖌️" },
+    ],
+  },
+  // Golden Ticket — SA1 English (Roald Dahl stories, jokes and limericks)
+  // wears this on both tests. Every right answer is a chocolate bar.
+  ticket: {
+    badge: "🎫", tag: "Golden Ticket Mode", flybyEmoji: "🍫",
+    title: "Find the Golden Ticket!",
+    sub: "Roald Dahl stories, riddles, puns and limericks — every right answer is a chocolate bar. Get them all and the Golden Ticket is yours!",
+    confetti: ["#f5b800", "#7b3f00", "#ffe27a", "#c2185b"],
+    cheer: "A chocolate bar for every right answer! 🍫",
+    voiceLine: "Whoopee! You found the Golden Ticket!",
+    bubbleText: "GOLDEN TICKET! 🎫",
+    voicePitch: 1.2, voiceRate: 0.95,
+    finish: [
+      { min: 100, text: "GOLDEN TICKET! Every answer right — the chocolate factory gates are open for you! 🎫",
+        say: "Whoopee! You found the Golden Ticket!", bubble: "GOLDEN TICKET! 🎫" },
+      { min: 90, text: "So close! You can see the gold shining through the wrapper. 🍫",
+        say: "So close! The Golden Ticket is shining through the wrapper!", bubble: "SO CLOSE! 🍫" },
+      { min: 70, text: "Lots of chocolate bars! Read the 💡 facts below and the Golden Ticket will be yours. 🍫",
+        say: "Lots of chocolate! Read the facts and the Golden Ticket will be yours!", bubble: "LOTS OF CHOCOLATE! 🍫" },
+      { min: 0, text: "Every great storyteller keeps practising! Read the 💡 facts below and unwrap another bar. 📖",
+        say: "Every great storyteller keeps practising! Read the facts and try again!", bubble: "UNWRAP ANOTHER BAR! 📖" },
     ],
   },
   ironman: {
@@ -1075,7 +1120,7 @@ if (RESULTS_GS_URL) {
 }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1english: "ticket" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
