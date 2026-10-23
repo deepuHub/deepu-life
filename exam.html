@@ -33,6 +33,8 @@
   :root[data-theme="light"] [data-hero="tiranga"]{ --accent:#b85c00; --accent-dim:#fff0dc; }
   [data-hero="artist"]{ --accent:#ff5d8f; --accent-dim:rgba(255,93,143,.16); --hero-glow:#1e88e5; }
   :root[data-theme="light"] [data-hero="artist"]{ --accent:#c2185b; --accent-dim:#ffe3ee; }
+  [data-hero="robo"]{ --accent:#3ff0ff; --accent-dim:rgba(63,240,255,.14); --hero-glow:#4c97ff; }
+  :root[data-theme="light"] [data-hero="robo"]{ --accent:#0b6e99; --accent-dim:#e0f4fb; }
   [data-hero="ironman"]{ --accent:#ffb61e; --accent-dim:rgba(255,182,30,.16); --hero-glow:#ff2d3d; }
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
   [data-hero="ticket"]{ --accent:#f5b800; --accent-dim:rgba(245,184,0,.16); --hero-glow:#7b3f00; }
@@ -189,6 +191,7 @@
     cursor:pointer;font-family:'Epilogue',sans-serif;color:var(--text)}
   .egg-card svg{width:84px;height:70px;display:block;margin:0 auto 0.2rem}
   .egg-card .egg-sub{font-weight:700;font-size:0.8rem}
+  .egg-card .egg-test{font-size:0.68rem;font-weight:600;color:var(--accent)}
   .egg-card .egg-state{font-size:0.68rem;color:var(--muted);margin-top:0.15rem;line-height:1.35}
   .egg-card.ready{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
   .egg-card.ready svg,.egg-card.next svg{animation:egg-wobble 1.4s ease-in-out infinite}
@@ -435,7 +438,7 @@
       <div class="chip-row" data-exam-subjects="sa1" hidden>
         <button class="big-chip" data-subject="sa1art">🎨 Art &amp; Design Theory <small>MCQs · Mon 19 Oct</small></button>
         <button class="big-chip" data-subject="sa1english">🎫 English <small>Roald Dahl &amp; jokes · Mon 26 Oct</small></button>
-        <button class="big-chip" disabled>💻 DL&amp;C <small>soon</small></button>
+        <button class="big-chip" data-subject="sa1dlc">🤖 DL&amp;C <small>Units 1, 2, 3, 5 · Tue 27 Oct</small></button>
         <button class="big-chip" data-subject="sa1hindi">🦁 Hindi <small>ऋ ए ऐ की मात्रा · Wed 28 Oct</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
         <button class="big-chip" disabled>📖 Marathi <small>soon</small></button>
@@ -604,6 +607,10 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=340034824&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=218711441&single=true&output=csv",
   },
+  sa1dlc: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1973281970&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1508830739&single=true&output=csv",
+  },
   ca2social: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1103703159&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=387042907&single=true&output=csv",
@@ -727,6 +734,14 @@ const TOPIC_EMOJI = {
   "Make New Words": "✨",
   "Amatrik Words": "⭕",
   "Fill the Sentence": "📝",
+  "Hardware & Software": "🖥️",
+  "Input Devices": "⌨️",
+  "Solving Problems with Data": "🔎",
+  "Charts": "📊",
+  "Discrete & Categorical": "🔢",
+  "Networks Around Us": "🏠",
+  "Network Services": "🌐",
+  "Pros & Cons of Networks": "⚖️",
 };
 
 // Iron Man helmet — red shell, gold faceplate, glowing eyes.
@@ -829,6 +844,27 @@ const HERO_THEME = {
         say: "Lovely colours! Read the facts and your next picture will be even better!", bubble: "LOVELY COLOURS! 🌈" },
       { min: 0, text: "Every great artist keeps practising! Read the 💡 facts below and paint again. 🖌️",
         say: "Every great artist keeps practising! Read the facts and paint again!", bubble: "PAINT AGAIN! 🖌️" },
+    ],
+  },
+  // Robo-Raptor — SA1 DL&C wears this on both tests (its Dino Egg Quest dino).
+  robo: {
+    badge: "🤖", tag: "Robo-Raptor Tech Mode", flybyEmoji: "🤖",
+    title: "Power up and code through this test!",
+    sub: "Robo-Raptor is booting up — hardware, software, data, charts and networks. Every right answer charges a battery bar!",
+    confetti: ["#3ff0ff", "#4c97ff", "#9aa5b1", "#ffab19"],
+    cheer: "Robo-Raptor beeps with joy for you! 🤖",
+    voiceLine: "Beep boop! All systems perfect. Zero bugs found!",
+    bubbleText: "ZERO BUGS! 🤖",
+    voicePitch: 1.3, voiceRate: 1.0,
+    finish: [
+      { min: 100, text: "ALL SYSTEMS PERFECT! Zero bugs found — Robo-Raptor is fully charged! 🤖",
+        say: "Beep boop! All systems perfect. Zero bugs found!", bubble: "ZERO BUGS! 🤖" },
+      { min: 90, text: "Battery at 90%! Just one tiny bug left to squash. 🔋",
+        say: "Beep! Battery almost full. Just one tiny bug to squash!", bubble: "ALMOST FULLY CHARGED! 🔋" },
+      { min: 70, text: "Systems online! Read the 💡 facts below to fix the bugs and power up more. ⚡",
+        say: "Systems online! Read the facts to fix the bugs and power up more!", bubble: "SYSTEMS ONLINE! ⚡" },
+      { min: 0, text: "Every robot needs a reboot sometimes! Read the 💡 facts below and try again. 🔧",
+        say: "Rebooting! Read the facts and let's try again!", bubble: "REBOOT AND RETRY! 🔧" },
     ],
   },
   // Golden Ticket — SA1 English (Roald Dahl stories, jokes and limericks)
@@ -989,11 +1025,16 @@ function questionSpeech(q) {
 }
 
 // ── 🦖 DINO EGG QUEST (SA1) ─────────────────────────────────────────
-// Every SA1 subject has an egg. Score 80%+ on any of its SA1 tests and the
-// egg is ready; tapping it plays the hatching. Scores come from this
-// device's history AND the results sheet (so iPad and Mac agree); which eggs
-// have been opened is remembered per device.
-const QUEST_PASS = 80;
+// Every SA1 subject has TWO eggs — one for the Regular test and a golden one
+// for the Harder test. Score 100% on that test and its egg is ready; tapping
+// it plays the hatching. Scores come from this device's history AND the
+// results sheet (so iPad and Mac agree); which eggs have been opened is
+// remembered per device.
+const QUEST_PASS = 100;
+const QUEST_TESTS = [
+  { id: 'A', test: 'Test A - Regular', label: 'Regular' },
+  { id: 'B', test: 'Test B - Harder',  label: 'Harder ⭐', gold: '#f5c542', prefix: 'Golden ' },
+];
 const SA1_QUEST = [
   { key: 'sa1art',     name: 'Art & Design', date: '2026-10-19', egg: '#ff8fb1', dino: 'ankylosaurus',    dinoName: 'Ankylosaurus',
     fact: 'Ankylosaurus was covered in armour like a tank and swung a heavy club on its tail.' },
@@ -1010,16 +1051,33 @@ const SA1_QUEST = [
   { key: 'sa1maths',   name: 'Maths',        date: '2026-11-02', egg: '#8bd17c', dino: 'trex',            dinoName: 'T-Rex',
     fact: 'Tyrannosaurus rex had teeth as long as bananas — the king of the dinosaurs!' },
 ];
+// One egg per subject per test, id like "sa1dlc|B".
+const QUEST_EGGS = SA1_QUEST.flatMap(q => QUEST_TESTS.map(t => ({
+  ...q, id: `${q.key}|${t.id}`, test: t.test, testLabel: t.label,
+  egg: t.gold || q.egg, dinoName: (t.prefix || '') + q.dinoName,
+})));
 const QUEST_SEEN_KEY = 'deepu-dino-hatched';
 let QUEST_REMOTE = [];
-function questSeen() { try { return JSON.parse(localStorage.getItem(QUEST_SEEN_KEY) || '[]'); } catch (e) { return []; } }
-function questMarkSeen(key) { try { const s = questSeen(); if (!s.includes(key)) { s.push(key); localStorage.setItem(QUEST_SEEN_KEY, JSON.stringify(s)); } } catch (e) {} }
-function questBest(key) {
-  const prefix = `${SUBJECT_LABEL[key]} — `;
+function questSeenRaw() { try { return JSON.parse(localStorage.getItem(QUEST_SEEN_KEY) || '[]'); } catch (e) { return []; } }
+// Before eggs were split per test, an opened egg was stored by subject key
+// alone ("sa1art") — that counts as opening the subject's first passed egg.
+function questSeen() {
+  const raw = questSeenRaw(), out = raw.filter(x => x.includes('|'));
+  raw.filter(x => !x.includes('|')).forEach(key => {
+    const e = QUEST_EGGS.find(x => x.key === key && questBest(x.id) >= QUEST_PASS);
+    if (e && !out.includes(e.id)) out.push(e.id);
+  });
+  return out;
+}
+function questMarkSeen(id) { try { const s = questSeenRaw(); if (!s.includes(id)) { s.push(id); localStorage.setItem(QUEST_SEEN_KEY, JSON.stringify(s)); } } catch (e) {} }
+function questBest(id) {
+  const e = QUEST_EGGS.find(x => x.id === id);
+  if (!e) return null;
+  const name = `${SUBJECT_LABEL[e.key]} — ${e.test}`;
   let local = [];
   try { local = JSON.parse(localStorage.getItem('deepu-exam-history') || '[]'); } catch (e) {}
   const pcts = [...local.map(h => [h.test, h.pct]), ...QUEST_REMOTE.map(r => [r.test, r.percent])]
-    .filter(([t]) => String(t || '').startsWith(prefix)).map(([, p]) => Number(p) || 0);
+    .filter(([t]) => String(t || '').trim() === name).map(([, p]) => Number(p) || 0);
   return pcts.length ? Math.max(...pcts) : null;
 }
 
@@ -1072,44 +1130,49 @@ function renderQuest() {
   box.hidden = CURRENT_EXAM !== 'sa1';
   if (box.hidden) return;
   const seen = questSeen(), today = new Date().toISOString().slice(0, 10);
-  const next = SA1_QUEST.find(q => q.date >= today && !(questBest(q.key) >= QUEST_PASS));
+  const next = QUEST_EGGS.find(q => q.date >= today && !(questBest(q.id) >= QUEST_PASS));
   let hatched = 0;
-  const cards = SA1_QUEST.map(q => {
-    const best = questBest(q.key), passed = best !== null && best >= QUEST_PASS, opened = passed && seen.includes(q.key);
+  const cards = QUEST_EGGS.map(q => {
+    const best = questBest(q.id), passed = best !== null && best >= QUEST_PASS, opened = passed && seen.includes(q.id);
     if (opened) hatched++;
     const date = new Date(q.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-    const cls = opened ? 'hatched' : passed ? 'ready' : (next && next.key === q.key ? 'next' : '');
+    const cls = opened ? 'hatched' : passed ? 'ready' : (next && next.id === q.id ? 'next' : '');
     const state = opened ? `🦖 ${q.dinoName}<br>best ${best}%`
       : passed ? '🥚 Tap to hatch!'
       : best !== null ? `best ${best}% · need ${QUEST_PASS}%` : `exam ${date}`;
-    return `<button type="button" class="egg-card ${cls}" data-key="${q.key}">${opened ? dinoSVG(q.dino) : eggSVG(q.egg, passed)}
-      <div class="egg-sub">${q.name}</div><div class="egg-state">${state}</div></button>`;
+    return `<button type="button" class="egg-card ${cls}" data-id="${q.id}">${opened ? dinoSVG(q.dino) : eggSVG(q.egg, passed)}
+      <div class="egg-sub">${q.name}</div><div class="egg-test">${q.testLabel}</div><div class="egg-state">${state}</div></button>`;
   }).join('');
-  const champ = hatched === SA1_QUEST.length
+  const champ = hatched === QUEST_EGGS.length
     ? `<div class="quest-champ">🏆 You hatched them all — SA1 Dino Champion!<br><button type="button" class="start-btn" onclick="printDinoCertificate()">🖨️ Print my certificate</button></div>` : '';
   box.innerHTML = `<div class="quest-title">🥚 Dino Egg Quest</div>
-    <div class="quest-sub">Score ${QUEST_PASS}% or more on any SA1 test to hatch that subject's egg. Hatch all ${SA1_QUEST.length} to become the <b>SA1 Dino Champion</b>! · ${hatched}/${SA1_QUEST.length} hatched</div>
+    <div class="quest-sub">Every subject has two eggs: score ${QUEST_PASS}% on the Regular test to hatch its egg, and ${QUEST_PASS}% on the Harder test to hatch its golden egg. Hatch all ${QUEST_EGGS.length} to become the <b>SA1 Dino Champion</b>! · ${hatched}/${QUEST_EGGS.length} hatched</div>
     <div class="egg-grid">${cards}</div>${champ}`;
   box.querySelectorAll('.egg-card').forEach(c => c.addEventListener('click', () => {
-    const q = SA1_QUEST.find(x => x.key === c.dataset.key);
-    if (c.classList.contains('ready') || c.classList.contains('hatched')) { hatchEgg(q.key, c.classList.contains('hatched')); return; }
+    const q = QUEST_EGGS.find(x => x.id === c.dataset.id);
+    if (c.classList.contains('ready') || c.classList.contains('hatched')) { hatchEgg(q.id, c.classList.contains('hatched')); return; }
     const chip = document.querySelector(`#subject-picker .big-chip[data-subject="${q.key}"]`);
-    if (chip) { selectSubject(chip); document.getElementById('start-btn').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    if (chip) {
+      selectSubject(chip);
+      const tc = document.querySelector(`#test-chips .big-chip[data-test="${q.test}"]`);
+      if (tc) tc.click();
+      document.getElementById('start-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }));
 }
 
 // The hatching show. `again` = replaying an egg that was already opened.
-function hatchEgg(key, again) {
-  const q = SA1_QUEST.find(x => x.key === key);
+function hatchEgg(id, again) {
+  const q = QUEST_EGGS.find(x => x.id === id);
   if (!q) return;
-  const best = questBest(key);
-  questMarkSeen(key);
+  const best = questBest(id);
+  questMarkSeen(id);
   const ov = document.createElement('div');
   ov.className = 'hatch-overlay';
   ov.innerHTML = `<div class="hatch-box">
     <div class="hatch-stage">${again ? '' : `<div class="hatch-egg">${eggSVG(q.egg, true)}</div>`}<div class="hatch-dino" style="${again ? 'animation-delay:0s' : ''}">${dinoSVG(q.dino)}</div></div>
     <div class="hatch-title" style="${again ? 'animation-delay:.2s' : ''}">${again ? `Your ${q.dinoName}!` : `You hatched ${/^[AEIOU]/i.test(q.dinoName) ? 'an' : 'a'} ${q.dinoName}! 🎉`}</div>
-    <div class="hatch-fact" style="${again ? 'animation-delay:.3s' : ''}">${q.fact}<br><b>${q.name}: best ${best}%</b></div>
+    <div class="hatch-fact" style="${again ? 'animation-delay:.3s' : ''}">${q.fact}<br><b>${q.name} ${q.testLabel}: best ${best}%</b></div>
     <button type="button" class="start-btn" style="${again ? 'animation-delay:.4s' : ''}">${again ? 'Back to my eggs' : 'Add to my Dino Museum 🦕'}</button></div>`;
   document.body.appendChild(ov);
   if (!again) setTimeout(() => { try { playImpactBoom(); } catch (e) {} try { fireConfetti(); } catch (e) {} }, 1350);
@@ -1122,14 +1185,14 @@ function hatchEgg(key, again) {
 function questAfterResult(pct) {
   const cta = document.getElementById('hatch-cta');
   cta.innerHTML = '';
-  const q = SA1_QUEST.find(x => x.key === CURRENT_SUBJECT);
-  if (!q || pct < QUEST_PASS || questSeen().includes(q.key)) return;
-  cta.innerHTML = `<button type="button">🥚 Your ${q.name} egg is wiggling! Tap to hatch it!</button>`;
-  cta.querySelector('button').addEventListener('click', () => hatchEgg(q.key, false));
+  const q = QUEST_EGGS.find(x => x.key === CURRENT_SUBJECT && x.test === CURRENT_TEST);
+  if (!q || pct < QUEST_PASS || questSeen().includes(q.id)) return;
+  cta.innerHTML = `<button type="button">🥚 Your ${q.name} ${q.testLabel} egg is wiggling! Tap to hatch it!</button>`;
+  cta.querySelector('button').addEventListener('click', () => hatchEgg(q.id, false));
 }
 
 function printDinoCertificate() {
-  const rows = SA1_QUEST.map(q => `<div class="r">${dinoSVG(q.dino)}<b>${q.dinoName}</b><span>${q.name} · best ${questBest(q.key)}%</span></div>`).join('');
+  const rows = QUEST_EGGS.map(q => `<div class="r">${dinoSVG(q.dino)}<b>${q.dinoName}</b><span>${q.name} ${q.testLabel} · best ${questBest(q.id)}%</span></div>`).join('');
   const w = window.open('', '_blank');
   if (!w) return;
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SA1 Dino Champion</title><style>
@@ -1150,7 +1213,7 @@ if (RESULTS_GS_URL) {
 }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1english: "ticket", sa1hindi: "sher" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
