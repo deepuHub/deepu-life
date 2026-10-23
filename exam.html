@@ -101,6 +101,8 @@
   .big-chip:hover{border-color:var(--accent)}
   .big-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
   .big-chip[disabled]{opacity:0.4;cursor:not-allowed}
+  /* finished exams stay tappable for practice, just greyed */
+  .big-chip.done:not(.active){opacity:0.5;filter:grayscale(1)}
   .big-chip small{font-weight:400;color:var(--muted);font-size:0.7rem}
 
   .name-input{
@@ -191,7 +193,6 @@
     cursor:pointer;font-family:'Epilogue',sans-serif;color:var(--text)}
   .egg-card svg{width:84px;height:70px;display:block;margin:0 auto 0.2rem}
   .egg-card .egg-sub{font-weight:700;font-size:0.8rem}
-  .egg-card .egg-test{font-size:0.68rem;font-weight:600;color:var(--accent)}
   .egg-card .egg-state{font-size:0.68rem;color:var(--muted);margin-top:0.15rem;line-height:1.35}
   .egg-card.ready{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
   .egg-card.ready svg,.egg-card.next svg{animation:egg-wobble 1.4s ease-in-out infinite}
@@ -408,9 +409,9 @@
     <div class="picker-block" id="exam-picker">
       <div class="picker-label">Exam</div>
       <div class="chip-row">
-        <button class="big-chip" data-exam="ca1">📝 CA1 <small>Aug · done</small></button>
-        <button class="big-chip active" data-exam="ca2">📝 CA2 <small>28 Sep – 6 Oct</small></button>
-        <button class="big-chip" data-exam="sa1">🏆 SA1 <small>19 Oct – 2 Nov</small></button>
+        <button class="big-chip done" data-exam="ca1">📝 CA1 <small>Aug · done</small></button>
+        <button class="big-chip done" data-exam="ca2">📝 CA2 <small>Sep – Oct · done</small></button>
+        <button class="big-chip active" data-exam="sa1">🏆 SA1 <small>19 Oct – 2 Nov</small></button>
         <button class="big-chip" data-exam="olympiad">🏅 Olympiad</button>
       </div>
     </div>
@@ -426,7 +427,7 @@
         <button class="big-chip" data-subject="english">🔤 English <small>Dictation Words</small></button>
         <button class="big-chip" data-subject="social">🌍 Social Studies <small>The Wider World</small></button>
       </div>
-      <div class="chip-row" data-exam-subjects="ca2">
+      <div class="chip-row" data-exam-subjects="ca2" hidden>
         <button class="big-chip" data-subject="ca2maths">🔢 Maths <small>Units 3 &amp; 9</small></button>
         <button class="big-chip" data-subject="ca2dlc">💻 DL&amp;C <small>Be a designer</small></button>
         <button class="big-chip" data-subject="ca2marathi">📖 Marathi <small>उ &amp; ऊ ची मात्रा</small></button>
@@ -435,7 +436,7 @@
         <button class="big-chip" data-subject="ca2science">🦖 Science <small>Staying alive · Dino mode</small></button>
         <button class="big-chip" data-subject="ca2social">🇮🇳 Social Studies <small>Our Nation · Wed 7 Oct</small></button>
       </div>
-      <div class="chip-row" data-exam-subjects="sa1" hidden>
+      <div class="chip-row" data-exam-subjects="sa1">
         <button class="big-chip" data-subject="sa1art">🎨 Art &amp; Design Theory <small>MCQs · Mon 19 Oct</small></button>
         <button class="big-chip" data-subject="sa1english">🎫 English <small>Roald Dahl &amp; jokes · Mon 26 Oct</small></button>
         <button class="big-chip" data-subject="sa1dlc">🤖 DL&amp;C <small>Units 1, 2, 3, 5 · Tue 27 Oct</small></button>
@@ -958,8 +959,8 @@ document.querySelectorAll('#harder-theme-switch [data-harder]').forEach(b => {
 });
 
 let CURRENT_QUESTIONS = [];
-let CURRENT_EXAM = "ca2";
-let CURRENT_SUBJECT = "ca2maths";
+let CURRENT_EXAM = "sa1";
+let CURRENT_SUBJECT = "sa1art";
 let CURRENT_TEST = "Test A - Regular";
 let CURRENT_HERO = "cap";
 let CURRENT_ANSWERS = {};
@@ -1025,15 +1026,15 @@ function questionSpeech(q) {
 }
 
 // ── 🦖 DINO EGG QUEST (SA1) ─────────────────────────────────────────
-// Every SA1 subject has TWO eggs — one for the Regular test and a golden one
-// for the Harder test. Score 100% on that test and its egg is ready; tapping
-// it plays the hatching. Scores come from this device's history AND the
-// results sheet (so iPad and Mac agree); which eggs have been opened is
-// remembered per device.
+// Every SA1 subject has ONE egg. It hatches only once BOTH of the subject's
+// tests — Regular and Harder — have been scored 100%; tapping it then plays
+// the hatching. Scores come from this device's history AND the results sheet
+// (so iPad and Mac agree); which eggs have been opened is remembered per
+// device.
 const QUEST_PASS = 100;
 const QUEST_TESTS = [
   { id: 'A', test: 'Test A - Regular', label: 'Regular' },
-  { id: 'B', test: 'Test B - Harder',  label: 'Harder ⭐', gold: '#f5c542', prefix: 'Golden ' },
+  { id: 'B', test: 'Test B - Harder',  label: 'Harder' },
 ];
 const SA1_QUEST = [
   { key: 'sa1art',     name: 'Art & Design', date: '2026-10-19', egg: '#ff8fb1', dino: 'ankylosaurus',    dinoName: 'Ankylosaurus',
@@ -1051,34 +1052,34 @@ const SA1_QUEST = [
   { key: 'sa1maths',   name: 'Maths',        date: '2026-11-02', egg: '#8bd17c', dino: 'trex',            dinoName: 'T-Rex',
     fact: 'Tyrannosaurus rex had teeth as long as bananas — the king of the dinosaurs!' },
 ];
-// One egg per subject per test, id like "sa1dlc|B".
-const QUEST_EGGS = SA1_QUEST.flatMap(q => QUEST_TESTS.map(t => ({
-  ...q, id: `${q.key}|${t.id}`, test: t.test, testLabel: t.label,
-  egg: t.gold || q.egg, dinoName: (t.prefix || '') + q.dinoName,
-})));
 const QUEST_SEEN_KEY = 'deepu-dino-hatched';
 let QUEST_REMOTE = [];
-function questSeenRaw() { try { return JSON.parse(localStorage.getItem(QUEST_SEEN_KEY) || '[]'); } catch (e) { return []; } }
-// Before eggs were split per test, an opened egg was stored by subject key
-// alone ("sa1art") — that counts as opening the subject's first passed egg.
+// Opened eggs are stored by subject key ("sa1art"); a briefly-used per-test
+// version stored "sa1art|A" — either form counts as that subject's egg.
 function questSeen() {
-  const raw = questSeenRaw(), out = raw.filter(x => x.includes('|'));
-  raw.filter(x => !x.includes('|')).forEach(key => {
-    const e = QUEST_EGGS.find(x => x.key === key && questBest(x.id) >= QUEST_PASS);
-    if (e && !out.includes(e.id)) out.push(e.id);
-  });
-  return out;
+  let raw = [];
+  try { raw = JSON.parse(localStorage.getItem(QUEST_SEEN_KEY) || '[]'); } catch (e) {}
+  return [...new Set(raw.map(x => String(x).split('|')[0]))];
 }
-function questMarkSeen(id) { try { const s = questSeenRaw(); if (!s.includes(id)) { s.push(id); localStorage.setItem(QUEST_SEEN_KEY, JSON.stringify(s)); } } catch (e) {} }
-function questBest(id) {
-  const e = QUEST_EGGS.find(x => x.id === id);
-  if (!e) return null;
-  const name = `${SUBJECT_LABEL[e.key]} — ${e.test}`;
+function questMarkSeen(key) { try { const s = questSeen(); if (!s.includes(key)) { s.push(key); localStorage.setItem(QUEST_SEEN_KEY, JSON.stringify(s)); } } catch (e) {} }
+// Best % on one of a subject's tests (null = not taken yet).
+function questTestBest(key, test) {
+  const name = `${SUBJECT_LABEL[key]} — ${test}`;
   let local = [];
   try { local = JSON.parse(localStorage.getItem('deepu-exam-history') || '[]'); } catch (e) {}
   const pcts = [...local.map(h => [h.test, h.pct]), ...QUEST_REMOTE.map(r => [r.test, r.percent])]
     .filter(([t]) => String(t || '').trim() === name).map(([, p]) => Number(p) || 0);
   return pcts.length ? Math.max(...pcts) : null;
+}
+// { Regular: %, Harder: %, passed } for a subject.
+function questScores(key) {
+  const out = {};
+  QUEST_TESTS.forEach(t => { out[t.label] = questTestBest(key, t.test); });
+  out.passed = QUEST_TESTS.every(t => out[t.label] !== null && out[t.label] >= QUEST_PASS);
+  return out;
+}
+function questScoreLine(sc, sep) {
+  return QUEST_TESTS.map(t => `${t.label} ${sc[t.label] === null ? '–' : sc[t.label] + '%'}${sc[t.label] >= QUEST_PASS ? ' ✓' : ''}`).join(sep);
 }
 
 function eggSVG(color, cracked) {
@@ -1130,31 +1131,35 @@ function renderQuest() {
   box.hidden = CURRENT_EXAM !== 'sa1';
   if (box.hidden) return;
   const seen = questSeen(), today = new Date().toISOString().slice(0, 10);
-  const next = QUEST_EGGS.find(q => q.date >= today && !(questBest(q.id) >= QUEST_PASS));
+  const next = SA1_QUEST.find(q => q.date >= today && !questScores(q.key).passed);
   let hatched = 0;
-  const cards = QUEST_EGGS.map(q => {
-    const best = questBest(q.id), passed = best !== null && best >= QUEST_PASS, opened = passed && seen.includes(q.id);
+  const cards = SA1_QUEST.map(q => {
+    const sc = questScores(q.key), passed = sc.passed, opened = passed && seen.includes(q.key);
+    const tried = QUEST_TESTS.some(t => sc[t.label] !== null);
     if (opened) hatched++;
     const date = new Date(q.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-    const cls = opened ? 'hatched' : passed ? 'ready' : (next && next.id === q.id ? 'next' : '');
-    const state = opened ? `🦖 ${q.dinoName}<br>best ${best}%`
+    const cls = opened ? 'hatched' : passed ? 'ready' : (next && next.key === q.key ? 'next' : '');
+    const state = opened ? `🦖 ${q.dinoName}`
       : passed ? '🥚 Tap to hatch!'
-      : best !== null ? `best ${best}% · need ${QUEST_PASS}%` : `exam ${date}`;
-    return `<button type="button" class="egg-card ${cls}" data-id="${q.id}">${opened ? dinoSVG(q.dino) : eggSVG(q.egg, passed)}
-      <div class="egg-sub">${q.name}</div><div class="egg-test">${q.testLabel}</div><div class="egg-state">${state}</div></button>`;
+      : tried ? questScoreLine(sc, '<br>') : `exam ${date}`;
+    return `<button type="button" class="egg-card ${cls}" data-key="${q.key}">${opened ? dinoSVG(q.dino) : eggSVG(q.egg, passed)}
+      <div class="egg-sub">${q.name}</div><div class="egg-state">${state}</div></button>`;
   }).join('');
-  const champ = hatched === QUEST_EGGS.length
+  const champ = hatched === SA1_QUEST.length
     ? `<div class="quest-champ">🏆 You hatched them all — SA1 Dino Champion!<br><button type="button" class="start-btn" onclick="printDinoCertificate()">🖨️ Print my certificate</button></div>` : '';
   box.innerHTML = `<div class="quest-title">🥚 Dino Egg Quest</div>
-    <div class="quest-sub">Every subject has two eggs: score ${QUEST_PASS}% on the Regular test to hatch its egg, and ${QUEST_PASS}% on the Harder test to hatch its golden egg. Hatch all ${QUEST_EGGS.length} to become the <b>SA1 Dino Champion</b>! · ${hatched}/${QUEST_EGGS.length} hatched</div>
+    <div class="quest-sub">Score ${QUEST_PASS}% on BOTH the Regular and the Harder test of a subject to hatch its egg. Hatch all ${SA1_QUEST.length} to become the <b>SA1 Dino Champion</b>! · ${hatched}/${SA1_QUEST.length} hatched</div>
     <div class="egg-grid">${cards}</div>${champ}`;
   box.querySelectorAll('.egg-card').forEach(c => c.addEventListener('click', () => {
-    const q = QUEST_EGGS.find(x => x.id === c.dataset.id);
-    if (c.classList.contains('ready') || c.classList.contains('hatched')) { hatchEgg(q.id, c.classList.contains('hatched')); return; }
+    const q = SA1_QUEST.find(x => x.key === c.dataset.key);
+    if (c.classList.contains('ready') || c.classList.contains('hatched')) { hatchEgg(q.key, c.classList.contains('hatched')); return; }
     const chip = document.querySelector(`#subject-picker .big-chip[data-subject="${q.key}"]`);
     if (chip) {
       selectSubject(chip);
-      const tc = document.querySelector(`#test-chips .big-chip[data-test="${q.test}"]`);
+      // jump to the test that still needs its 100% (Regular first)
+      const sc = questScores(q.key);
+      const t = QUEST_TESTS.find(x => !(sc[x.label] >= QUEST_PASS)) || QUEST_TESTS[0];
+      const tc = document.querySelector(`#test-chips .big-chip[data-test="${t.test}"]`);
       if (tc) tc.click();
       document.getElementById('start-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -1162,17 +1167,17 @@ function renderQuest() {
 }
 
 // The hatching show. `again` = replaying an egg that was already opened.
-function hatchEgg(id, again) {
-  const q = QUEST_EGGS.find(x => x.id === id);
+function hatchEgg(key, again) {
+  const q = SA1_QUEST.find(x => x.key === key);
   if (!q) return;
-  const best = questBest(id);
-  questMarkSeen(id);
+  const sc = questScores(key);
+  questMarkSeen(key);
   const ov = document.createElement('div');
   ov.className = 'hatch-overlay';
   ov.innerHTML = `<div class="hatch-box">
     <div class="hatch-stage">${again ? '' : `<div class="hatch-egg">${eggSVG(q.egg, true)}</div>`}<div class="hatch-dino" style="${again ? 'animation-delay:0s' : ''}">${dinoSVG(q.dino)}</div></div>
     <div class="hatch-title" style="${again ? 'animation-delay:.2s' : ''}">${again ? `Your ${q.dinoName}!` : `You hatched ${/^[AEIOU]/i.test(q.dinoName) ? 'an' : 'a'} ${q.dinoName}! 🎉`}</div>
-    <div class="hatch-fact" style="${again ? 'animation-delay:.3s' : ''}">${q.fact}<br><b>${q.name} ${q.testLabel}: best ${best}%</b></div>
+    <div class="hatch-fact" style="${again ? 'animation-delay:.3s' : ''}">${q.fact}<br><b>${q.name}: ${questScoreLine(sc, ' · ')}</b></div>
     <button type="button" class="start-btn" style="${again ? 'animation-delay:.4s' : ''}">${again ? 'Back to my eggs' : 'Add to my Dino Museum 🦕'}</button></div>`;
   document.body.appendChild(ov);
   if (!again) setTimeout(() => { try { playImpactBoom(); } catch (e) {} try { fireConfetti(); } catch (e) {} }, 1350);
@@ -1181,18 +1186,25 @@ function hatchEgg(id, again) {
   ov.addEventListener('click', e => { if (e.target === ov) close(); });
 }
 
-// After an SA1 test: if this score earns an unopened egg, offer the hatch.
+// After an SA1 test: offer the hatch once both tests are at 100%, or say
+// which test is still left when only this one is.
 function questAfterResult(pct) {
   const cta = document.getElementById('hatch-cta');
   cta.innerHTML = '';
-  const q = QUEST_EGGS.find(x => x.key === CURRENT_SUBJECT && x.test === CURRENT_TEST);
-  if (!q || pct < QUEST_PASS || questSeen().includes(q.id)) return;
-  cta.innerHTML = `<button type="button">🥚 Your ${q.name} ${q.testLabel} egg is wiggling! Tap to hatch it!</button>`;
-  cta.querySelector('button').addEventListener('click', () => hatchEgg(q.id, false));
+  const q = SA1_QUEST.find(x => x.key === CURRENT_SUBJECT);
+  if (!q || pct < QUEST_PASS || questSeen().includes(q.key)) return;
+  const sc = questScores(q.key);
+  if (!sc.passed) {
+    const left = QUEST_TESTS.find(t => !(sc[t.label] >= QUEST_PASS));
+    cta.innerHTML = `<div class="quest-champ">🥚 Your ${q.name} egg moved! Now get ${QUEST_PASS}% on the ${left.label} test to hatch it.</div>`;
+    return;
+  }
+  cta.innerHTML = `<button type="button">🥚 Your ${q.name} egg is wiggling! Tap to hatch it!</button>`;
+  cta.querySelector('button').addEventListener('click', () => hatchEgg(q.key, false));
 }
 
 function printDinoCertificate() {
-  const rows = QUEST_EGGS.map(q => `<div class="r">${dinoSVG(q.dino)}<b>${q.dinoName}</b><span>${q.name} ${q.testLabel} · best ${questBest(q.id)}%</span></div>`).join('');
+  const rows = SA1_QUEST.map(q => `<div class="r">${dinoSVG(q.dino)}<b>${q.dinoName}</b><span>${q.name} · ${questScoreLine(questScores(q.key), ' · ')}</span></div>`).join('');
   const w = window.open('', '_blank');
   if (!w) return;
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SA1 Dino Champion</title><style>
