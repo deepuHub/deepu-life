@@ -37,6 +37,8 @@
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
   [data-hero="ticket"]{ --accent:#f5b800; --accent-dim:rgba(245,184,0,.16); --hero-glow:#7b3f00; }
   :root[data-theme="light"] [data-hero="ticket"]{ --accent:#8a5a00; --accent-dim:#fff4cc; }
+  [data-hero="sher"]{ --accent:#f59e0b; --accent-dim:rgba(245,158,11,.16); --hero-glow:#b45309; }
+  :root[data-theme="light"] [data-hero="sher"]{ --accent:#a15c07; --accent-dim:#fff3dc; }
 
   .hero-badge{
     width:64px;height:64px;border-radius:50%;margin-bottom:0.9rem;display:flex;align-items:center;
@@ -434,7 +436,7 @@
         <button class="big-chip" data-subject="sa1art">🎨 Art &amp; Design Theory <small>MCQs · Mon 19 Oct</small></button>
         <button class="big-chip" data-subject="sa1english">🎫 English <small>Roald Dahl &amp; jokes · Mon 26 Oct</small></button>
         <button class="big-chip" disabled>💻 DL&amp;C <small>soon</small></button>
-        <button class="big-chip" disabled>📚 Hindi <small>soon</small></button>
+        <button class="big-chip" data-subject="sa1hindi">🦁 Hindi <small>ऋ ए ऐ की मात्रा · Wed 28 Oct</small></button>
         <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
         <button class="big-chip" disabled>📖 Marathi <small>soon</small></button>
         <button class="big-chip" disabled>🔢 Maths <small>soon</small></button>
@@ -584,6 +586,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1916905751&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=85477057&single=true&output=csv",
   },
+  sa1hindi: {
+    // TODO — publish "SA1_Hindi_TestA_Regular" and "SA1_Hindi_TestB_Harder"
+    // tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ca2hindi: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=478982704&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1351268542&single=true&output=csv",
@@ -717,6 +725,8 @@ const TOPIC_EMOJI = {
   "Odd One Out": "🕵️",
   "Count the Matra": "🔢",
   "Make New Words": "✨",
+  "Amatrik Words": "⭕",
+  "Fill the Sentence": "📝",
 };
 
 // Iron Man helmet — red shell, gold faceplate, glowing eyes.
@@ -843,6 +853,28 @@ const HERO_THEME = {
         say: "Every great storyteller keeps practising! Read the facts and try again!", bubble: "UNWRAP ANOTHER BAR! 📖" },
     ],
   },
+  // Sher Mode — SA1 Hindi wears this on both tests. In गधा बना शेर the
+  // donkey only pretended to be a lion; here the kid is the real शेर.
+  sher: {
+    badge: "🦁", tag: "Sher Mode", flybyEmoji: "🦁",
+    title: "Roar like a real शेर!",
+    sub: "In गधा बना शेर the donkey only pretended to be a lion. Show everyone you are the REAL शेर of Hindi — ऋ, ए and ऐ matras, here we come!",
+    confetti: ["#f59e0b", "#b45309", "#fde68a", "#16a34a"],
+    cheer: "The real शेर roars for you! 🦁",
+    voiceLine: "ROAR! You are the real sher of Hindi!",
+    bubbleText: "ASLI SHER! 🦁",
+    voicePitch: 0.7, voiceRate: 0.9,
+    finish: [
+      { min: 100, text: "ASLI SHER! Every matra right — no lion skin needed, you ARE the शेर! 🦁",
+        say: "ROAR! You are the real sher of Hindi!", bubble: "ASLI SHER! 🦁" },
+      { min: 90, text: "Mighty roar! Just one little matra to fix. 🦁",
+        say: "Mighty roar! Just one little matra to fix!", bubble: "MIGHTY ROAR! 🦁" },
+      { min: 70, text: "Good roar! Read the 💡 facts below and your roar will be even louder. 🐾",
+        say: "Good roar! Read the facts and roar even louder next time!", bubble: "GOOD ROAR! 🐾" },
+      { min: 0, text: "Even a lion cub practises its roar! Read the 💡 facts below and try again. 🐾",
+        say: "Even a lion cub practises its roar! Let's try again!", bubble: "PRACTISE THE ROAR! 🐾" },
+    ],
+  },
   ironman: {
     badge: "🦾", badgeHTML: IRONMAN_HELMET_SVG,
     chip: "🦾 Harder", chipSub: "Iron Man flight mode",
@@ -903,7 +935,7 @@ const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", s
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
 // Tests written in Devanagari get bigger type (see .lang-deva).
-const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi"]);
+const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi", "sa1hindi"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
@@ -1118,7 +1150,7 @@ if (RESULTS_GS_URL) {
 }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1english: "ticket" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1english: "ticket", sa1hindi: "sher" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
