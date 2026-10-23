@@ -441,7 +441,7 @@
         <button class="big-chip" data-subject="sa1english">🎫 English <small>Roald Dahl &amp; jokes · Mon 26 Oct</small></button>
         <button class="big-chip" data-subject="sa1dlc">🤖 DL&amp;C <small>Units 1, 2, 3, 5 · Tue 27 Oct</small></button>
         <button class="big-chip" data-subject="sa1hindi">🦁 Hindi <small>ऋ ए ऐ की मात्रा · Wed 28 Oct</small></button>
-        <button class="big-chip" disabled>🔬 Science <small>soon</small></button>
+        <button class="big-chip" data-subject="sa1science">🦖 Science <small>Plants, forces &amp; magnets · Thu 29 Oct</small></button>
         <button class="big-chip" disabled>📖 Marathi <small>soon</small></button>
         <button class="big-chip" disabled>🔢 Maths <small>soon</small></button>
       </div>
@@ -616,6 +616,12 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1103703159&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=387042907&single=true&output=csv",
   },
+  sa1science: {
+    // TODO — publish "SA1_Science_TestA_Regular" and "SA1_Science_TestB_Harder"
+    // tabs to web as CSV, then paste their links here.
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   ca2science: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1886424914&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1683957543&single=true&output=csv",
@@ -721,6 +727,14 @@ const TOPIC_EMOJI = {
   "Life Cycles": "🐸",
   "Food Chains": "🌿",
   "Fossils": "🦴",
+  "Alive or Not": "🌱",
+  "Plant Parts": "🌻",
+  "Plant Needs": "💧",
+  "Forces": "💪",
+  "Gravity": "🌍",
+  "Friction": "🛝",
+  "Magnets": "🧲",
+  "Magnetic Materials": "📎",
   "Think like a Scientist": "🔬",
   "Name the Picture": "🖼️",
   "Meanings": "💬",
@@ -1225,7 +1239,7 @@ if (RESULTS_GS_URL) {
 }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher", sa1science: "trex" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
