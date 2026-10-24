@@ -1328,8 +1328,24 @@ function selectSubject(btn) {
   document.querySelectorAll('#subject-picker .big-chip').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   CURRENT_SUBJECT = btn ? btn.dataset.subject : '';
-  document.getElementById('start-btn').disabled = !btn;
+  const opens = btn && testOpensOn(btn.dataset.subject);
+  const locked = !!opens && new Date() < opens;
+  const startBtn = document.getElementById('start-btn');
+  startBtn.disabled = !btn || locked;
+  startBtn.textContent = locked
+    ? '🔒 Opens ' + opens.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+    : '▶ Start test';
   if (typeof HARDER_HERO !== 'undefined') refreshHero();
+}
+
+// SA1 tests open the day before each paper: revise first, then sit the
+// real test the evening before. Paper dates come from SA1_QUEST.
+function testOpensOn(key) {
+  const q = SA1_QUEST.find(s => s.key === key);
+  if (!q) return null;
+  const d = new Date(q.date + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  return d;
 }
 
 // Picking an exam shows only its subjects and selects the first one that
