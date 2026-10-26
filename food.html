@@ -23,6 +23,20 @@
     .fcard .note{color:var(--muted);font-size:0.78rem;margin-top:0.6rem}
     .tag{display:inline-block;font-size:0.68rem;font-weight:500;padding:1px 8px;border-radius:999px;background:var(--ac-dim);color:var(--ac);margin-right:4px}
     .sec-label{padding:0.5rem var(--pad) 0.75rem;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+
+    /* ═══ TAG FILTER — same chip pattern as quotes.html, scoped to this page ═══ */
+    .filter-wrap{padding:0 var(--pad) 0.5rem}
+    .stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.85rem}
+    .stat-pill{font-size:0.75rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 14px;display:flex;align-items:center;gap:6px}
+    .stat-pill strong{color:var(--text);font-weight:600}
+    .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .filter-label{font-size:0.72rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.08em;margin-right:4px}
+    .chip{font-family:'Epilogue',sans-serif;font-size:0.75rem;font-weight:500;padding:5px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+    .chip:hover{border-color:var(--muted);color:var(--text)}
+    .chip.active{background:var(--ac-dim);border-color:var(--ac);color:var(--ac)}
+    .card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:0.7rem}
+    .fcard.is-hidden{display:none}
+    .food-group.is-empty{display:none}
   </style>
 </head>
 <body>
@@ -34,65 +48,158 @@
     <div><p class="sec-eyebrow">Food</p><h1 class="sec-title">Fuel &amp; kitchen.</h1></div>
   </div>
 
-  <div class="sec-label">Run-day fuel</div>
-  <div class="food-grid">
-    <section class="fcard">
-      <h2>Long run (10 mi)</h2>
-      <h3>Before</h3>
-      <ul><li>Big banana + 250 mL water, about 30–45 min before</li><li>Extra 100–150 mL water at the start</li></ul>
-      <h3>During</h3>
-      <ul><li>Small banana at ~45–50 min</li><li>2 dates at ~80–90 min</li><li>150–200 mL fluid every 20 min, pinch of salt</li></ul>
-      <h3>After (30–45 min)</h3>
-      <ul><li>Protein scoop with milk + banana or dates</li><li>Then a proper meal with carbs and protein</li></ul>
-      <p class="note">No protein or fat-heavy food during the run. It digests slowly and can upset the stomach.</p>
-    </section>
-
-    <section class="fcard">
-      <h2>Overnight infused water</h2>
-      <ul><li>Cucumber slices, 2 lemons, 1 orange, 1 amla</li><li>1–2 spoons sugar or honey (honey: use less, stir in last)</li><li>Pinch of salt on run days</li></ul>
-      <h3>Tips</h3>
-      <ul><li>Lemon peel and pith turn bitter, so remove after 4–6 h or squeeze in just before</li><li>Acidic: use a straw, rinse with water after, wait 30 min before brushing</li></ul>
-    </section>
+  <div class="filter-wrap">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="filter-row" id="filter-row">
+      <span class="filter-label">Filter</span>
+      <button class="chip active" data-filter="all">All</button>
+    </div>
   </div>
 
-  <div class="sec-label">Fish at home</div>
-  <div class="food-grid">
-    <section class="fcard">
-      <h2>Quick masala fish</h2>
-      <p><span class="tag">15 min</span><span class="tag">Low oil</span></p>
-      <ol>
-        <li>Marinate 10 min: salt, ½ tsp turmeric, ½ tsp chilli powder, lemon juice, ginger-garlic paste</li>
-        <li>Heat a non-stick tawa with 1 tsp oil</li>
-        <li>Cook 3–4 min per side until golden</li>
-        <li>Finish with lemon. Serve with rice or roti and salad</li>
-      </ol>
-      <h3>Which fish</h3>
-      <ul><li><b>Mild, few bones:</b> rawas (Indian salmon), pomfret, surmai (kingfish), basa</li><li><b>Most omega-3:</b> bangda (mackerel), tarli (sardines). Stronger smell</li><li><b>Skip before runs:</b> deep-fried rava fry</li></ul>
-      <p class="note">Best after a run or at dinner. Avoid within 3–4 h before a run. Aim for 2–3 times a week.</p>
-    </section>
+  <div class="food-group" data-group="run-day-fuel">
+    <div class="sec-label">Run-day fuel</div>
+    <div class="food-grid">
+      <section class="fcard" data-tags="Pre-Run,Mid-Run,Post-Run,Protein,Running">
+        <h2>Long run (10 mi)</h2>
+        <div class="card-tags"></div>
+        <h3>Before</h3>
+        <ul><li>Big banana + 250 mL water, about 30–45 min before</li><li>Extra 100–150 mL water at the start</li></ul>
+        <h3>During</h3>
+        <ul><li>Small banana at ~45–50 min</li><li>2 dates at ~80–90 min</li><li>150–200 mL fluid every 20 min, pinch of salt</li></ul>
+        <h3>After (30–45 min)</h3>
+        <ul><li>Protein scoop with milk + banana or dates</li><li>Then a proper meal with carbs and protein</li></ul>
+        <p class="note">No protein or fat-heavy food during the run. It digests slowly and can upset the stomach.</p>
+      </section>
 
-    <section class="fcard">
-      <h2>Less smell</h2>
-      <h3>Before cooking</h3>
-      <ul><li>Buy fresh: clear eyes, red gills, no strong odour. Fillets or steaks</li><li>Soak 10 min in cold water with lemon or a spoon of vinegar</li><li>Pat fully dry, then marinate with turmeric, salt, lemon, ginger</li></ul>
-      <h3>Cooking</h3>
-      <ul><li><b>Air fryer / oven:</b> 200°C, 8–10 min, foil on the tray (least smell)</li><li><b>Steam:</b> in banana leaf or foil, 10–12 min</li><li>Pan: non-stick, exhaust on, window open</li></ul>
-      <h3>After</h3>
-      <ul><li>Boil lemon peels in water, or leave a bowl of vinegar out</li><li>Wash pan and hands with lemon and salt</li></ul>
-    </section>
+      <section class="fcard" data-tags="Hydration,Make-Ahead,Pre-Run,Light">
+        <h2>Overnight infused water</h2>
+        <div class="card-tags"></div>
+        <ul><li>Cucumber slices, 2 lemons, 1 orange, 1 amla</li><li>1–2 spoons sugar or honey (honey: use less, stir in last)</li><li>Pinch of salt on run days</li></ul>
+        <h3>Tips</h3>
+        <ul><li>Lemon peel and pith turn bitter, so remove after 4–6 h or squeeze in just before</li><li>Acidic: use a straw, rinse with water after, wait 30 min before brushing</li></ul>
+      </section>
+    </div>
   </div>
 
-  <div class="sec-label">Eating out near Amanora</div>
-  <div class="food-grid">
-    <section class="fcard">
-      <h2>What to order</h2>
-      <ul><li><b>Day before a long run:</b> varan-bhaat with ghee, bhakri with a vegetable and dal, simple thali</li><li><b>After a run:</b> pithla-bhakri, moong or sprouts usal, curd or sol kadhi, egg or paneer bhurji with roti</li><li><b>Skip the night before:</b> misal, vada pav, deep-fried items</li></ul>
-      <p class="note">Nearby to check: Wah! Marathi (Seasons Mall, Magarpatta) and Mother's Kitchen (Hadapsar). Not verified yet.</p>
-    </section>
+  <div class="food-group" data-group="fish-at-home">
+    <div class="sec-label">Fish at home</div>
+    <div class="food-grid">
+      <section class="fcard" data-tags="Non-Veg,Seafood,15 min,Low Oil,Post-Run,Dinner">
+        <h2>Quick masala fish</h2>
+        <div class="card-tags"></div>
+        <ol>
+          <li>Marinate 10 min: salt, ½ tsp turmeric, ½ tsp chilli powder, lemon juice, ginger-garlic paste</li>
+          <li>Heat a non-stick tawa with 1 tsp oil</li>
+          <li>Cook 3–4 min per side until golden</li>
+          <li>Finish with lemon. Serve with rice or roti and salad</li>
+        </ol>
+        <h3>Which fish</h3>
+        <ul><li><b>Mild, few bones:</b> rawas (Indian salmon), pomfret, surmai (kingfish), basa</li><li><b>Most omega-3:</b> bangda (mackerel), tarli (sardines). Stronger smell</li><li><b>Skip before runs:</b> deep-fried rava fry</li></ul>
+        <p class="note">Best after a run or at dinner. Avoid within 3–4 h before a run. Aim for 2–3 times a week.</p>
+      </section>
+
+      <section class="fcard" data-tags="Non-Veg,Seafood,Technique,Tips">
+        <h2>Less smell</h2>
+        <div class="card-tags"></div>
+        <h3>Before cooking</h3>
+        <ul><li>Buy fresh: clear eyes, red gills, no strong odour. Fillets or steaks</li><li>Soak 10 min in cold water with lemon or a spoon of vinegar</li><li>Pat fully dry, then marinate with turmeric, salt, lemon, ginger</li></ul>
+        <h3>Cooking</h3>
+        <ul><li><b>Air fryer / oven:</b> 200°C, 8–10 min, foil on the tray (least smell)</li><li><b>Steam:</b> in banana leaf or foil, 10–12 min</li><li>Pan: non-stick, exhaust on, window open</li></ul>
+        <h3>After</h3>
+        <ul><li>Boil lemon peels in water, or leave a bowl of vinegar out</li><li>Wash pan and hands with lemon and salt</li></ul>
+      </section>
+    </div>
   </div>
+
+  <div class="food-group" data-group="eating-out">
+    <div class="sec-label">Eating out near Amanora</div>
+    <div class="food-grid">
+      <section class="fcard" data-tags="Maharashtrian,Eating-Out,Pre-Run,Post-Run">
+        <h2>What to order</h2>
+        <div class="card-tags"></div>
+        <ul><li><b>Day before a long run:</b> varan-bhaat with ghee, bhakri with a vegetable and dal, simple thali</li><li><b>After a run:</b> pithla-bhakri, moong or sprouts usal, curd or sol kadhi, egg or paneer bhurji with roti</li><li><b>Skip the night before:</b> misal, vada pav, deep-fried items</li></ul>
+        <p class="note">Nearby to check: Wah! Marathi (Seasons Mall, Magarpatta) and Mother's Kitchen (Hadapsar). Not verified yet.</p>
+      </section>
+    </div>
+  </div>
+
+  <div class="empty" id="no-results" style="display:none;padding:0 var(--pad) 2rem;color:var(--muted);font-size:0.85rem;">No recipes match this filter.</div>
 </main>
 
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/nav.js"></script>
+<script>
+// ── TAG COLOR (auto-assign from a palette by hash — same as quotes.html) ───
+const TAG_PALETTE = [
+  'rgba(100,150,220,0.12)/rgba(100,150,220,0.22)/#7eaadd',
+  'rgba(200,140,80,0.12)/rgba(200,140,80,0.22)/#d4a06a',
+  'rgba(170,100,200,0.12)/rgba(170,100,200,0.22)/#c08ae0',
+  'rgba(80,180,140,0.12)/rgba(80,180,140,0.22)/#60c4a0',
+  'rgba(220,190,80,0.12)/rgba(220,190,80,0.22)/#d4bc5a',
+  'rgba(220,90,90,0.12)/rgba(220,90,90,0.22)/#e07070',
+];
+function tagStyle(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  const parts = TAG_PALETTE[h % TAG_PALETTE.length].split('/');
+  return `background:${parts[0]};border:1px solid ${parts[1]};color:${parts[2]};`;
+}
+
+(() => {
+  const cards = [...document.querySelectorAll('.fcard[data-tags]')].map(el => ({
+    el,
+    group: el.closest('.food-group'),
+    tags: el.dataset.tags.split(',').map(t => t.trim()).filter(Boolean),
+  }));
+
+  // Render each card's own tag pills.
+  cards.forEach(c => {
+    const mount = c.el.querySelector('.card-tags');
+    if (mount) mount.innerHTML = c.tags.map(t => `<span class="tag" style="${tagStyle(t)}">${t}</span>`).join('');
+  });
+
+  // Stats.
+  const allTags = [...new Set(cards.flatMap(c => c.tags))].sort();
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-pill"><strong>${cards.length}</strong> recipes &amp; notes</div>
+    <div class="stat-pill"><strong>${allTags.length}</strong> tags</div>
+  `;
+
+  // Build filter chips from every unique tag in use.
+  const filterRow = document.getElementById('filter-row');
+  allTags.forEach(tag => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.dataset.filter = tag;
+    btn.textContent = tag;
+    filterRow.appendChild(btn);
+  });
+
+  function applyFilter(tag) {
+    const noResults = document.getElementById('no-results');
+    let anyVisible = false;
+
+    document.querySelectorAll('.food-group').forEach(group => {
+      let groupHasVisible = false;
+      cards.filter(c => c.group === group).forEach(c => {
+        const match = tag === 'all' || c.tags.includes(tag);
+        c.el.classList.toggle('is-hidden', !match);
+        if (match) { groupHasVisible = true; anyVisible = true; }
+      });
+      group.classList.toggle('is-empty', !groupHasVisible);
+    });
+
+    noResults.style.display = anyVisible ? 'none' : 'block';
+  }
+
+  filterRow.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    filterRow.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    applyFilter(chip.dataset.filter);
+  });
+})();
+</script>
 </body>
 </html>
