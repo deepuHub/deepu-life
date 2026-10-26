@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>deepu-life — Food</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <link rel="stylesheet" href="assets/css/activity.css">
+  <style>
+    .food-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;padding:0 var(--pad) 1.5rem}
+    .fcard{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--ac);border-radius:6px;padding:1.1rem 1.25rem}
+    .fcard h2{font-family:'Fraunces',serif;font-weight:700;font-size:1.05rem;color:var(--ac);margin-bottom:0.6rem}
+    .fcard h3{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0.9rem 0 0.35rem}
+    .fcard ul,.fcard ol{padding-left:1.1rem;font-size:0.85rem;line-height:1.65;color:var(--text)}
+    .fcard li{margin-bottom:0.2rem}
+    .fcard p{font-size:0.85rem;line-height:1.65;color:var(--text)}
+    .fcard .note{color:var(--muted);font-size:0.78rem;margin-top:0.6rem}
+    .tag{display:inline-block;font-size:0.68rem;font-weight:500;padding:1px 8px;border-radius:999px;background:var(--ac-dim);color:var(--ac);margin-right:4px}
+    .sec-label{padding:0.5rem var(--pad) 0.75rem;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<deepu-nav active="food"></deepu-nav>
+
+<main class="page" style="--ac:var(--grow);--ac-dim:var(--grow-dim)">
+  <div class="sec-head">
+    <div><p class="sec-eyebrow">Food</p><h1 class="sec-title">Fuel &amp; kitchen.</h1></div>
+  </div>
+
+  <div class="sec-label">Run-day fuel</div>
+  <div class="food-grid">
+    <section class="fcard">
+      <h2>Long run (10 mi)</h2>
+      <h3>Before</h3>
+      <ul><li>Big banana + 250 mL water, about 30–45 min before</li><li>Extra 100–150 mL water at the start</li></ul>
+      <h3>During</h3>
+      <ul><li>Small banana at ~45–50 min</li><li>2 dates at ~80–90 min</li><li>150–200 mL fluid every 20 min, pinch of salt</li></ul>
+      <h3>After (30–45 min)</h3>
+      <ul><li>Protein scoop with milk + banana or dates</li><li>Then a proper meal with carbs and protein</li></ul>
+      <p class="note">No protein or fat-heavy food during the run. It digests slowly and can upset the stomach.</p>
+    </section>
+
+    <section class="fcard">
+      <h2>Overnight infused water</h2>
+      <ul><li>Cucumber slices, 2 lemons, 1 orange, 1 amla</li><li>1–2 spoons sugar or honey (honey: use less, stir in last)</li><li>Pinch of salt on run days</li></ul>
+      <h3>Tips</h3>
+      <ul><li>Lemon peel and pith turn bitter, so remove after 4–6 h or squeeze in just before</li><li>Acidic: use a straw, rinse with water after, wait 30 min before brushing</li></ul>
+    </section>
+  </div>
+
+  <div class="sec-label">Fish at home</div>
+  <div class="food-grid">
+    <section class="fcard">
+      <h2>Quick masala fish</h2>
+      <p><span class="tag">15 min</span><span class="tag">Low oil</span></p>
+      <ol>
+        <li>Marinate 10 min: salt, ½ tsp turmeric, ½ tsp chilli powder, lemon juice, ginger-garlic paste</li>
+        <li>Heat a non-stick tawa with 1 tsp oil</li>
+        <li>Cook 3–4 min per side until golden</li>
+        <li>Finish with lemon. Serve with rice or roti and salad</li>
+      </ol>
+      <h3>Which fish</h3>
+      <ul><li><b>Mild, few bones:</b> rawas (Indian salmon), pomfret, surmai (kingfish), basa</li><li><b>Most omega-3:</b> bangda (mackerel), tarli (sardines). Stronger smell</li><li><b>Skip before runs:</b> deep-fried rava fry</li></ul>
+      <p class="note">Best after a run or at dinner. Avoid within 3–4 h before a run. Aim for 2–3 times a week.</p>
+    </section>
+
+    <section class="fcard">
+      <h2>Less smell</h2>
+      <h3>Before cooking</h3>
+      <ul><li>Buy fresh: clear eyes, red gills, no strong odour. Fillets or steaks</li><li>Soak 10 min in cold water with lemon or a spoon of vinegar</li><li>Pat fully dry, then marinate with turmeric, salt, lemon, ginger</li></ul>
+      <h3>Cooking</h3>
+      <ul><li><b>Air fryer / oven:</b> 200°C, 8–10 min, foil on the tray (least smell)</li><li><b>Steam:</b> in banana leaf or foil, 10–12 min</li><li>Pan: non-stick, exhaust on, window open</li></ul>
+      <h3>After</h3>
+      <ul><li>Boil lemon peels in water, or leave a bowl of vinegar out</li><li>Wash pan and hands with lemon and salt</li></ul>
+    </section>
+  </div>
+
+  <div class="sec-label">Eating out near Amanora</div>
+  <div class="food-grid">
+    <section class="fcard">
+      <h2>What to order</h2>
+      <ul><li><b>Day before a long run:</b> varan-bhaat with ghee, bhakri with a vegetable and dal, simple thali</li><li><b>After a run:</b> pithla-bhakri, moong or sprouts usal, curd or sol kadhi, egg or paneer bhurji with roti</li><li><b>Skip the night before:</b> misal, vada pav, deep-fried items</li></ul>
+      <p class="note">Nearby to check: Wah! Marathi (Seasons Mall, Magarpatta) and Mother's Kitchen (Hadapsar). Not verified yet.</p>
+    </section>
+  </div>
+</main>
+
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+</body>
+</html>
