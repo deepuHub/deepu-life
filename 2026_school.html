@@ -3062,25 +3062,31 @@ let homeworkSyncStale = false;
 let homeworkSyncFailed = false;
 const HOMEWORK_STALE_HOURS = 8;
 
+// Parses the whole text rather than line by line: a quoted cell can hold
+// line breaks (a `detail` with a blank line in it), and splitting on lines
+// pushed every later row's sheetRow off by one — so ✅ Done wrote to the
+// row below. One returned row per sheet row, so index + 1 = sheet row.
 function parseHomeworkCSV(text) {
   const rows = [];
-  const lines = text.split(/\r?\n/);
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    const fields = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
+  let fields = [], cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQ) {
       if (ch === '"') {
-        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
-        else inQ = !inQ;
-      } else if (ch === ',' && !inQ) {
-        fields.push(cur.trim()); cur = '';
+        if (text[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = false;
       } else cur += ch;
-    }
-    fields.push(cur.trim());
-    rows.push(fields);
+    } else if (ch === '"') {
+      inQ = true;
+    } else if (ch === ',') {
+      fields.push(cur.trim()); cur = '';
+    } else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      fields.push(cur.trim()); rows.push(fields);
+      fields = []; cur = '';
+    } else cur += ch;
   }
+  if (cur || fields.length) { fields.push(cur.trim()); rows.push(fields); }
   return rows;
 }
 
