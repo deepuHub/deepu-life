@@ -54,6 +54,11 @@
     .g-flags{display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.3rem}
     .g-note{font-size:0.78rem;color:var(--muted);line-height:1.45;max-width:280px}
     .etable th.yr{color:var(--gift)}
+    .g-st{display:block;margin-top:0.4rem}
+    .g-msg{font-size:0.74rem;color:var(--muted);margin-top:0.35rem;line-height:1.4;max-width:300px;
+           display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .g-msg.warn{color:var(--warning)}
+    .ecard .g-msg{-webkit-line-clamp:unset;display:block;max-width:none}
 
     /* mobile cards */
     .g-years{display:grid;gap:0.45rem;margin-top:0.6rem}
@@ -97,6 +102,7 @@
     <span class="lbl">Show</span>
     <button class="gift-chip on" data-f="all">Everyone</button>
     <button class="gift-chip" data-f="open">Still to pick</button>
+    <button class="gift-chip" data-f="unpacked">Not packed yet</button>
     <button class="gift-chip" data-f="kid">Kids</button>
     <button class="gift-chip" data-f="adult">Adults</button>
   </div>
@@ -126,7 +132,9 @@
    - type    kid | adult
    - age     age in that row's year
    - title   blank on the current year's row = still to pick
+   - status  yet to order | ordered | delivered | packed (packed = Udhbhav wrapped it)
    - note    free text; the latest year's note shows under "Watch out for"
+   - gift_message  the note sent with the book; shown under this year's pick
 
    Read with Google Identity Services + the Sheets API as the signed-in user.
    No Apps Script, no public URL, nothing cached in localStorage — this file
@@ -148,6 +156,28 @@ const chips = arr => arr.map(c => `<div class="summary-chip"><span class="chip-l
 let PEOPLE = [], YEARS = [], CUR = null, FILTER = 'all';
 
 const book = g => !g ? null : (g.title || '').trim() ? g : null;
+
+/* status — set in the Sheet's dropdown. "packed" = Udhbhav has wrapped it himself. */
+const STATUS = {
+  'yet to order': { label: 'Yet to order', cls: 'b-neu' },
+  'ordered':      { label: 'Ordered',      cls: 'b-prog' },
+  'delivered':    { label: 'Delivered',    cls: 'b-plan' },
+  'packed':       { label: 'Packed by Udhbhav', cls: 'b-done' },
+};
+function statusKey(g) {
+  const s = String((g && g.status) || '').trim().toLowerCase();
+  return (!s || s === 'todo' || s === 'in cart') ? 'yet to order' : s;
+}
+function statusBadge(g) {
+  const k = statusKey(g), st = STATUS[k] || { label: k, cls: 'b-neu' };
+  return `<span class="badge ${st.cls} g-st-b">${escHtml(st.label)}</span>`;
+}
+function giftMsg(g) {
+  const m = String((g && g.gift_message) || '').trim();
+  if (!m) return '';
+  const handwrite = m.startsWith('(');
+  return `<div class="g-msg${handwrite ? ' warn' : ''}" title="${escHtml(m)}">${handwrite ? '✍️ ' : '💌 '}${escHtml(m)}</div>`;
+}
 
 function pivot(rows) {
   const byKey = new Map();
@@ -192,18 +222,20 @@ function cellBook(p, y) {
   const b = book(g);
   const open = y === CUR && !b;
   const cls = 'g-book' + (open ? ' g-open' : '') + (y === CUR ? '' : ' ht');
-  if (!b) return `<td class="${cls}"><span class="g-none">${open ? 'To pick' : 'not recorded'}</span></td>`;
-  return `<td class="${cls}"><span class="t">${escHtml(b.title)}</span>${b.author ? `<span class="a">${escHtml(b.author)}</span>` : ''}</td>`;
+  const extra = y === CUR ? `<span class="g-st">${statusBadge(g)}</span>${giftMsg(g)}` : '';
+  if (!b) return `<td class="${cls}"><span class="g-none">${open ? 'To pick' : 'not recorded'}</span>${extra}</td>`;
+  return `<td class="${cls}"><span class="t">${escHtml(b.title)}</span>${b.author ? `<span class="a">${escHtml(b.author)}</span>` : ''}${extra}</td>`;
 }
 
 function draw() {
   const q = document.getElementById('g-q').value.trim().toLowerCase();
   const list = PEOPLE.filter(p => {
     if (FILTER === 'open'  && !isOpen(p)) return false;
+    if (FILTER === 'unpacked' && (!p.years[CUR] || statusKey(p.years[CUR]) === 'packed')) return false;
     if (FILTER === 'kid'   && p.type === 'adult') return false;
     if (FILTER === 'adult' && p.type !== 'adult') return false;
     if (!q) return true;
-    const hay = [p.name, p.family, p.note, ...YEARS.flatMap(y => p.years[y] ? [p.years[y].title, p.years[y].author] : [])];
+    const hay = [p.name, p.family, p.note, ...YEARS.flatMap(y => p.years[y] ? [p.years[y].title, p.years[y].author, p.years[y].gift_message] : [])];
     return hay.join(' ').toLowerCase().includes(q);
   });
 
@@ -230,13 +262,14 @@ function draw() {
       <div class="g-years">${YEARS.map(y => {
         const g = p.years[y]; if (!g) return '';
         const b = book(g), open = y === CUR && !b;
-        return `<div class="g-yr${open ? ' open' : ''}"><b>${y}</b><span>${b ? `${escHtml(b.title)}${b.author ? ` <span class="g-fam">· ${escHtml(b.author)}</span>` : ''}` : `<span class="g-none">${open ? 'To pick' : 'not recorded'}</span>`}</span></div>`;
+        const extra = y === CUR ? `<span class="g-st">${statusBadge(g)}</span>${giftMsg(g)}` : '';
+        return `<div class="g-yr${open ? ' open' : ''}"><b>${y}</b><span>${b ? `${escHtml(b.title)}${b.author ? ` <span class="g-fam">· ${escHtml(b.author)}</span>` : ''}` : `<span class="g-none">${open ? 'To pick' : 'not recorded'}</span>`}${extra}</span></div>`;
       }).join('')}</div>
       ${p.note ? `<div class="ecard-note">${escHtml(p.note)}</div>` : ''}
     </div>`;
   }).join('');
 
-  const labels = { all: 'All recipients', open: `Still to pick for ${CUR}`, kid: 'Kids', adult: 'Adults' };
+  const labels = { all: 'All recipients', open: `Still to pick for ${CUR}`, unpacked: `Not packed yet for ${CUR}`, kid: 'Kids', adult: 'Adults' };
   document.getElementById('g-label').textContent = `${labels[FILTER]} · ${list.length}`;
 }
 
@@ -252,16 +285,16 @@ function render(all) {
 
   const kids = PEOPLE.filter(p => p.type !== 'adult');
   const ages = kids.map(ageNow);
-  const given = rows.filter(r => book(r) && Number(r.year) !== CUR).length;
-  const picked = PEOPLE.filter(p => book(p.years[CUR])).length;
-  const due = PEOPLE.filter(p => p.years[CUR]).length;
+  const due = PEOPLE.filter(p => p.years[CUR]);
+  const n = k => due.filter(p => statusKey(p.years[CUR]) === k).length;
 
   document.getElementById('gift-sum').innerHTML = chips([
     { l: 'Recipients', v: PEOPLE.length },
-    { l: 'Kids', v: kids.length },
     { l: `Ages in ${CUR}`, v: ages.length ? `${Math.min(...ages)}–${Math.max(...ages)}` : '—' },
-    { l: 'Books given', v: given },
-    { l: `${CUR} picked`, v: `${picked}/${due}`, cls: 'gift-c' },
+    { l: 'Yet to order', v: n('yet to order') },
+    { l: 'Ordered', v: n('ordered') },
+    { l: 'Delivered', v: n('delivered') },
+    { l: 'Packed', v: `${n('packed')}/${due.length}`, cls: 'gift-c' },
   ]);
   draw();
 }
