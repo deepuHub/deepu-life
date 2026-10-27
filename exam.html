@@ -178,9 +178,6 @@
   .swatch-b.on{color:var(--text)}
   .review-fact{font-size:0.78rem;margin-top:0.4rem;color:var(--accent);line-height:1.45}
   /* 🔊 read-aloud */
-  .tts-btn{float:right;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;
-    padding:0.3rem 0.75rem;font-family:'Epilogue',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer}
-  .tts-btn:hover,.tts-btn.speaking{border-color:var(--accent);color:var(--accent)}
   .listen-btn{display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-bottom:0.9rem;padding:0.9rem;
     border-radius:14px;border:2px dashed var(--accent);background:var(--accent-dim);color:var(--accent);
     font-family:'Epilogue',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer}
@@ -491,7 +488,6 @@
     <div class="exam-layout" id="exam-layout">
       <div class="exam-main">
         <div class="q-card">
-          <button type="button" class="tts-btn" id="tts-btn" aria-label="Read this question aloud">🔊 Read to me</button>
           <span class="q-topic" id="q-topic">Place Value</span>
           <div class="q-text" id="q-text">Loading…</div>
           <img class="q-img" id="q-img" alt="" hidden>
@@ -1026,13 +1022,6 @@ function speakText(text, slow) {
     window.speechSynthesis.speak(u);
   });
   btn?.classList.add('speaking');
-}
-function questionSpeech(q) {
-  let opts = q.options || [];
-  if (q.type === 'Match') opts = parseMatch(q).items.map(it => it.text);
-  if (q.type === 'Paint') opts = [];
-  const list = opts.length ? ' ' + opts.map((o, i) => (q.type === 'Order' || q.type === 'Match') ? `${o}.` : `${String.fromCharCode(65 + i)}: ${o}.`).join(' ') : '';
-  return `${q.question}${list}`;
 }
 
 // ── 🦖 DINO EGG QUEST (SA1) ─────────────────────────────────────────
@@ -1730,11 +1719,6 @@ function renderMatch(q, area) {
 }
 
 document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
-document.getElementById('tts-btn').addEventListener('click', () => {
-  const btn = document.getElementById('tts-btn');
-  if (btn.classList.contains('speaking')) { ttsStop(); return; }      // second tap stops it
-  speakText(questionSpeech(CURRENT_QUESTIONS[CURRENT_INDEX]));
-});
 document.getElementById('next-btn').addEventListener('click', () => { if (CURRENT_INDEX < CURRENT_QUESTIONS.length - 1) { CURRENT_INDEX++; renderQuestion(); } });
 document.getElementById('submit-btn').addEventListener('click', submitExam);
 
