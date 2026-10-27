@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>Gifts — deepu-life</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎁%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <link rel="stylesheet" href="assets/css/activity.css">
+  <style>
+    /* several blocks below set display:flex, which otherwise wins over the
+       hidden attribute and leaks the gated content before sign-in */
+    [hidden]{display:none !important}
+
+    /* ── sign-in gate — the private Sheet is the access control, not this page ── */
+    .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:34vh;padding:0 var(--pad);margin-top:2rem}
+    .gate-icon{font-size:2.2rem}
+    .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem}
+    .gate p{font-size:.88rem;font-weight:300;line-height:1.7;color:var(--muted);max-width:46ch}
+    .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+                background:var(--gift-dim);color:var(--gift);border:1px solid var(--gift);font-family:'Epilogue',sans-serif;
+                font-size:.75rem;font-weight:600;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s;
+                -webkit-tap-highlight-color:transparent}
+    .btn-signin:hover{background:var(--gift);color:var(--bg)}
+    .btn-signin:focus-visible{outline:2px solid var(--gift);outline-offset:3px}
+    .gate-error{color:#f0545c;font-size:.8rem;max-width:52ch}
+    .sync-dot.ok{background:var(--grow)}
+
+    /* filter row */
+    .gift-tools{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0 var(--pad) 1rem}
+    .gift-search{flex:1 1 220px;min-width:0;max-width:340px;padding:0.5rem 0.85rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Epilogue',sans-serif;font-size:0.8rem}
+    .gift-search:focus{outline:none;border-color:var(--gift)}
+    .gift-chip{padding:0.35rem 0.85rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Epilogue',sans-serif;font-size:0.75rem;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+    .gift-chip:hover{border-color:var(--gift);color:var(--gift)}
+    .gift-chip.on{background:var(--gift-dim);border-color:var(--gift);color:var(--gift)}
+    .gift-tools .lbl{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-right:0.2rem}
+
+    /* table cells */
+    .g-who strong{display:block}
+    .g-fam{font-size:0.75rem;color:var(--muted);margin-top:0.15rem}
+    .g-age{white-space:nowrap;font-variant-numeric:tabular-nums}
+    .g-age small{color:var(--muted);font-size:0.72rem}
+    .g-book{line-height:1.35;min-width:150px}
+    .g-book .t{display:block}
+    .g-book .a{display:block;font-size:0.75rem;color:var(--muted);margin-top:0.15rem}
+    .g-none{color:var(--muted);font-style:italic;font-size:0.8rem}
+    td.g-open{background:var(--gift-dim)}
+    .g-open .g-none{color:var(--gift);font-style:normal;font-weight:500}
+    .g-flags{display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.3rem}
+    .g-note{font-size:0.78rem;color:var(--muted);line-height:1.45;max-width:280px}
+    .etable th.yr{color:var(--gift)}
+
+    /* mobile cards */
+    .g-years{display:grid;gap:0.45rem;margin-top:0.6rem}
+    .g-yr{display:grid;grid-template-columns:3.2rem 1fr;gap:0.5rem;font-size:0.82rem;line-height:1.35}
+    .g-yr b{color:var(--muted);font-weight:500;font-size:0.75rem;padding-top:0.05rem}
+    .g-yr.open b{color:var(--gift)}
+  </style>
+</head>
+<body>
+
+<deepu-nav active="gifts"></deepu-nav>
+
+<main class="page" style="--ac:var(--gift);--ac-dim:var(--gift-dim)">
+  <div class="sec-head">
+    <div><p class="sec-eyebrow gift-c">Giving</p><h1 class="sec-title">Book gifts.</h1></div>
+    <div class="sec-actions" id="sec-actions" hidden>
+      <a id="sheets-link" href="#" target="_blank" rel="noopener" class="sheets-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        Open Sheet
+      </a>
+      <div class="sync-badge" id="sync-badge"><span class="sync-dot"></span><span class="sync-label">—</span></div>
+    </div>
+  </div>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private list</h2>
+    <p>Gift history lives in a private Google Sheet. Sign in with the Google account that has access — anyone else's sign-in is rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <div id="content" hidden>
+  <div class="summary-strip" id="gift-sum"></div>
+
+  <div class="gift-tools" id="gift-tools">
+    <input class="gift-search" id="g-q" type="search" placeholder="Search name, family, title, author…" aria-label="Search gifts">
+    <span class="lbl">Show</span>
+    <button class="gift-chip on" data-f="all">Everyone</button>
+    <button class="gift-chip" data-f="open">Still to pick</button>
+    <button class="gift-chip" data-f="kid">Kids</button>
+    <button class="gift-chip" data-f="adult">Adults</button>
+  </div>
+
+  <div class="list-wrap">
+    <div class="list-section-label" id="g-label">All recipients</div>
+    <div class="twrap"><table class="etable"><thead id="g-head"></thead><tbody id="g-tbody"></tbody></table></div>
+    <div class="card-list" id="g-cards"></div>
+    <div class="empty-st" id="g-empty"><span class="emo">🎁</span>No gifts yet — add rows in the <strong>Gifts</strong> tab of the private Sheet.</div>
+  </div>
+  </div>
+</main>
+
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   gifts-private.html — December book gifts, by recipient and year.
+
+   DATA — a private Google Sheet ("Deepu — Book Gifts (Private)", sharing
+   Restricted), tab "Gifts":
+
+     id  year  recipient  family  type  gender  age  title  author  status  note
+
+   - one row per recipient per YEAR. Next December = add rows, no new columns.
+   - type    kid | adult
+   - age     age in that row's year
+   - title   blank on the current year's row = still to pick
+   - note    free text; the latest year's note shows under "Watch out for"
+
+   Read with Google Identity Services + the Sheets API as the signed-in user.
+   No Apps Script, no public URL, nothing cached in localStorage — this file
+   holds no data, so it is safe to serve from the public repo. Kids' names
+   must never go in AppScript.gs or the public deepu-life Sheet.
+═══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1-3Qd4kf8qxA7_e1x57qZwPrZwOrHCpvAHA6Hmf37epo';
+const SHEET_TAB      = 'Gifts';
+const SCOPES         = 'https://www.googleapis.com/auth/spreadsheets';
+
+const $ = id => document.getElementById(id);
+function escHtml(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const chips = arr => arr.map(c => `<div class="summary-chip"><span class="chip-lbl">${c.l}</span><span class="chip-val ${c.cls||''}">${c.v}</span></div>`).join('');
+
+/* The Gifts tab is long-format — one row per recipient per year — so
+   adding next December is just new rows, no new columns. This page
+   pivots it back into one line per person with a column per year. */
+let PEOPLE = [], YEARS = [], CUR = null, FILTER = 'all';
+
+const book = g => !g ? null : (g.title || '').trim() ? g : null;
+
+function pivot(rows) {
+  const byKey = new Map();
+  rows.forEach(r => {
+    const name = (r.recipient || '').trim();
+    if (!name) return;
+    const key = name + '|' + (r.family || '').trim();
+    if (!byKey.has(key)) byKey.set(key, { name, family: r.family || '', type: r.type || 'kid', years: {} });
+    const p = byKey.get(key);
+    p.years[r.year] = r;
+    if (r.type) p.type = r.type;
+  });
+  const people = [...byKey.values()];
+  people.forEach(p => {
+    const latest = p.years[Math.max(...Object.keys(p.years).map(Number))];
+    p.age = Number(latest.age) || 0;
+    p.ageYear = Number(latest.year);
+    p.note = latest.note || '';
+  });
+  return people;
+}
+
+/* Rules spotted across years — computed, so they stay true as the sheet grows. */
+function flags(p) {
+  const out = [];
+  const given = YEARS.filter(y => y !== CUR).map(y => book(p.years[y])).filter(Boolean);
+  const authors = given.map(g => (g.author || '').trim()).filter(Boolean);
+  const dupAuthor = authors.find((a, i) => authors.indexOf(a) !== i);
+  if (dupAuthor) out.push(`Same author ×${authors.filter(a => a === dupAuthor).length}`);
+  if (given.some(g => !(g.author || '').trim())) out.push('Title not fully recorded');
+  if (given.some(g => /\s\/\s/.test(g.title))) out.push('Unresolved pick');
+  if (p.type !== 'adult' && p.age >= 12) out.push('Ready for early YA');
+  return out;
+}
+
+function ageNow(p) { return CUR != null ? p.age + (CUR - p.ageYear) : p.age; }
+function isOpen(p) { const g = p.years[CUR]; return !!g && !book(g); }
+
+function cellBook(p, y) {
+  const g = p.years[y];
+  if (!g) return `<td class="ht"><span class="g-none">—</span></td>`;
+  const b = book(g);
+  const open = y === CUR && !b;
+  const cls = 'g-book' + (open ? ' g-open' : '') + (y === CUR ? '' : ' ht');
+  if (!b) return `<td class="${cls}"><span class="g-none">${open ? 'To pick' : 'not recorded'}</span></td>`;
+  return `<td class="${cls}"><span class="t">${escHtml(b.title)}</span>${b.author ? `<span class="a">${escHtml(b.author)}</span>` : ''}</td>`;
+}
+
+function draw() {
+  const q = document.getElementById('g-q').value.trim().toLowerCase();
+  const list = PEOPLE.filter(p => {
+    if (FILTER === 'open'  && !isOpen(p)) return false;
+    if (FILTER === 'kid'   && p.type === 'adult') return false;
+    if (FILTER === 'adult' && p.type !== 'adult') return false;
+    if (!q) return true;
+    const hay = [p.name, p.family, p.note, ...YEARS.flatMap(y => p.years[y] ? [p.years[y].title, p.years[y].author] : [])];
+    return hay.join(' ').toLowerCase().includes(q);
+  });
+
+  document.getElementById('g-head').innerHTML = `<tr>
+    <th>Recipient</th><th>Age</th>
+    ${YEARS.map(y => `<th class="${y === CUR ? 'yr' : 'ht'}">${y}${y === CUR ? ' · this year' : ''}</th>`).join('')}
+    <th class="ht">Watch out for</th></tr>`;
+
+  document.getElementById('g-tbody').innerHTML = list.map(p => {
+    const fl = flags(p);
+    return `<tr>
+      <td class="g-who"><strong>${escHtml(p.name)}</strong>${p.family && p.family !== p.name ? `<div class="g-fam">${escHtml(p.family)}</div>` : ''}</td>
+      <td class="g-age"><strong>${ageNow(p)}</strong>${p.type === 'adult' ? ' <small>adult</small>' : ''}</td>
+      ${YEARS.map(y => cellBook(p, y)).join('')}
+      <td class="ht">${fl.length ? `<div class="g-flags">${fl.map(f => `<span class="badge b-gift">${escHtml(f)}</span>`).join('')}</div>` : ''}${p.note ? `<div class="g-note">${escHtml(p.note)}</div>` : ''}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('g-cards').innerHTML = list.map(p => {
+    const fl = flags(p);
+    return `<div class="ecard">
+      <div class="ecard-top"><span class="ecard-title">${escHtml(p.name)}</span><span class="g-age"><strong>${ageNow(p)}</strong></span></div>
+      <div class="ecard-meta">${p.family && p.family !== p.name ? `<span class="g-fam">${escHtml(p.family)}</span>` : ''}${fl.map(f => `<span class="badge b-gift">${escHtml(f)}</span>`).join('')}</div>
+      <div class="g-years">${YEARS.map(y => {
+        const g = p.years[y]; if (!g) return '';
+        const b = book(g), open = y === CUR && !b;
+        return `<div class="g-yr${open ? ' open' : ''}"><b>${y}</b><span>${b ? `${escHtml(b.title)}${b.author ? ` <span class="g-fam">· ${escHtml(b.author)}</span>` : ''}` : `<span class="g-none">${open ? 'To pick' : 'not recorded'}</span>`}</span></div>`;
+      }).join('')}</div>
+      ${p.note ? `<div class="ecard-note">${escHtml(p.note)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const labels = { all: 'All recipients', open: `Still to pick for ${CUR}`, kid: 'Kids', adult: 'Adults' };
+  document.getElementById('g-label').textContent = `${labels[FILTER]} · ${list.length}`;
+}
+
+function render(all) {
+  const rows = all.filter(r => r.recipient && r.year);
+  document.getElementById('g-empty').style.display = rows.length ? 'none' : 'block';
+  document.getElementById('gift-tools').style.display = rows.length ? 'flex' : 'none';
+  if (!rows.length) { document.getElementById('gift-sum').innerHTML = ''; return; }
+
+  YEARS = [...new Set(rows.map(r => Number(r.year)))].sort((a, b) => a - b);
+  CUR = YEARS[YEARS.length - 1];
+  PEOPLE = pivot(rows).sort((a, b) => (a.type === 'adult') - (b.type === 'adult') || ageNow(b) - ageNow(a) || a.name.localeCompare(b.name));
+
+  const kids = PEOPLE.filter(p => p.type !== 'adult');
+  const ages = kids.map(ageNow);
+  const given = rows.filter(r => book(r) && Number(r.year) !== CUR).length;
+  const picked = PEOPLE.filter(p => book(p.years[CUR])).length;
+  const due = PEOPLE.filter(p => p.years[CUR]).length;
+
+  document.getElementById('gift-sum').innerHTML = chips([
+    { l: 'Recipients', v: PEOPLE.length },
+    { l: 'Kids', v: kids.length },
+    { l: `Ages in ${CUR}`, v: ages.length ? `${Math.min(...ages)}–${Math.max(...ages)}` : '—' },
+    { l: 'Books given', v: given },
+    { l: `${CUR} picked`, v: `${picked}/${due}`, cls: 'gift-c' },
+  ]);
+  draw();
+}
+
+document.getElementById('g-q').addEventListener('input', draw);
+document.querySelectorAll('.gift-chip').forEach(b => b.addEventListener('click', () => {
+  FILTER = b.dataset.f;
+  document.querySelectorAll('.gift-chip').forEach(x => x.classList.toggle('on', x === b));
+  draw();
+}));
+
+/* ── auth + load ─────────────────────────────────────────────────── */
+let tokenClient, accessToken = null;
+function showGateError(msg) { $('gate-error').textContent = msg; }
+
+function initAuth() {
+  $('sheets-link').href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`;
+  if (!window.google || !google.accounts) { showGateError('Could not load Google sign-in — check your connection and reload.'); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: resp => {
+      if (resp.error) { showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  $('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+
+async function onSignedIn() {
+  try {
+    const rows = parse(await loadRows());
+    $('gate').style.display = 'none';
+    $('content').hidden = false;
+    $('sec-actions').hidden = false;
+    render(rows);
+    const t = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    $('sync-badge').querySelector('.sync-dot').className = 'sync-dot ok';
+    $('sync-badge').querySelector('.sync-label').textContent = `Loaded at ${t}`;
+  } catch (e) {
+    showGateError(e.message);
+  }
+}
+
+async function loadRows() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(SHEET_TAB)}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 403) throw new Error('This Google account does not have access to the Book Gifts sheet.');
+  if (res.status === 400) throw new Error(`No tab named "${SHEET_TAB}" in that spreadsheet.`);
+  if (!res.ok) throw new Error(`Could not load the sheet (HTTP ${res.status}).`);
+  return (await res.json()).values || [];
+}
+
+/* Header-driven, so columns can be reordered in the Sheet. The Sheets API
+   drops trailing empty cells, so short rows are normal — missing = ''. */
+function parse(rows) {
+  if (!rows.length) return [];
+  const head = rows[0].map(h => String(h || '').toLowerCase().trim());
+  ['year', 'recipient'].forEach(k => { if (!head.includes(k)) throw new Error(`The Gifts tab needs a "${k}" column.`); });
+  return rows.slice(1).map(r => Object.fromEntries(head.map((h, i) => [h, r[i] == null ? '' : String(r[i]).trim()])));
+}
+
+initAuth();
+</script>
+</body>
+</html>

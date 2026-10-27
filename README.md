@@ -18,6 +18,7 @@
 | 🏅 Half Marathon (`half-marathon.html`) | Training plan with live race-day countdown | Public |
 | 🧮 Exams (`exam.html`) | Touch-friendly practice tests, Regular / Harder (Iron Man or Hulk mode, switchable on the picker), reads from a Sheet, auto-scores | Public |
 | 🎒 Kid (`kid-private.html`) | Report cards by grade/term + Continuous Assessment (CA) results, chip navigation | Private — Google Sign-In |
+| 🎁 Gifts (`gifts-private.html`) | December book gifts to friends' kids — one line per person, a column per year; flags repeat authors and kids ageing into early YA | Private — Google Sign-In |
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
 | 🔥 Embers & Tides (`embers-tides-private.html`) | Coded intake index; every counterparty is a code | Private — Google Sign-In |
@@ -170,6 +171,7 @@ deepu-life/
 ├── exam.html                  ← practice tests, hero-themed per test, reads from a Sheet
 ├── health-private.html       ← private health dashboard (Google Sign-In)
 ├── kid-private.html          ← private report-card dashboard (Google Sign-In)
+├── gifts-private.html        ← private December book-gift history (Google Sign-In)
 ├── results-private.html      ← private BEd results dashboard (Google Sign-In)
 ├── embers-tides-private.html ← coded intake index (private Sheet; seed built by scripts/)
 ├── bucket-private.html       ← bucket list as constellations (private Sheet; seed in data/bucket-list.tsv)

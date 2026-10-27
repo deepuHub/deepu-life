@@ -2,7 +2,7 @@
    deepu-life — shared layout for the activity pages (run.html,
    read.html, cycle.html). Pairs with assets/js/activity.js.
 ═══════════════════════════════════════════════════════════════════ */
-.run-c{color:var(--run)}.read-c{color:var(--read)}.grow-c{color:var(--grow)}.cycle-c{color:var(--cycle)}
+.run-c{color:var(--run)}.read-c{color:var(--read)}.grow-c{color:var(--grow)}.cycle-c{color:var(--cycle)}.gift-c{color:var(--gift)}
 
 .page{padding-top:var(--nav-h);animation:fadeIn 0.3s ease}
 

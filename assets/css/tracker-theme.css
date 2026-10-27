@@ -13,12 +13,13 @@
   --bg:#0a0f0d;--surface:#111a15;--surface2:#162019;--border:#243020;
   --text:#e8ede9;--muted:#6b7d6e;--muted2:#3d5244;
 
-  /* activity accents (Run / Read / Grow / Cycle) */
+  /* activity accents (Run / Read / Grow / Cycle / Gift) */
   --run:#c8f04a;--run-dim:#2a3a0e;
   --read:#f0a83c;--read-dim:#3a2808;
   --grow:#4acfa8;--grow-dim:#0a2e26;
   --cycle:#a78bfa;--cycle-dim:#1e1535;
   --plan:#f0c94a;--plan-dim:#3a3008;
+  --gift:#f06a9c;--gift-dim:#3a0f22;
 
   /* semantic aliases — used by todo.html's priority/status colors */
   --accent:var(--run);--accent-dim:var(--run-dim);
@@ -46,6 +47,7 @@
   --grow:#1f9174;--grow-dim:#d7f2ea;
   --cycle:#7458d1;--cycle-dim:#ece5fb;
   --plan:#a67d0a;--plan-dim:#f7ecc9;
+  --gift:#c2346c;--gift-dim:#fbdfe9;
 
   --accent:var(--run);--accent-dim:var(--run-dim);
   --warning:var(--read);--warning-dim:var(--read-dim);
@@ -154,6 +156,6 @@ nav{
 
 /* ═══ STATUS BADGES — shared by Cycle rides, the Half Marathon plan, etc. ═══ */
 .badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:999px;font-size:0.67rem;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
-.b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}
+.b-run{background:var(--run-dim);color:var(--run)}.b-read{background:var(--read-dim);color:var(--read)}.b-grow{background:var(--grow-dim);color:var(--grow)}.b-gift{background:var(--gift-dim);color:var(--gift)}
 .b-done{background:var(--success-dim);color:var(--success)}.b-prog{background:var(--warning-dim);color:var(--warning)}.b-plan{background:var(--info-dim);color:var(--info)}
 .b-fail{background:var(--danger-dim);color:var(--danger)}.b-neu{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
