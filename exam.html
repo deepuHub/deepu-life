@@ -1721,6 +1721,12 @@ function renderMatch(q, area) {
 document.getElementById('prev-btn').addEventListener('click', () => { if (CURRENT_INDEX > 0) { CURRENT_INDEX--; renderQuestion(); } });
 document.getElementById('next-btn').addEventListener('click', () => { if (CURRENT_INDEX < CURRENT_QUESTIONS.length - 1) { CURRENT_INDEX++; renderQuestion(); } });
 document.getElementById('submit-btn').addEventListener('click', submitExam);
+// Mid-test refresh or close → the browser asks "Leave/Reload? Changes may not be saved."
+window.addEventListener('beforeunload', e => {
+  if (document.getElementById('exam-view').style.display !== 'block') return;
+  e.preventDefault();
+  e.returnValue = '';
+});
 
 // ── GRADING ─────────────────────────────────────────────────────────
 function normalize(v) { return String(v || '').trim().toLowerCase().replace(/\s+/g, ' '); }
