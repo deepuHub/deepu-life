@@ -41,6 +41,8 @@
   :root[data-theme="light"] [data-hero="ticket"]{ --accent:#8a5a00; --accent-dim:#fff4cc; }
   [data-hero="goal"]{ --accent:#22c55e; --accent-dim:rgba(34,197,94,.16); --hero-glow:#15803d; }
   :root[data-theme="light"] [data-hero="goal"]{ --accent:#15803d; --accent-dim:#e3f8ea; }
+  [data-hero="rexhunt"]{ --accent:#f97316; --accent-dim:rgba(249,115,22,.16); --hero-glow:#65a30d; }
+  :root[data-theme="light"] [data-hero="rexhunt"]{ --accent:#c2410c; --accent-dim:#ffedd5; }
   [data-hero="sher"]{ --accent:#f59e0b; --accent-dim:rgba(245,158,11,.16); --hero-glow:#b45309; }
   :root[data-theme="light"] [data-hero="sher"]{ --accent:#a15c07; --accent-dim:#fff3dc; }
 
@@ -442,7 +444,7 @@
         <button class="big-chip" data-subject="sa1hindi">🦁 Hindi <small>मात्रा अ – ऐ · Wed 28 Oct</small></button>
         <button class="big-chip" data-subject="sa1science">🦖 Science <small>Plants, forces &amp; magnets · Thu 29 Oct</small></button>
         <button class="big-chip" data-subject="sa1marathi">⚽ Marathi <small>उ ऊ ऋ ए ऐ ची मात्रा · Fri 30 Oct</small></button>
-        <button class="big-chip" disabled>🔢 Maths <small>soon</small></button>
+        <button class="big-chip" data-subject="sa1maths">🦖 Maths <small>Units 1, 3, 5, 9, 11, 17 · Mon 2 Nov</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="olympiad" hidden>
         <button class="big-chip" data-subject="gk">🧠 GK <small>IGKO · 22 Sep</small></button>
@@ -612,6 +614,10 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1103703159&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=387042907&single=true&output=csv",
   },
+  sa1maths: {
+    "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=3011101&single=true&output=csv",
+    "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=3011102&single=true&output=csv",
+  },
   sa1marathi: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1692763934&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=448627988&single=true&output=csv",
@@ -677,6 +683,11 @@ const TOPIC_EMOJI = {
   "Addition": "➕",
   "Subtraction": "➖",
   "Money": "💵",
+  "Numbers to 1000": "🔢",
+  "Addition & Subtraction": "➕",
+  "Multiplication": "✖️",
+  "Division": "➗",
+  "Pattern & Symmetry": "🦋",
   "Regrouping Tens": "🔟",
   "Complements": "🧩",
   "Word and Structure Knowledge": "🔤",
@@ -927,6 +938,28 @@ const HERO_THEME = {
         say: "Good game! Read the facts and train for the next match!", bubble: "GOOD GAME! 🥅" },
       { min: 0, text: "Every champion trains hard! Read the 💡 facts below and play the match again. 🥅",
         say: "Every champion trains hard! Let's play again!", bubble: "BACK TO TRAINING! 🥅" },
+    ],
+  },
+  // Rex Hunt — SA1 Maths wears this on both tests; the Maths egg in the
+  // Dino Egg Quest is the T-Rex, so every right answer tracks it down.
+  rexhunt: {
+    badge: "🦖", tag: "T-Rex Number Hunt", flybyEmoji: "🦖",
+    title: "Track down the T-Rex!",
+    sub: "Numbers to 1000, money, times tables, sharing and symmetry — every right answer is a footprint closer to the king of the dinosaurs!",
+    confetti: ["#f97316", "#65a30d", "#fde68a", "#7c2d12"],
+    cheer: "ROAR! The T-Rex bows to the maths champion! 🦖",
+    voiceLine: "Roar! You found the T-Rex! Maths champion!",
+    bubbleText: "T-REX FOUND! 🦖",
+    voicePitch: 0.8, voiceRate: 0.95,
+    finish: [
+      { min: 100, text: "T-REX FOUND! Every sum right — the king of the dinosaurs bows to you! 🦖👑",
+        say: "Roar! A perfect hunt! You found the T-Rex!", bubble: "PERFECT HUNT! 👑" },
+      { min: 90, text: "So close! The T-Rex is just behind that tree. 🦖",
+        say: "So close! The T-Rex is just behind that tree!", bubble: "SO CLOSE! 🦖" },
+      { min: 70, text: "Great tracking! Read the 💡 facts below and follow the footprints again. 🐾",
+        say: "Great tracking! Read the facts and hunt again!", bubble: "GREAT TRACKING! 🐾" },
+      { min: 0, text: "Every dino hunter practises! Read the 💡 facts below and try the hunt again. 🐾",
+        say: "Every dino hunter practises! Let's hunt again!", bubble: "HUNT AGAIN! 🐾" },
     ],
   },
   sher: {
@@ -1255,7 +1288,7 @@ if (RESULTS_GS_URL) {
 }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher", sa1science: "trex", sa1marathi: "goal" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher", sa1science: "trex", sa1marathi: "goal", sa1maths: "rexhunt" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');

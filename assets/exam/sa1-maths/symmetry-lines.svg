@@ -1,0 +1,16 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 170' width='480' height='170' font-family='Verdana,Arial,sans-serif'><rect width='480' height='170' fill='#ffffff'/>
+<g stroke='#555' stroke-width='2'>
+<rect x='22' y='35' width='80' height='90' fill='#7cc6fe'/>
+<path d='M180 125 C130 90 130 45 160 42 C172 41 180 52 180 62 C180 52 188 41 200 42 C230 45 230 90 180 125 Z' fill='#ff8fab'/>
+<path d='M260 125 L340 125 L260 35 Z' fill='#8bd17c'/>
+<path d='M380 35 L410 35 L410 95 L460 95 L460 125 L380 125 Z' fill='#f6ad55'/>
+</g>
+<g stroke='#111' stroke-width='3' stroke-dasharray='7 5'>
+<line x1='14' y1='27' x2='110' y2='133'/>
+<line x1='180' y1='24' x2='180' y2='140'/>
+<line x1='300' y1='24' x2='300' y2='140'/>
+<line x1='420' y1='24' x2='420' y2='140'/>
+</g>
+<g font-size='20' font-weight='bold' fill='#111' text-anchor='middle'>
+<text x='62' y='162'>A</text><text x='180' y='162'>B</text><text x='300' y='162'>C</text><text x='420' y='162'>D</text>
+</g></svg>
