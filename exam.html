@@ -39,6 +39,8 @@
   :root[data-theme="light"] [data-hero="ironman"]{ --accent:#b3121f; --accent-dim:#ffe6e0; }
   [data-hero="ticket"]{ --accent:#f5b800; --accent-dim:rgba(245,184,0,.16); --hero-glow:#7b3f00; }
   :root[data-theme="light"] [data-hero="ticket"]{ --accent:#8a5a00; --accent-dim:#fff4cc; }
+  [data-hero="goal"]{ --accent:#22c55e; --accent-dim:rgba(34,197,94,.16); --hero-glow:#15803d; }
+  :root[data-theme="light"] [data-hero="goal"]{ --accent:#15803d; --accent-dim:#e3f8ea; }
   [data-hero="sher"]{ --accent:#f59e0b; --accent-dim:rgba(245,158,11,.16); --hero-glow:#b45309; }
   :root[data-theme="light"] [data-hero="sher"]{ --accent:#a15c07; --accent-dim:#fff3dc; }
 
@@ -439,7 +441,7 @@
         <button class="big-chip" data-subject="sa1dlc">🤖 DL&amp;C <small>Units 1, 2, 3, 5 · Tue 27 Oct</small></button>
         <button class="big-chip" data-subject="sa1hindi">🦁 Hindi <small>मात्रा अ – ऐ · Wed 28 Oct</small></button>
         <button class="big-chip" data-subject="sa1science">🦖 Science <small>Plants, forces &amp; magnets · Thu 29 Oct</small></button>
-        <button class="big-chip" disabled>📖 Marathi <small>soon</small></button>
+        <button class="big-chip" data-subject="sa1marathi">⚽ Marathi <small>उ ऊ ऋ ए ऐ ची मात्रा · Fri 30 Oct</small></button>
         <button class="big-chip" disabled>🔢 Maths <small>soon</small></button>
       </div>
       <div class="chip-row" data-exam-subjects="olympiad" hidden>
@@ -610,6 +612,10 @@ const SHEET_CSV = {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1103703159&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=387042907&single=true&output=csv",
   },
+  sa1marathi: {
+    "Test A - Regular": "",
+    "Test B - Harder":  "",
+  },
   sa1science: {
     "Test A - Regular": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=1540679326&single=true&output=csv",
     "Test B - Harder":  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRssnl8Qrh4NjiJQ08rH4_z-kBEDL2635M9t9S021GIJqorxZCV9hEXj0xfsAW-BqtcG02xRVQdsQ_N/pub?gid=707196139&single=true&output=csv",
@@ -741,6 +747,9 @@ const TOPIC_EMOJI = {
   "Make New Words": "✨",
   "Amatrik Words": "⭕",
   "Fill the Sentence": "📝",
+  "Write in English": "🔤",
+  "Write in Marathi": "✍️",
+  "Match the Columns": "🔗",
   "Hardware & Software": "🖥️",
   "Input Devices": "⌨️",
   "Solving Problems with Data": "🔎",
@@ -898,6 +907,28 @@ const HERO_THEME = {
   },
   // Sher Mode — SA1 Hindi wears this on both tests. In गधा बना शेर the
   // donkey only pretended to be a lion; here the kid is the real शेर.
+  // Goal Mode — SA1 Marathi wears this on both tests. Udhbhav fills his
+  // workbook lines with Messi and CR7, so every right answer is a goal.
+  goal: {
+    badge: "⚽", tag: "Goal Mode", flybyEmoji: "⚽",
+    title: "Score a goal with every matra!",
+    sub: "उ, ऊ, ऋ, ए and ऐ — five matras, one match. Dribble like Messi, shoot like CR7, and put every answer in the back of the net!",
+    confetti: ["#22c55e", "#15803d", "#ffffff", "#facc15"],
+    cheer: "GOOOAL! The whole stadium is cheering! ⚽",
+    voiceLine: "Goal! Goal! Goal! What a match! Siuuu!",
+    bubbleText: "GOOOAL! ⚽",
+    voicePitch: 1.1, voiceRate: 1.05,
+    finish: [
+      { min: 100, text: "HAT-TRICK HERO! Every answer in the back of the net — Messi and CR7 would cheer! ⚽🏆",
+        say: "Goal! Goal! Goal! A perfect match! Siuuu!", bubble: "PERFECT MATCH! 🏆" },
+      { min: 90, text: "What a striker! Just one shot hit the post. ⚽",
+        say: "What a striker! Just one shot hit the post!", bubble: "WHAT A STRIKER! ⚽" },
+      { min: 70, text: "Good game! Read the 💡 facts below — training makes champions. 🥅",
+        say: "Good game! Read the facts and train for the next match!", bubble: "GOOD GAME! 🥅" },
+      { min: 0, text: "Every champion trains hard! Read the 💡 facts below and play the match again. 🥅",
+        say: "Every champion trains hard! Let's play again!", bubble: "BACK TO TRAINING! 🥅" },
+    ],
+  },
   sher: {
     badge: "🦁", tag: "Sher Mode", flybyEmoji: "🦁",
     title: "Roar like a real शेर!",
@@ -978,7 +1009,7 @@ const SUBJECT_LABEL = { maths: "Mathematics", dlc: "DL&C", english: "English", s
 // regular full-width card — add future ones (imo/iso/ieo/icso) here.
 const OLYMPIAD_SUBJECTS = new Set(["gk", "ieo"]);
 // Tests written in Devanagari get bigger type (see .lang-deva).
-const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi", "sa1hindi"]);
+const DEVANAGARI_SUBJECTS = new Set(["ca2marathi", "ca2hindi", "sa1hindi", "sa1marathi"]);
 // The exact test name logged/shown everywhere — includes the subject, so
 // "Test A - Regular" is distinguishable between Mathematics and DL&C.
 function fullTestLabel() { return `${SUBJECT_LABEL[CURRENT_SUBJECT] || CURRENT_SUBJECT} — ${CURRENT_TEST}`; }
@@ -1224,7 +1255,7 @@ if (RESULTS_GS_URL) {
 }
 
 // Subjects that wear their own hero on BOTH tests, overriding the chip's.
-const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher", sa1science: "trex" };
+const SUBJECT_HERO = { ca2science: "trex", ca2social: "tiranga", sa1art: "artist", sa1dlc: "robo", sa1english: "ticket", sa1hindi: "sher", sa1science: "trex", sa1marathi: "goal" };
 function refreshHero() {
   CURRENT_HERO = SUBJECT_HERO[CURRENT_SUBJECT]
     || (CURRENT_TEST === 'Test B - Harder' ? HARDER_HERO : 'cap');
