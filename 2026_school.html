@@ -1520,7 +1520,9 @@ Object.entries(OCT_LUNCH).forEach(([d, v]) => {
   const b = OCT_BREAKFAST[d];
   if (b) MENU[d].breakfast = { regular: octBreakfast(b.r), jain: octBreakfast(b.j || b.r) };
 });
-if (!MENU['2026-11-06']) MENU['2026-11-06'] = { holiday: true, label: 'Diwali Vacations' };
+['2026-11-06','2026-11-09','2026-11-10','2026-11-11','2026-11-12','2026-11-13','2026-11-16','2026-11-17'].forEach(d => {
+  if (!MENU[d]) MENU[d] = { holiday: true, label: 'Diwali Vacations' };
+});
 if (!MENU['2026-11-24']) MENU['2026-11-24'] = { holiday: true, label: 'Guru Nanak Jayanti' };
 if (!MENU['2026-10-02']) MENU['2026-10-02'] = { holiday: true, label: 'Mahatma Gandhi Jayanti' };
 if (!MENU['2026-10-20']) MENU['2026-10-20'] = { holiday: true, label: 'Dusshera' };
@@ -1575,6 +1577,7 @@ const MONTHS = [
     weeks: [
       // SA1 runs to Mon 2 Nov (Maths); 5 Nov is the Grades 1 & 2 picnic; Diwali vacations 6–17 Nov.
       { label: 'Week 1 · Nov 2–6', days: ['2026-11-02','2026-11-03','2026-11-04','2026-11-05','2026-11-06'] },
+      { label: 'Nov 9–17 · Diwali break 🪔', days: ['2026-11-09','2026-11-10','2026-11-11','2026-11-12','2026-11-13','2026-11-16','2026-11-17'] },
       { label: 'Week 2 · Nov 18–20', days: ['2026-11-18','2026-11-19','2026-11-20'] },
       { label: 'Week 3 · Nov 23–27', days: ['2026-11-23','2026-11-24','2026-11-25','2026-11-26','2026-11-27'] },
       { label: 'Week 4 · Nov 30', days: ['2026-11-30'] },
@@ -1602,6 +1605,8 @@ const DAY_NAMES = {
   '2026-10-19':'Mon','2026-10-20':'Tue','2026-10-21':'Wed','2026-10-22':'Thu','2026-10-23':'Fri',
   '2026-10-26':'Mon','2026-10-27':'Tue','2026-10-28':'Wed','2026-10-29':'Thu','2026-10-30':'Fri',
   '2026-11-02':'Mon','2026-11-03':'Tue','2026-11-04':'Wed','2026-11-05':'Thu','2026-11-06':'Fri',
+  '2026-11-09':'Mon','2026-11-10':'Tue','2026-11-11':'Wed','2026-11-12':'Thu','2026-11-13':'Fri',
+  '2026-11-16':'Mon','2026-11-17':'Tue',
   '2026-11-18':'Wed','2026-11-19':'Thu','2026-11-20':'Fri',
   '2026-11-23':'Mon','2026-11-24':'Tue','2026-11-25':'Wed','2026-11-26':'Thu','2026-11-27':'Fri',
   '2026-11-30':'Mon',
