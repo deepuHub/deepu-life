@@ -1413,6 +1413,8 @@ const OCT_THEME_META = {
   'Gujarati':      { emoji: '🪁' },
   'Maharashtrian': { emoji: '🚩' },
   'South Indian':  { emoji: '🌴' },
+  'Punjabi':       { emoji: '🌾' },
+  'Diwali Special':{ emoji: '🪔', label: 'Diwali Special Lunch' },
 };
 const OCT_LUNCH = {
   '2026-10-01': { r: ['Black Chana Salad','Burhani Raita','Bhindi Masala','Dal Panchemal','Steam Rice','Phulka','Khow Suey','Veg Roll'] },
@@ -1469,6 +1471,40 @@ const OCT_BREAKFAST = {
   '2026-10-29': { r: ['Onion Utthapam, Coconut Chutney','Khaman Dhokla, Sweet Chutney','Papaya'] },
   '2026-10-30': { r: ['Besan Chilla, Tomato Chutney','Hummus Sandwich, Sweet Chutney','Mix Fruit'] },
 };
+// ── NOVEMBER 2026 — cafeteria menus (school email, 29 Oct). Same layout as October;
+// the Nov sheet has no evening-snack row, and Jain is only listed where it differs. 3 Nov is the
+// Punjabi theme lunch, 4 Nov a Diwali special. 6 Nov and 9–17 Nov are Diwali vacations. ───────
+const NOV_LUNCH = {
+  '2026-11-02': { r: ['Corn Chaat','Plain Chaas','Kadhai Paneer','Veg Dal','Steam Rice','Phulka','Veg Chowmein',''] },
+  '2026-11-03': { theme: 'Punjabi', r: ['Laccha Onion Salad','Boondi Raita','Amritsari Chole','Dal Makhani','Peas Pulao','Laccha Paratha','Spaghetti Pomodoro',''],
+                  j: ['Cucumber Salad','Boondi Raita','Amritsari Chole','Dal Makhani','Peas Pulao','Laccha Paratha','Spaghetti Pomodoro',''] },
+  '2026-11-04': { theme: 'Diwali Special', r: ['Crunchy Veg & Pomegranate','Mix Veg Raita','Phuchka','Mirchi Ka Salan','Veg Biryani','Fryums','Pizza & Gulabjamun',''] },
+  '2026-11-05': { r: ['Mix Sprout Salad','Lemonade','Dhaba-Style Mushroom Matar','Dal Panchmel','Steam Rice','Phulka','Khow Suey',''] },
+  '2026-11-18': { r: ['Rainbow Salad','Masala Chaas','Veg Jalfrezi','Chana Dal Tadka','Coriander Rice','Phulka','Chocolate Doughnut',''] },
+  '2026-11-19': { r: ['Corn Salad','Cream of Broccoli Soup','Aloo Gobhi Matar','Saboot Masoor Tadka','Jeera Rice','Phulka','Veg Momos',''] },
+  '2026-11-20': { r: ['Khimchi Salad','Lemon Coriander Soup','Fruit Custard','Veg Hakka Noodles','Veg Schezwan Fried Rice','Veg Manchurian','Cheese Garlic Bread',''] },
+  '2026-11-23': { r: ['Green Salad','Chaas','Paneer Lababdar','Dal Triveni','Veg Pulao','Phulka','Fruit Custard',''] },
+  '2026-11-25': { r: ['Green Moong Salad','Buttermilk','Bhindi Masala','Masoor Dal Tadka','Jeera Rice','Phulka','Veg Manchurian',''] },
+  '2026-11-26': { r: ['Black Chana Salad','Buttermilk','Veg Diwani Handi','Masala Khichdi','Kadhi','Phulka','Mac & Cheese',''] },
+  '2026-11-27': { r: ['Three Beans Salad','Boondi Raita','Schezwan Noodles','Veg Biryani','Capsicum Salan','Fryums','Pizza',''] },
+  '2026-11-30': { r: ['Crunchy Veg','Plain Chaas','Paneer Tikka Masala','Dal Tadka','Jeera Rice','Phulka','Mini Burger (Wheat)',''] },
+};
+const NOV_BREAKFAST = {
+  '2026-11-02': { r: ['Oats Chocolate Pancake, Maple Syrup','Mix Veg Poha','Watermelon'] },
+  '2026-11-03': { r: ['Corn Cheese Sandwich, Sweet Chutney','Palak Idli, Coconut Chutney','Papaya'] },
+  '2026-11-04': { r: ['Mix Veg Paratha, Curd','Hara Bhara Kebab, Mint Chutney','Watermelon'] },
+  '2026-11-05': { r: ['Poori, Chole','Dhokla, Sweet Chutney','Mix Fruit'] },
+  '2026-11-18': { r: ['Mix Utthapam, Sambar','Mix Veg Rawa Upma, Coconut Chutney','Watermelon'] },
+  '2026-11-19': { r: ['Medu Wada, Sambar','Oats Kheer','Papaya'] },
+  '2026-11-20': { r: ['Aloo Paratha, Curd','Cheese Chutney Sandwich, Sweet Chutney','Mix Fruit'], j: ['Paneer Paratha, Curd','Cheese Chutney Sandwich, Sweet Chutney','Mix Fruit'] },
+  '2026-11-23': { r: ['Chole, Kulcha','Batata Poha, Lemon','Watermelon'], j: ['Chole, Kulcha','Green Peas Poha, Lemon','Watermelon'] },
+  '2026-11-25': { r: ['Kathi Roll, Sweet Chutney','Veg Cutlet, Green Chutney','Watermelon'] },
+  '2026-11-26': { r: ['Pav, Bhaji','Vermicelli Upma, Coconut Chutney','Papaya'] },
+  '2026-11-27': { r: ['Tadka Idli, Coconut Chutney','Palak Thepla, Curd','Mix Fruit'] },
+  '2026-11-30': { r: ['Mix Veg Paratha, Curd','Vegetable Upma, Coconut Chutney','Watermelon'] },
+};
+Object.assign(OCT_LUNCH, NOV_LUNCH);
+Object.assign(OCT_BREAKFAST, NOV_BREAKFAST);
 const octBreakfast = ([opt1, opt2, fruit]) => ({ opt1, opt2, fruit });
 const octLunch = ([salad, raita, main, dal, rice, bread, yummy]) =>
   ({ salad, raita, dessert: '', main, dal, rice, bread, yummy });
@@ -1484,9 +1520,8 @@ Object.entries(OCT_LUNCH).forEach(([d, v]) => {
   const b = OCT_BREAKFAST[d];
   if (b) MENU[d].breakfast = { regular: octBreakfast(b.r), jain: octBreakfast(b.j || b.r) };
 });
-// Dates with no lunch menu yet (Maths SA1, 2 Nov) are still school days.
-if (!MENU['2026-11-02']) MENU['2026-11-02'] = { noMenu: true };
-if (!MENU['2026-11-05']) MENU['2026-11-05'] = { noMenu: true };   // picnic day: pre-packed snacks + lunch at school
+if (!MENU['2026-11-06']) MENU['2026-11-06'] = { holiday: true, label: 'Diwali Vacations' };
+if (!MENU['2026-11-24']) MENU['2026-11-24'] = { holiday: true, label: 'Guru Nanak Jayanti' };
 if (!MENU['2026-10-02']) MENU['2026-10-02'] = { holiday: true, label: 'Mahatma Gandhi Jayanti' };
 if (!MENU['2026-10-20']) MENU['2026-10-20'] = { holiday: true, label: 'Dusshera' };
 
@@ -1531,9 +1566,18 @@ const MONTHS = [
       { label: 'Week 2 · Oct 5–9', days: ['2026-10-05','2026-10-06','2026-10-07','2026-10-08','2026-10-09'] },
       { label: 'Week 3 · Oct 12–16', days: ['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-16'] },
       { label: 'Week 4 · Oct 19–23', days: ['2026-10-19','2026-10-20','2026-10-21','2026-10-22','2026-10-23'] },
-      // SA1 runs to Mon 2 Nov (Maths), so its last paper sits in this week.
-      { label: 'Week 5 · Oct 26 – Nov 2', days: ['2026-10-26','2026-10-27','2026-10-28','2026-10-29','2026-10-30','2026-11-02'] },
-      { label: 'Nov 5 · Picnic 🎈', days: ['2026-11-05'] },
+      { label: 'Week 5 · Oct 26–30', days: ['2026-10-26','2026-10-27','2026-10-28','2026-10-29','2026-10-30'] },
+    ]
+  },
+  {
+    key: '2026-11',
+    label: 'November',
+    weeks: [
+      // SA1 runs to Mon 2 Nov (Maths); 5 Nov is the Grades 1 & 2 picnic; Diwali vacations 6–17 Nov.
+      { label: 'Week 1 · Nov 2–6', days: ['2026-11-02','2026-11-03','2026-11-04','2026-11-05','2026-11-06'] },
+      { label: 'Week 2 · Nov 18–20', days: ['2026-11-18','2026-11-19','2026-11-20'] },
+      { label: 'Week 3 · Nov 23–27', days: ['2026-11-23','2026-11-24','2026-11-25','2026-11-26','2026-11-27'] },
+      { label: 'Week 4 · Nov 30', days: ['2026-11-30'] },
     ]
   },
 ];
@@ -1557,8 +1601,10 @@ const DAY_NAMES = {
   '2026-10-12':'Mon','2026-10-13':'Tue','2026-10-14':'Wed','2026-10-15':'Thu','2026-10-16':'Fri',
   '2026-10-19':'Mon','2026-10-20':'Tue','2026-10-21':'Wed','2026-10-22':'Thu','2026-10-23':'Fri',
   '2026-10-26':'Mon','2026-10-27':'Tue','2026-10-28':'Wed','2026-10-29':'Thu','2026-10-30':'Fri',
-  '2026-11-02':'Mon',
-  '2026-11-05':'Thu',
+  '2026-11-02':'Mon','2026-11-03':'Tue','2026-11-04':'Wed','2026-11-05':'Thu','2026-11-06':'Fri',
+  '2026-11-18':'Wed','2026-11-19':'Thu','2026-11-20':'Fri',
+  '2026-11-23':'Mon','2026-11-24':'Tue','2026-11-25':'Wed','2026-11-26':'Thu','2026-11-27':'Fri',
+  '2026-11-30':'Mon',
 };
 const WEEKDAY_BY_DATE = DAY_NAMES;
 const TT_KEY = { 'Mon':'mon','Tue':'tue','Wed':'wed','Thu':'thu','Fri':'fri' };
@@ -1942,32 +1988,6 @@ function renderTimeline() {
     return;
   }
 
-  const override = DAY_OVERRIDES[currentDay];
-  if (override) {
-    html += `<div class="shortday-card">
-      <span class="h-emoji">🎈</span>
-      <div><strong>${override.title}</strong><p>${override.intro}</p></div>
-    </div><div class="timeline" style="margin-top:14px;">`;
-    override.schedule.forEach(([time, icon, what, badge]) => {
-      html += `
-        <div class="t-item c-circle" style="position:relative;">
-          <div class="t-time">${time}</div>
-          <div class="t-dot"></div>
-          <div class="period-card">
-            <span class="period-icon">${icon}</span>
-            <div class="period-info"><div class="period-name">${what}</div><div class="period-time">${time}</div></div>
-            <span class="period-badge">${badge}</span>
-          </div>
-        </div>`;
-    });
-    html += `</div><div class="break-card short-break" style="margin-top:14px;">
-        <div class="break-title">📋 Important notes</div>
-        ${override.notes.map(([i, t]) => `<div style="margin:6px 0;font-size:0.88rem;">${i} ${t}</div>`).join('')}
-      </div><div class="day-end">— End of the picnic day —</div>`;
-    wrap.innerHTML = html;
-    return;
-  }
-
   const bf = menuData.breakfast ? menuData.breakfast[mode] : null;
   const ln = menuData.lunch ? menuData.lunch[mode] : null;
   const es = menuData.eveningSnack ? menuData.eveningSnack[mode] : '';
@@ -1992,11 +2012,42 @@ function renderTimeline() {
         <div class="food-chip">🍚 <div class="food-chip-inner"><span class="fc-label">Rice</span>${ln.rice}</div></div>`;
     if (ln.bread) chips += `<div class="food-chip">🫓 <div class="food-chip-inner"><span class="fc-label">Bread</span>${ln.bread}</div></div>`;
     if (ln.dessert) chips += `<div class="food-chip">🍮 <div class="food-chip-inner"><span class="fc-label">Dessert</span>${ln.dessert}</div></div>`;
-    return `${th ? `<div class="theme-strip">${th.emoji} ${menuData.theme} Theme Lunch</div>` : ''}
+    return `${th ? `<div class="theme-strip">${th.emoji} ${th.label || menuData.theme + ' Theme Lunch'}</div>` : ''}
             <div class="food-row">${chips}</div>
             ${ln.yummy ? `<div class="yummy-strip">⭐ Yummy of the Day: ${ln.yummy}</div>` : ''}
             ${es ? `<div class="snack-strip">🌆 ${menuData.snackLabel || 'Evening Snack'}: ${es}</div>` : ''}`;
   };
+
+  const override = DAY_OVERRIDES[currentDay];
+  if (override) {
+    html += `<div class="shortday-card">
+      <span class="h-emoji">🎈</span>
+      <div><strong>${override.title}</strong><p>${override.intro}</p></div>
+    </div><div class="timeline" style="margin-top:14px;">`;
+    override.schedule.forEach(([time, icon, what, badge]) => {
+      html += `
+        <div class="t-item c-circle" style="position:relative;">
+          <div class="t-time">${time}</div>
+          <div class="t-dot"></div>
+          <div class="period-card">
+            <span class="period-icon">${icon}</span>
+            <div class="period-info"><div class="period-name">${what}</div><div class="period-time">${time}</div></div>
+            <span class="period-badge">${badge}</span>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+    if (menuData.lunch) html += `<div class="break-card long-break" style="margin-top:14px;">
+        <div class="break-title">🍱 Lunch at school (on return, ~13:00)</div>
+        ${lunchBody()}
+      </div>`;
+    html += `<div class="break-card short-break" style="margin-top:14px;">
+        <div class="break-title">📋 Important notes</div>
+        ${override.notes.map(([i, t]) => `<div style="margin:6px 0;font-size:0.88rem;">${i} ${t}</div>`).join('')}
+      </div><div class="day-end">— End of the picnic day —</div>`;
+    wrap.innerHTML = html;
+    return;
+  }
 
   // SA1 paper days: school runs 8:00am–12:00pm, so the regular timetable
   // (8:15–2:45) doesn't apply — say so instead of showing it. The cafeteria
