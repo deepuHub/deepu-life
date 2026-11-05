@@ -14,6 +14,7 @@
     { key: 'read',     href: 'read.html',                   icon: '📚', label: 'Read',          group: 'public',  desc: 'Book list and saved quotes' },
     { key: 'cycle',    href: 'cycle.html',                  icon: '🚴', label: 'Cycle',         group: 'public',  desc: 'Ride log and training rides' },
     { key: 'todo',     href: 'todo.html',                   icon: '✅', label: 'To-Do',         group: 'public',  desc: 'Checklists, saved on this device' },
+    { key: 'tripitems',href: 'trip-items.html',             icon: '✈️', label: 'Trip Items',    group: 'public',  desc: 'Packing checklists — tap to tick off' },
     { key: 'quotes',   href: 'quotes.html',                 icon: '💬', label: 'Quotes',        group: 'public',  desc: 'Quotes worth keeping' },
     { key: 'school',   href: '2026_school.html',            icon: '🏫', label: 'School',        group: 'public',  desc: 'Timings, menu, homework and notices' },
     { key: 'exam',     href: 'exam.html',                   icon: '🧮', label: 'Exams',         group: 'public',  desc: 'Practice tests, auto-scored' },

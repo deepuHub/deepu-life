@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>deepu-life — Trip Items</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✈️%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <link rel="stylesheet" href="assets/css/activity.css">
+  <style>
+    .ti-wrap{padding:0 var(--pad) 3rem;max-width:1200px}
+    .sec-sub{color:var(--muted);font-size:0.88rem;margin-top:0.6rem;line-height:1.5}
+
+    /* ── overall progress ── */
+    .overall{margin:1.5rem 0 1rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem}
+    .ov-top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+    .ov-num{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.8rem,5vw,2.6rem);line-height:1;color:var(--text)}
+    .ov-num small{font-size:0.45em;font-weight:300;color:var(--muted);margin-left:4px}
+    .ov-msg{font-size:0.82rem;color:var(--muted)}
+    .bar{height:8px;border-radius:999px;background:var(--surface2);overflow:hidden;margin-top:0.85rem}
+    .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--grow),var(--run));border-radius:inherit;transition:width .35s ease}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem}
+    .btn{font-family:'Epilogue',sans-serif;font-size:0.78rem;font-weight:500;padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+    .btn:hover{color:var(--text);border-color:var(--muted)}
+    .btn.on{background:var(--grow-dim);border-color:var(--grow);color:var(--grow)}
+    .btn.warn:hover{border-color:var(--danger);color:var(--danger)}
+
+    /* ── category tiles (Trip - All) ── */
+    .lbl{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:1.5rem 0 0.7rem}
+    .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+    .tile{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:left;color:var(--text);font-family:inherit;transition:border-color .15s,transform .1s}
+    .tile:hover{border-color:var(--ac)}
+    .tile:active{transform:scale(.98)}
+    .tile.done{border-color:var(--ac);background:var(--ac-dim)}
+    .ring{--p:0;width:38px;height:38px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:1.05rem;
+      background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--surface2) 0)}
+    .ring>span{width:30px;height:30px;border-radius:50%;background:var(--surface);display:grid;place-items:center}
+    .tile.done .ring>span{background:var(--ac-dim)}
+    .tile b{display:block;font-size:0.82rem;font-weight:600;line-height:1.2}
+    .tile em{font-style:normal;font-size:0.72rem;color:var(--muted)}
+
+    /* ── checklist cards ── */
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;align-items:start}
+    @media(max-width:420px){.cards{grid-template-columns:1fr}}
+    .card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--ac);border-radius:10px;overflow:hidden;scroll-margin-top:calc(var(--nav-h) + 12px)}
+    .card.flash{animation:flash 1s ease}
+    @keyframes flash{0%{box-shadow:0 0 0 3px var(--ac)}100%{box-shadow:0 0 0 0 transparent}}
+    .c-head{display:flex;align-items:center;gap:10px;padding:0.9rem 1rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+    .c-ico{font-size:1.3rem}
+    .c-title{flex:1;min-width:0}
+    .c-title h2{font-family:'Fraunces',serif;font-weight:700;font-size:1.05rem;color:var(--text);line-height:1.2}
+    .c-title p{font-size:0.72rem;color:var(--muted);margin-top:2px}
+    .c-count{font-size:0.75rem;font-weight:600;color:var(--ac);background:var(--ac-dim);padding:3px 10px;border-radius:999px;white-space:nowrap}
+    .chev{color:var(--muted);transition:transform .2s;font-size:0.8rem}
+    .card.closed .chev{transform:rotate(-90deg)}
+    .card.closed .c-body{display:none}
+    .c-bar{height:3px;background:var(--surface2)}
+    .c-bar>i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s ease}
+
+    .items{list-style:none;padding:0.35rem 0}
+    .item{display:flex;align-items:center;gap:12px;padding:0.62rem 1rem;cursor:pointer;transition:background .12s;-webkit-tap-highlight-color:transparent;position:relative}
+    .item:hover{background:var(--surface2)}
+    .box{width:22px;height:22px;flex-shrink:0;border-radius:7px;border:2px solid var(--muted2);display:grid;place-items:center;transition:all .15s}
+    .box svg{width:13px;height:13px;stroke:var(--bg);stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;opacity:0;transition:stroke-dashoffset .2s ease .05s,opacity .1s}
+    .item.chk .box{background:var(--ac);border-color:var(--ac)}
+    .item.chk .box svg{stroke-dashoffset:0;opacity:1}
+    .item .txt{flex:1;font-size:0.9rem;color:var(--text);line-height:1.35;transition:color .15s}
+    .item.chk .txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted2)}
+    .item .del{opacity:0;border:none;background:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0 4px}
+    .item:hover .del{opacity:1}
+    @media(hover:none){.item .del{opacity:.6}}
+    .item.pop .box{animation:pop .25s ease}
+    @keyframes pop{50%{transform:scale(1.2)}}
+    .hide-packed .item.chk{display:none}
+    .done-note{display:none;padding:0.4rem 1rem 0.8rem;font-size:0.8rem;color:var(--ac)}
+    .hide-packed .card.all-done .done-note{display:block}
+
+    .c-foot{display:flex;gap:8px;align-items:center;padding:0.5rem 1rem 0.9rem;border-top:1px dashed var(--border)}
+    .c-foot input{flex:1;min-width:0;font-family:inherit;font-size:0.85rem;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+    .c-foot input:focus{outline:none;border-color:var(--ac)}
+    .c-foot .btn{padding:7px 12px}
+    .note{font-size:0.75rem;color:var(--muted);margin-top:1.5rem;line-height:1.5}
+
+    .toast{position:fixed;left:50%;bottom:calc(20px + var(--safe-b));transform:translateX(-50%) translateY(120%);background:var(--text);color:var(--bg);font-size:0.82rem;padding:10px 16px;border-radius:999px;transition:transform .25s ease,opacity .25s;opacity:0;z-index:200;pointer-events:none}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  </style>
+</head>
+<body>
+
+<deepu-nav active="tripitems"></deepu-nav>
+
+<main class="page" style="--ac:var(--grow);--ac-dim:var(--grow-dim)">
+  <div class="sec-head">
+    <div>
+      <p class="sec-eyebrow" style="color:var(--grow)">Trip Items</p>
+      <h1 class="sec-title">Pack it right.</h1>
+      <p class="sec-sub">Tap an item to check it off. Ticks are saved on this device.</p>
+    </div>
+  </div>
+
+  <div class="ti-wrap">
+    <section class="overall">
+      <div class="ov-top">
+        <div class="ov-num" id="ov-num">0<small>/ 0 packed</small></div>
+        <div class="ov-msg" id="ov-msg"></div>
+      </div>
+      <div class="bar"><i id="ov-bar"></i></div>
+      <div class="actions">
+        <button class="btn" id="btn-hide">Hide packed</button>
+        <button class="btn" id="btn-collapse">Collapse all</button>
+        <button class="btn warn" id="btn-reset">↺ New trip (untick all)</button>
+      </div>
+    </section>
+
+    <div class="lbl">Trip — All</div>
+    <div class="tiles" id="tiles"></div>
+
+    <div class="lbl">Checklists</div>
+    <div class="cards" id="cards"></div>
+
+    <p class="note">The item lists are part of the page, so they show on every device. Items you add with “+ Add” and your ticks are saved only in this browser.</p>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+(function(){
+  /* Item lists — copied from the Google Keep "Trip" notes.
+     "Trip - All" is shown as the category tiles at the top. */
+  const LISTS=[
+    {id:'before',  name:'Before the Trip',          icon:'🏠', ac:'plan',  sub:'Do these before you lock the door',
+      items:['Prints','Plants','Switch off AC','Switch off Internet','Switch off TV','Check doors','Clean Fridge','Throw Trash','Check Car']},
+    {id:'docs',    name:'Docs & Prints',            icon:'📄', ac:'read',  sub:'Trip - Docs prints',
+      items:['Passport','Driving licence','Driving insurance','Flight tickets','Car Parking tickets','Car rental docs','Hotel rental docs','Places to visit tickets','Bridge tickets','Ids','Fast tags']},
+    {id:'clothes', name:'Clothes & Outerwear',      icon:'👕', ac:'cycle', sub:'Trip - Clothes n Outerwear',
+      items:['Towels','Underwears','Banians n inners','Boxers','Thermals','Tees n Shirts','Night tees','Swimwear','Jeans','Night pants','Jackets','Skullcaps','Hats','Gloves','Scarfs','Socks','Shoes','Water shoes','Flip-flops','Shoe brush','Duffle bag (empty, extra bag)','Panche','Canyon chappals']},
+    {id:'bath',    name:'Bath & Body',              icon:'🧴', ac:'grow',  sub:'Trip - Bath n Body',
+      items:['Body soap','Face soap','Shampoo','Conditioner','Moisturising cream','Lip guard','Comb','Kumkum','Tooth paste powder','Body spray','Body deo']},
+    {id:'devices', name:'Devices & Utilities',      icon:'🔌', ac:'run',   sub:'Trip - Devices & Utilities',
+      items:['Phones n Chargers','Phone charger','Apple watch + charger','Watch charger','Airpods','Airpods charger','Powerbank','Universal adapter','Junction box','Kindle','GPS device','DSLR camera + chargers','Digital camera + chargers','Tripod','Binoculars','Sun glasses','Car charger','Car aux cable','Sony Bluetooth speaker','Playing cards','Board games','Frisbee','Inflatable toys for Udhu','Swiss Army knife','Waist bag','Water bottles','First aid kit','Mosquito cream','Mosquito incense sticks']},
+    {id:'god',     name:'God',                      icon:'🪔', ac:'gift',  sub:'Trip - God',
+      items:['Panche','LS book','Kumkum','Rudraksha maala','Newspaper/magazine']}
+  ];
+
+  const KEY='deepu-trip-items-v1';
+  let S={checked:{},extra:{},closed:{},hide:false};
+  try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r)S=Object.assign(S,r);}catch(e){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const itemsOf=l=>[...l.items.map(t=>({t,k:l.id+':'+slug(t)})),...(S.extra[l.id]||[]).map(t=>({t,k:l.id+':x:'+slug(t),x:true}))];
+  // de-duplicate keys (e.g. "Kumkum" only once per list)
+  const uniq=a=>{const seen=new Set();return a.filter(i=>!seen.has(i.k)&&seen.add(i.k));};
+  const stat=l=>{const its=uniq(itemsOf(l));return{n:its.length,d:its.filter(i=>S.checked[i.k]).length};};
+  const tick='<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>';
+
+  let toastT;
+  function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}
+
+  function renderTiles(){
+    $('tiles').innerHTML=LISTS.map(l=>{const s=stat(l);const p=s.n?Math.round(s.d/s.n*100):0;
+      return `<button class="tile${s.d===s.n&&s.n?' done':''}" data-go="${l.id}" style="--ac:var(--${l.ac});--ac-dim:var(--${l.ac}-dim)">
+        <span class="ring" style="--p:${p}"><span>${l.icon}</span></span>
+        <span><b>${esc(l.name)}</b><em>${s.d===s.n&&s.n?'All packed ✓':s.d+' / '+s.n}</em></span></button>`;}).join('');
+  }
+  function renderCards(){
+    $('cards').innerHTML=LISTS.map(l=>{
+      const its=uniq(itemsOf(l));
+      return `<section class="card${S.closed[l.id]?' closed':''}" id="c-${l.id}" style="--ac:var(--${l.ac});--ac-dim:var(--${l.ac}-dim)">
+        <div class="c-head" data-toggle="${l.id}">
+          <span class="c-ico">${l.icon}</span>
+          <div class="c-title"><h2>${esc(l.name)}</h2><p>${esc(l.sub)}</p></div>
+          <span class="c-count" data-count="${l.id}"></span><span class="chev">▾</span>
+        </div>
+        <div class="c-bar"><i data-bar="${l.id}"></i></div>
+        <div class="c-body">
+          <ul class="items">${its.map(i=>`<li class="item${S.checked[i.k]?' chk':''}" data-k="${esc(i.k)}" data-l="${l.id}">
+            <span class="box">${tick}</span><span class="txt">${esc(i.t)}</span>${i.x?`<button class="del" data-del="${esc(i.t)}" title="Remove">×</button>`:''}</li>`).join('')}</ul>
+          <div class="done-note">✓ Everything here is packed.</div>
+          <form class="c-foot" data-add="${l.id}">
+            <input placeholder="Add an item…" aria-label="Add item to ${esc(l.name)}" maxlength="60"/>
+            <button class="btn" type="submit">+ Add</button>
+            <button class="btn warn" type="button" data-clear="${l.id}" title="Untick this list">↺</button>
+          </form>
+        </div>
+      </section>`;}).join('');
+    updateCounts();
+  }
+  function updateCounts(){
+    let N=0,D=0;
+    LISTS.forEach(l=>{const s=stat(l);N+=s.n;D+=s.d;
+      const c=document.querySelector(`[data-count="${l.id}"]`);if(c)c.textContent=s.d===s.n&&s.n?'✓ Done':`${s.d}/${s.n}`;
+      const b=document.querySelector(`[data-bar="${l.id}"]`);if(b)b.style.width=(s.n?s.d/s.n*100:0)+'%';
+      const card=$('c-'+l.id);if(card)card.classList.toggle('all-done',s.d===s.n&&s.n>0);
+    });
+    $('ov-num').innerHTML=`${D}<small>/ ${N} packed</small>`;
+    $('ov-bar').style.width=(N?D/N*100:0)+'%';
+    const p=N?D/N:0;
+    $('ov-msg').textContent=p===0?'Ready when you are.':p===1?'All packed — have a great trip! 🎉':p>.75?'Almost there.':p>.4?'Good progress.':'Getting started.';
+    renderTiles();
+    document.body.classList.toggle('hide-packed',!!S.hide);
+    $('btn-hide').classList.toggle('on',!!S.hide);
+    $('btn-hide').textContent=S.hide?'Show packed':'Hide packed';
+    $('btn-collapse').textContent=LISTS.every(l=>S.closed[l.id])?'Expand all':'Collapse all';
+  }
+
+  document.addEventListener('click',e=>{
+    const del=e.target.closest('[data-del]');
+    if(del){e.stopPropagation();const li=del.closest('.item');const l=li.dataset.l;
+      S.extra[l]=(S.extra[l]||[]).filter(t=>t!==del.dataset.del);delete S.checked[li.dataset.k];save();renderCards();toast('Removed');return;}
+    const it=e.target.closest('.item');
+    if(it){const k=it.dataset.k;S.checked[k]=!S.checked[k];if(!S.checked[k])delete S.checked[k];
+      it.classList.toggle('chk',!!S.checked[k]);it.classList.remove('pop');void it.offsetWidth;it.classList.add('pop');
+      save();updateCounts();
+      const l=LISTS.find(x=>x.id===it.dataset.l),s=stat(l);if(S.checked[k]&&s.d===s.n)toast(`${l.icon} ${l.name} — all packed!`);
+      return;}
+    const tg=e.target.closest('[data-toggle]');
+    if(tg){const id=tg.dataset.toggle;S.closed[id]=!S.closed[id];$('c-'+id).classList.toggle('closed',!!S.closed[id]);save();updateCounts();return;}
+    const go=e.target.closest('[data-go]');
+    if(go){const id=go.dataset.go,c=$('c-'+id);if(S.closed[id]){S.closed[id]=false;c.classList.remove('closed');save();updateCounts();}
+      c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash');return;}
+    const clr=e.target.closest('[data-clear]');
+    if(clr){const id=clr.dataset.clear;const l=LISTS.find(x=>x.id===id);
+      if(!confirm(`Untick everything in "${l.name}"?`))return;
+      Object.keys(S.checked).forEach(k=>{if(k.startsWith(id+':'))delete S.checked[k];});save();renderCards();toast('List unticked');}
+  });
+  document.addEventListener('submit',e=>{
+    const f=e.target.closest('[data-add]');if(!f)return;e.preventDefault();
+    const inp=f.querySelector('input'),v=inp.value.trim();if(!v)return;const id=f.dataset.add;
+    S.extra[id]=S.extra[id]||[];if(!S.extra[id].includes(v))S.extra[id].push(v);save();renderCards();
+    const ni=document.querySelector(`[data-add="${id}"] input`);if(ni)ni.focus();toast('Added');
+  });
+  $('btn-hide').onclick=()=>{S.hide=!S.hide;save();updateCounts();};
+  $('btn-collapse').onclick=()=>{const all=LISTS.every(l=>S.closed[l.id]);LISTS.forEach(l=>S.closed[l.id]=!all);save();renderCards();};
+  $('btn-reset').onclick=()=>{if(!confirm('Start a new trip? This unticks every item (your added items stay).'))return;S.checked={};save();renderCards();toast('Fresh start — happy packing!');};
+
+  renderCards();
+})();
+</script>
+</body>
+</html>
