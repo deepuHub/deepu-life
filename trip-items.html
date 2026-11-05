@@ -76,7 +76,15 @@
     @media(hover:none){.item .del{opacity:.6}}
     .item.pop .box{animation:pop .25s ease}
     @keyframes pop{50%{transform:scale(1.2)}}
-    .hide-packed .item.chk{display:none}
+    .hide-packed .item.chk,.hide-packed .item.na{display:none}
+    .item.na .box{border-style:dashed;border-color:var(--muted2);background:transparent}
+    .item.na .box::after{content:'–';color:var(--muted);font-size:0.8rem;line-height:1}
+    .item.na .txt{color:var(--muted2)}
+    .na-tag{display:none;font-size:0.64rem;font-weight:600;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+    .item.na .na-tag{display:inline-block}
+    .bulk{display:flex;gap:6px;flex-wrap:wrap;padding:0.7rem 1rem 0.2rem}
+    .bulk .btn{padding:6px 11px;font-size:0.74rem}
+    .bulk .btn:hover{border-color:var(--ac);color:var(--ac)}
     .done-note{display:none;padding:0.4rem 1rem 0.8rem;font-size:0.8rem;color:var(--ac)}
     .hide-packed .card.all-done .done-note{display:block}
 
@@ -86,8 +94,10 @@
     .c-foot .btn{padding:7px 12px}
     .note{font-size:0.75rem;color:var(--muted);margin-top:1.5rem;line-height:1.5}
 
-    .toast{position:fixed;left:50%;bottom:calc(20px + var(--safe-b));transform:translateX(-50%) translateY(120%);background:var(--text);color:var(--bg);font-size:0.82rem;padding:10px 16px;border-radius:999px;transition:transform .25s ease,opacity .25s;opacity:0;z-index:200;pointer-events:none}
-    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast{position:fixed;left:50%;bottom:calc(20px + var(--safe-b));transform:translateX(-50%) translateY(120%);background:var(--text);color:var(--bg);font-size:0.82rem;padding:10px 16px;border-radius:999px;transition:transform .25s ease,opacity .25s;opacity:0;z-index:200;pointer-events:none;display:flex;align-items:center;gap:12px}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+    .toast button{border:none;background:none;color:var(--grow);font-weight:700;font-family:inherit;font-size:0.82rem;cursor:pointer;padding:0}
+    :root[data-theme="light"] .toast button{color:#7fe0c4}
   </style>
 </head>
 <body>
@@ -99,7 +109,7 @@
     <div>
       <p class="sec-eyebrow" style="color:var(--grow)">Trip Items</p>
       <h1 class="sec-title">Pack it right.</h1>
-      <p class="sec-sub">Tap an item to check it off. Ticks are saved on this device.</p>
+      <p class="sec-sub">Tap an item to check it off — tap an N/A item to bring it back. Ticks are saved on this device.</p>
     </div>
   </div>
 
@@ -111,7 +121,7 @@
       </div>
       <div class="bar"><i id="ov-bar"></i></div>
       <div class="actions">
-        <button class="btn" id="btn-hide">Hide packed</button>
+        <button class="btn" id="btn-hide">Hide done</button>
         <button class="btn" id="btn-collapse">Collapse all</button>
         <button class="btn warn" id="btn-reset">↺ New trip (untick all)</button>
       </div>
@@ -151,8 +161,9 @@
   ];
 
   const KEY='deepu-trip-items-v1';
-  let S={checked:{},extra:{},closed:{},hide:false};
+  let S={checked:{},na:{},extra:{},closed:{},hide:false};
   try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r)S=Object.assign(S,r);}catch(e){}
+  if(!S.na)S.na={};
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
   const $=id=>document.getElementById(id);
   const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -160,17 +171,19 @@
   const itemsOf=l=>[...l.items.map(t=>({t,k:l.id+':'+slug(t)})),...(S.extra[l.id]||[]).map(t=>({t,k:l.id+':x:'+slug(t),x:true}))];
   // de-duplicate keys (e.g. "Kumkum" only once per list)
   const uniq=a=>{const seen=new Set();return a.filter(i=>!seen.has(i.k)&&seen.add(i.k));};
-  const stat=l=>{const its=uniq(itemsOf(l));return{n:its.length,d:its.filter(i=>S.checked[i.k]).length};};
+  const stat=l=>{const its=uniq(itemsOf(l));const p=its.filter(i=>S.checked[i.k]).length,a=its.filter(i=>S.na[i.k]).length;return{n:its.length,p,a,d:p+a};};
   const tick='<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>';
 
   let toastT;
-  function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}
+  function toast(m,undo){const t=$('toast');t.innerHTML='<span></span>';t.firstChild.textContent=m;
+    if(undo){const b=document.createElement('button');b.textContent='Undo';b.onclick=()=>{undo();t.classList.remove('show');};t.appendChild(b);}
+    t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),undo?5000:1800);}
 
   function renderTiles(){
     $('tiles').innerHTML=LISTS.map(l=>{const s=stat(l);const p=s.n?Math.round(s.d/s.n*100):0;
       return `<button class="tile${s.d===s.n&&s.n?' done':''}" data-go="${l.id}" style="--ac:var(--${l.ac});--ac-dim:var(--${l.ac}-dim)">
         <span class="ring" style="--p:${p}"><span>${l.icon}</span></span>
-        <span><b>${esc(l.name)}</b><em>${s.d===s.n&&s.n?'All packed ✓':s.d+' / '+s.n}</em></span></button>`;}).join('');
+        <span><b>${esc(l.name)}</b><em>${s.d===s.n&&s.n?'All done ✓':s.d+' / '+s.n}${s.a?' · '+s.a+' N/A':''}</em></span></button>`;}).join('');
   }
   function renderCards(){
     $('cards').innerHTML=LISTS.map(l=>{
@@ -183,55 +196,68 @@
         </div>
         <div class="c-bar"><i data-bar="${l.id}"></i></div>
         <div class="c-body">
-          <ul class="items">${its.map(i=>`<li class="item${S.checked[i.k]?' chk':''}" data-k="${esc(i.k)}" data-l="${l.id}">
-            <span class="box">${tick}</span><span class="txt">${esc(i.t)}</span>${i.x?`<button class="del" data-del="${esc(i.t)}" title="Remove">×</button>`:''}</li>`).join('')}</ul>
-          <div class="done-note">✓ Everything here is packed.</div>
+          <div class="bulk">
+            <button class="btn" data-bulk="all" data-l="${l.id}">✓ Check all</button>
+            <button class="btn" data-bulk="none" data-l="${l.id}">○ Uncheck all</button>
+            <button class="btn" data-bulk="na" data-l="${l.id}">– Mark rest N/A</button>
+          </div>
+          <ul class="items">${its.map(i=>`<li class="item${S.checked[i.k]?' chk':''}${S.na[i.k]?' na':''}" data-k="${esc(i.k)}" data-l="${l.id}">
+            <span class="box">${tick}</span><span class="txt">${esc(i.t)}</span><span class="na-tag">N/A</span>${i.x?`<button class="del" data-del="${esc(i.t)}" title="Remove">×</button>`:''}</li>`).join('')}</ul>
+          <div class="done-note">✓ Everything here is done.</div>
           <form class="c-foot" data-add="${l.id}">
             <input placeholder="Add an item…" aria-label="Add item to ${esc(l.name)}" maxlength="60"/>
             <button class="btn" type="submit">+ Add</button>
-            <button class="btn warn" type="button" data-clear="${l.id}" title="Untick this list">↺</button>
           </form>
         </div>
       </section>`;}).join('');
     updateCounts();
   }
   function updateCounts(){
-    let N=0,D=0;
-    LISTS.forEach(l=>{const s=stat(l);N+=s.n;D+=s.d;
-      const c=document.querySelector(`[data-count="${l.id}"]`);if(c)c.textContent=s.d===s.n&&s.n?'✓ Done':`${s.d}/${s.n}`;
+    let N=0,D=0,A=0;
+    LISTS.forEach(l=>{const s=stat(l);N+=s.n;D+=s.d;A+=s.a;
+      const c=document.querySelector(`[data-count="${l.id}"]`);if(c)c.textContent=(s.d===s.n&&s.n?'✓ Done':`${s.d}/${s.n}`)+(s.a?` · ${s.a} N/A`:'');
       const b=document.querySelector(`[data-bar="${l.id}"]`);if(b)b.style.width=(s.n?s.d/s.n*100:0)+'%';
       const card=$('c-'+l.id);if(card)card.classList.toggle('all-done',s.d===s.n&&s.n>0);
     });
-    $('ov-num').innerHTML=`${D}<small>/ ${N} packed</small>`;
+    $('ov-num').innerHTML=`${D}<small>/ ${N} done${A?` · ${A} N/A`:''}</small>`;
     $('ov-bar').style.width=(N?D/N*100:0)+'%';
     const p=N?D/N:0;
-    $('ov-msg').textContent=p===0?'Ready when you are.':p===1?'All packed — have a great trip! 🎉':p>.75?'Almost there.':p>.4?'Good progress.':'Getting started.';
+    $('ov-msg').textContent=p===0?'Ready when you are.':p===1?'All done — have a great trip! 🎉':p>.75?'Almost there.':p>.4?'Good progress.':'Getting started.';
     renderTiles();
     document.body.classList.toggle('hide-packed',!!S.hide);
     $('btn-hide').classList.toggle('on',!!S.hide);
-    $('btn-hide').textContent=S.hide?'Show packed':'Hide packed';
+    $('btn-hide').textContent=S.hide?'Show done':'Hide done';
     $('btn-collapse').textContent=LISTS.every(l=>S.closed[l.id])?'Expand all':'Collapse all';
   }
 
   document.addEventListener('click',e=>{
     const del=e.target.closest('[data-del]');
     if(del){e.stopPropagation();const li=del.closest('.item');const l=li.dataset.l;
-      S.extra[l]=(S.extra[l]||[]).filter(t=>t!==del.dataset.del);delete S.checked[li.dataset.k];save();renderCards();toast('Removed');return;}
+      S.extra[l]=(S.extra[l]||[]).filter(t=>t!==del.dataset.del);delete S.checked[li.dataset.k];delete S.na[li.dataset.k];save();renderCards();toast('Removed');return;}
     const it=e.target.closest('.item');
-    if(it){const k=it.dataset.k;S.checked[k]=!S.checked[k];if(!S.checked[k])delete S.checked[k];
-      it.classList.toggle('chk',!!S.checked[k]);it.classList.remove('pop');void it.offsetWidth;it.classList.add('pop');
+    if(it){const k=it.dataset.k;
+      if(S.na[k]){delete S.na[k];}else{S.checked[k]=!S.checked[k];if(!S.checked[k])delete S.checked[k];}
+      it.classList.toggle('chk',!!S.checked[k]);it.classList.toggle('na',!!S.na[k]);it.classList.remove('pop');void it.offsetWidth;it.classList.add('pop');
       save();updateCounts();
-      const l=LISTS.find(x=>x.id===it.dataset.l),s=stat(l);if(S.checked[k]&&s.d===s.n)toast(`${l.icon} ${l.name} — all packed!`);
+      const l=LISTS.find(x=>x.id===it.dataset.l),s=stat(l);if(S.checked[k]&&s.d===s.n)toast(`${l.icon} ${l.name} — all done!`);
       return;}
     const tg=e.target.closest('[data-toggle]');
     if(tg){const id=tg.dataset.toggle;S.closed[id]=!S.closed[id];$('c-'+id).classList.toggle('closed',!!S.closed[id]);save();updateCounts();return;}
     const go=e.target.closest('[data-go]');
     if(go){const id=go.dataset.go,c=$('c-'+id);if(S.closed[id]){S.closed[id]=false;c.classList.remove('closed');save();updateCounts();}
       c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash');return;}
-    const clr=e.target.closest('[data-clear]');
-    if(clr){const id=clr.dataset.clear;const l=LISTS.find(x=>x.id===id);
-      if(!confirm(`Untick everything in "${l.name}"?`))return;
-      Object.keys(S.checked).forEach(k=>{if(k.startsWith(id+':'))delete S.checked[k];});save();renderCards();toast('List unticked');}
+    const bk=e.target.closest('[data-bulk]');
+    if(bk){const l=LISTS.find(x=>x.id===bk.dataset.l),mode=bk.dataset.bulk;
+      const snap={checked:{...S.checked},na:{...S.na}};
+      const keys=uniq(itemsOf(l)).map(i=>i.k);let n=0;
+      keys.forEach(k=>{
+        if(mode==='all'){if(!S.checked[k])n++;S.checked[k]=true;delete S.na[k];}
+        else if(mode==='none'){if(S.checked[k]||S.na[k])n++;delete S.checked[k];delete S.na[k];}
+        else if(!S.checked[k]&&!S.na[k]){S.na[k]=true;n++;}
+      });
+      save();renderCards();
+      const msg=mode==='all'?`Checked ${n} in ${l.name}`:mode==='none'?`Cleared ${n} in ${l.name}`:`${n} marked N/A in ${l.name}`;
+      toast(n?msg:'Nothing to change',n?()=>{S.checked=snap.checked;S.na=snap.na;save();renderCards();}:null);}
   });
   document.addEventListener('submit',e=>{
     const f=e.target.closest('[data-add]');if(!f)return;e.preventDefault();
@@ -241,7 +267,7 @@
   });
   $('btn-hide').onclick=()=>{S.hide=!S.hide;save();updateCounts();};
   $('btn-collapse').onclick=()=>{const all=LISTS.every(l=>S.closed[l.id]);LISTS.forEach(l=>S.closed[l.id]=!all);save();renderCards();};
-  $('btn-reset').onclick=()=>{if(!confirm('Start a new trip? This unticks every item (your added items stay).'))return;S.checked={};save();renderCards();toast('Fresh start — happy packing!');};
+  $('btn-reset').onclick=()=>{if(!confirm('Start a new trip? This unticks every item (your added items stay).'))return;S.checked={};S.na={};save();renderCards();toast('Fresh start — happy packing!');};
 
   renderCards();
 })();
