@@ -25,7 +25,7 @@
   }
   [hidden]{display:none !important}
 
-  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:calc(var(--nav-h) + 2.2rem) var(--pad) 4rem}
+  .wrap{position:relative;z-index:1;max-width:1640px;margin:0 auto;padding:calc(var(--nav-h) + 2.2rem) var(--pad) 4rem}
   .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
 
   .hero{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.2rem 2.5rem;margin-bottom:1.6rem}
@@ -87,7 +87,30 @@
   .empty{padding:2.5rem 1rem;text-align:center;color:var(--muted);font-size:.88rem;line-height:1.7}
 
   /* ── real map ── */
-  #leaflet{height:min(62vh,520px);border-radius:12px;overflow:hidden;background:var(--surface2)}
+  #leaflet{height:min(70vh,560px);border-radius:12px;overflow:hidden;background:var(--surface2)}
+  /* Wide screens: the view card fills the window height and stays put while
+     the trip list scrolls beside it, so the map is never scrolled away. */
+  .grid > .card{scroll-margin-top:calc(var(--nav-h) + .8rem)}
+  @media(min-width:981px){
+    .grid > .card{position:sticky;top:calc(var(--nav-h) + .8rem);height:calc(100vh - var(--nav-h) - 1.6rem);
+                  min-height:420px;display:flex;flex-direction:column}
+    #mapview{flex:1;min-height:0;display:flex;flex-direction:column}
+    #leaflet{flex:1;height:auto;min-height:0}
+    #net,#cal{flex:1;min-height:0;overflow:auto}
+    /* The trip list scrolls inside its own column, to the same height. */
+    .stack{position:sticky;top:calc(var(--nav-h) + .8rem);max-height:calc(100vh - var(--nav-h) - 1.6rem);
+           overflow-y:auto;padding-right:.35rem;scrollbar-width:thin}
+    .stack > *{flex-shrink:0}
+  }
+  /* Full screen: the same card, pinned over the whole window. */
+  body.view-full{overflow:hidden}
+  body.view-full .wrap{z-index:400}
+  body.view-full .grid > .card{position:fixed;inset:0;z-index:5;height:auto;border-radius:0;display:flex;flex-direction:column;
+                               padding:.9rem 1rem calc(.9rem + var(--safe-b))}
+  body.view-full #mapview{flex:1;min-height:0;display:flex;flex-direction:column}
+  body.view-full #leaflet{flex:1;height:auto;min-height:0}
+  body.view-full #net,body.view-full #cal{flex:1;min-height:0;overflow:auto}
+  .tools{display:flex;flex-wrap:wrap;gap:.45rem;margin-left:auto}
   .status{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:var(--muted);margin-top:.5rem}
   .leg-arrow{background:none;border:0}
   .leaflet-tooltip.place-tip{font-family:'Epilogue',sans-serif;font-weight:600;font-size:12px;color:#14201a}
@@ -198,6 +221,10 @@
             <button class="pill" type="button" data-tab="calendar" aria-pressed="false">CALENDAR</button>
             <label id="year-wrap" hidden><select id="year" aria-label="Year"></select></label>
           </div>
+          <div class="tools" role="group" aria-label="Display">
+            <button class="pill" type="button" id="labels-btn" aria-pressed="true">CITY NAMES</button>
+            <button class="pill" type="button" id="full-btn" aria-pressed="false">FULL SCREEN</button>
+          </div>
           <div class="legend" id="legend"></div>
         </div>
         <div id="net"></div>
@@ -266,7 +293,8 @@ const fmtKm = n => Math.round(n).toLocaleString('en-IN');
 
 let tokenClient, accessToken;
 let LEGS = [], PLACES = {}, HOME = '';
-let state = { tab: 'map', year: null, month: null, trip: null };
+let state = { tab: 'map', year: null, month: null, trip: null, labels: true, full: false };
+try { state.labels = localStorage.getItem('deepu-travel-labels') !== 'off'; } catch (e){}
 
 /* ── dates ─────────────────────────────────────────────────────────*/
 const pad = n => String(n).padStart(2, '0');
@@ -539,7 +567,7 @@ async function renderMap(legs){
   try { await loadLeaflet(); } catch (e){ $('map-status').textContent = e.message; return; }
   if (state.tab !== 'map') return;
   if (!map){
-    map = L.map('leaflet', { scrollWheelZoom: false });
+    map = L.map('leaflet', { scrollWheelZoom: false, zoomSnap: 0.25 });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
@@ -581,7 +609,7 @@ async function renderMap(legs){
   [...new Set(legs.flatMap(l => [l.from, l.to]))].forEach(n => {
     const p = PLACES[n]; if (!p) return;
     L.circleMarker([p.lat, p.lon], { radius: n === HOME ? 9 : 6, color: '#14201a', weight: 3, fillColor: '#ffffff', fillOpacity: 1 })
-      .bindTooltip(n, { permanent: true, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
+      .bindTooltip(n, { permanent: state.labels, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
   });
   $('map-status').textContent = legs.length ? 'One arc per leg, with an arrow for its direction. Arcs join the cities; they are not the actual track or flight path.' : 'No journeys in this period.';
 }
@@ -684,6 +712,11 @@ function render(){
   $('legend').innerHTML = Object.entries(MODES).map(([, m]) => `<span><i style="background:${m.color}"></i>${m.label}</span>`).join('') +
     `<span><i class="dash"></i>Still ahead</span>`;
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === state.tab)));
+  $('labels-btn').hidden = state.tab !== 'map';
+  $('labels-btn').setAttribute('aria-pressed', String(state.labels));
+  $('full-btn').setAttribute('aria-pressed', String(state.full));
+  $('full-btn').textContent = state.full ? 'EXIT FULL SCREEN' : 'FULL SCREEN';
+  document.body.classList.toggle('view-full', state.full);
   $('net').hidden = state.tab !== 'network';
   $('mapview').hidden = state.tab !== 'map';
   $('cal').hidden = state.tab !== 'calendar';
@@ -704,8 +737,21 @@ document.addEventListener('click', e => {
   const mo = e.target.closest('[data-month]');
   if (mo && !mo.disabled){ state.month = mo.dataset.month === 'all' ? null : +mo.dataset.month; render(); return; }
   const tk = e.target.closest('[data-trip]');
-  if (tk){ state.trip = state.trip === tk.dataset.trip ? null : tk.dataset.trip; render(); }
+  if (tk){
+    state.trip = state.trip === tk.dataset.trip ? null : tk.dataset.trip; render();
+    // Narrow screens stack the trips under the view: bring the view back up.
+    if (state.trip && window.innerWidth <= 980) document.querySelector('.grid > .card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  if (e.target.closest('#labels-btn')){
+    state.labels = !state.labels;
+    try { localStorage.setItem('deepu-travel-labels', state.labels ? 'on' : 'off'); } catch (err){}
+    render(); return;
+  }
+  if (e.target.closest('#full-btn')){ state.full = !state.full; render(); }
 });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.full){ state.full = false; render(); } });
+window.addEventListener('resize', () => { if (map && state.tab === 'map') map.invalidateSize(); });
 $('year').addEventListener('change', e => { state.year = +e.target.value; state.month = null; state.trip = null; render(); });
 
 /* ── auth ──────────────────────────────────────────────────────────*/
