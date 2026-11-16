@@ -26,6 +26,7 @@
 | 🎙️ Carnatic (`carnatic-private.html`) | Carnatic vocal journey at Artium — badge medallions, lesson ladder, riyaaz log | Private — Google Sign-In |
 | 💡 Ideas (`ideas-private.html`) | Ideas and projects — date each one turned up, status, AI verdict on whether to chase it, impact × effort matrix | Private — Google Sign-In |
 | 🧳 Trips (`trips-private.html`) | Every group trip from its Splitwise export — spend per trip and by category, who fronts the money, who still owes whom; native charts can be written into the Sheet | Private — Google Sign-In |
+| 🚇 Travel (`travel-private.html`) | Where I went — journeys as a metro-style network, a real map and a calendar, with a ticket per trip, distance, cities and nights away | Private — Google Sign-In |
 
 Private pages render nothing until Google authenticates the one account with access to that page's Sheet — enforced by Google, not by the page.
 
@@ -145,6 +146,16 @@ refused; to fix or remove a trip, edit its rows in the Sheet — the page never 
 Group totals are per currency (a currency picker appears when trips differ). Same `spreadsheets` OAuth scope as the
 Bucket List and Ideas pages. One-time setup: create an empty Sheet, put its id in `SPREADSHEET_ID`.
 
+**Travel — a journey log, drawn as a transit network.** `travel-private.html` reads two more tabs of the Trips Ledger
+Sheet: `Journeys` (`id | depart | arrive | from | to | mode | carrier | ref | status | trip | km | with | note`) and `Places`
+(`name | lat | lon | country | home`). One row per leg; legs sharing a `trip` name become one ticket. `mode` is
+`flight | train | bus | road`. `depart` / `arrive` are text (`2026-11-09` or `2026-11-09T15:00`), and the clock decides
+whether a leg is done or still ahead — only `status = planned` (not booked yet) is read from the Sheet. `km` holds the
+distance printed on the ticket; left blank it is estimated (great-circle, × 1.25 on the ground) and shown with `≈`.
+A trip whose legs do not join up gets a "no ticket in the log" warning. The page only reads. No PNRs or phone numbers
+go in the Sheet. `SINCE` in the page source is the first month filled in from bookings; move it back as older months
+are added. The Real map tab loads Leaflet from unpkg (with integrity hashes) and OpenStreetMap tiles, only when opened.
+
 ---
 
 ## Features
@@ -177,6 +188,7 @@ deepu-life/
 ├── bucket-private.html       ← bucket list as constellations (private Sheet; seed in data/bucket-list.tsv)
 ├── carnatic-private.html     ← Carnatic journey at Artium (private Sheet; seed in data/carnatic.tsv)
 ├── ideas-private.html        ← ideas & projects with AI verdicts (private Sheet; seed in data/ideas.tsv)
+├── travel-private.html       ← where I went: network, map, calendar (Journeys + Places tabs of the Trips Sheet)
 ├── assets/
 │   ├── css/
 │   │   ├── tracker-theme.css ← shared design tokens, nav, light/dark palette

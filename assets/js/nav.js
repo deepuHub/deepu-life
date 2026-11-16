@@ -31,6 +31,7 @@
     { key: 'ideas',    href: 'ideas-private.html',          icon: '💡', label: 'Ideas',         group: 'private', desc: 'Ideas and projects, with verdicts' },
     { key: 'gifts',    href: 'gifts-private.html',          icon: '🎁', label: 'Gifts',         group: 'private', desc: 'December book gifts, year by year' },
     { key: 'trips',    href: 'trips-private.html',          icon: '🧳', label: 'Trips',         group: 'private', desc: 'Group trips from Splitwise, across years' },
+    { key: 'travel',   href: 'travel-private.html',         icon: '🚇', label: 'Travel',        group: 'private', desc: 'Where I went: network, map and calendar' },
   ];
   // index.html builds its launcher cards from this same list.
   window.DEEPU_LINKS = LINKS;

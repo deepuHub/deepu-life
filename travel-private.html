@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Travel — deepu-life</title>
+<meta name="description" content="Where I went: a metro-style network, a real map and a calendar, drawn from a private journey log.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🚇%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600&family=Fraunces:wght@700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tracker-theme.css">
+<script src="assets/js/theme.js"></script>
+<style>
+  /* ── Transit skin: the site palette, plus one colour per mode of travel.
+        Flight / train / bus / road are told apart by lightness as well as hue. ── */
+  :root{
+    --m-flight:#7cb7ff;--m-train:#ff8a80;--m-bus:#4ade80;--m-road:#d0a2ff;
+    --hot:#fb7185;--board:#0c1410;--board-ink:#f0c94a;
+  }
+  :root[data-theme="light"]{
+    --m-flight:#1d4ed8;--m-train:#c62828;--m-bus:#15803d;--m-road:#7c3aed;
+    --hot:#be123c;--board:#14201a;--board-ink:#f0c94a;
+  }
+  [hidden]{display:none !important}
+
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:calc(var(--nav-h) + 2.2rem) var(--pad) 4rem}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
+
+  .hero{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.2rem 2.5rem;margin-bottom:1.6rem}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.24em;color:var(--muted);margin-bottom:.6rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,3.1rem);line-height:1;letter-spacing:-.03em}
+  .hero .cap{margin-top:.55rem;font-size:.86rem;color:var(--muted);max-width:52ch;line-height:1.6}
+
+  .stats{display:grid;grid-template-columns:repeat(4,auto);gap:1rem 2.2rem}
+  @media(max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}}
+  .stat{text-align:right}
+  .stat b{display:block;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1;
+          letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .stat span{display:block;margin-top:.3rem;font-size:.78rem;color:var(--muted)}
+  .stat em{display:block;font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;color:var(--muted);margin-top:.15rem}
+
+  /* ── sign-in gate (same shape as the other private pages) ── */
+  .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:34vh}
+  .gate-icon{font-size:2.2rem}
+  .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem}
+  .gate p{font-size:.88rem;line-height:1.7;color:var(--muted);max-width:46ch}
+  .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+              background:var(--run-dim);color:var(--run);border:1px solid var(--run);font-family:'JetBrains Mono',monospace;
+              font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s}
+  .btn-signin:hover{background:var(--run);color:var(--bg)}
+  .btn-signin:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  .gate-error{color:var(--hot);font-size:.8rem;max-width:52ch}
+
+  /* ── layout ── */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,390px);gap:1.15rem;align-items:start}
+  @media(max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+  .card{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:1.1rem 1.2rem}
+
+  .view-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.7rem 1rem;margin-bottom:.6rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:.45rem}
+  .pill{display:inline-flex;align-items:center;min-height:44px;padding:.5rem 1.05rem;border-radius:999px;cursor:pointer;
+        background:transparent;color:var(--text);border:1px solid var(--border);
+        font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em}
+  .pill:hover{border-color:var(--text)}
+  .pill[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .pill:focus-visible,.ticket:focus-visible,.mo:focus-visible,select:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+  select{min-height:44px;padding:.5rem .8rem;border-radius:10px;background:var(--surface2);color:var(--text);border:1px solid var(--border);font:inherit;font-size:.85rem}
+  .legend{display:flex;flex-wrap:wrap;gap:.35rem .9rem;font-size:.74rem;color:var(--muted)}
+  .legend i{display:inline-block;width:1.3rem;height:.42rem;border-radius:4px;margin-right:.4rem;vertical-align:1px}
+  .legend .dash{background:none !important;border-top:3px dotted var(--muted);height:0;border-radius:0;vertical-align:3px}
+
+  /* ── network (metro) view ── */
+  #net{overflow-x:auto}
+  #net svg{display:block;width:100%;min-width:540px;height:auto}
+  .route{fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;transition:opacity .2s}
+  .route.up{stroke-dasharray:1 17}
+  .route.dim{opacity:.14}
+  .stn{fill:var(--surface);stroke:var(--text);stroke-width:4;transition:opacity .2s}
+  .stn-label{font-family:'Fraunces',serif;font-weight:700;font-size:17px;fill:var(--text);
+             paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+  .stn-label.home{font-weight:900;font-size:21px}
+  .stn-sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;fill:var(--muted);
+           paint-order:stroke;stroke:var(--surface);stroke-width:4px}
+  .dimmed{opacity:.25}
+  .empty{padding:2.5rem 1rem;text-align:center;color:var(--muted);font-size:.88rem;line-height:1.7}
+
+  /* ── real map ── */
+  #leaflet{height:min(62vh,520px);border-radius:12px;overflow:hidden;background:var(--surface2)}
+  .status{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:var(--muted);margin-top:.5rem}
+  .leaflet-tooltip.place-tip{font-family:'Epilogue',sans-serif;font-weight:600;font-size:12px;color:#14201a}
+
+  /* ── calendar ── */
+  .cal-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:1.4rem;padding:.4rem 0 .2rem}
+  .cal h3{font-family:'Fraunces',serif;font-weight:900;font-size:1.05rem;margin-bottom:.6rem}
+  .cal h3 small{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:.6rem;letter-spacing:.1em;color:var(--muted);margin-left:.6rem}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+  .dow{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.1em;color:var(--muted);text-align:center;padding-bottom:.2rem}
+  .day{position:relative;aspect-ratio:1/1;min-height:36px;border-radius:8px;border:1px solid transparent;background:var(--surface2);
+       display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.78rem;font-variant-numeric:tabular-nums}
+  .day.blank{background:none}
+  .day.away{background:var(--run-dim);color:var(--text);border-color:var(--run)}
+  .day.away.up{background:none;border-style:dashed}
+  .day.today{outline:2px solid var(--text);outline-offset:1px}
+  .day.dimmed{opacity:.3}
+  .dots{display:flex;gap:2px;height:6px}
+  .dots i{width:6px;height:6px;border-radius:50%}
+  .cal-key{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:.9rem;font-size:.74rem;color:var(--muted)}
+  .cal-key i{display:inline-block;width:.85rem;height:.85rem;border-radius:4px;margin-right:.4rem;vertical-align:-2px}
+
+  /* ── month strip: one dot per journey; doubles as the month filter ── */
+  .strip{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:4px;border-top:1px solid var(--border);margin-top:.8rem;padding-top:.8rem}
+  @media(max-width:640px){.strip{grid-template-columns:repeat(7,minmax(0,1fr))}}
+  .mo{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:48px;padding:.35rem .4rem;border-radius:8px;cursor:pointer;
+      background:none;border:1px solid transparent;color:var(--text);font:inherit;text-align:left}
+  .mo span{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--muted)}
+  .mo:hover{border-color:var(--border)}
+  .mo[aria-pressed="true"]{background:var(--surface2);border-color:var(--text)}
+  .mo[aria-pressed="true"] span{color:var(--text)}
+  .mo:disabled{cursor:default;opacity:.4}
+  .mo .dots{flex-wrap:wrap;height:auto;gap:3px}
+  .mo .dots i{width:8px;height:8px}
+
+  /* ── ticket stack ── */
+  .stack{display:flex;flex-direction:column;gap:.6rem}
+  .stack h2{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:.64rem;letter-spacing:.2em;color:var(--muted);margin:.5rem 0 .1rem}
+  .stack h2:first-child{margin-top:0}
+  .ticket{display:flex;width:100%;padding:0;text-align:left;cursor:pointer;color:var(--text);font:inherit;
+          background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+  .ticket:hover{border-color:var(--muted)}
+  .ticket[aria-pressed="true"]{border-color:var(--text)}
+  .ticket.next{background:var(--board);color:#f3f6f1;border-color:var(--board)}
+  .ticket.next[aria-pressed="true"]{border-color:var(--board-ink)}
+  .tk-main{flex:1;min-width:0;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.35rem}
+  .tk-meta{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem .6rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--muted)}
+  .ticket.next .tk-meta,.ticket.next .tk-sub{color:#c3cdc4}
+  .tk-meta i{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin:0 .35rem 0 .1rem}
+  .tk-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.12rem;line-height:1.15;letter-spacing:-.01em}
+  .tk-route{font-size:.8rem;line-height:1.5}
+  .tk-sub{font-size:.74rem;color:var(--muted);line-height:1.5}
+  .tk-gap{font-size:.74rem;line-height:1.45;color:var(--hot);font-weight:500}
+  .ticket.next .tk-gap{color:#ffb3bf}
+  .tk-stub{flex:0 0 86px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:.6rem;
+           border-left:2px dashed var(--border)}
+  .ticket.next .tk-stub{border-left-color:#5a6b5d}
+  .tk-stub b{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem;line-height:1;font-variant-numeric:tabular-nums}
+  .ticket.next .tk-stub b{color:var(--board-ink)}
+  .tk-stub span{font-size:.68rem;color:var(--muted);text-align:center}
+  .ticket.next .tk-stub span{color:#c3cdc4}
+
+  .legs{border:1px solid var(--border);border-radius:12px;padding:.3rem .9rem;margin-top:-.2rem;background:var(--surface)}
+  .leg{display:grid;grid-template-columns:4.6rem minmax(0,1fr) auto;gap:.2rem .7rem;align-items:baseline;padding:.55rem 0;border-top:1px solid var(--border);font-size:.8rem}
+  .leg:first-child{border-top:0}
+  .leg time{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.06em;color:var(--muted)}
+  .leg b{font-weight:500}
+  .leg small{display:block;color:var(--muted);font-size:.72rem;line-height:1.45}
+  .leg .km{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);white-space:nowrap}
+  .leg i{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;margin-right:.4rem}
+
+  footer{margin-top:2rem;font-size:.74rem;color:var(--muted);line-height:1.7;max-width:80ch}
+  footer code{font-family:'JetBrains Mono',monospace;font-size:.68rem}
+</style>
+</head>
+<body>
+
+<deepu-nav active="travel"></deepu-nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <p class="kicker" id="kicker">TRAVEL NETWORK</p>
+      <h1>Where I went</h1>
+      <p class="cap" id="cap">Every journey as a line on the network, a route on the map and a day on the calendar.</p>
+    </div>
+    <div class="stats" id="stats" hidden></div>
+  </header>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private journey log</h2>
+    <p>Journeys live in a private Google Sheet. Sign in with the Google account that owns it — anyone else’s sign-in is rejected by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error" role="alert"></p>
+  </div>
+
+  <main id="main" hidden>
+    <div class="grid">
+      <section class="card" aria-label="Where I went">
+        <div class="view-head">
+          <div class="tabs" role="group" aria-label="View">
+            <button class="pill" type="button" data-tab="network" aria-pressed="true">NETWORK</button>
+            <button class="pill" type="button" data-tab="map" aria-pressed="false">REAL MAP</button>
+            <button class="pill" type="button" data-tab="calendar" aria-pressed="false">CALENDAR</button>
+            <label id="year-wrap" hidden><select id="year" aria-label="Year"></select></label>
+          </div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div id="net"></div>
+        <div id="mapview" hidden>
+          <div id="leaflet"></div>
+          <p class="status" id="map-status" role="status"></p>
+        </div>
+        <div id="cal" hidden></div>
+        <div class="strip" id="strip" role="group" aria-label="Month"></div>
+      </section>
+      <section class="stack" id="stack" aria-label="Trips"></section>
+    </div>
+  </main>
+
+  <footer id="foot"></footer>
+</div>
+
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   Travel — where I went, as a transit network.
+
+   Reads two tabs of the private Trips Ledger Sheet (the same Sheet the
+   Trips page uses) through the Sheets API as the signed-in user. The
+   page only reads; rows are added in the Sheet.
+
+   Journeys  id | depart | arrive | from | to | mode | carrier | ref |
+             status | trip | km | with | note
+     depart/arrive  text, 2026-11-09 or 2026-11-09T15:00 (local time)
+     mode           flight | train | bus | road
+     status         planned = not booked yet; anything else is decided
+                    by the clock (arrived → done, otherwise upcoming)
+     trip           legs sharing a trip name become one ticket
+     km             the ticket's own distance when it prints one; blank
+                    = estimated here (great-circle, × 1.25 on the ground)
+   Places    name | lat | lon | country | home
+     one row per city; exactly one row has home = yes
+
+   SINCE is the first month the log has been filled in from bookings.
+   Months before it are shown as "not imported" rather than "no travel".
+   Move it back as older months are added.
+══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1X-y2IiW94QcF6ds100F9wNtLNUmoi6RftPZwBqgxxH0';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+const SINCE  = '2026-10';
+
+/* Leaflet is fetched only when the Real map tab is first opened. */
+const LEAFLET = {
+  js:  ['https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',  'sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH'],
+  css: ['https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', 'sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H'],
+};
+
+const MODES = {
+  flight: { label: 'Flight', color: 'var(--m-flight)', cssVar: '--m-flight' },
+  train:  { label: 'Train',  color: 'var(--m-train)',  cssVar: '--m-train'  },
+  bus:    { label: 'Bus',    color: 'var(--m-bus)',    cssVar: '--m-bus'    },
+  road:   { label: 'Road',   color: 'var(--m-road)',   cssVar: '--m-road'   },
+};
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtKm = n => Math.round(n).toLocaleString('en-IN');
+
+let tokenClient, accessToken;
+let LEGS = [], PLACES = {}, HOME = '';
+let state = { tab: 'network', year: null, month: null, trip: null };
+
+/* ── dates ─────────────────────────────────────────────────────────*/
+const pad = n => String(n).padStart(2, '0');
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const dayNum = key => { const [y, m, d] = key.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 864e5); };
+const fromDayNum = n => { const d = new Date(n * 864e5); return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); };
+const fmtDay = key => { const [, m, d] = key.split('-').map(Number); return `${d} ${MONTHS[m - 1]}`; };
+function fmtRange(a, b){
+  if (a === b) return fmtDay(a);
+  const [, ma, da] = a.split('-').map(Number), [, mb, db] = b.split('-').map(Number);
+  return ma === mb ? `${da}–${db} ${MONTHS[ma - 1]}` : `${fmtDay(a)} – ${fmtDay(b)}`;
+}
+/* Sheet cell → {at: Date, day: 'YYYY-MM-DD', time: 'HH:MM' | ''}. Accepts the
+   text form the log uses and, in case a cell got auto-converted, a Sheets
+   serial number. A date with no time counts as noon. */
+function parseWhen(v){
+  if (typeof v === 'number' && isFinite(v)){
+    const u = new Date(Math.round((v - 25569) * 864e5));
+    const at = new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate(), u.getUTCHours(), u.getUTCMinutes());
+    const hasTime = v % 1 !== 0;
+    if (!hasTime) at.setHours(12);
+    return { at, day: keyOf(at), time: hasTime ? `${pad(at.getHours())}:${pad(at.getMinutes())}` : '' };
+  }
+  const m = /^'?(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/.exec(String(v || '').trim());
+  if (!m) return null;
+  const at = new Date(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 12, m[5] ? +m[5] : 0);
+  return { at, day: `${m[1]}-${m[2]}-${m[3]}`, time: m[4] ? `${pad(+m[4])}:${m[5]}` : '' };
+}
+
+/* ── Sheets API ────────────────────────────────────────────────────*/
+async function api(path){
+  const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}${path}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (res.status === 403) throw new Error('This Google account does not have access to the journey log.');
+  if (res.status === 404) throw new Error('Sheet not found — check SPREADSHEET_ID in this page’s source.');
+  if (!res.ok){
+    let detail = '';
+    try { detail = (await res.json()).error.message; } catch (e){}
+    if (/parse range/i.test(detail)) throw new Error('The Sheet has no Journeys or Places tab yet.');
+    throw new Error(`Sheets API error ${res.status}${detail ? ': ' + detail : ''}`);
+  }
+  return res.json();
+}
+/* Header-driven, so columns can be reordered in the Sheet. */
+function rowsOf(values){
+  if (!values || !values.length) return [];
+  const h = values[0].map(x => String(x || '').toLowerCase().trim());
+  return values.slice(1).map(r => { const o = {}; h.forEach((k, i) => { o[k] = r[i] == null ? '' : r[i]; }); return o; });
+}
+function haversine(a, b){
+  const R = 6371, rad = x => x * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+async function loadAll(){
+  const r = await api('/values:batchGet?ranges=Journeys&ranges=Places&valueRenderOption=UNFORMATTED_VALUE');
+  const [journeys, places] = (r.valueRanges || []).map(v => v.values || []);
+  PLACES = {}; HOME = '';
+  rowsOf(places).forEach(o => {
+    const name = String(o.name || '').trim(), lat = parseFloat(o.lat), lon = parseFloat(o.lon);
+    if (!name || !isFinite(lat) || !isFinite(lon)) return;
+    PLACES[name] = { name, lat, lon, country: String(o.country || '') };
+    if (/^(y|yes|true|1)$/i.test(String(o.home).trim()) && !HOME) HOME = name;
+  });
+  LEGS = rowsOf(journeys).map(o => {
+    const dep = parseWhen(o.depart), arr = parseWhen(o.arrive) || dep;
+    const from = String(o.from || '').trim(), to = String(o.to || '').trim();
+    if (!dep || !from || !to) return null;
+    const mode = MODES[String(o.mode || '').toLowerCase().trim()] ? String(o.mode).toLowerCase().trim() : 'road';
+    let km = parseFloat(o.km), est = false;
+    if (!isFinite(km) || km <= 0){
+      const a = PLACES[from], b = PLACES[to];
+      km = a && b ? haversine(a, b) * (mode === 'flight' ? 1 : 1.25) : 0;
+      est = true;
+    }
+    return {
+      id: String(o.id || ''), dep, arr, from, to, mode, km, est,
+      carrier: String(o.carrier || ''), ref: String(o.ref || ''),
+      planned: String(o.status || '').toLowerCase().trim() === 'planned',
+      trip: String(o.trip || '').trim() || `${from} → ${to}`,
+      who: String(o.with || ''), note: String(o.note || ''),
+    };
+  }).filter(Boolean).sort((a, b) => a.dep.at - b.dep.at);
+}
+
+/* ── derived ───────────────────────────────────────────────────────*/
+const now = () => new Date();
+const isDone = leg => !leg.planned && leg.arr.at <= now();
+function legsInView(){
+  return LEGS.filter(l => l.dep.at.getFullYear() === state.year && (state.month == null || l.dep.at.getMonth() === state.month));
+}
+function tripsOf(legs){
+  const map = new Map();
+  legs.forEach(l => { if (!map.has(l.trip)) map.set(l.trip, []); map.get(l.trip).push(l); });
+  const today = keyOf(now());
+  return [...map.entries()].map(([name, ls]) => {
+    const start = ls[0].dep.day, end = ls.reduce((m, l) => l.arr.day > m ? l.arr.day : m, ls[0].arr.day);
+    const gaps = [];
+    ls.forEach((l, i) => { if (i && ls[i - 1].to !== l.from) gaps.push(`${ls[i - 1].to} → ${l.from}`); });
+    let route = ls[0].from;
+    ls.forEach((l, i) => { route += (i && ls[i - 1].to !== l.from ? ` · ${l.from}` : '') + ` → ${l.to}`; });
+    const who = [...new Set(ls.flatMap(l => l.who.split(',').map(s => s.trim()).filter(Boolean)))];
+    return {
+      name, legs: ls, start, end, gaps, route, who,
+      modes: [...new Set(ls.map(l => l.mode))],
+      km: ls.reduce((s, l) => s + l.km, 0), est: ls.some(l => l.est),
+      nights: dayNum(end) - dayNum(start),
+      done: ls.every(isDone), startsIn: dayNum(start) - dayNum(today),
+    };
+  }).sort((a, b) => a.start < b.start ? -1 : 1);
+}
+function yearsAvailable(){
+  const ys = new Set(LEGS.map(l => l.dep.at.getFullYear()));
+  ys.add(+SINCE.slice(0, 4));
+  return [...ys].sort((a, b) => b - a);
+}
+const monthImported = (y, m) => `${y}-${pad(m + 1)}` >= SINCE;
+
+/* ── stats ─────────────────────────────────────────────────────────*/
+function renderStats(legs, trips){
+  const done = legs.filter(isDone), ahead = legs.filter(l => !isDone(l));
+  const cities = ls => new Set(ls.flatMap(l => [l.from, l.to]).filter(p => p !== HOME));
+  const cDone = cities(done), cAll = cities(legs);
+  const kmDone = done.reduce((s, l) => s + l.km, 0), kmAhead = ahead.reduce((s, l) => s + l.km, 0);
+  const today = dayNum(keyOf(now()));
+  let nights = 0, nightsAhead = 0;
+  trips.forEach(t => {
+    const s = dayNum(t.start), e = dayNum(t.end), past = Math.max(0, Math.min(e, today) - s);
+    nights += past; nightsAhead += (e - s) - past;
+  });
+  const tDone = trips.filter(t => t.done).length;
+  const stat = (big, label, more) => `<div class="stat"><b>${big}</b><span>${label}</span>${more ? `<em>${more}</em>` : ''}</div>`;
+  $('stats').innerHTML =
+    stat(cDone.size, cDone.size === 1 ? 'city' : 'cities', cAll.size > cDone.size ? `+${cAll.size - cDone.size} ahead` : '') +
+    stat(fmtKm(kmDone), 'km travelled', kmAhead ? `+${fmtKm(kmAhead)} ahead` : '') +
+    stat(tDone, tDone === 1 ? 'trip done' : 'trips done', trips.length > tDone ? `+${trips.length - tDone} ahead` : '') +
+    stat(nights, nights === 1 ? 'night away' : 'nights away', nightsAhead ? `+${nightsAhead} ahead` : '');
+  $('stats').hidden = false;
+}
+
+/* ── network: a metro map drawn from latitude and longitude ─────────
+   A transit diagram keeps the order of things (what is north of what,
+   what is east of what) but not true distances. Each place gets its own
+   row, north to south, and a column, west to east; every gap has a fixed
+   minimum so labels never collide, and whatever room is left over is
+   shared out in proportion to the real distance. Places are then joined
+   with lines that run only straight or at 45°. */
+const NET = { w: 720, h: 480, l: 150, r: 170, t: 40, b: 40 };
+function spread(values, room, minGap, nearGap, nearTol){
+  /* values sorted ascending → positions 0..room */
+  const n = values.length;
+  if (n === 1) return [room / 2];
+  const span = values[n - 1] - values[0] || 1;
+  let fixed = [], total = 0;
+  for (let i = 1; i < n; i++){ const g = (values[i] - values[i - 1]) < nearTol * span ? nearGap : minGap; fixed.push(g); total += g; }
+  const scale = total > room ? room / total : 1, spare = Math.max(0, room - total);
+  const out = [0];
+  for (let i = 1; i < n; i++) out.push(out[i - 1] + fixed[i - 1] * scale + spare * (values[i] - values[i - 1]) / span);
+  return out;
+}
+function layoutPlaces(names){
+  const P = names.map(n => PLACES[n]).filter(Boolean);
+  if (!P.length) return {};
+  const iw = NET.w - NET.l - NET.r, ih = NET.h - NET.t - NET.b, out = {};
+  const byLon = [...P].sort((a, b) => a.lon - b.lon), byLat = [...P].sort((a, b) => b.lat - a.lat);
+  const xs = spread(byLon.map(p => p.lon), iw, 64, 26, 0.04);
+  const ys = spread(byLat.map(p => -p.lat), ih, 42, 42, 0);
+  byLon.forEach((p, i) => { out[p.name] = { x: NET.l + xs[i], y: 0 }; });
+  byLat.forEach((p, i) => { out[p.name].y = NET.t + ys[i]; });
+  return out;
+}
+/* Straight run first, then a 45° run into the far station. Endpoints are
+   ordered so the same pair always takes the same path whichever way it
+   was travelled. */
+function octilinear(a, b){
+  let p = a, q = b;
+  if (p.y > q.y || (p.y === q.y && p.x > q.x)) [p, q] = [q, p];
+  const dx = q.x - p.x, dy = q.y - p.y, adx = Math.abs(dx), ady = Math.abs(dy), d = Math.min(adx, ady);
+  const mid = adx > ady ? [p.x + Math.sign(dx) * (adx - d), p.y] : [p.x, p.y + Math.sign(dy) * (ady - d)];
+  return [[p.x, p.y], mid, [q.x, q.y]];
+}
+function renderNetwork(legs){
+  const names = [...new Set([HOME, ...legs.flatMap(l => [l.from, l.to])].filter(n => PLACES[n]))];
+  if (!legs.length){
+    $('net').innerHTML = `<p class="empty">No journeys in this period.</p>`;
+    return;
+  }
+  const pos = layoutPlaces(names);
+  /* One line per pair of places and mode; dotted until some leg on it is done. */
+  const routes = new Map();
+  legs.forEach(l => {
+    if (!pos[l.from] || !pos[l.to]) return;
+    const pair = [l.from, l.to].sort().join('|'), key = `${pair}|${l.mode}`;
+    if (!routes.has(key)) routes.set(key, { pair, mode: l.mode, a: l.from, b: l.to, done: false, trips: new Set(), n: 0 });
+    const r = routes.get(key);
+    r.done = r.done || isDone(l); r.trips.add(l.trip); r.n++;
+  });
+  const byPair = new Map();
+  routes.forEach(r => { if (!byPair.has(r.pair)) byPair.set(r.pair, []); byPair.get(r.pair).push(r); });
+  let lines = '';
+  byPair.forEach(group => group.forEach((r, i) => {
+    const pts = octilinear(pos[r.a], pos[r.b]);
+    const off = (i - (group.length - 1) / 2) * 11;
+    if (off){
+      const [x1, y1] = pts[0], [x2, y2] = pts[2], len = Math.hypot(x2 - x1, y2 - y1) || 1;
+      const ox = -(y2 - y1) / len * off, oy = (x2 - x1) / len * off;
+      pts.forEach(p => { p[0] += ox; p[1] += oy; });
+    }
+    const dim = state.trip && !r.trips.has(state.trip) ? ' dim' : '';
+    const d = pts.map((p, n) => `${n ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+    lines += `<path class="route${r.done ? '' : ' up'}${dim}" d="${d}" stroke="${MODES[r.mode].color}"><title>${esc(r.a)} – ${esc(r.b)} · ${MODES[r.mode].label}${r.n > 1 ? ` × ${r.n}` : ''}${r.done ? '' : ' · ahead'}</title></path>`;
+  }));
+  const inTrip = new Set(state.trip ? legs.filter(l => l.trip === state.trip).flatMap(l => [l.from, l.to]) : []);
+  /* A label goes in whichever of eight directions is furthest from the
+     lines leaving its station; right, then left, win ties. */
+  const exits = {};
+  const exit = (name, from, to) => { (exits[name] = exits[name] || []).push(Math.atan2(to[1] - from[1], to[0] - from[0])); };
+  routes.forEach(r => {
+    const pts = octilinear(pos[r.a], pos[r.b]);
+    const first = pos[r.a].x === pts[0][0] && pos[r.a].y === pts[0][1] ? r.a : r.b, last = first === r.a ? r.b : r.a;
+    const leave = (at, i, step) => { let j = i + step; if (Math.hypot(pts[j][0] - pts[i][0], pts[j][1] - pts[i][1]) < 2) j += step; exit(at, pts[i], pts[j]); };
+    leave(first, 0, 1); leave(last, 2, -1);
+  });
+  const SPOTS = [ // [angle°, dx, dy, anchor] with dx/dy in units of the gap
+    [0, 1, 0.35, 'start'], [180, -1, 0.35, 'end'], [45, 0.8, 1.25, 'start'], [-135, -0.8, -0.7, 'end'],
+    [-45, 0.8, -0.7, 'start'], [135, -0.8, 1.25, 'end'], [90, 0, 1.75, 'middle'], [-90, 0, -1.05, 'middle'],
+  ];
+  const apart = (a, b) => { const d = Math.abs(a - b) % (2 * Math.PI); return d > Math.PI ? 2 * Math.PI - d : d; };
+  let stations = '', labels = '';
+  names.forEach(n => {
+    const p = pos[n]; if (!p) return;
+    const dim = state.trip && !inTrip.has(n) ? ' dimmed' : '';
+    const home = n === HOME, gap = home ? 22 : 17, ex = exits[n] || [];
+    let best = SPOTS[0], bestClear = -1;
+    SPOTS.forEach(sp => {
+      const clear = ex.length ? Math.min(...ex.map(e => apart(e, sp[0] * Math.PI / 180))) : 9;
+      if (clear > bestClear + 0.01){ best = sp; bestClear = clear; }
+    });
+    const lx = p.x + best[1] * gap, ly = p.y + best[2] * gap, anchor = best[3];
+    stations += home
+      ? `<rect class="stn${dim}" x="${(p.x - 13).toFixed(1)}" y="${(p.y - 13).toFixed(1)}" width="26" height="26" rx="13" stroke-width="5"/>`
+      : `<circle class="stn${dim}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="8.5"/>`;
+    labels += `<text class="stn-label${home ? ' home' : ''}${dim}" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}">${esc(n)}</text>`;
+    if (home) labels += `<text class="stn-sub${dim}" x="${lx.toFixed(1)}" y="${(ly + (best[2] < 0 ? -22 : 16)).toFixed(1)}" text-anchor="${anchor}">HOME · INTERCHANGE</text>`;
+  });
+  $('net').innerHTML = `<svg viewBox="0 0 ${NET.w} ${NET.h}" role="img" aria-label="Metro-style network of ${names.length} places joined by ${routes.size} routes">${lines}${stations}${labels}</svg>`;
+}
+
+/* ── real map (Leaflet + OpenStreetMap tiles, loaded on demand) ─────*/
+let leafletReady = null, map = null, mapLayer = null;
+function loadLeaflet(){
+  if (leafletReady) return leafletReady;
+  leafletReady = new Promise((resolve, reject) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = LEAFLET.css[0]; css.integrity = LEAFLET.css[1]; css.crossOrigin = 'anonymous';
+    document.head.appendChild(css);
+    const js = document.createElement('script');
+    js.src = LEAFLET.js[0]; js.integrity = LEAFLET.js[1]; js.crossOrigin = 'anonymous';
+    js.onload = resolve;
+    js.onerror = () => { leafletReady = null; reject(new Error('Could not load the map library — check the connection and try again.')); };
+    document.head.appendChild(js);
+  });
+  return leafletReady;
+}
+async function renderMap(legs){
+  $('map-status').textContent = 'Loading map…';
+  try { await loadLeaflet(); } catch (e){ $('map-status').textContent = e.message; return; }
+  if (state.tab !== 'map') return;
+  if (!map){
+    map = L.map('leaflet', { scrollWheelZoom: false });
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    mapLayer = L.layerGroup().addTo(map);
+  }
+  mapLayer.clearLayers();
+  const css = getComputedStyle(document.documentElement);
+  const pts = [];
+  legs.forEach(l => {
+    const a = PLACES[l.from], b = PLACES[l.to]; if (!a || !b) return;
+    const faded = state.trip && l.trip !== state.trip;
+    L.polyline([[a.lat, a.lon], [b.lat, b.lon]], {
+      color: css.getPropertyValue(MODES[l.mode].cssVar).trim() || '#888', weight: 5,
+      opacity: faded ? 0.15 : 0.9, dashArray: isDone(l) ? null : '2 10', lineCap: 'round',
+    }).bindTooltip(`${l.from} → ${l.to} · ${MODES[l.mode].label} · ${fmtDay(l.dep.day)}`).addTo(mapLayer);
+    pts.push([a.lat, a.lon], [b.lat, b.lon]);
+  });
+  [...new Set(legs.flatMap(l => [l.from, l.to]))].forEach(n => {
+    const p = PLACES[n]; if (!p) return;
+    L.circleMarker([p.lat, p.lon], { radius: n === HOME ? 9 : 6, color: '#14201a', weight: 3, fillColor: '#ffffff', fillOpacity: 1 })
+      .bindTooltip(n, { permanent: true, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
+  });
+  map.invalidateSize();
+  if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 9 });
+  else if (PLACES[HOME]) map.setView([PLACES[HOME].lat, PLACES[HOME].lon], 6);
+  $('map-status').textContent = legs.length ? 'Straight lines between cities, not the actual track or flight path.' : 'No journeys in this period.';
+}
+
+/* ── calendar ──────────────────────────────────────────────────────*/
+function renderCalendar(legs, trips){
+  const months = state.month != null ? [state.month]
+    : [...Array(12).keys()].filter(m => monthImported(state.year, m) && new Date(state.year, m, 1) <= lastShownMonth());
+  if (!months.length){ $('cal').innerHTML = `<p class="empty">Nothing imported for ${state.year} yet.</p>`; return; }
+  const today = keyOf(now()), todayN = dayNum(today);
+  const away = new Map();                       // dayNum → trip name
+  trips.forEach(t => { for (let n = dayNum(t.start); n <= dayNum(t.end); n++) away.set(n, t.name); });
+  const moves = new Map();                      // day key → legs leaving that day
+  legs.forEach(l => { if (!moves.has(l.dep.day)) moves.set(l.dep.day, []); moves.get(l.dep.day).push(l); });
+  const DOW = ['M','T','W','T','F','S','S'];
+  $('cal').innerHTML = `<div class="cal-wrap">${months.map(m => {
+    const first = new Date(state.year, m, 1), days = new Date(state.year, m + 1, 0).getDate();
+    const lead = (first.getDay() + 6) % 7;
+    let awayCount = 0, cells = DOW.map(d => `<div class="dow" aria-hidden="true">${d}</div>`).join('') + '<div class="day blank"></div>'.repeat(lead);
+    for (let d = 1; d <= days; d++){
+      const key = `${state.year}-${pad(m + 1)}-${pad(d)}`, n = dayNum(key), trip = away.get(n), mv = moves.get(key) || [];
+      if (trip) awayCount++;
+      const cls = ['day', trip ? 'away' : '', trip && n > todayN ? 'up' : '', key === today ? 'today' : '',
+                   state.trip && trip && trip !== state.trip ? 'dimmed' : ''].filter(Boolean).join(' ');
+      const tip = [fmtDay(key), trip || '', ...mv.map(l => `${l.from} → ${l.to} (${MODES[l.mode].label.toLowerCase()})`)].filter(Boolean).join(' · ');
+      cells += `<div class="${cls}" title="${esc(tip)}"><span>${d}</span>${mv.length ? `<span class="dots" aria-hidden="true">${mv.map(l => `<i style="background:${MODES[l.mode].color}"></i>`).join('')}</span>` : ''}</div>`;
+    }
+    return `<div class="cal"><h3>${MONTHS[m]} ${state.year}<small>${awayCount ? `${awayCount} DAY${awayCount > 1 ? 'S' : ''} AWAY` : 'HOME ALL MONTH'}</small></h3><div class="cal-grid">${cells}</div></div>`;
+  }).join('')}</div>
+  <div class="cal-key"><span><i style="background:var(--run-dim);border:1px solid var(--run)"></i>Away</span>
+    <span><i style="border:1px dashed var(--run)"></i>Away, still ahead</span>
+    <span><i style="outline:2px solid var(--text);outline-offset:-2px"></i>Today</span>
+    <span>Dots mark the day a leg leaves, coloured by mode</span></div>`;
+}
+/* Calendars run up to the later of this month and the last journey. */
+function lastShownMonth(){
+  const last = LEGS.length ? LEGS[LEGS.length - 1].dep.at : now();
+  const a = new Date(last.getFullYear(), last.getMonth(), 1), b = new Date(now().getFullYear(), now().getMonth(), 1);
+  return a > b ? a : b;
+}
+
+/* ── month strip ───────────────────────────────────────────────────*/
+function renderStrip(){
+  const yearLegs = LEGS.filter(l => l.dep.at.getFullYear() === state.year);
+  const btn = (m, label, inner, disabled, title) =>
+    `<button class="mo" type="button" data-month="${m}" aria-pressed="${String(state.month == null ? m === 'all' : m === state.month)}"${disabled ? ' disabled' : ''} title="${esc(title)}"><span>${label}</span>${inner}</button>`;
+  $('strip').innerHTML = btn('all', 'ALL', '', false, `All of ${state.year}`) + MONTHS.map((name, m) => {
+    const ls = yearLegs.filter(l => l.dep.at.getMonth() === m);
+    const imported = monthImported(state.year, m);
+    const dots = `<span class="dots" aria-hidden="true">${ls.map(l => `<i style="background:${MODES[l.mode].color}"></i>`).join('')}</span>`;
+    const title = !imported ? `${name}: not imported yet` : `${name}: ${ls.length} journey${ls.length === 1 ? '' : 's'}`;
+    return btn(m, name.toUpperCase(), dots, !imported && !ls.length, title);
+  }).join('');
+}
+
+/* ── ticket stack ──────────────────────────────────────────────────*/
+function ticketHTML(t, next){
+  const sel = state.trip === t.name;
+  const modes = t.modes.map(m => `<i style="background:${MODES[m].color}" aria-hidden="true"></i>${MODES[m].label.toUpperCase()}`).join(' ');
+  const sub = [`${t.est ? '≈' : ''}${fmtKm(t.km)} km`, t.nights ? `${t.nights} night${t.nights > 1 ? 's' : ''}` : 'day trip',
+               t.who.length ? `with ${t.who.join(', ')}` : ''].filter(Boolean).join(' · ');
+  const stub = t.done ? [t.legs.length, t.legs.length === 1 ? 'leg' : 'legs']
+    : t.startsIn > 0 ? [t.startsIn, t.startsIn === 1 ? 'day to go' : 'days to go']
+    : ['now', 'on the road'];
+  let html = `<button class="ticket${next ? ' next' : ''}" type="button" data-trip="${esc(t.name)}" aria-pressed="${sel}" aria-expanded="${sel}">
+    <span class="tk-main">
+      <span class="tk-meta"><span>${esc(fmtRange(t.start, t.end).toUpperCase())}</span><span>${modes}</span></span>
+      <span class="tk-title">${esc(t.name)}</span>
+      <span class="tk-route">${esc(t.route)}</span>
+      <span class="tk-sub">${esc(sub)}</span>
+      ${t.gaps.map(g => `<span class="tk-gap">No ticket in the log: ${esc(g)}</span>`).join('')}
+    </span>
+    <span class="tk-stub"><b>${stub[0]}</b><span>${stub[1]}</span></span>
+  </button>`;
+  if (sel) html += `<div class="legs">${t.legs.map(l => {
+    const when = l.dep.time ? `${fmtDay(l.dep.day)} ${l.dep.time}` : fmtDay(l.dep.day);
+    const detail = [[l.carrier, l.ref].filter(Boolean).join(' '), l.note, l.planned ? 'planned, not booked' : ''].filter(Boolean).join(' · ');
+    return `<div class="leg"><time>${esc(when)}</time>
+      <div><b><i style="background:${MODES[l.mode].color}" aria-hidden="true"></i>${esc(l.from)} → ${esc(l.to)}</b>${detail ? `<small>${esc(detail)}</small>` : ''}</div>
+      <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km</span></div>`;
+  }).join('')}</div>`;
+  return html;
+}
+function renderStack(trips){
+  const ahead = trips.filter(t => !t.done), done = trips.filter(t => t.done).reverse();
+  let html = '';
+  if (ahead.length) html += `<h2>COMING UP</h2>` + ahead.map((t, i) => ticketHTML(t, i === 0)).join('');
+  if (done.length)  html += `<h2>DONE</h2>` + done.map(t => ticketHTML(t, false)).join('');
+  if (!trips.length) html = `<p class="empty">No trips in this period.</p>`;
+  $('stack').innerHTML = html;
+}
+
+/* ── render ────────────────────────────────────────────────────────*/
+function render(){
+  const legs = legsInView(), trips = tripsOf(legs);
+  if (state.trip && !trips.some(t => t.name === state.trip)) state.trip = null;
+  const period = state.month == null ? String(state.year) : `${MONTHS[state.month]} ${state.year}`;
+  $('kicker').textContent = `TRAVEL NETWORK · ${period.toUpperCase()}${HOME ? ` · EVERY LINE STARTS AT ${HOME.toUpperCase()}` : ''}`;
+  renderStats(legs, trips);
+  $('legend').innerHTML = Object.entries(MODES).map(([, m]) => `<span><i style="background:${m.color}"></i>${m.label}</span>`).join('') +
+    `<span><i class="dash"></i>Still ahead</span>`;
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === state.tab)));
+  $('net').hidden = state.tab !== 'network';
+  $('mapview').hidden = state.tab !== 'map';
+  $('cal').hidden = state.tab !== 'calendar';
+  if (state.tab === 'network') renderNetwork(legs);
+  if (state.tab === 'map') renderMap(legs);
+  if (state.tab === 'calendar') renderCalendar(legs, trips);
+  renderStrip();
+  renderStack(trips);
+  const [sy, sm] = SINCE.split('-').map(Number);
+  $('foot').innerHTML = `Log starts ${MONTHS[sm - 1]} ${sy}; earlier months are not imported yet. Distances marked ≈ are estimates
+    (great-circle for flights, × 1.25 on the ground); the rest are the figures printed on the ticket. To add a journey, add a row to the
+    <code>Journeys</code> tab of the Trips Ledger Sheet, and a row to <code>Places</code> for any new city.`;
+}
+
+document.addEventListener('click', e => {
+  const tab = e.target.closest('[data-tab]');
+  if (tab){ state.tab = tab.dataset.tab; render(); return; }
+  const mo = e.target.closest('[data-month]');
+  if (mo && !mo.disabled){ state.month = mo.dataset.month === 'all' ? null : +mo.dataset.month; render(); return; }
+  const tk = e.target.closest('[data-trip]');
+  if (tk){ state.trip = state.trip === tk.dataset.trip ? null : tk.dataset.trip; render(); }
+});
+$('year').addEventListener('change', e => { state.year = +e.target.value; state.month = null; state.trip = null; render(); });
+
+/* ── auth ──────────────────────────────────────────────────────────*/
+function showGateError(msg){ $('gate-error').textContent = msg; }
+function initAuth(){
+  if (!window.google || !google.accounts){ showGateError('Google Sign-In did not load — check the connection and reload.'); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID, scope: SCOPES,
+    callback: resp => {
+      if (resp.error){ showGateError('Sign-in failed: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      onSignedIn();
+    },
+  });
+  $('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt: '' }));
+}
+async function onSignedIn(){
+  try {
+    await loadAll();
+    const years = yearsAvailable();
+    const thisYear = now().getFullYear();
+    state.year = years.includes(thisYear) ? thisYear : years[0];
+    $('year').innerHTML = years.map(y => `<option value="${y}"${y === state.year ? ' selected' : ''}>${y}</option>`).join('');
+    $('year-wrap').hidden = years.length < 2;
+    $('gate').style.display = 'none';
+    $('main').hidden = false;
+    render();
+  } catch (e){ showGateError(e.message); }
+}
+window.addEventListener('load', initAuth);
+</script>
+</body>
+</html>
