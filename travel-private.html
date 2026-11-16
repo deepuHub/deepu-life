@@ -89,6 +89,7 @@
   /* ── real map ── */
   #leaflet{height:min(62vh,520px);border-radius:12px;overflow:hidden;background:var(--surface2)}
   .status{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:var(--muted);margin-top:.5rem}
+  .leg-arrow{background:none;border:0}
   .leaflet-tooltip.place-tip{font-family:'Epilogue',sans-serif;font-weight:600;font-size:12px;color:#14201a}
 
   /* ── calendar ── */
@@ -547,24 +548,42 @@ async function renderMap(legs){
   mapLayer.clearLayers();
   const css = getComputedStyle(document.documentElement);
   const pts = [];
+  legs.forEach(l => { const a = PLACES[l.from], b = PLACES[l.to]; if (a && b) pts.push([a.lat, a.lon], [b.lat, b.lon]); });
+  map.invalidateSize();
+  if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 9 });
+  else if (PLACES[HOME]) map.setView([PLACES[HOME].lat, PLACES[HOME].lon], 6);
+  /* One arc per leg, bowed to the right of the direction of travel, so an
+     out-and-back between the same two cities reads as two lines, not one.
+     A repeat of the same direction bows a little further each time. */
+  const seen = new Map();
   legs.forEach(l => {
     const a = PLACES[l.from], b = PLACES[l.to]; if (!a || !b) return;
     const faded = state.trip && l.trip !== state.trip;
-    L.polyline([[a.lat, a.lon], [b.lat, b.lon]], {
-      color: css.getPropertyValue(MODES[l.mode].cssVar).trim() || '#888', weight: 5,
-      opacity: faded ? 0.15 : 0.9, dashArray: isDone(l) ? null : '2 10', lineCap: 'round',
-    }).bindTooltip(`${l.from} → ${l.to} · ${MODES[l.mode].label} · ${fmtDay(l.dep.day)}`).addTo(mapLayer);
-    pts.push([a.lat, a.lon], [b.lat, b.lon]);
+    const color = css.getPropertyValue(MODES[l.mode].cssVar).trim() || '#888';
+    const dirKey = `${l.from}>${l.to}`, nth = seen.get(dirKey) || 0; seen.set(dirKey, nth + 1);
+    const k = Math.cos((a.lat + b.lat) / 2 * Math.PI / 180) || 1;
+    const dx = (b.lon - a.lon) * k, dy = b.lat - a.lat, bow = 0.14 + 0.07 * nth;
+    const cx = (a.lon * k + b.lon * k) / 2 + dy * bow, cy = (a.lat + b.lat) / 2 - dx * bow;
+    const at = t => [(1 - t) * (1 - t) * a.lat + 2 * (1 - t) * t * cy + t * t * b.lat,
+                     ((1 - t) * (1 - t) * a.lon * k + 2 * (1 - t) * t * cx + t * t * b.lon * k) / k];
+    const curve = Array.from({ length: 25 }, (_, n) => at(n / 24));
+    const tip = `${l.from} → ${l.to} · ${MODES[l.mode].label} · ${fmtDay(l.dep.day)}`;
+    L.polyline(curve, {
+      color, weight: 5, opacity: faded ? 0.15 : 0.9, dashArray: isDone(l) ? null : '2 10', lineCap: 'round',
+    }).bindTooltip(tip).addTo(mapLayer);
+    const p1 = map.latLngToLayerPoint(at(0.47)), p2 = map.latLngToLayerPoint(at(0.53));
+    const deg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+    L.marker(at(0.5), { interactive: false, keyboard: false, opacity: faded ? 0.2 : 1, icon: L.divIcon({
+      className: 'leg-arrow', iconSize: [18, 18], iconAnchor: [9, 9],
+      html: `<svg viewBox="-9 -9 18 18" width="18" height="18" aria-hidden="true" style="transform:rotate(${deg.toFixed(1)}deg)"><path d="M0 -7 L6 6 L0 2.5 L-6 6 Z" fill="${color}" stroke="#14201a" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    }) }).addTo(mapLayer);
   });
   [...new Set(legs.flatMap(l => [l.from, l.to]))].forEach(n => {
     const p = PLACES[n]; if (!p) return;
     L.circleMarker([p.lat, p.lon], { radius: n === HOME ? 9 : 6, color: '#14201a', weight: 3, fillColor: '#ffffff', fillOpacity: 1 })
       .bindTooltip(n, { permanent: true, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
   });
-  map.invalidateSize();
-  if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 9 });
-  else if (PLACES[HOME]) map.setView([PLACES[HOME].lat, PLACES[HOME].lon], 6);
-  $('map-status').textContent = legs.length ? 'Straight lines between cities, not the actual track or flight path.' : 'No journeys in this period.';
+  $('map-status').textContent = legs.length ? 'One arc per leg, with an arrow for its direction. Arcs join the cities; they are not the actual track or flight path.' : 'No journeys in this period.';
 }
 
 /* ── calendar ──────────────────────────────────────────────────────*/
