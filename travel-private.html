@@ -192,8 +192,8 @@
       <section class="card" aria-label="Where I went">
         <div class="view-head">
           <div class="tabs" role="group" aria-label="View">
-            <button class="pill" type="button" data-tab="network" aria-pressed="true">NETWORK</button>
-            <button class="pill" type="button" data-tab="map" aria-pressed="false">REAL MAP</button>
+            <button class="pill" type="button" data-tab="network" aria-pressed="false">NETWORK</button>
+            <button class="pill" type="button" data-tab="map" aria-pressed="true">REAL MAP</button>
             <button class="pill" type="button" data-tab="calendar" aria-pressed="false">CALENDAR</button>
             <label id="year-wrap" hidden><select id="year" aria-label="Year"></select></label>
           </div>
@@ -243,7 +243,7 @@
 const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
 const SPREADSHEET_ID = '1X-y2IiW94QcF6ds100F9wNtLNUmoi6RftPZwBqgxxH0';
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-const SINCE  = '2026-10';
+const SINCE  = '2026-01';
 
 /* Leaflet is fetched only when the Real map tab is first opened. */
 const LEAFLET = {
@@ -265,7 +265,7 @@ const fmtKm = n => Math.round(n).toLocaleString('en-IN');
 
 let tokenClient, accessToken;
 let LEGS = [], PLACES = {}, HOME = '';
-let state = { tab: 'network', year: null, month: null, trip: null };
+let state = { tab: 'map', year: null, month: null, trip: null };
 
 /* ── dates ─────────────────────────────────────────────────────────*/
 const pad = n => String(n).padStart(2, '0');
