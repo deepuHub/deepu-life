@@ -77,6 +77,8 @@
   .route{fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;transition:opacity .2s}
   .route.up{stroke-dasharray:1 17}
   .route.dim{opacity:.14}
+  .chev{fill:var(--text);stroke:var(--surface);stroke-width:1.4;stroke-linejoin:round;transition:opacity .2s;pointer-events:none}
+  .chev.dim{opacity:.14}
   .stn{fill:var(--surface);stroke:var(--text);stroke-width:4;transition:opacity .2s}
   .stn-label{font-family:'Fraunces',serif;font-weight:700;font-size:17px;fill:var(--text);
              paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
@@ -486,21 +488,29 @@ function renderNetwork(legs){
     return;
   }
   const pos = layoutPlaces(names);
-  /* One line per pair of places and mode; dotted until some leg on it is done. */
+  /* One line per direction of travel between two places, per mode; dotted
+     until some leg on it is done. Out and back the same way is therefore
+     two lines side by side, each with a chevron pointing the way it ran. */
   const routes = new Map();
   legs.forEach(l => {
-    if (!pos[l.from] || !pos[l.to]) return;
-    const pair = [l.from, l.to].sort().join('|'), key = `${pair}|${l.mode}`;
+    if (!pos[l.from] || !pos[l.to] || l.from === l.to) return;
+    const pair = [l.from, l.to].sort().join('|'), key = `${l.from}>${l.to}|${l.mode}`;
     if (!routes.has(key)) routes.set(key, { pair, mode: l.mode, a: l.from, b: l.to, done: false, trips: new Set(), n: 0 });
     const r = routes.get(key);
     r.done = r.done || isDone(l); r.trips.add(l.trip); r.n++;
   });
   const byPair = new Map();
   routes.forEach(r => { if (!byPair.has(r.pair)) byPair.set(r.pair, []); byPair.get(r.pair).push(r); });
-  let lines = '';
+  let lines = '', chevs = '';
+  /* The drawn path always runs from the higher station to the lower one.
+     `fwd` says whether a route was travelled that way round; lines going
+     against it sit on the other side, so each keeps to the right of its
+     own direction, like traffic. */
+  const fwdOf = r => { const s = octilinear(pos[r.a], pos[r.b])[0]; return s[0] === pos[r.a].x && s[1] === pos[r.a].y; };
+  byPair.forEach(group => { group.forEach(r => { r.fwd = fwdOf(r); }); group.sort((x, y) => x.fwd - y.fwd); });
   byPair.forEach(group => group.forEach((r, i) => {
     const pts = octilinear(pos[r.a], pos[r.b]);
-    const off = (i - (group.length - 1) / 2) * 11;
+    const off = (i - (group.length - 1) / 2) * 12;
     if (off){
       const [x1, y1] = pts[0], [x2, y2] = pts[2], len = Math.hypot(x2 - x1, y2 - y1) || 1;
       const ox = -(y2 - y1) / len * off, oy = (x2 - x1) / len * off;
@@ -508,7 +518,13 @@ function renderNetwork(legs){
     }
     const dim = state.trip && !r.trips.has(state.trip) ? ' dim' : '';
     const d = pts.map((p, n) => `${n ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
-    lines += `<path class="route${r.done ? '' : ' up'}${dim}" d="${d}" stroke="${MODES[r.mode].color}"><title>${esc(r.a)} – ${esc(r.b)} · ${MODES[r.mode].label}${r.n > 1 ? ` × ${r.n}` : ''}${r.done ? '' : ' · ahead'}</title></path>`;
+    lines += `<path class="route${r.done ? '' : ' up'}${dim}" d="${d}" stroke="${MODES[r.mode].color}"><title>${esc(r.a)} → ${esc(r.b)} · ${MODES[r.mode].label}${r.n > 1 ? ` × ${r.n}` : ''}${r.done ? '' : ' · ahead'}</title></path>`;
+    /* chevron on the middle of the longer run, turned to face the way travelled */
+    const seg = Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) >= Math.hypot(pts[2][0] - pts[1][0], pts[2][1] - pts[1][1]) ? [pts[0], pts[1]] : [pts[1], pts[2]];
+    const rad = Math.atan2(seg[1][1] - seg[0][1], seg[1][0] - seg[0][0]) + (r.fwd ? 0 : Math.PI), deg = rad * 180 / Math.PI;
+    /* nudged a little the way it points, so an out-and-back pair does not sit nose to nose */
+    const cx = (seg[0][0] + seg[1][0]) / 2 + Math.cos(rad) * 9, cy = (seg[0][1] + seg[1][1]) / 2 + Math.sin(rad) * 9;
+    chevs += `<path class="chev${dim}" d="M7 0 L-4.5 -5.5 L-1.5 0 L-4.5 5.5 Z" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${deg.toFixed(1)})"/>`;
   }));
   const inTrip = new Set(state.trip ? legs.filter(l => l.trip === state.trip).flatMap(l => [l.from, l.to]) : []);
   /* A label goes in whichever of eight directions is furthest from the
@@ -543,7 +559,7 @@ function renderNetwork(legs){
     labels += `<text class="stn-label${home ? ' home' : ''}${dim}" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}">${esc(n)}</text>`;
     if (home) labels += `<text class="stn-sub${dim}" x="${lx.toFixed(1)}" y="${(ly + (best[2] < 0 ? -22 : 16)).toFixed(1)}" text-anchor="${anchor}">HOME · INTERCHANGE</text>`;
   });
-  $('net').innerHTML = `<svg viewBox="0 0 ${NET.w} ${NET.h}" role="img" aria-label="Metro-style network of ${names.length} places joined by ${routes.size} routes">${lines}${stations}${labels}</svg>`;
+  $('net').innerHTML = `<svg viewBox="0 0 ${NET.w} ${NET.h}" role="img" aria-label="Metro-style network of ${names.length} places joined by ${byPair.size} routes, with an arrow for each direction travelled">${lines}${chevs}${stations}${labels}</svg>`;
 }
 
 /* ── real map (Leaflet + OpenStreetMap tiles, loaded on demand) ─────*/
