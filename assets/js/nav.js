@@ -23,6 +23,7 @@
     { key: 'embers',   href: 'embers-tides-private.html',   icon: '🔥', label: 'Embers',        group: 'public',  desc: 'Coded intake index' },
     { key: 'piepoints',href: 'https://pie-pulse-play.lovable.app', icon: '🥧', label: 'PiePoints', group: 'public',  desc: 'Score tracker, opens in new tab', external: true },
     { key: 'kid',      href: 'kid-private.html',            icon: '🎒', label: 'Kid',           group: 'private', desc: 'Report cards and CA results' },
+    { key: 'races',    href: 'races-private.html',          icon: '🏅', label: 'Races',         group: 'private', desc: 'Race results, certificates and splits' },
     { key: 'health',   href: 'health-private.html',         icon: '🩺', label: 'Health',        group: 'private', desc: 'Vitals, labs and trend flags' },
     { key: 'results',  href: 'results-private.html',        icon: '🎓', label: 'BEd Results',   group: 'private', desc: 'Semester results, subject by subject' },
     { key: 'apple',    href: 'apple-health-private.html',   icon: '🍎', label: 'Apple Health',  group: 'private', desc: 'Activity, sleep and heart trends' },

@@ -21,6 +21,7 @@
 | 🎁 Gifts (`gifts-private.html`) | December book gifts to friends' kids — one line per person, a column per year; flags repeat authors and kids ageing into early YA | Private — Google Sign-In |
 | 🩺 Health (`health-private.html`) | Vitals, lab panels, trend flags, action plan | Private — Google Sign-In |
 | 🎓 BEd Results (`results-private.html`) | Semester results, subject-by-subject | Private — Google Sign-In |
+| 🏅 Races (`races-private.html`) | Race log with chip times, official splits, and certificate/result PDFs (kept in a private Drive folder, never in this repo) | Private — Google Sign-In |
 | 🔥 Embers & Tides (`embers-tides-private.html`) | Coded intake index; every counterparty is a code | Private — Google Sign-In |
 | ✶ Bucket List (`bucket-private.html`) | Life list as star charts — one constellation per section, one star per item | Private — Google Sign-In |
 | 🎙️ Carnatic (`carnatic-private.html`) | Carnatic vocal journey at Artium — badge medallions, lesson ladder, riyaaz log | Private — Google Sign-In |
@@ -184,6 +185,7 @@ deepu-life/
 ├── kid-private.html          ← private report-card dashboard (Google Sign-In)
 ├── gifts-private.html        ← private December book-gift history (Google Sign-In)
 ├── results-private.html      ← private BEd results dashboard (Google Sign-In)
+├── races-private.html        ← private race log + certificates (Google Sign-In)
 ├── embers-tides-private.html ← coded intake index (private Sheet; seed built by scripts/)
 ├── bucket-private.html       ← bucket list as constellations (private Sheet; seed in data/bucket-list.tsv)
 ├── carnatic-private.html     ← Carnatic journey at Artium (private Sheet; seed in data/carnatic.tsv)
