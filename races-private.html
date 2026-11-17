@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>Races — deepu-life</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏅%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <link rel="stylesheet" href="assets/css/activity.css">
+  <style>
+    [hidden]{display:none !important}
+    .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center;min-height:34vh;padding:0 var(--pad);margin-top:2rem}
+    .gate-icon{font-size:2.2rem}
+    .gate h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem}
+    .gate p{font-size:.88rem;font-weight:300;line-height:1.7;color:var(--muted);max-width:46ch}
+    .btn-signin{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.3rem;border-radius:999px;
+                background:var(--run-dim);color:var(--run);border:1px solid var(--run);font-family:'Epilogue',sans-serif;
+                font-size:.75rem;font-weight:600;letter-spacing:.12em;cursor:pointer;transition:background .25s,color .25s}
+    .btn-signin:hover{background:var(--run);color:var(--bg)}
+    .btn-signin:focus-visible{outline:2px solid var(--run);outline-offset:3px}
+    .gate-error{color:#f0545c;font-size:.8rem;max-width:52ch}
+    .sync-dot.ok{background:var(--grow)}
+    .races{display:flex;flex-direction:column;gap:1rem;padding:0 var(--pad) 2rem}
+    .race{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:6px;padding:1rem 1.15rem}
+    .race.official{border-left-color:var(--run)}
+    .race-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1rem;align-items:baseline}
+    .race h2{font-family:'Fraunces',serif;font-weight:700;font-size:1.05rem}
+    .race .when{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+    .race .time{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;color:var(--run);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .race .time small{display:block;font-family:'Epilogue',sans-serif;font-weight:400;font-size:.68rem;color:var(--muted);text-align:right}
+    .stats{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+    .stat{font-size:.74rem;padding:.25rem .6rem;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--muted)}
+    .stat b{color:var(--text);font-weight:600}
+    .race .note{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:.6rem}
+    .splits{margin-top:.9rem}
+    .splits table{width:100%;border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums}
+    .splits th{text-align:left;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:.4rem .5rem;border-bottom:1px solid var(--border)}
+    .splits td{padding:.45rem .5rem;border-bottom:1px solid var(--border)}
+    .splits tr:last-child td{border-bottom:none}
+    .splits .best{color:var(--run);font-weight:600}
+    .splits .cap{font-size:.7rem;color:var(--muted);margin-top:.35rem}
+    .docs{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
+    .doc-btn{display:inline-flex;align-items:center;gap:.4rem;min-height:36px;padding:.4rem .9rem;border-radius:999px;border:1px solid var(--run);
+             background:var(--run-dim);color:var(--run);font-size:.74rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:'Epilogue',sans-serif}
+    .doc-btn:hover{background:var(--run);color:var(--bg)}
+    .doc-btn.ghost{background:transparent;border-color:var(--border);color:var(--muted)}
+    .viewer{margin-top:.8rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
+    .viewer iframe{display:block;width:100%;height:min(78vh,720px);border:0}
+    .viewer .vbar{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.4rem .7rem;font-size:.72rem;color:var(--muted);border-bottom:1px solid var(--border)}
+    .viewer .vbar a{color:var(--run)}
+  </style>
+</head>
+<body>
+<deepu-nav active="races"></deepu-nav>
+<main class="page" style="--ac:var(--run);--ac-dim:var(--run-dim)">
+  <div class="sec-head">
+    <div><p class="sec-eyebrow run-c">Races</p><h1 class="sec-title">Every finish line.</h1></div>
+    <div class="sec-actions" id="sec-actions" hidden>
+      <a id="sheets-link" href="#" target="_blank" rel="noopener" class="sheets-btn">Open Sheet</a>
+      <a id="folder-link" href="#" target="_blank" rel="noopener" class="sheets-btn">Drive folder</a>
+      <div class="sync-badge" id="sync-badge"><span class="sync-dot"></span><span class="sync-label">—</span></div>
+    </div>
+  </div>
+
+  <div class="gate" id="gate">
+    <div class="gate-icon">🔒</div>
+    <h2>Private race log</h2>
+    <p>Results, certificates and splits live in a private Google Sheet and Drive folder. Sign in with the Google account that owns them — anyone else is refused by Google, not by this page.</p>
+    <button class="btn-signin" id="signin-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+
+  <div id="content" hidden>
+    <div class="summary-strip" id="race-sum"></div>
+    <div class="races" id="race-list"></div>
+  </div>
+</main>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   races-private.html — race results, certificates and official splits.
+   DATA — private Google Sheet "Deepu — Races (Private)" (sharing Restricted),
+   in the private Drive folder "Deepu — Races (Private)":
+     tab Races:  id date race dist_mi time_min chip_time gun_time rank field place note certificate_file result_file
+       - time_min   older races, minutes as logged in the Runs tab (decimal)
+       - chip_time  official chip time, text hh:mm:ss (wins over time_min)
+       - certificate_file / result_file  Drive file IDs of the PDFs, stored as-is
+     tab Splits: race_id checkpoint km elapsed segment pace_per_km clock_time
+   PDFs open in Drive's own viewer, which only renders for an account that can
+   see the file. Nothing is cached; this file holds no data, so it is safe in
+   the public repo. Never put race PDFs in the repo itself.
+═══════════════════════════════════════════════════════════════════ */
+const CLIENT_ID      = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SPREADSHEET_ID = '1w_D7M-gy3DwBm62odfroAFYh-RYWIQEfsE19kxYxRJY';
+const FOLDER_ID      = '1XyHILvWrqXJrnvxkDmIJcgU8UtyRW73Q';
+const SCOPES         = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let tokenClient, accessToken;
+function showGateError(m){ $('gate-error').textContent = m; }
+
+/* time helpers — everything in seconds */
+function hmsToSec(t){ const p=String(t||'').trim().split(':').map(Number); if(p.some(isNaN)||!p.length||!t) return null;
+  return p.reduce((a,v)=>a*60+v,0); }
+function fmtSec(s){ if(s==null) return '—'; s=Math.round(s); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60;
+  return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0'); }
+function raceSec(r){ const c=hmsToSec(r.chip_time); if(c!=null) return c; const m=parseFloat(r.time_min); return isNaN(m)?null:m*60; }
+function kind(mi){ mi=parseFloat(mi); if(mi>=26) return 'Full'; if(mi>=13) return 'Half'; if(mi>=6) return '10K'; if(mi>=3) return '5K'; return 'Fun run'; }
+const fmtDate = d => new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+function initAuth(){
+  $('sheets-link').href = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`;
+  $('folder-link').href = `https://drive.google.com/drive/folders/${FOLDER_ID}`;
+  if(!window.google||!google.accounts){ showGateError('Could not load Google sign-in — check your connection and reload.'); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({ client_id:CLIENT_ID, scope:SCOPES,
+    callback: r => { if(r.error){ showGateError('Sign-in failed: '+r.error); return; } accessToken=r.access_token; onSignedIn(); } });
+  $('signin-btn').addEventListener('click', () => tokenClient.requestAccessToken({ prompt:'' }));
+}
+
+async function loadTab(tab){
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tab)}`;
+  const res=await fetch(url,{headers:{Authorization:`Bearer ${accessToken}`}});
+  if(res.status===403) throw new Error('This Google account does not have access to the Races sheet.');
+  if(res.status===400) throw new Error(`No tab named "${tab}" in the Races sheet.`);
+  if(!res.ok) throw new Error(`Could not load the sheet (HTTP ${res.status}).`);
+  const rows=(await res.json()).values||[]; if(!rows.length) return [];
+  const head=rows[0].map(h=>String(h||'').toLowerCase().trim());
+  return rows.slice(1).filter(r=>r.length).map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]==null?'':String(r[i]).trim()])));
+}
+
+async function onSignedIn(){
+  try{
+    const [races, splits] = await Promise.all([loadTab('Races'), loadTab('Splits').catch(()=>[])]);
+    $('gate').style.display='none'; $('content').hidden=false; $('sec-actions').hidden=false;
+    render(races, splits);
+    const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    $('sync-badge').querySelector('.sync-dot').className='sync-dot ok';
+    $('sync-badge').querySelector('.sync-label').textContent=`Loaded at ${t}`;
+  }catch(e){ showGateError(e.message); }
+}
+
+function render(races, splits){
+  races.sort((a,b)=>b.date.localeCompare(a.date));
+  /* personal best per distance type */
+  const pb={};
+  races.forEach(r=>{ const k=kind(r.dist_mi), s=raceSec(r); if(s!=null&&(pb[k]==null||s<pb[k])) pb[k]=s; });
+  const halves=races.filter(r=>kind(r.dist_mi)==='Half');
+  const miles=races.reduce((a,r)=>a+(parseFloat(r.dist_mi)||0),0);
+  $('race-sum').innerHTML=[
+    {l:'Races',v:races.length},
+    {l:'Race miles',v:miles.toFixed(1)},
+    {l:'Half PB',v:pb.Half!=null?fmtSec(pb.Half):'—'},
+    {l:'Sub-2 goal',v:pb.Half!=null?(pb.Half<7200?'Done ✅':fmtSec(pb.Half-7200)+' to go'):'—'},
+  ].map(c=>`<div class="summary-chip"><span class="chip-lbl">${c.l}</span><span class="chip-val">${c.v}</span></div>`).join('');
+
+  $('race-list').innerHTML=races.map(r=>{
+    const s=raceSec(r), mi=parseFloat(r.dist_mi), k=kind(r.dist_mi);
+    const pace=s&&mi?fmtSec(s/mi)+'/mi · '+fmtSec(s/(mi*1.609344))+'/km':'';
+    const isPB=s!=null&&pb[k]===s&&races.filter(x=>kind(x.dist_mi)===k).length>1;
+    const sp=splits.filter(x=>x.race_id===r.id);
+    const fast=sp.length?sp.reduce((a,b)=>hmsToSec(b.pace_per_km)<hmsToSec(a.pace_per_km)?b:a):null;
+    const stats=[
+      `<span class="stat">${esc(k)} · <b>${mi} mi</b></span>`,
+      pace&&`<span class="stat">Pace <b>${pace}</b></span>`,
+      r.gun_time&&`<span class="stat">Gun <b>${esc(r.gun_time)}</b></span>`,
+      r.rank&&`<span class="stat">Rank <b>#${esc(r.rank)}</b>${r.field?' / '+esc(r.field)+' · top '+Math.round(r.rank/r.field*100)+'%':''}</span>`,
+      isPB&&`<span class="stat"><b>🏅 PB</b></span>`,
+    ].filter(Boolean).join('');
+    const splitTbl=sp.length?`<div class="splits"><table><thead><tr><th>Checkpoint</th><th>Elapsed</th><th>Segment</th><th>Pace /km</th></tr></thead><tbody>${
+      sp.map(x=>`<tr><td>${esc(x.checkpoint)}</td><td>${esc(x.elapsed)}</td><td>${esc(x.segment)}</td><td class="${x===fast?'best':''}">${esc(x.pace_per_km)}</td></tr>`).join('')
+    }</tbody></table><p class="cap">Official timing-mat splits, measured from the gun.</p></div>`:'';
+    const docs=[r.certificate_file&&['Certificate',r.certificate_file], r.result_file&&['Official result',r.result_file]].filter(Boolean);
+    const docBtns=docs.length?`<div class="docs">${docs.map(([lbl,id])=>`<button class="doc-btn" type="button" data-file="${esc(id)}" data-label="${esc(lbl)}">📄 ${lbl}</button>`).join('')}</div><div class="viewer-slot"></div>`:'';
+    return `<article class="race${r.chip_time?' official':''}">
+      <div class="race-top"><div><h2>${esc(r.race)}</h2><div class="when">${fmtDate(r.date)}${r.place?' · '+esc(r.place):''}</div></div>
+      <div class="time">${fmtSec(s)}<small>${r.chip_time?'chip time':'logged time'}</small></div></div>
+      <div class="stats">${stats}</div>
+      ${r.note?`<p class="note">${esc(r.note)}</p>`:''}
+      ${splitTbl}${docBtns}</article>`;
+  }).join('');
+
+  /* PDFs open inline in Drive's viewer; it renders only for an account that can see the file */
+  document.querySelectorAll('.doc-btn').forEach(b=>b.addEventListener('click',()=>{
+    const slot=b.closest('.race').querySelector('.viewer-slot'), id=b.dataset.file;
+    if(slot.dataset.open===id){ slot.innerHTML=''; slot.dataset.open=''; return; }
+    slot.dataset.open=id;
+    slot.innerHTML=`<div class="viewer"><div class="vbar"><span>${esc(b.dataset.label)}</span><a href="https://drive.google.com/file/d/${id}/view" target="_blank" rel="noopener">Open in Drive ↗</a></div>
+      <iframe src="https://drive.google.com/file/d/${id}/preview" title="${esc(b.dataset.label)}" loading="lazy" allow="autoplay"></iframe></div>`;
+  }));
+}
+
+initAuth();
+</script>
+</body>
+</html>
