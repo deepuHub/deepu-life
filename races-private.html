@@ -91,10 +91,11 @@
    races-private.html — race results, certificates and official splits.
    DATA — private Google Sheet "Deepu — Races (Private)" (sharing Restricted),
    in the private Drive folder "Deepu — Races (Private)":
-     tab Races:  id date race dist_mi time_min chip_time gun_time rank field place note certificate_file result_file
+     tab Races:  id date race dist_mi time_min chip_time gun_time rank field place note certificate_file result_file other_files
        - time_min   older races, minutes as logged in the Runs tab (decimal)
        - chip_time  official chip time, text hh:mm:ss (wins over time_min)
        - certificate_file / result_file  Drive file IDs of the PDFs, stored as-is
+       - other_files  extra photos/files: "Label|driveId; Label|driveId"
      tab Splits: race_id checkpoint km elapsed segment pace_per_km clock_time
    PDFs open in Drive's own viewer, which only renders for an account that can
    see the file. Nothing is cached; this file holds no data, so it is safe in
@@ -179,9 +180,10 @@ function render(races, splits){
     ].filter(Boolean).join('');
     const splitTbl=sp.length?`<div class="splits"><table><thead><tr><th>Checkpoint</th><th>Elapsed</th><th>Segment</th><th>Pace /km</th></tr></thead><tbody>${
       sp.map(x=>`<tr><td>${esc(x.checkpoint)}</td><td>${esc(x.elapsed)}</td><td>${esc(x.segment)}</td><td class="${x===fast?'best':''}">${esc(x.pace_per_km)}</td></tr>`).join('')
-    }</tbody></table><p class="cap">Official timing-mat splits, measured from the gun.</p></div>`:'';
-    const docs=[r.certificate_file&&['Certificate',r.certificate_file], r.result_file&&['Official result',r.result_file]].filter(Boolean);
-    const docBtns=docs.length?`<div class="docs">${docs.map(([lbl,id])=>`<button class="doc-btn" type="button" data-file="${esc(id)}" data-label="${esc(lbl)}">📄 ${lbl}</button>`).join('')}</div><div class="viewer-slot"></div>`:'';
+    }</tbody></table><p class="cap">Official timing-mat splits.</p></div>`:'';
+    const extra=String(r.other_files||'').split(';').map(x=>x.split('|').map(y=>y.trim())).filter(x=>x.length===2&&x[1]);
+    const docs=[r.certificate_file&&['Certificate',r.certificate_file], r.result_file&&['Official result',r.result_file], ...extra].filter(Boolean);
+    const docBtns=docs.length?`<div class="docs">${docs.map(([lbl,id])=>`<button class="doc-btn" type="button" data-file="${esc(id)}" data-label="${esc(lbl)}">📄 ${esc(lbl)}</button>`).join('')}</div><div class="viewer-slot"></div>`:'';
     return `<article class="race${r.chip_time?' official':''}">
       <div class="race-top"><div><h2>${esc(r.race)}</h2><div class="when">${fmtDate(r.date)}${r.place?' · '+esc(r.place):''}</div></div>
       <div class="time">${fmtSec(s)}<small>${r.chip_time?'chip time':'logged time'}</small></div></div>
