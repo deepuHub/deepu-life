@@ -441,7 +441,23 @@ function tripsOf(legs){
       /* a stay joins its trip by name, or else by falling inside the trip's dates */
       stays: STAYS.filter(st => st.trip ? st.trip === name : (st.in.day >= start && st.in.day <= end)),
     };
-  }).sort((a, b) => a.start < b.start ? -1 : 1);
+  }).concat(stayOnlyTrips(map)).sort((a, b) => a.start < b.start ? -1 : 1);
+}
+/* A stay with no tickets in its trip (a road trip, say) still makes a trip of its own. */
+function stayOnlyTrips(legTrips){
+  const today = keyOf(now()), groups = new Map();
+  STAYS.filter(st => st.in.at.getFullYear() === state.year && (state.month == null || st.in.at.getMonth() === state.month))
+    .filter(st => !(st.trip ? legTrips.has(st.trip) : [...legTrips.values()].some(ls => st.in.day >= ls[0].dep.day && st.in.day <= ls[ls.length - 1].arr.day)))
+    .forEach(st => { const k = st.trip || `${st.place || st.name} stay`; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(st); });
+  return [...groups.entries()].map(([name, ss]) => {
+    const start = ss[0].in.day, end = ss.reduce((m, st) => st.out.day > m ? st.out.day : m, ss[0].out.day);
+    return {
+      name, legs: [], start, end, gaps: [], route: [...new Set(ss.map(st => st.place).filter(Boolean))].join(' · '),
+      who: [...new Set(ss.flatMap(st => st.who.split(',').map(x => x.trim()).filter(Boolean)))],
+      modes: [], km: 0, est: false, nights: dayNum(end) - dayNum(start),
+      done: ss.every(st => st.out.at <= now()), startsIn: dayNum(start) - dayNum(today), stays: ss, stayOnly: true,
+    };
+  });
 }
 function yearsAvailable(){
   const ys = new Set(LEGS.map(l => l.dep.at.getFullYear()));
@@ -625,8 +641,10 @@ async function renderMap(legs){
   const css = getComputedStyle(document.documentElement);
   const pts = [];
   /* with a trip picked, the view closes in on that trip */
-  const inView = state.trip && legs.some(l => l.trip === state.trip) ? legs.filter(l => l.trip === state.trip) : legs;
+  const inView = state.trip ? legs.filter(l => l.trip === state.trip) : legs;
   inView.forEach(l => { const a = PLACES[l.from], b = PLACES[l.to]; if (a && b) pts.push([a.lat, a.lon], [b.lat, b.lon]); });
+  if (state.trip && !legs.some(l => l.trip === state.trip))
+    STAYS.filter(st => st.trip === state.trip || `${st.place || st.name} stay` === state.trip).forEach(st => { const p = PLACES[st.place]; if (p) pts.push([p.lat, p.lon]); });
   map.invalidateSize();
   if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 9 });
   else if (PLACES[HOME]) map.setView([PLACES[HOME].lat, PLACES[HOME].lon], 6);
@@ -669,11 +687,17 @@ async function renderMap(legs){
       .bindTooltip(n, { permanent: state.labels, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
   });
   /* where you slept: one pin per stay, set just above its city's dot */
-  const tripNames = new Set(legs.map(l => l.trip));
-  STAYS.filter(st => tripNames.has(st.trip) || (!st.trip && legs.some(l => st.in.day >= l.dep.day && st.in.day <= l.arr.day)))
+  const tripNames = new Set(legs.map(l => l.trip)), legPlaces = new Set(legs.flatMap(l => [l.from, l.to]));
+  STAYS.filter(st => tripNames.has(st.trip) || (st.in.at.getFullYear() === state.year && (state.month == null || st.in.at.getMonth() === state.month)))
     .forEach(st => {
       const p = PLACES[st.place]; if (!p) return;
-      const faded = state.trip && st.trip !== state.trip;
+      const faded = state.trip && (st.trip || `${st.place || st.name} stay`) !== state.trip;
+      /* a stay on a road trip may be in a city no ticket reaches, so give it a dot of its own */
+      if (!legPlaces.has(st.place)){
+        legPlaces.add(st.place);
+        L.circleMarker([p.lat, p.lon], { radius: 6, color: '#14201a', weight: 3, fillColor: '#ffffff', fillOpacity: faded ? 0.3 : 1, opacity: faded ? 0.3 : 1 })
+          .bindTooltip(st.place, { permanent: state.labels, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
+      }
       L.marker([p.lat, p.lon], { keyboard: false, zIndexOffset: 400, opacity: faded ? 0.25 : 1, icon: L.divIcon({
         className: 'stay-pin', iconSize: [24, 24], iconAnchor: [-4, 30], html: '<b>🛏</b>',
       }) }).bindTooltip(`${st.name} · ${fmtRange(st.in.day, st.out.day)} · ${st.nights} night${st.nights === 1 ? '' : 's'}`)
@@ -749,9 +773,9 @@ function renderStrip(){
 function ticketHTML(t, next){
   const sel = state.trip === t.name;
   const modes = t.modes.map(m => `<i style="background:${MODES[m].color}" aria-hidden="true"></i>${MODES[m].label.toUpperCase()}`).join(' ');
-  const sub = [`${t.est ? '≈' : ''}${fmtKm(t.km)} km`, t.nights ? `${t.nights} night${t.nights > 1 ? 's' : ''}` : 'day trip',
+  const sub = [t.stayOnly ? 'no tickets in the log' : `${t.est ? '≈' : ''}${fmtKm(t.km)} km`, t.nights ? `${t.nights} night${t.nights > 1 ? 's' : ''}` : 'day trip',
                t.who.length ? `with ${t.who.join(', ')}` : ''].filter(Boolean).join(' · ');
-  const stub = t.done ? [t.legs.length, t.legs.length === 1 ? 'leg' : 'legs']
+  const stub = t.done ? (t.stayOnly ? [t.nights, t.nights === 1 ? 'night' : 'nights'] : [t.legs.length, t.legs.length === 1 ? 'leg' : 'legs'])
     : t.startsIn > 0 ? [t.startsIn, t.startsIn === 1 ? 'day to go' : 'days to go']
     : ['now', 'on the road'];
   let html = `<button class="ticket${next ? ' next' : ''}" type="button" data-trip="${esc(t.name)}" aria-pressed="${sel}" aria-expanded="${sel}">
