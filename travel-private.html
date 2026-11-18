@@ -173,6 +173,14 @@
   .tk-route{font-size:.8rem;line-height:1.5}
   .tk-sub{font-size:.74rem;color:var(--muted);line-height:1.5}
   .tk-gap{font-size:.74rem;line-height:1.45;color:var(--hot);font-weight:500}
+  .tk-stay{font-size:.74rem;line-height:1.45;color:var(--text)}
+  .ticket.next .tk-stay{color:#e8efe9}
+  .leg.stay b{font-weight:500}
+  .leg.stay .bed{display:inline-block;margin-right:.4rem}
+  .stay-pin{background:none;border:0}
+  .stay-pin b{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:#fff7e0;border:2px solid #14201a;
+              font-size:13px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .day .bed{position:absolute;top:2px;right:4px;font-size:.62rem;line-height:1}
   .ticket.next .tk-gap{color:#ffb3bf}
   .tk-stub{flex:0 0 86px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:.6rem;
            border-left:2px dashed var(--border)}
@@ -301,7 +309,7 @@ const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'
 const fmtKm = n => Math.round(n).toLocaleString('en-IN');
 
 let tokenClient, accessToken;
-let LEGS = [], PLACES = {}, HOME = '';
+let LEGS = [], PLACES = {}, HOME = '', STAYS = [];
 let state = { tab: 'map', year: null, month: null, trip: null, labels: true, full: false };
 try { state.labels = localStorage.getItem('deepu-travel-labels') !== 'off'; } catch (e){}
 
@@ -390,6 +398,21 @@ async function loadAll(){
       who: String(o.with || ''), note: String(o.note || ''),
     };
   }).filter(Boolean).sort((a, b) => a.dep.at - b.dep.at);
+  /* Stays are optional: a Sheet without a Stays tab still loads. */
+  STAYS = [];
+  try {
+    const st = await api('/values/Stays?valueRenderOption=UNFORMATTED_VALUE');
+    STAYS = rowsOf(st.values || []).map(o => {
+      const a = parseWhen(o.check_in), b = parseWhen(o.check_out) || a, name = String(o.name || '').trim();
+      if (!a || !name) return null;
+      return {
+        id: String(o.id || ''), name, place: String(o.place || '').trim(), in: a, out: b,
+        nights: Math.max(0, dayNum(b.day) - dayNum(a.day)),
+        type: String(o.type || 'hotel').toLowerCase().trim(), via: String(o.via || ''),
+        trip: String(o.trip || '').trim(), who: String(o.with || ''), note: String(o.note || ''),
+      };
+    }).filter(Boolean).sort((a, b) => a.in.at - b.in.at);
+  } catch (e){ STAYS = []; }
 }
 
 /* ── derived ───────────────────────────────────────────────────────*/
@@ -415,6 +438,8 @@ function tripsOf(legs){
       km: ls.reduce((s, l) => s + l.km, 0), est: ls.some(l => l.est),
       nights: dayNum(end) - dayNum(start),
       done: ls.every(isDone), startsIn: dayNum(start) - dayNum(today),
+      /* a stay joins its trip by name, or else by falling inside the trip's dates */
+      stays: STAYS.filter(st => st.trip ? st.trip === name : (st.in.day >= start && st.in.day <= end)),
     };
   }).sort((a, b) => a.start < b.start ? -1 : 1);
 }
@@ -643,6 +668,17 @@ async function renderMap(legs){
     L.circleMarker([p.lat, p.lon], { radius: n === HOME ? 9 : 6, color: '#14201a', weight: 3, fillColor: '#ffffff', fillOpacity: 1 })
       .bindTooltip(n, { permanent: state.labels, direction: 'right', offset: [8, 0], className: 'place-tip' }).addTo(mapLayer);
   });
+  /* where you slept: one pin per stay, set just above its city's dot */
+  const tripNames = new Set(legs.map(l => l.trip));
+  STAYS.filter(st => tripNames.has(st.trip) || (!st.trip && legs.some(l => st.in.day >= l.dep.day && st.in.day <= l.arr.day)))
+    .forEach(st => {
+      const p = PLACES[st.place]; if (!p) return;
+      const faded = state.trip && st.trip !== state.trip;
+      L.marker([p.lat, p.lon], { keyboard: false, zIndexOffset: 400, opacity: faded ? 0.25 : 1, icon: L.divIcon({
+        className: 'stay-pin', iconSize: [24, 24], iconAnchor: [-4, 30], html: '<b>🛏</b>',
+      }) }).bindTooltip(`${st.name} · ${fmtRange(st.in.day, st.out.day)} · ${st.nights} night${st.nights === 1 ? '' : 's'}`)
+        .addTo(mapLayer);
+    });
   /* where the picked trip began and where it finished */
   const tl = state.trip ? legs.filter(l => l.trip === state.trip) : [];
   if (tl.length){
@@ -663,6 +699,8 @@ function renderCalendar(legs, trips){
   const today = keyOf(now()), todayN = dayNum(today);
   const away = new Map();                       // dayNum → trip name
   trips.forEach(t => { for (let n = dayNum(t.start); n <= dayNum(t.end); n++) away.set(n, t.name); });
+  const beds = new Map();                       // dayNum → stay slept in that night
+  STAYS.forEach(st => { for (let n = dayNum(st.in.day); n < dayNum(st.out.day); n++) beds.set(n, st); });
   const moves = new Map();                      // day key → legs leaving that day
   legs.forEach(l => { if (!moves.has(l.dep.day)) moves.set(l.dep.day, []); moves.get(l.dep.day).push(l); });
   const DOW = ['M','T','W','T','F','S','S'];
@@ -675,15 +713,16 @@ function renderCalendar(legs, trips){
       if (trip) awayCount++;
       const cls = ['day', trip ? 'away' : '', trip && n > todayN ? 'up' : '', key === today ? 'today' : '',
                    state.trip && trip && trip !== state.trip ? 'dimmed' : ''].filter(Boolean).join(' ');
-      const tip = [fmtDay(key), trip || '', ...mv.map(l => `${l.from} → ${l.to} (${MODES[l.mode].label.toLowerCase()})`)].filter(Boolean).join(' · ');
-      cells += `<div class="${cls}" title="${esc(tip)}"><span>${d}</span>${mv.length ? `<span class="dots" aria-hidden="true">${mv.map(l => `<i style="background:${MODES[l.mode].color}"></i>`).join('')}</span>` : ''}</div>`;
+      const bed = beds.get(n);
+      const tip = [fmtDay(key), trip || '', bed ? `night at ${bed.name}` : '', ...mv.map(l => `${l.from} → ${l.to} (${MODES[l.mode].label.toLowerCase()})`)].filter(Boolean).join(' · ');
+      cells += `<div class="${cls}" title="${esc(tip)}"><span>${d}</span>${bed ? '<b class="bed" aria-hidden="true">🛏</b>' : ''}${mv.length ? `<span class="dots" aria-hidden="true">${mv.map(l => `<i style="background:${MODES[l.mode].color}"></i>`).join('')}</span>` : ''}</div>`;
     }
     return `<div class="cal"><h3>${MONTHS[m]} ${state.year}<small>${awayCount ? `${awayCount} DAY${awayCount > 1 ? 'S' : ''} AWAY` : 'HOME ALL MONTH'}</small></h3><div class="cal-grid">${cells}</div></div>`;
   }).join('')}</div>
   <div class="cal-key"><span><i style="background:var(--run-dim);border:1px solid var(--run)"></i>Away</span>
     <span><i style="border:1px dashed var(--run)"></i>Away, still ahead</span>
     <span><i style="outline:2px solid var(--text);outline-offset:-2px"></i>Today</span>
-    <span>Dots mark the day a leg leaves, coloured by mode</span></div>`;
+    <span>Dots mark the day a leg leaves, coloured by mode</span><span>🛏 a night at a booked stay</span></div>`;
 }
 /* Calendars run up to the later of this month and the last journey. */
 function lastShownMonth(){
@@ -721,17 +760,32 @@ function ticketHTML(t, next){
       <span class="tk-title">${esc(t.name)}</span>
       <span class="tk-route">${esc(t.route)}</span>
       <span class="tk-sub">${esc(sub)}</span>
+      ${t.stays.map(st => `<span class="tk-stay">🛏 ${esc(st.name)}${st.place ? `, ${esc(st.place)}` : ''} · ${st.nights} night${st.nights === 1 ? '' : 's'}</span>`).join('')}
       ${t.gaps.map(g => `<span class="tk-gap">No ticket in the log: ${esc(g)}</span>`).join('')}
     </span>
     <span class="tk-stub"><b>${stub[0]}</b><span>${stub[1]}</span></span>
   </button>`;
-  if (sel) html += `<div class="legs">${t.legs.map((l, i) => {
-    const when = l.dep.time ? `${fmtDay(l.dep.day)} ${l.dep.time}` : fmtDay(l.dep.day);
-    const detail = [[l.carrier, l.ref].filter(Boolean).join(' '), l.note, l.planned ? 'planned, not booked' : ''].filter(Boolean).join(' · ');
-    return `<div class="leg"><time>${esc(when)}</time>
-      <div><b><span class="leg-n" title="Leg ${i + 1}">${i + 1}</span><i style="background:${MODES[l.mode].color}" aria-hidden="true"></i>${esc(l.from)} → ${esc(l.to)}</b>${detail ? `<small>${esc(detail)}</small>` : ''}</div>
-      <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km</span></div>`;
-  }).join('')}</div>`;
+  if (sel){
+    /* legs and stays in the order they happen; a stay sorts just after a leg that arrives the same day */
+    const rows = [...t.legs.map((l, i) => ({ at: +l.dep.at, leg: l, i })),
+                  ...t.stays.map(st => ({ at: +st.in.at + 1, stay: st }))].sort((a, b) => a.at - b.at);
+    html += `<div class="legs">${rows.map(r => {
+      if (r.stay){
+        const st = r.stay;
+        const detail = [`${st.type}${st.via ? ` via ${st.via}` : ''}`, `in ${fmtDay(st.in.day)}, out ${fmtDay(st.out.day)}`,
+                        st.who ? `with ${st.who}` : '', st.note].filter(Boolean).join(' · ');
+        return `<div class="leg stay"><time>${esc(fmtDay(st.in.day))}</time>
+          <div><b><span class="bed" aria-hidden="true">🛏</span>${esc(st.name)}${st.place ? `, ${esc(st.place)}` : ''}</b><small>${esc(detail)}</small></div>
+          <span class="km">${st.nights} night${st.nights === 1 ? '' : 's'}</span></div>`;
+      }
+      const l = r.leg, i = r.i;
+      const when = l.dep.time ? `${fmtDay(l.dep.day)} ${l.dep.time}` : fmtDay(l.dep.day);
+      const detail = [[l.carrier, l.ref].filter(Boolean).join(' '), l.note, l.planned ? 'planned, not booked' : ''].filter(Boolean).join(' · ');
+      return `<div class="leg"><time>${esc(when)}</time>
+        <div><b><span class="leg-n" title="Leg ${i + 1}">${i + 1}</span><i style="background:${MODES[l.mode].color}" aria-hidden="true"></i>${esc(l.from)} → ${esc(l.to)}</b>${detail ? `<small>${esc(detail)}</small>` : ''}</div>
+        <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km</span></div>`;
+    }).join('')}</div>`;
+  }
   return html;
 }
 function renderStack(trips){
@@ -751,7 +805,7 @@ function render(){
   $('kicker').textContent = `TRAVEL NETWORK · ${period.toUpperCase()}${HOME ? ` · EVERY LINE STARTS AT ${HOME.toUpperCase()}` : ''}`;
   renderStats(legs, trips);
   $('legend').innerHTML = Object.entries(MODES).map(([, m]) => `<span><i style="background:${m.color}"></i>${m.label}</span>`).join('') +
-    `<span><i class="dash"></i>Still ahead</span>`;
+    `<span><i class="dash"></i>Still ahead</span>` + (STAYS.length ? '<span>🛏 Stay</span>' : '');
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === state.tab)));
   $('labels-btn').hidden = state.tab !== 'map';
   $('labels-btn').setAttribute('aria-pressed', String(state.labels));
