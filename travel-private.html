@@ -33,8 +33,19 @@
   .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,3.1rem);line-height:1;letter-spacing:-.03em}
   .hero .cap{margin-top:.55rem;font-size:.86rem;color:var(--muted);max-width:52ch;line-height:1.6}
 
-  .stats{display:grid;grid-template-columns:repeat(4,auto);gap:1rem 2.2rem}
+  .stats{display:grid;grid-template-columns:repeat(5,auto);gap:1rem 2.2rem}
+  .search{position:relative;margin-top:1rem;max-width:30rem}
+  .search input{width:100%;font:inherit;font-size:.9rem;color:var(--text);background:var(--surface);border:1px solid var(--line);
+                border-radius:999px;padding:.62rem 2.4rem .62rem 2.4rem;outline:none}
+  .search input:focus{border-color:var(--text)}
+  .search::before{content:'⌕';position:absolute;left:.95rem;top:50%;transform:translateY(-52%);font-size:1.05rem;color:var(--muted);pointer-events:none}
+  .search button{position:absolute;right:.45rem;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);
+                 font-size:1rem;padding:.3rem .55rem;cursor:pointer;border-radius:999px}
+  .search button:hover{color:var(--text)}
+  .search input::-webkit-search-cancel-button{display:none}
+  .search-note{margin-top:.45rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:var(--muted)}
   @media(max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}}
+  @media(min-width:641px) and (max-width:1100px){.stats{grid-template-columns:repeat(3,auto)}}
   .stat{text-align:right}
   .stat b{display:block;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1;
           letter-spacing:-.03em;font-variant-numeric:tabular-nums}
@@ -213,6 +224,11 @@
       <p class="kicker" id="kicker">TRAVEL NETWORK</p>
       <h1>Where I went</h1>
       <p class="cap" id="cap">Every journey as a line on the network, a route on the map and a day on the calendar.</p>
+      <div class="search" id="search-wrap" hidden>
+        <input type="search" id="q" placeholder="Search trips, cities, hotels, people, flights…" aria-label="Search every year" autocomplete="off" spellcheck="false">
+        <button type="button" id="q-clear" aria-label="Clear search" hidden>✕</button>
+      </div>
+      <p class="search-note" id="search-note" hidden></p>
     </div>
     <div class="stats" id="stats" hidden></div>
   </header>
@@ -310,7 +326,7 @@ const fmtKm = n => Math.round(n).toLocaleString('en-IN');
 
 let tokenClient, accessToken;
 let LEGS = [], PLACES = {}, HOME = '', STAYS = [];
-let state = { tab: 'map', year: null, month: null, trip: null, labels: true, full: false };
+let state = { tab: 'map', year: null, month: null, trip: null, labels: true, full: false, q: '' };
 try { state.labels = localStorage.getItem('deepu-travel-labels') !== 'off'; } catch (e){}
 
 /* ── dates ─────────────────────────────────────────────────────────*/
@@ -413,13 +429,44 @@ async function loadAll(){
       };
     }).filter(Boolean).sort((a, b) => a.in.at - b.in.at);
   } catch (e){ STAYS = []; }
+  SEARCH_TEXT = null;
 }
 
 /* ── derived ───────────────────────────────────────────────────────*/
 const now = () => new Date();
 const isDone = leg => !leg.planned && leg.arr.at <= now();
+/* Search runs across every year. A trip matches when every word typed appears
+   somewhere in it: its name, its cities, carriers, flight or train numbers,
+   hotels, co-travellers, notes, the year or the month. */
+const stayKey = st => st.trip || `${st.place || st.name} stay`;
+let SEARCH_TEXT = null;
+function searchText(){
+  if (SEARCH_TEXT) return SEARCH_TEXT;
+  const m = new Map(), add = (k, ...bits) => m.set(k, (m.get(k) || '') + ' ' + bits.filter(Boolean).join(' '));
+  LEGS.forEach(l => add(l.trip, l.trip, l.from, l.to, MODES[l.mode].label, l.carrier, l.ref, l.who, l.note,
+                         l.dep.day.slice(0, 4), MONTHS[l.dep.at.getMonth()], l.planned ? 'planned' : ''));
+  STAYS.forEach(st => add(stayKey(st), stayKey(st), st.name, st.place, st.type, st.via, st.who, st.note,
+                         'stay hotel', st.in.day.slice(0, 4), MONTHS[st.in.at.getMonth()]));
+  m.forEach((v, k) => m.set(k, ' ' + v.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ') + ' '));
+  return (SEARCH_TEXT = m);
+}
+function matchingTrips(){
+  /* Whole words first, so “goa” finds Goa and not GoAir; if nothing matches
+     whole, fall back to words that start with what was typed (“vij” → Vijayawada). */
+  const words = state.q.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const pick = test => { const out = new Set(); searchText().forEach((text, trip) => { if (words.every(w => test(text, w))) out.add(trip); }); return out; };
+  const whole = pick((text, w) => text.includes(` ${w} `));
+  return whole.size ? whole : pick((text, w) => text.includes(` ${w}`));
+}
+const searching = () => state.q.trim().length > 0;
+function inPeriod(at){ return at.getFullYear() === state.year && (state.month == null || at.getMonth() === state.month); }
 function legsInView(){
-  return LEGS.filter(l => l.dep.at.getFullYear() === state.year && (state.month == null || l.dep.at.getMonth() === state.month));
+  if (searching()){ const hit = matchingTrips(); return LEGS.filter(l => hit.has(l.trip)); }
+  return LEGS.filter(l => inPeriod(l.dep.at));
+}
+function staysInView(){
+  if (searching()){ const hit = matchingTrips(); return STAYS.filter(st => hit.has(stayKey(st))); }
+  return STAYS.filter(st => inPeriod(st.in.at));
 }
 function tripsOf(legs){
   const map = new Map();
@@ -446,9 +493,9 @@ function tripsOf(legs){
 /* A stay with no tickets in its trip (a road trip, say) still makes a trip of its own. */
 function stayOnlyTrips(legTrips){
   const today = keyOf(now()), groups = new Map();
-  STAYS.filter(st => st.in.at.getFullYear() === state.year && (state.month == null || st.in.at.getMonth() === state.month))
+  staysInView()
     .filter(st => !(st.trip ? legTrips.has(st.trip) : [...legTrips.values()].some(ls => st.in.day >= ls[0].dep.day && st.in.day <= ls[ls.length - 1].arr.day)))
-    .forEach(st => { const k = st.trip || `${st.place || st.name} stay`; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(st); });
+    .forEach(st => { const k = stayKey(st); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(st); });
   return [...groups.entries()].map(([name, ss]) => {
     const start = ss[0].in.day, end = ss.reduce((m, st) => st.out.day > m ? st.out.day : m, ss[0].out.day);
     return {
@@ -479,12 +526,16 @@ function renderStats(legs, trips){
     nights += past; nightsAhead += (e - s) - past;
   });
   const tDone = trips.filter(t => t.done).length;
+  const stays = trips.flatMap(t => t.stays), sDone = stays.filter(st => st.out.at <= now()).length;
+  const hNights = stays.filter(st => st.out.at <= now()).reduce((n, st) => n + st.nights, 0);
   const stat = (big, label, more) => `<div class="stat"><b>${big}</b><span>${label}</span>${more ? `<em>${more}</em>` : ''}</div>`;
   $('stats').innerHTML =
     stat(cDone.size, cDone.size === 1 ? 'city' : 'cities', cAll.size > cDone.size ? `+${cAll.size - cDone.size} ahead` : '') +
     stat(fmtKm(kmDone), 'km travelled', kmAhead ? `+${fmtKm(kmAhead)} ahead` : '') +
     stat(tDone, tDone === 1 ? 'trip done' : 'trips done', trips.length > tDone ? `+${trips.length - tDone} ahead` : '') +
-    stat(nights, nights === 1 ? 'night away' : 'nights away', nightsAhead ? `+${nightsAhead} ahead` : '');
+    stat(nights, nights === 1 ? 'night away' : 'nights away', nightsAhead ? `+${nightsAhead} ahead` : '') +
+    stat(sDone, sDone === 1 ? 'hotel' : 'hotels',
+         [hNights ? `${hNights} night${hNights === 1 ? '' : 's'} booked` : '', stays.length > sDone ? `+${stays.length - sDone} ahead` : ''].filter(Boolean).join(' · '));
   $('stats').hidden = false;
 }
 
@@ -644,7 +695,7 @@ async function renderMap(legs){
   const inView = state.trip ? legs.filter(l => l.trip === state.trip) : legs;
   inView.forEach(l => { const a = PLACES[l.from], b = PLACES[l.to]; if (a && b) pts.push([a.lat, a.lon], [b.lat, b.lon]); });
   if (state.trip && !legs.some(l => l.trip === state.trip))
-    STAYS.filter(st => st.trip === state.trip || `${st.place || st.name} stay` === state.trip).forEach(st => { const p = PLACES[st.place]; if (p) pts.push([p.lat, p.lon]); });
+    STAYS.filter(st => stayKey(st) === state.trip).forEach(st => { const p = PLACES[st.place]; if (p) pts.push([p.lat, p.lon]); });
   map.invalidateSize();
   if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 9 });
   else if (PLACES[HOME]) map.setView([PLACES[HOME].lat, PLACES[HOME].lon], 6);
@@ -688,10 +739,10 @@ async function renderMap(legs){
   });
   /* where you slept: one pin per stay, set just above its city's dot */
   const tripNames = new Set(legs.map(l => l.trip)), legPlaces = new Set(legs.flatMap(l => [l.from, l.to]));
-  STAYS.filter(st => tripNames.has(st.trip) || (st.in.at.getFullYear() === state.year && (state.month == null || st.in.at.getMonth() === state.month)))
+  [...new Set([...STAYS.filter(st => tripNames.has(st.trip)), ...staysInView()])]
     .forEach(st => {
       const p = PLACES[st.place]; if (!p) return;
-      const faded = state.trip && (st.trip || `${st.place || st.name} stay`) !== state.trip;
+      const faded = state.trip && stayKey(st) !== state.trip;
       /* a stay on a road trip may be in a city no ticket reaches, so give it a dot of its own */
       if (!legPlaces.has(st.place)){
         legPlaces.add(st.place);
@@ -780,7 +831,7 @@ function ticketHTML(t, next){
     : ['now', 'on the road'];
   let html = `<button class="ticket${next ? ' next' : ''}" type="button" data-trip="${esc(t.name)}" aria-pressed="${sel}" aria-expanded="${sel}">
     <span class="tk-main">
-      <span class="tk-meta"><span>${esc(fmtRange(t.start, t.end).toUpperCase())}</span><span>${modes}</span></span>
+      <span class="tk-meta"><span>${esc(fmtRange(t.start, t.end).toUpperCase())}${searching() ? ` ${t.start.slice(0, 4)}` : ''}</span><span>${modes}</span></span>
       <span class="tk-title">${esc(t.name)}</span>
       <span class="tk-route">${esc(t.route)}</span>
       <span class="tk-sub">${esc(sub)}</span>
@@ -817,7 +868,7 @@ function renderStack(trips){
   let html = '';
   if (ahead.length) html += `<h2>COMING UP</h2>` + ahead.map((t, i) => ticketHTML(t, i === 0)).join('');
   if (done.length)  html += `<h2>DONE</h2>` + done.map(t => ticketHTML(t, false)).join('');
-  if (!trips.length) html = `<p class="empty">No trips in this period.</p>`;
+  if (!trips.length) html = `<p class="empty">${searching() ? `Nothing matches “${esc(state.q.trim())}” in any year.` : 'No trips in this period.'}</p>`;
   $('stack').innerHTML = html;
 }
 
@@ -825,7 +876,16 @@ function renderStack(trips){
 function render(){
   const legs = legsInView(), trips = tripsOf(legs);
   if (state.trip && !trips.some(t => t.name === state.trip)) state.trip = null;
-  const period = state.month == null ? String(state.year) : `${MONTHS[state.month]} ${state.year}`;
+  const period = searching() ? `SEARCH “${state.q.trim()}”` : state.month == null ? String(state.year) : `${MONTHS[state.month]} ${state.year}`;
+  $('search-note').hidden = !searching();
+  if (searching()){
+    const ys = [...new Set(trips.map(t => t.start.slice(0, 4)))].sort();
+    $('search-note').textContent = trips.length
+      ? `${trips.length} TRIP${trips.length === 1 ? '' : 'S'} ACROSS ${ys.length === 1 ? ys[0] : `${ys[0]}–${ys[ys.length - 1]}`} · ESC TO CLEAR`
+      : 'NO MATCHES · ESC TO CLEAR';
+  }
+  $('q-clear').hidden = !state.q;
+  $('year').disabled = searching();
   $('kicker').textContent = `TRAVEL NETWORK · ${period.toUpperCase()}${HOME ? ` · EVERY LINE STARTS AT ${HOME.toUpperCase()}` : ''}`;
   renderStats(legs, trips);
   $('legend').innerHTML = Object.entries(MODES).map(([, m]) => `<span><i style="background:${m.color}"></i>${m.label}</span>`).join('') +
@@ -842,6 +902,7 @@ function render(){
   if (state.tab === 'network') renderNetwork(legs);
   if (state.tab === 'map') renderMap(legs);
   if (state.tab === 'calendar') renderCalendar(legs, trips);
+  $('strip').hidden = searching();
   renderStrip();
   renderStack(trips);
   const [sy, sm] = SINCE.split('-').map(Number);
@@ -869,7 +930,13 @@ document.addEventListener('click', e => {
   }
   if (e.target.closest('#full-btn')){ state.full = !state.full; render(); }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.full){ state.full = false; render(); } });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && state.q){ state.q = ''; $('q').value = ''; state.trip = null; render(); return; }
+  if (e.key === 'Escape' && state.full){ state.full = false; render(); }
+  if (e.key === '/' && document.activeElement !== $('q') && !e.metaKey && !e.ctrlKey){ e.preventDefault(); $('q').focus(); }
+});
+$('q').addEventListener('input', e => { state.q = e.target.value; state.trip = null; render(); });
+$('q-clear').addEventListener('click', () => { state.q = ''; $('q').value = ''; state.trip = null; render(); $('q').focus(); });
 window.addEventListener('resize', () => { if (map && state.tab === 'map') map.invalidateSize(); });
 $('year').addEventListener('change', e => { state.year = +e.target.value; state.month = null; state.trip = null; render(); });
 
@@ -897,6 +964,7 @@ async function onSignedIn(){
     $('year-wrap').hidden = years.length < 2;
     $('gate').style.display = 'none';
     $('main').hidden = false;
+    $('search-wrap').hidden = false;
     render();
   } catch (e){ showGateError(e.message); }
 }
