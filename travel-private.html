@@ -204,6 +204,22 @@
 
   .legs{border:1px solid var(--border);border-radius:12px;padding:.3rem .9rem;margin-top:-.2rem;background:var(--surface)}
   .leg{display:grid;grid-template-columns:4.6rem minmax(0,1fr) auto;gap:.2rem .7rem;align-items:baseline;padding:.55rem 0;border-top:1px solid var(--border);font-size:.8rem}
+  .docbtn{grid-column:2;justify-self:start;margin-top:.35rem;font:inherit;font-size:.7rem;letter-spacing:.02em;color:var(--text);
+          background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.26rem .7rem;cursor:pointer}
+  .docbtn:hover{border-color:var(--m-flight);color:var(--m-flight)}
+  .tk-doc{margin-left:.35rem}
+
+  .docview{position:fixed;inset:0;z-index:60;background:rgba(6,10,14,.82);backdrop-filter:blur(3px);display:grid;place-items:center;padding:1.2rem}
+  .docview-box{width:min(820px,100%);height:min(88vh,980px);display:flex;flex-direction:column;
+               background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .docview-box header{display:flex;align-items:center;gap:1rem;padding:.7rem 1rem;border-bottom:1px solid var(--border)}
+  .docview-box h3{flex:1;min-width:0;font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .docview-box a{font-size:.72rem;color:var(--muted);text-decoration:none;white-space:nowrap}
+  .docview-box a:hover{color:var(--m-flight)}
+  .docview-box button{font:inherit;font-size:.9rem;line-height:1;color:var(--muted);background:none;border:0;cursor:pointer;padding:.2rem .3rem}
+  .docview-box button:hover{color:var(--text)}
+  .docview iframe{flex:1;width:100%;border:0;background:#fff}
+  body.modal-open{overflow:hidden}
   .leg:first-child{border-top:0}
   .leg time{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.06em;color:var(--muted)}
   .leg b{font-weight:500}
@@ -277,6 +293,16 @@
   <footer id="foot"></footer>
 </div>
 
+<!-- Ticket viewer: the file is served by Drive, to the signed-in account only. -->
+<div class="docview" id="docview" role="dialog" aria-modal="true" aria-labelledby="docview-title" hidden>
+  <div class="docview-box">
+    <header><h3 id="docview-title">Ticket</h3>
+      <a id="docview-open" href="#" target="_blank" rel="noopener">Open in Drive ↗</a>
+      <button type="button" id="docview-close" aria-label="Close">✕</button></header>
+    <iframe id="docview-frame" title="Ticket" src="about:blank" allow="autoplay"></iframe>
+  </div>
+</div>
+
 <script src="assets/js/nav.js"></script>
 <script src="https://accounts.google.com/gsi/client"></script>
 <script>
@@ -288,7 +314,7 @@
    page only reads; rows are added in the Sheet.
 
    Journeys  id | depart | arrive | from | to | mode | carrier | ref |
-             status | trip | km | with | note
+             status | trip | km | with | note | doc
      depart/arrive  text, 2026-11-09 or 2026-11-09T15:00 (local time)
      mode           flight | train | bus | road
      status         planned = not booked yet; anything else is decided
@@ -296,6 +322,8 @@
      trip           legs sharing a trip name become one ticket
      km             the ticket's own distance when it prints one; blank
                     = estimated here (great-circle, × 1.25 on the ground)
+     doc            Google Drive file id (or any link to one) for the
+                    ticket or boarding pass; the file stays in Drive
    Places    name | lat | lon | country | home
      one row per city; exactly one row has home = yes
 
@@ -434,7 +462,7 @@ async function loadAll(){
       carrier: String(o.carrier || ''), ref: String(o.ref || ''),
       planned: String(o.status || '').toLowerCase().trim() === 'planned',
       trip: String(o.trip || '').trim() || `${from} → ${to}`,
-      who: String(o.with || ''), note: String(o.note || ''),
+      who: String(o.with || ''), note: String(o.note || ''), doc: String(o.doc || '').trim(),
     };
   }).filter(Boolean).sort((a, b) => a.dep.at - b.dep.at);
   /* Stays are optional: a Sheet without a Stays tab still loads. */
@@ -863,7 +891,7 @@ function ticketHTML(t, next){
     : ['now', 'on the road'];
   let html = `<button class="ticket${next ? ' next' : ''}" type="button" data-trip="${esc(t.name)}" aria-pressed="${sel}" aria-expanded="${sel}">
     <span class="tk-main">
-      <span class="tk-meta"><span>${esc(fmtRange(t.start, t.end).toUpperCase())}${searching() ? ` ${t.start.slice(0, 4)}` : ''}</span><span>${modes}</span></span>
+      <span class="tk-meta"><span>${esc(fmtRange(t.start, t.end).toUpperCase())}${searching() ? ` ${t.start.slice(0, 4)}` : ''}</span><span>${modes}${t.legs.some(l => l.doc) ? ' <span class="tk-doc" title="Boarding pass in the log">🎫</span>' : ''}</span></span>
       <span class="tk-title">${esc(t.name)}</span>
       <span class="tk-route">${esc(t.route)}</span>
       <span class="tk-sub">${esc(sub)}</span>
@@ -890,11 +918,34 @@ function ticketHTML(t, next){
       const detail = [[l.carrier, l.ref].filter(Boolean).join(' '), l.note, l.planned ? 'planned, not booked' : ''].filter(Boolean).join(' · ');
       return `<div class="leg"><time>${esc(when)}</time>
         <div><b><span class="leg-n" title="Leg ${i + 1}">${i + 1}</span><i style="background:${MODES[l.mode].color}" aria-hidden="true"></i>${esc(l.from)} → ${esc(l.to)}</b>${detail ? `<small>${esc(detail)}</small>` : ''}</div>
-        <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km<br><small>${fmtCO2(legCO2(l))} CO₂e</small></span></div>`;
+        <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km<br><small>${fmtCO2(legCO2(l))} CO₂e</small></span>
+        ${l.doc ? `<button class="docbtn" type="button" data-doc="${esc(docId(l.doc))}" data-doc-label="${esc(`${l.from} → ${l.to}${l.carrier || l.ref ? ` · ${[l.carrier, l.ref].filter(Boolean).join(' ')}` : ''}`)}">🎫 Boarding pass</button>` : ''}</div>`;
     }).join('')}</div>`;
   }
   return html;
 }
+/* ── boarding passes and tickets ───────────────────────────────────
+   The doc column holds a Google Drive file id, or any link to one. The
+   file itself stays in Drive, private to the account that is signed in;
+   the page only ever holds its id. */
+function docId(v){
+  const m = String(v).match(/[-\w]{25,}/);
+  return m ? m[0] : String(v).trim();
+}
+function openDoc(id, label){
+  $('docview-title').textContent = label || 'Ticket';
+  $('docview-frame').src = `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`;
+  $('docview-open').href = `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`;
+  $('docview').hidden = false;
+  document.body.classList.add('modal-open');
+  $('docview-close').focus();
+}
+function closeDoc(){
+  $('docview').hidden = true;
+  $('docview-frame').src = 'about:blank';
+  document.body.classList.remove('modal-open');
+}
+
 function renderStack(trips){
   const ahead = trips.filter(t => !t.done), done = trips.filter(t => t.done).reverse();
   let html = '';
@@ -963,9 +1014,13 @@ document.addEventListener('click', e => {
     try { localStorage.setItem('deepu-travel-labels', state.labels ? 'on' : 'off'); } catch (err){}
     render(); return;
   }
+  const doc = e.target.closest('[data-doc]');
+  if (doc){ openDoc(doc.dataset.doc, doc.dataset.docLabel); return; }
+  if (e.target.closest('#docview-close') || e.target.id === 'docview'){ closeDoc(); return; }
   if (e.target.closest('#full-btn')){ state.full = !state.full; render(); }
 });
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('docview').hidden){ closeDoc(); return; }
   if (e.key === 'Escape' && state.q){ state.q = ''; $('q').value = ''; state.trip = null; render(); return; }
   if (e.key === 'Escape' && state.full){ state.full = false; render(); }
   if (e.key === '/' && document.activeElement !== $('q') && !e.metaKey && !e.ctrlKey){ e.preventDefault(); $('q').focus(); }
