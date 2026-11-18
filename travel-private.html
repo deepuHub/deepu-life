@@ -33,7 +33,8 @@
   .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,3.1rem);line-height:1;letter-spacing:-.03em}
   .hero .cap{margin-top:.55rem;font-size:.86rem;color:var(--muted);max-width:52ch;line-height:1.6}
 
-  .stats{display:grid;grid-template-columns:repeat(5,auto);gap:1rem 2.2rem}
+  .stats{display:grid;grid-template-columns:repeat(6,auto);gap:1rem 2rem}
+  .stat b small{font-size:.5em;font-weight:700;margin-left:.08em}
   .search{position:relative;margin-top:1rem;max-width:30rem}
   .search input{width:100%;font:inherit;font-size:.9rem;color:var(--text);background:var(--surface);border:1px solid var(--line);
                 border-radius:999px;padding:.62rem 2.4rem .62rem 2.4rem;outline:none}
@@ -45,7 +46,7 @@
   .search input::-webkit-search-cancel-button{display:none}
   .search-note{margin-top:.45rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:var(--muted)}
   @media(max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}}
-  @media(min-width:641px) and (max-width:1100px){.stats{grid-template-columns:repeat(3,auto)}}
+  @media(min-width:641px) and (max-width:1250px){.stats{grid-template-columns:repeat(3,auto)}}
   .stat{text-align:right}
   .stat b{display:block;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1;
           letter-spacing:-.03em;font-variant-numeric:tabular-nums}
@@ -207,7 +208,8 @@
   .leg time{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.06em;color:var(--muted)}
   .leg b{font-weight:500}
   .leg small{display:block;color:var(--muted);font-size:.72rem;line-height:1.45}
-  .leg .km{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);white-space:nowrap}
+  .leg .km{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);white-space:nowrap;text-align:right}
+  .leg .km small{font-size:.92em;opacity:.8}
   .leg i{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;margin-right:.4rem}
 
   footer{margin-top:2rem;font-size:.74rem;color:var(--muted);line-height:1.7;max-width:80ch}
@@ -318,6 +320,27 @@ const MODES = {
   bus:    { label: 'Bus',    color: 'var(--m-bus)',    cssVar: '--m-bus'    },
   road:   { label: 'Road',   color: 'var(--m-road)',   cssVar: '--m-road'   },
 };
+/* ── emissions ─────────────────────────────────────────────────────
+   UK government (DESNZ) 2026 greenhouse gas conversion factors, kg CO2e.
+   Flights include radiative forcing (the extra warming from contrails and
+   high-altitude NOx) and already allow for detours, so the distance is the
+   one on the ticket or the great-circle estimate, unchanged. Road counts
+   the whole car, whoever else was in it. Hotels are per room-night by
+   country; a campsite counts as nothing. */
+const CO2 = {
+  flight: km => km * (km < 700 ? 0.22928 : km < 3700 ? 0.12576 : 0.11704),
+  train:  km => km * 0.03092,
+  bus:    km => km * 0.03948,
+  road:   km => km * 0.17,
+};
+const HOTEL_CO2 = { IN: 66, US: 16.1, _: 40 };
+const legCO2 = l => (CO2[l.mode] || CO2.road)(l.km);
+function stayCO2(st){
+  if (st.type === 'campsite') return 0;
+  const c = (PLACES[st.place] || {}).country;
+  return st.nights * (HOTEL_CO2[c] ?? HOTEL_CO2._);
+}
+const fmtCO2 = kg => kg >= 1000 ? `${(kg / 1000).toFixed(kg >= 10000 ? 0 : 1)} t` : `${Math.round(kg)} kg`;
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const $ = id => document.getElementById(id);
@@ -482,7 +505,7 @@ function tripsOf(legs){
     return {
       name, legs: ls, start, end, gaps, route, who,
       modes: [...new Set(ls.map(l => l.mode))],
-      km: ls.reduce((s, l) => s + l.km, 0), est: ls.some(l => l.est),
+      km: ls.reduce((s, l) => s + l.km, 0), est: ls.some(l => l.est), co2: ls.reduce((s, l) => s + legCO2(l), 0),
       nights: dayNum(end) - dayNum(start),
       done: ls.every(isDone), startsIn: dayNum(start) - dayNum(today),
       /* a stay joins its trip by name, or else by falling inside the trip's dates */
@@ -501,7 +524,7 @@ function stayOnlyTrips(legTrips){
     return {
       name, legs: [], start, end, gaps: [], route: [...new Set(ss.map(st => st.place).filter(Boolean))].join(' · '),
       who: [...new Set(ss.flatMap(st => st.who.split(',').map(x => x.trim()).filter(Boolean)))],
-      modes: [], km: 0, est: false, nights: dayNum(end) - dayNum(start),
+      modes: [], km: 0, est: false, co2: 0, nights: dayNum(end) - dayNum(start),
       done: ss.every(st => st.out.at <= now()), startsIn: dayNum(start) - dayNum(today), stays: ss, stayOnly: true,
     };
   });
@@ -527,6 +550,11 @@ function renderStats(legs, trips){
   });
   const tDone = trips.filter(t => t.done).length;
   const stays = trips.flatMap(t => t.stays), sDone = stays.filter(st => st.out.at <= now()).length;
+  /* emissions: what is done so far, split into travel and nights */
+  const travelCO2 = done.reduce((s, l) => s + legCO2(l), 0), aheadCO2 = ahead.reduce((s, l) => s + legCO2(l), 0)
+    + stays.filter(st => st.out.at > now()).reduce((s, st) => s + stayCO2(st), 0);
+  const nightsCO2 = stays.filter(st => st.out.at <= now()).reduce((s, st) => s + stayCO2(st), 0);
+  const flyCO2 = done.filter(l => l.mode === 'flight').reduce((s, l) => s + legCO2(l), 0), totalCO2 = travelCO2 + nightsCO2;
   const hNights = stays.filter(st => st.out.at <= now()).reduce((n, st) => n + st.nights, 0);
   const stat = (big, label, more) => `<div class="stat"><b>${big}</b><span>${label}</span>${more ? `<em>${more}</em>` : ''}</div>`;
   $('stats').innerHTML =
@@ -535,7 +563,10 @@ function renderStats(legs, trips){
     stat(tDone, tDone === 1 ? 'trip done' : 'trips done', trips.length > tDone ? `+${trips.length - tDone} ahead` : '') +
     stat(nights, nights === 1 ? 'night away' : 'nights away', nightsAhead ? `+${nightsAhead} ahead` : '') +
     stat(sDone, sDone === 1 ? 'hotel' : 'hotels',
-         [hNights ? `${hNights} night${hNights === 1 ? '' : 's'} booked` : '', stays.length > sDone ? `+${stays.length - sDone} ahead` : ''].filter(Boolean).join(' · '));
+         [hNights ? `${hNights} night${hNights === 1 ? '' : 's'}` : '', stays.length > sDone ? `+${stays.length - sDone} ahead` : ''].filter(Boolean).join(' · ')) +
+    `<div class="stat co2" title="Flights ${fmtCO2(flyCO2)}, trains, buses and road ${fmtCO2(travelCO2 - flyCO2)}, hotel nights ${fmtCO2(nightsCO2)}">` +
+      `<b>${fmtCO2(totalCO2).replace(/ (t|kg)$/, '<small> $1</small>')}</b><span>CO₂e emitted</span>` +
+      `<em>${[totalCO2 ? `${Math.round(100 * flyCO2 / totalCO2)}% flying` : '', aheadCO2 ? `+${fmtCO2(aheadCO2)}` : ''].filter(Boolean).join(' · ')}</em></div>`;
   $('stats').hidden = false;
 }
 
@@ -824,7 +855,8 @@ function renderStrip(){
 function ticketHTML(t, next){
   const sel = state.trip === t.name;
   const modes = t.modes.map(m => `<i style="background:${MODES[m].color}" aria-hidden="true"></i>${MODES[m].label.toUpperCase()}`).join(' ');
-  const sub = [t.stayOnly ? 'no tickets in the log' : `${t.est ? '≈' : ''}${fmtKm(t.km)} km`, t.nights ? `${t.nights} night${t.nights > 1 ? 's' : ''}` : 'day trip',
+  const tCO2 = t.co2 + t.stays.reduce((s, st) => s + stayCO2(st), 0);
+  const sub = [t.stayOnly ? 'no tickets in the log' : `${t.est ? '≈' : ''}${fmtKm(t.km)} km`, tCO2 ? `${fmtCO2(tCO2)} CO₂e` : '', t.nights ? `${t.nights} night${t.nights > 1 ? 's' : ''}` : 'day trip',
                t.who.length ? `with ${t.who.join(', ')}` : ''].filter(Boolean).join(' · ');
   const stub = t.done ? (t.stayOnly ? [t.nights, t.nights === 1 ? 'night' : 'nights'] : [t.legs.length, t.legs.length === 1 ? 'leg' : 'legs'])
     : t.startsIn > 0 ? [t.startsIn, t.startsIn === 1 ? 'day to go' : 'days to go']
@@ -851,14 +883,14 @@ function ticketHTML(t, next){
                         st.who ? `with ${st.who}` : '', st.note].filter(Boolean).join(' · ');
         return `<div class="leg stay"><time>${esc(fmtDay(st.in.day))}</time>
           <div><b><span class="bed" aria-hidden="true">🛏</span>${esc(st.name)}${st.place ? `, ${esc(st.place)}` : ''}</b><small>${esc(detail)}</small></div>
-          <span class="km">${st.nights} night${st.nights === 1 ? '' : 's'}</span></div>`;
+          <span class="km">${st.nights} night${st.nights === 1 ? '' : 's'}<br><small>${fmtCO2(stayCO2(st))} CO₂e</small></span></div>`;
       }
       const l = r.leg, i = r.i;
       const when = l.dep.time ? `${fmtDay(l.dep.day)} ${l.dep.time}` : fmtDay(l.dep.day);
       const detail = [[l.carrier, l.ref].filter(Boolean).join(' '), l.note, l.planned ? 'planned, not booked' : ''].filter(Boolean).join(' · ');
       return `<div class="leg"><time>${esc(when)}</time>
         <div><b><span class="leg-n" title="Leg ${i + 1}">${i + 1}</span><i style="background:${MODES[l.mode].color}" aria-hidden="true"></i>${esc(l.from)} → ${esc(l.to)}</b>${detail ? `<small>${esc(detail)}</small>` : ''}</div>
-        <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km</span></div>`;
+        <span class="km">${l.est ? '≈' : ''}${fmtKm(l.km)} km<br><small>${fmtCO2(legCO2(l))} CO₂e</small></span></div>`;
     }).join('')}</div>`;
   }
   return html;
@@ -907,7 +939,10 @@ function render(){
   renderStack(trips);
   const [sy, sm] = SINCE.split('-').map(Number);
   $('foot').innerHTML = `Log starts ${MONTHS[sm - 1]} ${sy}; earlier months are not imported yet. Distances marked ≈ are estimates
-    (great-circle for flights, × 1.25 on the ground); the rest are the figures printed on the ticket. To add a journey, add a row to the
+    (great-circle for flights, × 1.25 on the ground); the rest are the figures printed on the ticket.
+    CO₂e uses the UK government's 2026 conversion factors: flights per passenger-km with the extra warming at altitude included
+    (0.229 kg under 700 km, 0.126 up to 3,700 km, 0.117 beyond), trains 0.031, buses 0.039, and the whole car at 0.17 kg per km;
+    hotel nights 66 kg in India and 16.1 kg in the US per room-night, campsites nothing. Treat it as an estimate. To add a journey, add a row to the
     <code>Journeys</code> tab of the Trips Ledger Sheet, and a row to <code>Places</code> for any new city.`;
 }
 
