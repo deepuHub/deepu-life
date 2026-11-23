@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>try{var t=localStorage.getItem('deepu-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0a0f0d"/>
+  <title>deepu-life — Eats</title>
+  <meta name="description" content="Every plate worth photographing, where it was, and whether it was worth going back for."/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍛%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="preconnect" href="https://drive.google.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300&family=Epilogue:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/tracker-theme.css">
+  <style>
+  /* ── Eats ──────────────────────────────────────────────────────────
+     Reading is public: the dish log is a published Google Sheet and the
+     photos are a link-shared Drive folder, both fetched with no sign-in.
+     Writing is not: the + button and the editable fields appear only
+     after a Google sign-in, and Drive refuses the write to anyone who
+     is not the owner. The page enforces nothing — Google does.
+     Anything in that sheet is public. The `hidden` column keeps a row
+     off this page; it does NOT keep it secret. */
+  :root{ --eat:#f2704a; --eat-dim:#3a1409; }
+  :root[data-theme="light"]{ --eat:#c4441c; --eat-dim:#fbe3da; }
+  [hidden]{display:none !important}
+
+  .page{max-width:1500px;margin:0 auto;padding:calc(var(--nav-h) + 2rem) var(--pad) 4rem}
+  .hero{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.2rem 2.5rem}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}
+  .hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,3.1rem);line-height:1;letter-spacing:-.03em}
+  .hero .cap{margin-top:.55rem;font-size:.86rem;color:var(--muted);max-width:50ch;line-height:1.6}
+
+  .owner-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:0 1.15rem;
+             font:inherit;font-size:.82rem;font-weight:500;border-radius:999px;cursor:pointer;
+             background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+  .owner-btn:hover{border-color:var(--eat);color:var(--eat)}
+  .owner-btn.on{background:var(--eat-dim);border-color:var(--eat);color:var(--eat)}
+
+  .stats{display:grid;grid-template-columns:repeat(5,auto);gap:1rem 2.2rem;margin-top:1.8rem;padding:1.3rem 0;
+         border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .stat b{display:block;font-family:'Fraunces',serif;font-weight:700;font-size:1.85rem;line-height:1;color:var(--text)}
+  .stat span{display:block;margin-top:.32rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .stat em{display:block;margin-top:.2rem;font-style:normal;font-size:.72rem;color:var(--muted2)}
+  @media(max-width:1100px){.stats{grid-template-columns:repeat(3,auto)}}
+  @media(max-width:620px){
+    .stats{display:flex;flex-wrap:nowrap;gap:.5rem;margin-top:1.3rem;padding:.9rem 0;overflow-x:auto;scrollbar-width:none}
+    .stats::-webkit-scrollbar{display:none}
+    .stat{flex:none;display:flex;align-items:baseline;gap:.42rem;padding:.45rem .85rem;background:var(--surface);
+          border:1px solid var(--border);border-radius:999px;white-space:nowrap}
+    .stat b{display:inline;font-size:1rem}
+    .stat span{display:inline;margin-top:0}
+    .stat em{display:none}
+  }
+
+  .controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.9rem 1.4rem;margin-top:1.5rem}
+  .search{position:relative;flex:1 1 20rem;max-width:26rem}
+  .search svg{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--muted2);pointer-events:none}
+  .search input{width:100%;min-height:44px;font:inherit;font-size:.88rem;color:var(--text);background:var(--surface);
+                border:1px solid var(--border);border-radius:999px;padding:0 2.6rem;outline:none}
+  .search input:focus{border-color:var(--eat)}
+  .search input::-webkit-search-cancel-button{display:none}
+  .q-clear{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;border-radius:50%;
+           background:none;color:var(--muted);font-size:.9rem;cursor:pointer}
+
+  .views{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:999px}
+  .views button{font:inherit;font-size:.8rem;font-weight:500;min-height:36px;padding:0 1.05rem;border:0;border-radius:999px;
+                background:none;color:var(--muted);cursor:pointer}
+  .views button[aria-pressed="true"]{background:var(--eat-dim);color:var(--eat)}
+
+  .chips{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:1rem}
+  .chips .lbl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:.2rem}
+  .chip{font:inherit;font-size:.78rem;font-weight:500;min-height:34px;padding:0 .85rem;border-radius:999px;cursor:pointer;
+        background:transparent;border:1px solid var(--border);color:var(--muted)}
+  .chip:hover{border-color:var(--muted);color:var(--text)}
+  .chip[aria-pressed="true"]{background:var(--eat-dim);border-color:var(--eat);color:var(--eat)}
+  .chip i{font-style:normal;opacity:.6;margin-left:.3rem}
+  @media(max-width:620px){
+    .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:.2rem}
+    .chips::-webkit-scrollbar{display:none}
+    .chip,.chips .lbl{flex:none}
+    .controls{gap:.7rem}
+    .search{flex:1 1 100%;max-width:none}
+    .views{width:100%}
+    .views button{flex:1}
+  }
+
+  /* gallery */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:1.1rem;margin-top:1.7rem}
+  .shot{position:relative;display:block;overflow:hidden;border-radius:12px;border:1px solid var(--border);
+        background:var(--surface2);padding:0;cursor:pointer;aspect-ratio:3/4;width:100%;text-align:left}
+  .shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease}
+  .shot:hover img{transform:scale(1.04)}
+  .shot .scrim{position:absolute;inset:auto 0 0 0;padding:2.6rem .9rem .8rem;display:flex;flex-direction:column;gap:.15rem;
+               background:linear-gradient(to top,rgba(6,10,8,.95) 18%,rgba(6,10,8,0) 100%)}
+  .shot .dish{font-family:'Fraunces',serif;font-weight:700;font-size:1rem;line-height:1.2;color:#fff}
+  .shot .where{font-size:.72rem;color:#c3d0c4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .shot .rate{margin-top:.2rem;font-size:.62rem;letter-spacing:.16em;color:var(--eat)}
+  @media(max-width:620px){
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:1.2rem}
+    .shot .dish{font-size:.86rem}
+    .shot .where{font-size:.66rem}
+    .shot .scrim{padding:2rem .6rem .6rem}
+  }
+  .shot .flag{position:absolute;top:.6rem;right:.6rem;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+              padding:.2rem .5rem;border-radius:999px;background:rgba(6,10,8,.72);color:#f6d7cb}
+
+  /* journal */
+  .month{margin-top:2rem}
+  .month h2{display:flex;align-items:baseline;gap:.9rem;font-family:'Fraunces',serif;font-weight:700;font-size:1.25rem}
+  .month h2 small{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400}
+  .month h2::after{content:'';flex:1;height:1px;background:var(--border)}
+  .row{display:grid;grid-template-columns:4.4rem 76px minmax(0,1fr) auto;gap:0 1.1rem;align-items:center;width:100%;
+       padding:.9rem .3rem;border-bottom:1px solid var(--border);background:none;border-left:0;border-right:0;border-top:0;
+       text-align:left;font:inherit;color:inherit;cursor:pointer}
+  .row:hover{background:var(--surface)}
+  .row .day{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.06em;color:var(--muted)}
+  .row img{width:76px;height:76px;object-fit:cover;border-radius:9px;border:1px solid var(--border);display:block}
+  .row .mid{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+  .row .dish{font-family:'Fraunces',serif;font-weight:700;font-size:1.02rem;line-height:1.25}
+  .row .where{font-size:.76rem;color:var(--muted)}
+  .row .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.1rem}
+  .row .tags span{font-size:.64rem;padding:.1rem .55rem;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+  .row .end{display:flex;flex-direction:column;align-items:flex-end;gap:.3rem;text-align:right}
+  .row .rate{font-size:.68rem;letter-spacing:.16em;color:var(--eat)}
+  .row .kind{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+  @media(max-width:620px){
+    .row{grid-template-columns:62px minmax(0,1fr);gap:.1rem .8rem}
+    .row .day{grid-column:2;order:-1;margin-bottom:.1rem}
+    .row img{width:62px;height:62px;grid-row:span 3}
+    .row .end{align-items:flex-start;text-align:left;grid-column:2}
+  }
+
+  /* places */
+  .places{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:1.2rem;margin-top:1.7rem}
+  .place{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);
+         border-top:3px solid var(--eat);border-radius:12px;overflow:hidden}
+  .place .strip{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+  .place .strip button{padding:0;border:0;background:var(--surface2);cursor:pointer;aspect-ratio:1}
+  .place .strip img{width:100%;height:100%;object-fit:cover;display:block}
+  .place .body{padding:1.05rem 1.15rem 1.2rem;display:flex;flex-direction:column;gap:.75rem}
+  .place h2{font-family:'Fraunces',serif;font-weight:700;font-size:1.12rem;line-height:1.25}
+  .place .sub{margin-top:.25rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .place .count{flex:none;font-size:.66rem;font-weight:500;padding:.22rem .65rem;border-radius:999px;background:var(--eat-dim);color:var(--eat)}
+  .place ul{list-style:none;display:flex;flex-direction:column;gap:.42rem;border-top:1px solid var(--border);padding-top:.75rem}
+  .place li{display:flex;align-items:baseline;justify-content:space-between;gap:.7rem;font-size:.8rem}
+  .place li span:last-child{flex:none;font-size:.62rem;letter-spacing:.14em;color:var(--eat)}
+  .place .last{font-size:.72rem;color:var(--muted2)}
+
+  .empty{margin-top:3rem;text-align:center;color:var(--muted);font-size:.88rem}
+  .foot-note{margin-top:2.5rem;font-size:.72rem;line-height:1.75;color:var(--muted2);max-width:72ch}
+
+  /* detail */
+  .sheetwrap{position:fixed;inset:0;z-index:60;background:rgba(6,10,8,.84);backdrop-filter:blur(3px);display:grid;place-items:center;padding:1.1rem}
+  .sheet{width:min(1040px,100%);max-height:min(90vh,980px);display:flex;background:var(--surface);border:1px solid var(--border);
+         border-radius:16px;overflow:hidden}
+  .sheet .pic{position:relative;flex:1 1 56%;min-width:0;background:var(--surface2);display:flex;align-items:center;justify-content:center}
+  .sheet .pic img{width:100%;height:100%;object-fit:contain;display:block}
+  .sheet .nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;border-radius:50%;
+              background:rgba(6,10,8,.6);color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .sheet .nav.prev{left:.7rem} .sheet .nav.next{right:.7rem}
+  .sheet .meta{flex:1 1 44%;min-width:0;display:flex;flex-direction:column;gap:1.1rem;padding:1.5rem 1.6rem 1.4rem;overflow:auto}
+  .sheet .meta h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.75rem;line-height:1.1;letter-spacing:-.02em}
+  .sheet .when{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+  .sheet .close{position:absolute;top:.7rem;right:.7rem;width:44px;height:44px;border:0;border-radius:50%;background:rgba(6,10,8,.6);
+                color:#fff;font-size:1rem;cursor:pointer;z-index:2}
+  .sheet dl{display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:.6rem .9rem;border-top:1px solid var(--border);
+            border-bottom:1px solid var(--border);padding:1rem 0;font-size:.84rem}
+  .sheet dt{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-top:.15rem}
+  .sheet .note{font-size:.86rem;line-height:1.65;color:var(--text)}
+  .sheet .acts{margin-top:auto;display:flex;flex-wrap:wrap;gap:.55rem;padding-top:1.1rem;border-top:1px solid var(--border)}
+  .sheet .acts a,.sheet .acts button{display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 1rem;font:inherit;font-size:.78rem;
+       border:1px solid var(--border);border-radius:999px;background:var(--surface2);color:var(--muted);text-decoration:none;cursor:pointer}
+  .sheet .acts a:hover,.sheet .acts button:hover{border-color:var(--eat);color:var(--eat)}
+  @media(max-width:860px){
+    .sheet{flex-direction:column;max-height:92vh}
+    .sheet .pic{flex:none;height:44vh}
+    .sheet .meta{flex:1}
+  }
+
+  /* owner editing */
+  .edit{display:flex;flex-direction:column;gap:.75rem}
+  .edit label{display:flex;flex-direction:column;gap:.3rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;
+              letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .edit input,.edit select,.edit textarea{font:inherit;font-size:.86rem;color:var(--text);background:var(--surface2);
+              border:1px solid var(--border);border-radius:8px;padding:.5rem .7rem;min-height:40px;outline:none;letter-spacing:normal;text-transform:none}
+  .edit textarea{min-height:68px;resize:vertical}
+  .edit input:focus,.edit select:focus,.edit textarea:focus{border-color:var(--eat)}
+  .edit .pair{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+  .saveline{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+  .saveline button{min-height:44px;padding:0 1.2rem;font:inherit;font-size:.82rem;font-weight:500;border-radius:999px;cursor:pointer;
+                   background:var(--eat-dim);border:1px solid var(--eat);color:var(--eat)}
+  .saveline .msg{font-size:.76rem;color:var(--muted)}
+
+  .uploading{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:.6rem;
+             padding:.7rem 1.2rem;border-radius:999px;background:var(--surface);border:1px solid var(--eat);color:var(--text);font-size:.82rem}
+  .spin{width:14px;height:14px;border:2px solid var(--eat-dim);border-top-color:var(--eat);border-radius:50%;animation:sp .7s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media(prefers-reduced-motion:reduce){.spin{animation:none}.shot img{transition:none}}
+  </style>
+</head>
+<body>
+
+<deepu-nav active="eats"></deepu-nav>
+
+<main class="page">
+  <header class="hero">
+    <div>
+      <p class="kicker">Eats</p>
+      <h1>Everything I ate.</h1>
+      <p class="cap">Every plate worth photographing, where it was, and whether it was worth going back for.</p>
+    </div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+      <button type="button" class="owner-btn" id="add-btn" hidden>＋ Add photos</button>
+      <button type="button" class="owner-btn" id="key-btn" title="Sign in to add or edit">🔑</button>
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search dishes and places</label>
+      <input type="search" id="q" placeholder="paneer, Nainital, pasta…" autocomplete="off">
+      <button type="button" class="q-clear" id="q-clear" aria-label="Clear search" hidden>✕</button>
+    </div>
+    <div class="views" role="group" aria-label="View">
+      <button type="button" data-view="gallery" aria-pressed="true">Gallery</button>
+      <button type="button" data-view="journal" aria-pressed="false">Journal</button>
+      <button type="button" data-view="places" aria-pressed="false">Places</button>
+    </div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <div id="body"></div>
+  <p class="foot-note" id="foot"></p>
+</main>
+
+<div class="sheetwrap" id="detail" role="dialog" aria-modal="true" aria-labelledby="d-dish" hidden>
+  <div class="sheet">
+    <div class="pic">
+      <img id="d-img" alt="">
+      <button type="button" class="nav prev" id="d-prev" aria-label="Previous">‹</button>
+      <button type="button" class="nav next" id="d-next" aria-label="Next">›</button>
+      <button type="button" class="close" id="d-close" aria-label="Close">✕</button>
+    </div>
+    <div class="meta" id="d-meta"></div>
+  </div>
+</div>
+
+<input type="file" id="picker" accept="image/*" multiple hidden>
+<div class="uploading" id="busy" hidden><span class="spin"></span><span id="busy-text">Working…</span></div>
+
+<script src="assets/js/nav.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+/* ── where the data lives ─────────────────────────────────────────── */
+const SHEET_ID  = '1ZF2fWjuMfhxuIdSZhGeX-LV3gdi1Ifzox9PaPmidLIg';
+const TAB       = 'Dishes';
+const FOLDER_ID = '1APFYiFcByZ7yhYpV1NgwdUzv3oGIRG__';
+const CLIENT_ID = '501650994787-u2dosea47cv134ohefsjbskj6rc6qo5u.apps.googleusercontent.com';
+const SCOPES    = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive';
+const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TAB)}`;
+const MAX_EDGE  = 1600;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const photoURL = (id, w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+/* Drive serves the same file from a second host; if one is throttled the
+   other usually answers, so every <img> falls back once. */
+const photoAlt = (id, w) => `https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w${w}`;
+const imgTag = (id, w, cls, alt) =>
+  `<img src="${photoURL(id, w)}" alt="${esc(alt || '')}" loading="lazy" decoding="async"${cls ? ` class="${cls}"` : ''}
+        onerror="this.onerror=null;this.src='${photoAlt(id, w)}'">`;
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const KINDS  = ['restaurant','cafe','street','home','ashram','hotel','train','flight','wedding','other'];
+
+let DISHES = [], owner = false, token = null, tokenClient = null;
+const state = { view: 'gallery', q: '', tag: null, open: null };
+try { const v = localStorage.getItem('deepu-eats-view'); if (v) state.view = v; } catch (e) {}
+
+/* ── CSV ──────────────────────────────────────────────────────────── */
+function parseCSV(text){
+  const rows = []; let row = [], cell = '', quoted = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (quoted){
+      if (c === '"'){ if (text[i + 1] === '"'){ cell += '"'; i++; } else quoted = false; }
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ','){ row.push(cell); cell = ''; }
+    else if (c === '\n'){ row.push(cell); rows.push(row); row = []; cell = ''; }
+    else if (c !== '\r') cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+function toDate(s){
+  const m = String(s).match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  const d = new Date(s);
+  return isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+const fmtDay   = d => d ? `${+d.slice(8, 10)} ${MONTHS[+d.slice(5, 7) - 1]}` : '';
+const fmtMonth = d => d ? `${MONTHS[+d.slice(5, 7) - 1]} ${d.slice(0, 4)}` : 'Undated';
+const dots     = n => n ? '●'.repeat(Math.min(5, n)) + '○'.repeat(Math.max(0, 5 - n)) : '';
+
+async function load(){
+  const res = await fetch(CSV_URL + '&cb=' + Date.now());
+  if (!res.ok) throw new Error('sheet ' + res.status);
+  const rows = parseCSV(await res.text()).filter(r => r.length > 1);
+  const head = rows.shift().map(h => h.trim().toLowerCase());
+  const at = name => head.indexOf(name);
+  DISHES = rows.map((r, i) => {
+    const get = n => { const k = at(n); return k < 0 ? '' : String(r[k] ?? '').trim(); };
+    const date = toDate(get('date'));
+    return {
+      _row: i + 2,
+      id: get('id') || `r${i + 2}`,
+      date, dish: get('dish'), place: get('place'), city: get('city'),
+      kind: get('kind').toLowerCase(), note: get('note'), who: get('with'),
+      tags: get('tags').split(',').map(t => t.trim()).filter(Boolean),
+      rating: parseInt(get('rating'), 10) || 0,
+      photo: (get('photo').match(/[-\w]{25,}/) || [get('photo')])[0],
+      hidden: /^(y|yes|true|1)$/i.test(get('hidden')),
+    };
+  }).filter(d => d.photo || d.dish);
+  DISHES.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+}
+
+/* ── filtering ────────────────────────────────────────────────────── */
+const norm = s => ' ' + String(s).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() + ' ';
+const hay  = d => norm([d.dish, d.place, d.city, d.kind, d.note, d.who, d.tags.join(' ')].join(' '));
+
+function visible(){
+  let out = DISHES.filter(d => owner || !d.hidden);
+  if (state.tag) out = out.filter(d => d.tags.some(t => t.toLowerCase() === state.tag.toLowerCase()));
+  const q = state.q.trim().toLowerCase();
+  if (q){
+    const words = q.split(/\s+/).filter(Boolean);
+    out = out.filter(d => { const h = hay(d); return words.every(w => h.includes(` ${w} `) || h.includes(` ${w}`)); });
+  }
+  return out;
+}
+
+/* ── render ───────────────────────────────────────────────────────── */
+function renderStats(){
+  const all = DISHES.filter(d => owner || !d.hidden);
+  const year = String(new Date().getFullYear());
+  const places = new Set(all.map(d => d.place).filter(Boolean));
+  const cities = new Set(all.map(d => d.city).filter(Boolean));
+  const counts = {};
+  all.forEach(d => d.tags.forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  const best = all.filter(d => d.rating === 5).length;
+  const cards = [
+    [all.length, 'dishes', 'photographed'],
+    [places.size, places.size === 1 ? 'place' : 'places', `${cities.size} ${cities.size === 1 ? 'city' : 'cities'}`],
+    [all.filter(d => d.date.startsWith(year)).length, 'this year', year],
+    [best, 'five-star', 'going back'],
+    [top ? top[0] : '—', 'top tag', top ? `${top[1]} ${top[1] === 1 ? 'plate' : 'plates'}` : ''],
+  ];
+  $('stats').innerHTML = cards.map(([n, l, s]) =>
+    `<div class="stat"><b>${esc(n)}</b><span>${esc(l)}</span><em>${esc(s)}</em></div>`).join('');
+}
+
+function renderChips(){
+  const counts = {};
+  DISHES.filter(d => owner || !d.hidden).forEach(d => d.tags.forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+  const tags = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 12);
+  $('chips').innerHTML = `<span class="lbl">Tags</span>` +
+    `<button type="button" class="chip" data-tag="" aria-pressed="${!state.tag}">All</button>` +
+    tags.map(([t, n]) =>
+      `<button type="button" class="chip" data-tag="${esc(t)}" aria-pressed="${state.tag === t}">${esc(t)}<i>${n}</i></button>`).join('');
+}
+
+function renderGallery(list){
+  if (!list.length) return `<p class="empty">Nothing matches that yet.</p>`;
+  return `<div class="grid">` + list.map((d, i) => `
+    <button type="button" class="shot" data-open="${esc(d.id)}">
+      ${d.photo ? imgTag(d.photo, 600, '', d.dish) : ''}
+      ${d.hidden ? '<span class="flag">Hidden</span>' : ''}
+      <span class="scrim">
+        <span class="dish">${esc(d.dish || 'Unlabelled')}</span>
+        <span class="where">${esc([d.place, d.city].filter(Boolean).join(' · '))}</span>
+        <span class="rate">${fmtDay(d.date)}${d.rating ? ' · ' + dots(d.rating) : ''}</span>
+      </span>
+    </button>`).join('') + `</div>`;
+}
+
+function renderJournal(list){
+  if (!list.length) return `<p class="empty">Nothing matches that yet.</p>`;
+  const groups = [];
+  list.forEach(d => {
+    const key = fmtMonth(d.date);
+    const g = groups.find(x => x.key === key) || (groups.push({ key, rows: [] }), groups[groups.length - 1]);
+    g.rows.push(d);
+  });
+  return groups.map(g => {
+    const places = new Set(g.rows.map(r => r.place).filter(Boolean));
+    return `<section class="month">
+      <h2>${esc(g.key)} <small>${g.rows.length} ${g.rows.length === 1 ? 'dish' : 'dishes'} · ${places.size} ${places.size === 1 ? 'place' : 'places'}</small></h2>
+      ${g.rows.map(d => `
+        <button type="button" class="row" data-open="${esc(d.id)}">
+          <span class="day">${fmtDay(d.date)}</span>
+          ${d.photo ? imgTag(d.photo, 200, '', '') : '<span></span>'}
+          <span class="mid">
+            <span class="dish">${esc(d.dish || 'Unlabelled')}</span>
+            <span class="where">${esc([d.place, d.city].filter(Boolean).join(' · '))}</span>
+            <span class="tags">${d.tags.slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</span>
+          </span>
+          <span class="end"><span class="rate">${dots(d.rating)}</span><span class="kind">${esc(d.kind)}</span></span>
+        </button>`).join('')}
+    </section>`;
+  }).join('');
+}
+
+function renderPlaces(list){
+  if (!list.length) return `<p class="empty">Nothing matches that yet.</p>`;
+  const map = new Map();
+  list.forEach(d => {
+    const key = d.place || d.city || 'Somewhere';
+    if (!map.has(key)) map.set(key, { name: key, city: d.city, kind: d.kind, rows: [] });
+    map.get(key).rows.push(d);
+  });
+  const places = [...map.values()].sort((a, b) => b.rows.length - a.rows.length ||
+    (b.rows[0].date || '').localeCompare(a.rows[0].date || ''));
+  return `<div class="places">` + places.map(p => {
+    const shots = p.rows.filter(d => d.photo).slice(0, 3);
+    const seen = new Set();
+    const dishes = p.rows.filter(d => d.dish && !seen.has(d.dish.toLowerCase()) && seen.add(d.dish.toLowerCase())).slice(0, 5);
+    return `<article class="place">
+      <div class="strip">${shots.map(d =>
+        `<button type="button" data-open="${esc(d.id)}" aria-label="${esc(d.dish)}">${imgTag(d.photo, 300, '', d.dish)}</button>`).join('')}</div>
+      <div class="body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.7rem">
+          <div style="min-width:0"><h2>${esc(p.name)}</h2>
+            <p class="sub">${esc([p.city, p.kind].filter(Boolean).join(' · '))}</p></div>
+          <span class="count">${p.rows.length} ${p.rows.length === 1 ? 'dish' : 'dishes'}</span>
+        </div>
+        <ul>${dishes.map(d => `<li><span>${esc(d.dish)}</span><span>${dots(d.rating)}</span></li>`).join('')}</ul>
+        <p class="last">Last eaten ${esc(fmtDay(p.rows[0].date))} ${esc((p.rows[0].date || '').slice(0, 4))}</p>
+      </div>
+    </article>`;
+  }).join('') + `</div>`;
+}
+
+function render(){
+  document.querySelectorAll('.views button').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+  const list = visible();
+  $('body').innerHTML = state.view === 'journal' ? renderJournal(list)
+                      : state.view === 'places'  ? renderPlaces(list)
+                      : renderGallery(list);
+  renderStats(); renderChips();
+  $('q-clear').hidden = !state.q;
+  const n = DISHES.filter(d => owner || !d.hidden).length;
+  $('foot').innerHTML = `${n} ${n === 1 ? 'dish' : 'dishes'} in the log. Photos live in a Google Drive folder and the log is a Google Sheet; `
+    + `both are read straight from this page, no account needed. Only I can add to them.`;
+}
+
+/* ── detail ───────────────────────────────────────────────────────── */
+function metaView(d){
+  const facts = [['Place', d.place], ['City', d.city], ['Kind', d.kind], ['With', d.who]]
+    .filter(([, v]) => v).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  return `
+    <p class="when">${esc(d.date ? `${fmtDay(d.date)} ${d.date.slice(0, 4)}` : 'Undated')}${d.kind ? ' · ' + esc(d.kind) : ''}</p>
+    <h2 id="d-dish">${esc(d.dish || 'Unlabelled')}</h2>
+    ${d.rating ? `<p style="color:var(--eat);letter-spacing:.2em">${dots(d.rating)}</p>` : ''}
+    ${facts ? `<dl>${facts}</dl>` : ''}
+    ${d.tags.length ? `<div class="chips" style="margin:0">${d.tags.map(t => `<span class="chip" style="cursor:default">${esc(t)}</span>`).join('')}</div>` : ''}
+    ${d.note ? `<p class="note">${esc(d.note)}</p>` : ''}
+    <div class="acts">
+      ${d.photo ? `<a href="https://drive.google.com/file/d/${esc(d.photo)}/view" target="_blank" rel="noopener">Open photo ↗</a>` : ''}
+      ${d.place ? `<button type="button" id="d-place">All at ${esc(d.place)}</button>` : ''}
+      ${owner ? `<button type="button" id="d-edit">Edit</button>` : ''}
+    </div>`;
+}
+
+function metaEdit(d){
+  const opt = KINDS.map(k => `<option value="${k}"${k === d.kind ? ' selected' : ''}>${k}</option>`).join('');
+  return `<div class="edit">
+    <label>Dish<input id="e-dish" value="${esc(d.dish)}" placeholder="What was it?"></label>
+    <div class="pair">
+      <label>Place<input id="e-place" value="${esc(d.place)}"></label>
+      <label>City<input id="e-city" value="${esc(d.city)}"></label>
+    </div>
+    <div class="pair">
+      <label>Date<input id="e-date" type="date" value="${esc(d.date)}"></label>
+      <label>Kind<select id="e-kind">${opt}</select></label>
+    </div>
+    <div class="pair">
+      <label>Rating<select id="e-rating">${[0,1,2,3,4,5].map(n =>
+        `<option value="${n}"${n === d.rating ? ' selected' : ''}>${n ? dots(n) : '—'}</option>`).join('')}</select></label>
+      <label>With<input id="e-with" value="${esc(d.who)}"></label>
+    </div>
+    <label>Tags<input id="e-tags" value="${esc(d.tags.join(', '))}" placeholder="Starter, Veg, Chinese"></label>
+    <label>Note<textarea id="e-note">${esc(d.note)}</textarea></label>
+    <label style="flex-direction:row;align-items:center;gap:.5rem">
+      <input type="checkbox" id="e-hidden" style="min-height:0;width:auto"${d.hidden ? ' checked' : ''}> Keep off the page
+    </label>
+    <div class="saveline">
+      <button type="button" id="e-save">Save</button>
+      <button type="button" id="e-cancel" style="background:none;border-color:var(--border);color:var(--muted)">Cancel</button>
+      <span class="msg" id="e-msg"></span>
+    </div>
+  </div>`;
+}
+
+function openDetail(id){
+  const d = visible().find(x => x.id === id); if (!d) return;
+  state.open = id;
+  $('d-img').src = d.photo ? photoURL(d.photo, 1600) : '';
+  $('d-img').onerror = () => { $('d-img').onerror = null; if (d.photo) $('d-img').src = photoAlt(d.photo, 1600); };
+  $('d-img').alt = d.dish || 'Dish photo';
+  $('d-meta').innerHTML = metaView(d);
+  $('detail').hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('d-close').focus();
+}
+function closeDetail(){
+  state.open = null; $('detail').hidden = true; $('d-img').src = ''; document.body.style.overflow = '';
+}
+function step(n){
+  const list = visible(); const i = list.findIndex(x => x.id === state.open);
+  if (i < 0) return; openDetail(list[(i + n + list.length) % list.length].id);
+}
+
+/* ── signing in ───────────────────────────────────────────────────── */
+function ensureToken(){
+  return new Promise((resolve, reject) => {
+    if (token) return resolve(token);
+    if (!window.google || !google.accounts) return reject(new Error('Google sign-in is still loading — try again in a moment.'));
+    tokenClient = tokenClient || google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID, scope: SCOPES, callback: () => {},
+    });
+    tokenClient.callback = r => {
+      if (r && r.access_token){ token = r.access_token; resolve(token); }
+      else reject(new Error('Sign-in was cancelled.'));
+    };
+    tokenClient.requestAccessToken({ prompt: token ? '' : 'consent' });
+  });
+}
+
+async function signIn(){
+  try {
+    await ensureToken();
+    owner = true;
+    $('key-btn').classList.add('on');
+    $('key-btn').textContent = '🔓';
+    $('key-btn').title = 'Signed in';
+    $('add-btn').hidden = false;
+    render();
+  } catch (err){ alert(err.message); }
+}
+
+/* ── uploading ────────────────────────────────────────────────────── */
+const busy = text => { $('busy-text').textContent = text; $('busy').hidden = false; };
+const idle = () => { $('busy').hidden = true; };
+
+/* A JPEG's EXIF block carries the moment the shutter fired. Read it
+   before the canvas re-encode, which drops EXIF — including the GPS
+   fix, which has no business on a public page. */
+function exifDate(buf){
+  try {
+    const v = new DataView(buf);
+    if (v.getUint16(0) !== 0xFFD8) return '';
+    let off = 2;
+    while (off < v.byteLength - 4){
+      if (v.getUint8(off) !== 0xFF) break;
+      const marker = v.getUint8(off + 1), size = v.getUint16(off + 2);
+      if (marker === 0xE1 && v.getUint32(off + 4) === 0x45786966){
+        const tiff = off + 10, little = v.getUint16(tiff) === 0x4949;
+        const u16 = p => v.getUint16(p, little), u32 = p => v.getUint32(p, little);
+        const walk = dir => {
+          const n = u16(dir);
+          for (let i = 0; i < n; i++){
+            const e = dir + 2 + i * 12, tag = u16(e);
+            if (tag === 0x8769) { const r = walk(tiff + u32(e + 8)); if (r) return r; }
+            if (tag === 0x9003 || tag === 0x0132){
+              let s = '', p = tiff + u32(e + 8);
+              for (let k = 0; k < 19; k++) s += String.fromCharCode(v.getUint8(p + k));
+              const m = s.match(/(\d{4}):(\d{2}):(\d{2})/);
+              if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+            }
+          }
+          return '';
+        };
+        return walk(tiff + u32(tiff + 4));
+      }
+      if (marker === 0xD9 || marker === 0xDA) break;
+      off += 2 + size;
+    }
+  } catch (e) {}
+  return '';
+}
+
+function shrink(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => b ? resolve(b) : reject(new Error('Could not read that image.')), 'image/jpeg', 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image.')); };
+    img.src = url;
+  });
+}
+
+async function driveUpload(blob, name){
+  const meta = { name, parents: [FOLDER_ID], mimeType: 'image/jpeg' };
+  const body = new FormData();
+  body.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+  body.append('file', blob);
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + token }, body,
+  });
+  if (!res.ok) throw new Error('Drive refused the upload (' + res.status + ').');
+  return (await res.json()).id;
+}
+
+async function sheetAppend(values){
+  const res = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(TAB)}!A:L:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+    { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [values] }) });
+  if (!res.ok) throw new Error('The sheet refused the row (' + res.status + ').');
+}
+
+async function sheetUpdate(row, values){
+  const res = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(TAB)}!A${row}:L${row}?valueInputOption=USER_ENTERED`,
+    { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [values] }) });
+  if (!res.ok) throw new Error('The sheet refused the change (' + res.status + ').');
+}
+
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+async function addPhotos(files){
+  await ensureToken();
+  let done = 0;
+  for (const file of files){
+    busy(`Uploading ${++done} of ${files.length}…`);
+    const taken = exifDate(await file.arrayBuffer()) || todayISO();
+    const blob = await shrink(file);
+    const slug = (file.name.replace(/\.[^.]+$/, '') || 'photo').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
+    const fileId = await driveUpload(blob, `${taken}-${slug}.jpg`);
+    await sheetAppend([`${taken}-${Math.random().toString(36).slice(2, 6)}`, taken, '', '', '', '', '', '', '', '', fileId, 'yes']);
+  }
+  busy('Reloading…');
+  await load(); render(); idle();
+  const first = DISHES.find(d => d.hidden);
+  if (first) openDetail(first.id), setTimeout(() => { const b = $('d-edit'); if (b) b.click(); }, 60);
+}
+
+async function saveEdit(d){
+  const tags = $('e-tags').value.split(',').map(s => s.trim()).filter(Boolean).join(', ');
+  const vals = [d.id, $('e-date').value, $('e-dish').value.trim(), $('e-place').value.trim(), $('e-city').value.trim(),
+                $('e-kind').value, tags, $('e-rating').value === '0' ? '' : $('e-rating').value,
+                $('e-with').value.trim(), $('e-note').value.trim(), d.photo, $('e-hidden').checked ? 'yes' : ''];
+  $('e-msg').textContent = 'Saving…';
+  await sheetUpdate(d._row, vals);
+  await load(); render();
+  if (DISHES.some(x => x.id === d.id)) openDetail(d.id); else closeDetail();
+}
+
+/* ── events ───────────────────────────────────────────────────────── */
+document.addEventListener('click', e => {
+  const v = e.target.closest('.views button');
+  if (v){ state.view = v.dataset.view; try { localStorage.setItem('deepu-eats-view', state.view); } catch (err){} render(); return; }
+
+  const chip = e.target.closest('.chips [data-tag]');
+  if (chip){ state.tag = chip.dataset.tag || null; render(); return; }
+
+  const open = e.target.closest('[data-open]');
+  if (open){ openDetail(open.dataset.open); return; }
+
+  if (e.target.closest('#d-close') || e.target.id === 'detail'){ closeDetail(); return; }
+  if (e.target.closest('#d-prev')){ step(-1); return; }
+  if (e.target.closest('#d-next')){ step(1); return; }
+  if (e.target.closest('#q-clear')){ state.q = ''; $('q').value = ''; render(); return; }
+  if (e.target.closest('#key-btn')){ signIn(); return; }
+  if (e.target.closest('#add-btn')){ $('picker').click(); return; }
+
+  if (e.target.closest('#d-place')){
+    const d = DISHES.find(x => x.id === state.open);
+    if (d){ closeDetail(); state.q = d.place; $('q').value = d.place; state.tag = null; render(); }
+    return;
+  }
+  if (e.target.closest('#d-edit')){
+    const d = DISHES.find(x => x.id === state.open);
+    if (d) $('d-meta').innerHTML = metaEdit(d);
+    return;
+  }
+  if (e.target.closest('#e-cancel')){ openDetail(state.open); return; }
+  if (e.target.closest('#e-save')){
+    const d = DISHES.find(x => x.id === state.open);
+    if (d) saveEdit(d).catch(err => { $('e-msg').textContent = err.message; });
+    return;
+  }
+});
+
+$('q').addEventListener('input', e => { state.q = e.target.value; render(); });
+$('picker').addEventListener('change', e => {
+  const files = [...e.target.files]; e.target.value = '';
+  if (files.length) addPhotos(files).catch(err => { idle(); alert(err.message); });
+});
+document.addEventListener('keydown', e => {
+  if ($('detail').hidden) return;
+  if (e.key === 'Escape') closeDetail();
+  if (e.key === 'ArrowLeft') step(-1);
+  if (e.key === 'ArrowRight') step(1);
+});
+
+load().then(render).catch(err => {
+  $('body').innerHTML = `<p class="empty">Could not load the dish log.<br><small>${esc(err.message)}</small></p>`;
+});
+</script>
+</body>
+</html>

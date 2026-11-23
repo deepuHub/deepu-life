@@ -20,6 +20,7 @@
     { key: 'exam',     href: 'exam.html',                   icon: '🧮', label: 'Exams',         group: 'public',  desc: 'Practice tests, auto-scored' },
     { key: 'marathon', href: 'half-marathon.html',          icon: '🏅', label: 'Half Marathon', group: 'public',  desc: 'Training plan and race countdown' },
     { key: 'food',     href: 'food.html',                   icon: '🍽️', label: 'Food',          group: 'public',  desc: 'Run-day fuel, fish and eating out' },
+    { key: 'eats',     href: 'eats.html',                   icon: '🍛', label: 'Eats',          group: 'public',  desc: 'Photo log of everything I ate' },
     { key: 'piepoints',href: 'https://pie-pulse-play.lovable.app', icon: '🥧', label: 'PiePoints', group: 'public',  desc: 'Score tracker, opens in new tab', external: true },
     { key: 'kid',      href: 'kid-private.html',            icon: '🎒', label: 'Kid',           group: 'private', desc: 'Report cards and CA results' },
     { key: 'races',    href: 'races-private.html',          icon: '🏅', label: 'Races',         group: 'private', desc: 'Race results, certificates and splits' },
