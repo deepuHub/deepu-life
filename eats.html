@@ -193,6 +193,35 @@
                    background:var(--eat-dim);border:1px solid var(--eat);color:var(--eat)}
   .saveline .msg{font-size:.76rem;color:var(--muted)}
 
+  .addbox{flex-direction:column;width:min(680px,100%);max-height:92vh}
+  .addhead{display:flex;align-items:center;gap:1rem;padding:1rem 1.3rem;border-bottom:1px solid var(--border)}
+  .addhead h2{flex:1;font-family:'Fraunces',serif;font-weight:700;font-size:1.15rem}
+  .addhead .x{width:44px;height:44px;border:0;border-radius:50%;background:none;color:var(--muted);font-size:1rem;cursor:pointer}
+  .addbody{flex:1;min-height:0;overflow:auto;padding:1.2rem 1.3rem 1.4rem;display:flex;flex-direction:column;gap:1rem}
+  .drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;min-height:120px;padding:1.2rem;
+        border:1px dashed var(--border);border-radius:12px;background:var(--surface2);color:var(--muted);font-size:.84rem;
+        text-align:center;cursor:pointer;width:100%;font-family:inherit}
+  .drop:hover{border-color:var(--eat);color:var(--eat)}
+  .picked{display:flex;flex-direction:column;gap:.6rem}
+  .pick{display:grid;grid-template-columns:62px minmax(0,1fr) 36px;gap:.7rem;align-items:center}
+  .pick img{width:62px;height:62px;object-fit:cover;border-radius:9px;border:1px solid var(--border)}
+  .pick input{font:inherit;font-size:.86rem;color:var(--text);background:var(--surface2);border:1px solid var(--border);
+              border-radius:8px;padding:.5rem .7rem;min-height:42px;width:100%;box-sizing:border-box;outline:none}
+  .pick input:focus{border-color:var(--eat)}
+  .pick .drop-one{width:36px;height:36px;border:0;border-radius:50%;background:none;color:var(--muted);font-size:.95rem;cursor:pointer}
+  .shared{display:flex;flex-direction:column;gap:.7rem;border-top:1px solid var(--border);padding-top:1rem}
+  .shared input,.shared select{font:inherit;font-size:.86rem;color:var(--text);background:var(--surface2);
+          border:1px solid var(--border);border-radius:8px;padding:.5rem .7rem;min-height:42px;width:100%;
+          box-sizing:border-box;outline:none;color-scheme:dark}
+  :root[data-theme="light"] .shared input,:root[data-theme="light"] .shared select,
+  :root[data-theme="light"] .edit input,:root[data-theme="light"] .edit select,
+  :root[data-theme="light"] .edit textarea,:root[data-theme="light"] .pick input{color-scheme:light}
+  .shared input:focus,.shared select:focus{border-color:var(--eat)}
+  .shared a{color:var(--eat)}
+  .edit input,.edit select,.edit textarea,.pick input{color-scheme:dark}
+  .shared .hint{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .err{font-size:.8rem;line-height:1.55;color:#ff9b7a;background:var(--eat-dim);border:1px solid var(--eat);border-radius:10px;padding:.7rem .9rem}
+  .err a{color:inherit}
   .uploading{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:.6rem;
              padding:.7rem 1.2rem;border-radius:999px;background:var(--surface);border:1px solid var(--eat);color:var(--text);font-size:.82rem}
   .spin{width:14px;height:14px;border:2px solid var(--eat-dim);border-top-color:var(--eat);border-radius:50%;animation:sp .7s linear infinite}
@@ -212,7 +241,8 @@
       <p class="cap">Every plate worth photographing, where it was, and whether it was worth going back for.</p>
     </div>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-      <button type="button" class="owner-btn" id="add-btn" hidden>＋ Add photos</button>
+      <a class="owner-btn" id="sheet-btn" href="https://docs.google.com/spreadsheets/d/1ZF2fWjuMfhxuIdSZhGeX-LV3gdi1Ifzox9PaPmidLIg/edit" target="_blank" rel="noopener" hidden>Open the sheet ↗</a>
+      <button type="button" class="owner-btn" id="add-btn" hidden>＋ Add dishes</button>
       <button type="button" class="owner-btn" id="key-btn" title="Sign in to add or edit">🔑</button>
     </div>
   </header>
@@ -247,6 +277,16 @@
       <button type="button" class="close" id="d-close" aria-label="Close">✕</button>
     </div>
     <div class="meta" id="d-meta"></div>
+  </div>
+</div>
+
+<div class="sheetwrap" id="addwrap" role="dialog" aria-modal="true" aria-labelledby="a-title" hidden>
+  <div class="sheet addbox">
+    <header class="addhead">
+      <h2 id="a-title">Add dishes</h2>
+      <button type="button" class="x" id="a-close" aria-label="Close">✕</button>
+    </header>
+    <div class="addbody" id="a-body"></div>
   </div>
 </div>
 
@@ -539,8 +579,17 @@ function ensureToken(){
       client_id: CLIENT_ID, scope: SCOPES, callback: () => {},
     });
     tokenClient.callback = r => {
-      if (r && r.access_token){ token = r.access_token; resolve(token); }
-      else reject(new Error('Sign-in was cancelled.'));
+      if (!r || !r.access_token) return reject(new Error('Sign-in was cancelled.'));
+      /* Google lets a person untick individual permissions on the consent
+         screen, so a token can come back missing the one we need. */
+      const granted = String(r.scope || '').split(' ');
+      const missing = SCOPES.split(' ').filter(s => !granted.includes(s));
+      if (missing.length && r.scope){
+        return reject(new Error('Sign-in went through, but the '
+          + (missing.some(m => m.includes('drive')) ? 'Google Drive' : 'Google Sheets')
+          + ' permission was not granted. Sign in again and leave every box ticked.'));
+      }
+      token = r.access_token; resolve(token);
     };
     tokenClient.requestAccessToken({ prompt: token ? '' : 'consent' });
   });
@@ -554,6 +603,7 @@ async function signIn(){
     $('key-btn').textContent = '🔓';
     $('key-btn').title = 'Signed in';
     $('add-btn').hidden = false;
+    $('sheet-btn').hidden = false;
     render();
   } catch (err){ alert(err.message); }
 }
@@ -615,6 +665,14 @@ function shrink(file){
   });
 }
 
+async function apiError(res, what){
+  let detail = '';
+  try { const j = await res.json(); detail = (j.error && j.error.message) || ''; } catch (e) {}
+  const err = new Error(`${what} (${res.status})${detail ? ': ' + detail : ''}`);
+  err.status = res.status; err.detail = detail;
+  return err;
+}
+
 async function driveUpload(blob, name){
   const meta = { name, parents: [FOLDER_ID], mimeType: 'image/jpeg' };
   const body = new FormData();
@@ -623,16 +681,16 @@ async function driveUpload(blob, name){
   const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
     method: 'POST', headers: { Authorization: 'Bearer ' + token }, body,
   });
-  if (!res.ok) throw new Error('Drive refused the upload (' + res.status + ').');
+  if (!res.ok) throw await apiError(res, 'Drive refused the upload');
   return (await res.json()).id;
 }
 
-async function sheetAppend(values){
+async function sheetAppend(rows){
   const res = await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(TAB)}!A:L:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
     { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [values] }) });
-  if (!res.ok) throw new Error('The sheet refused the row (' + res.status + ').');
+      body: JSON.stringify({ values: rows }) });
+  if (!res.ok) throw await apiError(res, 'The sheet refused the row');
 }
 
 async function sheetUpdate(row, values){
@@ -640,26 +698,100 @@ async function sheetUpdate(row, values){
     `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(TAB)}!A${row}:L${row}?valueInputOption=USER_ENTERED`,
     { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [values] }) });
-  if (!res.ok) throw new Error('The sheet refused the change (' + res.status + ').');
+  if (!res.ok) throw await apiError(res, 'The sheet refused the change');
 }
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
-async function addPhotos(files){
-  await ensureToken();
-  let done = 0;
+/* The add form. Each photo carries its own dish name; everything else —
+   the place, the day, who you were with — is almost always the same across
+   one meal, so it is asked once and copied onto every row. */
+let PICKED = [];
+
+function openAdd(){
+  PICKED = [];
+  $('addwrap').hidden = false;
+  document.body.style.overflow = 'hidden';
+  drawAdd();
+}
+function closeAdd(){
+  PICKED.forEach(p => URL.revokeObjectURL(p.url));
+  PICKED = []; $('addwrap').hidden = true; document.body.style.overflow = '';
+}
+
+function drawAdd(err){
+  const last = DISHES[0] || {};
+  const keep = f => { const el = $(f); return el ? el.value : null; };
+  const v = { place: keep('a-place'), city: keep('a-city'), date: keep('a-date'),
+              kind: keep('a-kind'), tags: keep('a-tags'), who: keep('a-with') };
+  $('a-body').innerHTML = `
+    ${err ? `<p class="err">${err}</p>` : ''}
+    <button type="button" class="drop" id="a-pick">
+      <span style="font-size:1.4rem">＋</span>
+      <span>${PICKED.length ? 'Add more photos' : 'Choose photos from your phone'}</span>
+    </button>
+    ${PICKED.length ? `<div class="picked">${PICKED.map((p, i) => `
+      <div class="pick">
+        <img src="${p.url}" alt="">
+        <input id="a-dish-${i}" value="${esc(p.dish)}" placeholder="What was it? e.g. Paneer tikka">
+        <button type="button" class="drop-one" data-drop="${i}" aria-label="Remove this photo">✕</button>
+      </div>`).join('')}</div>` : ''}
+    <div class="shared">
+      <p class="hint">The same for ${PICKED.length === 1 ? 'this photo' : 'all these photos'}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+        <input id="a-place" value="${esc(v.place ?? last.place ?? '')}" placeholder="Place">
+        <input id="a-city" value="${esc(v.city ?? last.city ?? '')}" placeholder="City">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+        <input id="a-date" type="date" value="${esc(v.date ?? (PICKED[0] && PICKED[0].date) ?? todayISO())}">
+        <select id="a-kind">${KINDS.map(k =>
+          `<option value="${k}"${k === (v.kind ?? last.kind) ? ' selected' : ''}>${k}</option>`).join('')}</select>
+      </div>
+      <input id="a-tags" value="${esc(v.tags ?? '')}" placeholder="Tags, comma separated">
+      <input id="a-with" value="${esc(v.who ?? '')}" placeholder="With">
+      <div class="saveline">
+        <button type="button" id="a-save"${PICKED.length ? '' : ' disabled style="opacity:.45"'}>
+          Save${PICKED.length ? ` ${PICKED.length} ${PICKED.length === 1 ? 'dish' : 'dishes'}` : ''}</button>
+        <span class="msg" id="a-msg"></span>
+      </div>
+      <p style="font-size:.72rem;color:var(--muted2);line-height:1.6">
+        Ratings and notes come later — tap a photo on the page to add them. Or
+        <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit" target="_blank" rel="noopener">fill the sheet in by hand</a>.</p>
+    </div>`;
+  if (PICKED.length) setTimeout(() => { const f = $('a-dish-0'); if (f && !f.value) f.focus(); }, 30);
+}
+
+async function takeFiles(files){
   for (const file of files){
-    busy(`Uploading ${++done} of ${files.length}…`);
-    const taken = exifDate(await file.arrayBuffer()) || todayISO();
-    const blob = await shrink(file);
-    const slug = (file.name.replace(/\.[^.]+$/, '') || 'photo').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
-    const fileId = await driveUpload(blob, `${taken}-${slug}.jpg`);
-    await sheetAppend([`${taken}-${Math.random().toString(36).slice(2, 6)}`, taken, '', '', '', '', '', '', '', '', fileId, 'yes']);
+    if (!/^image\//.test(file.type)) continue;
+    const date = exifDate(await file.arrayBuffer()) || '';
+    PICKED.push({ file, url: URL.createObjectURL(file), dish: '', date });
   }
-  busy('Reloading…');
+  drawAdd();
+}
+
+async function saveAdd(){
+  if (!PICKED.length) return;
+  const place = $('a-place').value.trim(), city = $('a-city').value.trim();
+  const date = $('a-date').value || todayISO(), kind = $('a-kind').value;
+  const tags = $('a-tags').value.split(',').map(s => s.trim()).filter(Boolean).join(', ');
+  const who = $('a-with').value.trim();
+  const dishes = PICKED.map((p, i) => (($(`a-dish-${i}`) || {}).value || '').trim());
+
+  await ensureToken();
+  const rows = [];
+  for (let i = 0; i < PICKED.length; i++){
+    busy(`Uploading ${i + 1} of ${PICKED.length}…`);
+    const blob = await shrink(PICKED[i].file);
+    const slug = (dishes[i] || 'photo').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) || 'photo';
+    const fileId = await driveUpload(blob, `${date}-${slug}.jpg`);
+    rows.push([`${date}-${Math.random().toString(36).slice(2, 6)}`, date, dishes[i], place, city,
+               kind, tags, '', who, '', fileId, dishes[i] ? '' : 'yes']);
+  }
+  busy('Saving…');
+  await sheetAppend(rows);
+  closeAdd(); busy('Reloading…');
   await load(); render(); idle();
-  const first = DISHES.find(d => d.hidden);
-  if (first) openDetail(first.id), setTimeout(() => { const b = $('d-edit'); if (b) b.click(); }, 60);
 }
 
 async function saveEdit(d){
@@ -689,7 +821,12 @@ document.addEventListener('click', e => {
   if (e.target.closest('#d-next')){ step(1); return; }
   if (e.target.closest('#q-clear')){ state.q = ''; $('q').value = ''; render(); return; }
   if (e.target.closest('#key-btn')){ signIn(); return; }
-  if (e.target.closest('#add-btn')){ $('picker').click(); return; }
+  if (e.target.closest('#add-btn')){ openAdd(); return; }
+  if (e.target.closest('#a-close') || e.target.id === 'addwrap'){ closeAdd(); return; }
+  if (e.target.closest('#a-pick')){ $('picker').click(); return; }
+  const dropOne = e.target.closest('[data-drop]');
+  if (dropOne){ const i = +dropOne.dataset.drop; URL.revokeObjectURL(PICKED[i].url); PICKED.splice(i, 1); drawAdd(); return; }
+  if (e.target.closest('#a-save')){ saveAdd().catch(err => { idle(); drawAdd(explain(err)); }); return; }
 
   if (e.target.closest('#d-place')){
     const d = DISHES.find(x => x.id === state.open);
@@ -712,9 +849,27 @@ document.addEventListener('click', e => {
 $('q').addEventListener('input', e => { state.q = e.target.value; render(); });
 $('picker').addEventListener('change', e => {
   const files = [...e.target.files]; e.target.value = '';
-  if (files.length) addPhotos(files).catch(err => { idle(); alert(err.message); });
+  if (files.length) takeFiles(files).catch(err => drawAdd(esc(err.message)));
 });
+
+/* A bare status code tells nobody anything. Turn the Google refusals we
+   can recognise into the actual thing that has to be done about them. */
+function explain(err){
+  const m = esc(err.message || String(err));
+  const d = String(err.detail || '');
+  if (err.status === 403 && /has not been used in project|is disabled|accessNotConfigured/i.test(d))
+    return `${m}<br><br>The Drive API is switched off for this page's Google project. Turn it on once at `
+         + `<a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?project=501650994787" target="_blank" rel="noopener">`
+         + `console.cloud.google.com → Drive API → Enable</a>, give it a minute, then try again.`;
+  if (err.status === 403)
+    return `${m}<br><br>If that mentions permission or scope, the sign-in did not include write access to Drive: `
+         + `reload, sign in again, and leave every box ticked.`;
+  if (err.status === 401)
+    return `${m}<br><br>The sign-in expired. Reload the page and sign in again.`;
+  return m;
+}
 document.addEventListener('keydown', e => {
+  if (!$('addwrap').hidden){ if (e.key === 'Escape') closeAdd(); return; }
   if ($('detail').hidden) return;
   if (e.key === 'Escape') closeDetail();
   if (e.key === 'ArrowLeft') step(-1);
